@@ -3,11 +3,23 @@ import { vi } from 'vitest'
 
 // Mock IntersectionObserver
 class IntersectionObserver {
-    observe = vi.fn()
+    private readonly callback: IntersectionObserverCallback
+
+    observe = vi.fn((target: Element) => {
+        // Simulate the element being in view to unblock whileInView animations.
+        const entry = [{ isIntersecting: true, target }] as unknown as IntersectionObserverEntry[]
+        this.callback(entry, this)
+    })
     disconnect = vi.fn()
     unobserve = vi.fn()
-    takeRecords = vi.fn()
-    constructor() { }
+    takeRecords = vi.fn(() => [])
+    root: Element | Document | null = null
+    rootMargin: string = ''
+    thresholds: ReadonlyArray<number> = []
+
+    constructor(callback: IntersectionObserverCallback) {
+        this.callback = callback
+    }
 }
 
 Object.defineProperty(window, 'IntersectionObserver', {

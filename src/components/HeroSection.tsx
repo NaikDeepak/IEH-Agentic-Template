@@ -59,6 +59,7 @@ export const HeroSection: React.FC = () => {
                         <Search className="w-6 h-6 text-slate-400 mr-4 flex-shrink-0" />
 
                         <input
+                            aria-label="Job search"
                             type="text"
                             placeholder="Ex: Product Designer in Bangalore with 4+ years exp..."
                             className="flex-grow bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 text-lg py-2"
@@ -66,7 +67,9 @@ export const HeroSection: React.FC = () => {
 
                         <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 gap-2 text-slate-500">
                             <MapPin className="w-4 h-4" />
-                            <select className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer">
+                            <select
+                                aria-label="Location"
+                                className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer">
                                 <option>Remote</option>
                                 <option>Hybrid</option>
                                 <option>Office</option>
