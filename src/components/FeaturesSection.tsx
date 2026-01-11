@@ -17,21 +17,21 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, del
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay, type: "spring" }}
-            className={`relative p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group overflow-hidden ${className}`}
+            className={`relative p-8 bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1 group overflow-hidden ${className}`}
         >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative z-10">
                 <div className="flex justify-between items-start mb-6">
-                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-sky-500 group-hover:rotate-12 transition-all duration-300">
+                    <div className="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:rotate-6 transition-all duration-300">
                         {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
-                            className: "w-7 h-7 text-slate-900 group-hover:text-white transition-colors"
+                            className: "w-7 h-7 text-slate-700 group-hover:text-white transition-colors"
                         }) : icon}
                     </div>
-                    <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-sky-500 transition-colors opacity-0 group-hover:opacity-100" />
+                    <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">{title}</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{title}</h3>
                 <p className="text-slate-500 leading-relaxed font-medium">{description}</p>
             </div>
         </motion.div>
@@ -56,7 +56,7 @@ export const FeaturesSection: React.FC = () => {
                         viewport={{ once: true }}
                         className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
                     >
-                        Why Choose <span className="text-sky-600 underline decoration-4 decoration-sky-200 underline-offset-4">Active</span>?
+                        Why Choose <span className="text-indigo-600 underline decoration-4 decoration-indigo-200 underline-offset-4">Active</span>?
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}

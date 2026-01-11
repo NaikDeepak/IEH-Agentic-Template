@@ -6,10 +6,10 @@ describe('LandingPage', () => {
     it('assembles the hero and feature sections', () => {
         render(<LandingPage />);
 
-        // Check for Hero presence (Headline)
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Active/i);
+        // Check for Hero Section (Headline)
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Find your dream job/i);
 
-        // Check for Feature section presence (One of the feature cards)
-        expect(screen.getByText(/Active Ecosystem/i)).toBeInTheDocument();
+        // Check for Features Section (Section Title)
+        expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/Why Choose Active/i);
     });
 });

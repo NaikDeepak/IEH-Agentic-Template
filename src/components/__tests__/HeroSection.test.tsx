@@ -6,11 +6,13 @@ describe('HeroSection', () => {
     it('renders main headline and CTAs', () => {
         render(<HeroSection />);
 
-        // Check for "Active" keyword in headline (Core Differentiator)
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Active/i);
+        // Check for AI Search Badge
+        expect(screen.getByText(/AI-Powered Job Search/i)).toBeInTheDocument();
 
-        // Check for CTA Buttons
-        expect(screen.getByRole('button', { name: /Start Hiring/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /How it works/i })).toBeInTheDocument();
+        // Check for Search Input
+        expect(screen.getByPlaceholderText(/Ex: Product Designer/i)).toBeInTheDocument();
+
+        // Check for Search Button
+        expect(screen.getByRole('button', { name: /Search/i })).toBeInTheDocument();
     });
 });
