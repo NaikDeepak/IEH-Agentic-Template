@@ -68,8 +68,8 @@ export const HeroSection: React.FC = () => {
                             <MapPin className="w-4 h-4" />
                             <select className="bg-transparent border-none outline-none text-sm font-medium cursor-pointer">
                                 <option>Remote</option>
-                                <option>India</option>
-                                <option>Bangalore</option>
+                                <option>Hybrid</option>
+                                <option>Office</option>
                             </select>
                         </div>
 
