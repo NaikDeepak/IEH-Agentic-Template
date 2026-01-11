@@ -7,7 +7,7 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { AuthContext, type AuthContextType, type UserData } from './AuthContextType';
+import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<FirebaseUser | null>(null);
