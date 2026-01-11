@@ -12,9 +12,9 @@ Build a "Visionary" MVP of India Employment Hub, an AI-first recruitment platfor
 
 ### Phase 1: Foundation & Setup
 #### [NEW] Project Initialization
-- [ ] Initialize Next.js project with TypeScript.
-- [ ] Configure Tailwind CSS and generic Design System.
-- [ ] Setup `docs/` structure (Accomplished).
+- [x] Initialize Next.js project with TypeScript.
+- [x] Configure Tailwind CSS and generic Design System.
+- [x] Setup `docs/` structure (Accomplished).
 
 #### [NEW] Authentication
 - [ ] Document Auth Plan in `docs/features/auth.md`.
