@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     onAuthStateChanged,
     signInWithPopup,
@@ -13,54 +13,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState(true);
+    const didInitRef = useRef(false);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            setUser(user);
-            if (user) {
-                const fetchUserData = async () => {
-                    try {
-                        const userDocRef = doc(db, 'users', user.uid);
-                        const userDoc = await getDoc(userDocRef);
-                        if (userDoc.exists()) {
-                            setUserData(userDoc.data() as UserData);
-                            // Update last_login for existing users
-                            await updateDoc(userDocRef, {
-                                last_login: serverTimestamp()
-                            });
-                        } else {
-                            const newUserData: UserData = {
-                                uid: user.uid,
-                                email: user.email,
-                                displayName: user.displayName,
-                                photoURL: user.photoURL,
-                                role: null,
-                            };
-                            setUserData(newUserData);
+        // Prevent duplicate Firestore writes in dev StrictMode
+        if (didInitRef.current) return;
+        didInitRef.current = true;
 
-                            await setDoc(userDocRef, {
-                                ...newUserData,
-                                last_login: serverTimestamp(),
-                                created_at: serverTimestamp()
-                            }, { merge: true });
-                        }
-                    } catch (err: unknown) {
-                        const error = err as { code?: string; message?: string };
-                        console.error("Firestore Error:", error);
-                        // Handle "offline" error which usually means DB not created or API disabled
-                        if (error.code === 'unavailable' || error.message?.includes('offline')) {
-                            console.warn("Firestore database might not be initialized or API is disabled in this project.");
-                        }
+        let isMounted = true;
+
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!isMounted) return;
+            setUser(user);
+
+            if (user) {
+                try {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (!isMounted) return;
+
+                    if (userDoc.exists()) {
+                        setUserData(userDoc.data() as UserData);
+                        await updateDoc(userDocRef, {
+                            last_login: serverTimestamp()
+                        });
+                    } else {
+                        const newUserData: UserData = {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: user.displayName,
+                            photoURL: user.photoURL,
+                            role: null,
+                        };
+                        setUserData(newUserData);
+
+                        await setDoc(userDocRef, {
+                            ...newUserData,
+                            last_login: serverTimestamp(),
+                            created_at: serverTimestamp()
+                        }, { merge: true });
                     }
-                };
-                await fetchUserData();
+                } catch (err: unknown) {
+                    const error = err as { code?: string; message?: string };
+                    console.error("Firestore Error:", error);
+                    if (error.code === 'unavailable' || error.message?.includes('offline')) {
+                        console.warn("Firestore database might not be initialized or API is disabled in this project.");
+                    }
+                }
             } else {
                 setUserData(null);
             }
-            setLoading(false);
+
+            if (isMounted) setLoading(false);
         });
 
-        return () => unsubscribe();
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
     }, []);
 
     const loginWithGoogle = async () => {

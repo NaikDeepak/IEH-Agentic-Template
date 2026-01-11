@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../lib/firebase';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { UserCheck, Building2 } from 'lucide-react';
 
 export const RoleSelection: React.FC = () => {
@@ -11,10 +11,35 @@ export const RoleSelection: React.FC = () => {
         if (!user) return;
         try {
             const userDocRef = doc(db, 'users', user.uid);
-            await updateDoc(userDocRef, {
-                role,
-                updated_at: serverTimestamp()
+
+            await runTransaction(db, async (transaction) => {
+                const userDoc = await transaction.get(userDocRef);
+
+                if (!userDoc.exists()) {
+                    // Create doc if it happens to be missing
+                    transaction.set(userDocRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        role,
+                        created_at: serverTimestamp(),
+                        updated_at: serverTimestamp(),
+                        last_login: serverTimestamp()
+                    });
+                    return;
+                }
+
+                const data = userDoc.data() as { role?: string | null };
+                // Only set the role if it's currently null or undefined
+                if (!data.role) {
+                    transaction.update(userDocRef, {
+                        role,
+                        updated_at: serverTimestamp()
+                    });
+                }
             });
+
             // Manually refresh the user data in the context to update UI immediately
             await refreshUserData();
         } catch (error) {

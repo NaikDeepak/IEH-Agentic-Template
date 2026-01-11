@@ -17,13 +17,13 @@ Build a "Visionary" MVP of India Employment Hub, an AI-first recruitment platfor
 - [x] Setup `docs/` structure (Accomplished).
 
 #### [NEW] Authentication
-- [x] Document Auth Plan in `docs/features/auth.md`.
+- [x] Document Auth Plan in `docs/auth.md`.
 - [x] Implement `AuthController` for handling Sign Up / Sign In.
 - [x] Create `AuthContext` to manage user sessions.
 
 ### Phase 2: Core Platform UI (Frontend)
 #### [NEW] Landing Page
-- [ ] Document Landing Page Specs in `docs/features/landing.md`.
+- [ ] Document Landing Page Specs in `docs/landing.md`.
 - [ ] **Hero Section**: High-impact "Vision" slider/video.
 - [ ] **Problem/Solution**: Interactive components.
 - [ ] **Feature Highlights**: Cards for Active System, AI Assistant.
