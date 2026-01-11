@@ -18,25 +18,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setUser(user);
             if (user) {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists()) {
-                    setUserData(userDoc.data() as UserData);
-                } else {
-                    const newUserData: UserData = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL,
-                        role: null,
-                    };
-                    setUserData(newUserData);
+                const fetchUserData = async () => {
+                    try {
+                        const userDoc = await getDoc(doc(db, 'users', user.uid));
+                        if (userDoc.exists()) {
+                            setUserData(userDoc.data() as UserData);
+                        } else {
+                            const newUserData: UserData = {
+                                uid: user.uid,
+                                email: user.email,
+                                displayName: user.displayName,
+                                photoURL: user.photoURL,
+                                role: null,
+                            };
+                            setUserData(newUserData);
 
-                    await setDoc(doc(db, 'users', user.uid), {
-                        ...newUserData,
-                        last_login: serverTimestamp(),
-                        created_at: serverTimestamp()
-                    }, { merge: true });
-                }
+                            await setDoc(doc(db, 'users', user.uid), {
+                                ...newUserData,
+                                last_login: serverTimestamp(),
+                                created_at: serverTimestamp()
+                            }, { merge: true });
+                        }
+                    } catch (err: unknown) {
+                        const error = err as { code?: string; message?: string };
+                        console.error("Firestore Error:", error);
+                        // Handle "offline" error which usually means DB not created or API disabled
+                        if (error.code === 'unavailable' || error.message?.includes('offline')) {
+                            console.warn("Firestore database might not be initialized or API is disabled in this project.");
+                        }
+                    }
+                };
+                await fetchUserData();
             } else {
                 setUserData(null);
             }

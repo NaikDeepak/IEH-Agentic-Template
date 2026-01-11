@@ -17,9 +17,9 @@ Build a "Visionary" MVP of India Employment Hub, an AI-first recruitment platfor
 - [x] Setup `docs/` structure (Accomplished).
 
 #### [NEW] Authentication
-- [ ] Document Auth Plan in `docs/features/auth.md`.
-- [ ] Implement `AuthController` for handling Sign Up / Sign In.
-- [ ] Create `AuthContext` to manage user sessions.
+- [x] Document Auth Plan in `docs/features/auth.md`.
+- [x] Implement `AuthController` for handling Sign Up / Sign In.
+- [x] Create `AuthContext` to manage user sessions.
 
 ### Phase 2: Core Platform UI (Frontend)
 #### [NEW] Landing Page
