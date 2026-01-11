@@ -10,7 +10,7 @@ describe('HeroSection', () => {
         expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Active/i);
 
         // Check for CTA Buttons
-        expect(screen.getByRole('button', { name: /Hire Talent/i })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Find Jobs/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Start Hiring/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /How it works/i })).toBeInTheDocument();
     });
 });
