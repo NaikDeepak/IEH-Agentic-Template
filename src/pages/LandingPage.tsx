@@ -12,10 +12,10 @@ const Footer: React.FC = () => (
                 <span className="text-slate-400 mx-2">|</span>
                 <span className="text-sm">© {new Date().getFullYear()} India Employment Hub</span>
             </div>
-            <div className="flex gap-8">
-                <a href="#" className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200"><Twitter className="w-5 h-5" /></a>
-                <a href="#" className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200"><Linkedin className="w-5 h-5" /></a>
-                <a href="#" className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200"><Github className="w-5 h-5" /></a>
+            <div className="flex gap-8" aria-hidden="true">
+                <span className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200 cursor-pointer"><Twitter className="w-5 h-5" /></span>
+                <span className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200 cursor-pointer"><Linkedin className="w-5 h-5" /></span>
+                <span className="hover:text-sky-600 transition-colors transform hover:-translate-y-1 duration-200 cursor-pointer"><Github className="w-5 h-5" /></span>
             </div>
         </div>
     </footer>
