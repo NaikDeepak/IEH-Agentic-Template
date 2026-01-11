@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Sparkles, MapPin, Briefcase } from 'lucide-react';
+import { Search, Sparkles, MapPin } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
     return (

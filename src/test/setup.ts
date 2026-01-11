@@ -16,7 +16,7 @@ Object.defineProperty(window, 'IntersectionObserver', {
     value: IntersectionObserver,
 });
 
-Object.defineProperty(global, 'IntersectionObserver', {
+Object.defineProperty(globalThis, 'IntersectionObserver', {
     writable: true,
     configurable: true,
     value: IntersectionObserver,
@@ -36,7 +36,7 @@ Object.defineProperty(window, 'ResizeObserver', {
     value: ResizeObserver,
 });
 
-Object.defineProperty(global, 'ResizeObserver', {
+Object.defineProperty(globalThis, 'ResizeObserver', {
     writable: true,
     configurable: true,
     value: ResizeObserver,
