@@ -5,17 +5,18 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { UserCheck, Building2 } from 'lucide-react';
 
 export const RoleSelection: React.FC = () => {
-    const { userData, user } = useAuth();
+    const { userData, user, refreshUserData } = useAuth();
 
     const handleRoleSelect = async (role: 'seeker' | 'employer') => {
         if (!user) return;
         try {
-            await updateDoc(doc(db, 'users', user.uid), {
+            const userDocRef = doc(db, 'users', user.uid);
+            await updateDoc(userDocRef, {
                 role,
                 updated_at: serverTimestamp()
             });
-            // Context will automatically update via onAuthStateChanged or manual refresh
-            window.location.reload(); // Simple way to refresh context data
+            // Manually refresh the user data in the context to update UI immediately
+            await refreshUserData();
         } catch (error) {
             console.error("Error setting role:", error);
         }

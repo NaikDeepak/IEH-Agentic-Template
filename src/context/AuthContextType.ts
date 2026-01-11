@@ -15,6 +15,7 @@ export interface AuthContextType {
     loading: boolean;
     loginWithGoogle: () => Promise<void>;
     logout: () => Promise<void>;
+    refreshUserData: () => Promise<void>;
 }
 
 export const AuthContext: Context<AuthContextType | undefined> = createContext<AuthContextType | undefined>(undefined);

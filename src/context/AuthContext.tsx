@@ -6,7 +6,7 @@ import {
     type User as FirebaseUser
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '../lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContextType';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -20,9 +20,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (user) {
                 const fetchUserData = async () => {
                     try {
-                        const userDoc = await getDoc(doc(db, 'users', user.uid));
+                        const userDocRef = doc(db, 'users', user.uid);
+                        const userDoc = await getDoc(userDocRef);
                         if (userDoc.exists()) {
                             setUserData(userDoc.data() as UserData);
+                            // Update last_login for existing users
+                            await updateDoc(userDocRef, {
+                                last_login: serverTimestamp()
+                            });
                         } else {
                             const newUserData: UserData = {
                                 uid: user.uid,
@@ -33,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             };
                             setUserData(newUserData);
 
-                            await setDoc(doc(db, 'users', user.uid), {
+                            await setDoc(userDocRef, {
                                 ...newUserData,
                                 last_login: serverTimestamp(),
                                 created_at: serverTimestamp()
@@ -76,12 +81,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const refreshUserData = async () => {
+        if (!user) return;
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                setUserData(userDoc.data() as UserData);
+            }
+        } catch (error) {
+            console.error("Error refreshing user data:", error);
+            throw error;
+        }
+    };
+
     const value: AuthContextType = {
         user,
         userData,
         loading,
         loginWithGoogle,
-        logout
+        logout,
+        refreshUserData
     };
 
     return (
