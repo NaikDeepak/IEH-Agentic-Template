@@ -1,0 +1,47 @@
+rules_version = '2';
+ 
+ service cloud.firestore {
+   match /databases/{database}/documents {
+     // Users can read and update their own user document.
+     // They cannot change their role once it has been set.
+     match /users/{userId} {
+       allow read: if request.auth != null && request.auth.uid == userId;
+
+       allow update: if request.auth != null
+                     && request.auth.uid == userId
+                     // prevent arbitrary field injection
+                     && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                       'displayName',
+                       'photoURL',
+                       'role',
+                       'updated_at',
+                       'last_login'
+                     ])
+                     // role is immutable once set
+                     && (resource.data.role == null || request.resource.data.role == resource.data.role);
+
+       // Allow creation of a user document with strict validation
+       allow create: if request.auth != null
+                     && request.auth.uid == userId
+                     && request.resource.data.keys().hasOnly([
+                       'uid',
+                       'email',
+                       'displayName',
+                       'photoURL',
+                       'role',
+                       'last_login',
+                       'created_at',
+                       'updated_at'
+                     ])
+                     && request.resource.data.uid == request.auth.uid
+                     && request.resource.data.email == request.auth.token.email
+                     && (
+                       request.resource.data.role == null
+                       || request.resource.data.role in ['seeker', 'employer']
+                     );
+     }
+
+    // Add other rules for other collections here.
+    // e.g., match /jobs/{jobId} { ... }
+  }
+}

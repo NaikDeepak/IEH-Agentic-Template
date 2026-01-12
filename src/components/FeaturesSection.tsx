@@ -7,32 +7,50 @@ interface FeatureCardProps {
     title: string;
     description: string;
     delay: number;
-    className?: string; // Allow custom classes for Bento sizing
+    className?: string;
+    variant?: 'light' | 'dark' | 'glass' | 'accent';
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, delay, className = "" }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, delay, className = "", variant = 'light' }) => {
+    const variants = {
+        light: "bg-white border-slate-100 text-slate-900",
+        dark: "bg-slate-900 border-slate-800 text-white",
+        glass: "bg-white/40 backdrop-blur-md border-white/40 text-slate-900",
+        accent: "bg-gradient-to-br from-indigo-600 to-blue-600 border-indigo-500 text-white shadow-xl shadow-indigo-500/20"
+    };
+
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay, type: "spring" }}
-            className={`relative p-8 bg-white rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1 group overflow-hidden ${className}`}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7, delay, type: "spring", bounce: 0.2 }}
+            className={`bento-card p-10 flex flex-col justify-between group ${variants[variant]} ${className}`}
         >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className={`absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700 ${variant === 'dark' ? 'bg-indigo-400' : 'bg-indigo-300'}`} />
 
             <div className="relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                    <div className="w-14 h-14 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-600 group-hover:rotate-6 transition-all duration-300">
+                <div className="flex justify-between items-start mb-10">
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm ${variant === 'light' ? 'bg-slate-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white' : 'bg-white/10 text-white group-hover:bg-white group-hover:text-indigo-600'}`}>
                         {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
-                            className: "w-7 h-7 text-slate-700 group-hover:text-white transition-colors"
+                            className: "w-8 h-8 transition-colors"
                         }) : icon}
                     </div>
-                    <ArrowUpRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-600 transition-colors opacity-0 group-hover:opacity-100" />
+                    <motion.div
+                        whileHover={{ scale: 1.2, rotate: 15 }}
+                        className={`p-2 rounded-full cursor-pointer transition-colors ${variant === 'light' ? 'text-slate-300 hover:text-indigo-600 hover:bg-indigo-50' : 'text-white/30 hover:text-white hover:bg-white/10'}`}
+                    >
+                        <ArrowUpRight className="w-6 h-6" />
+                    </motion.div>
                 </div>
 
-                <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">{title}</h3>
-                <p className="text-slate-500 leading-relaxed font-medium">{description}</p>
+                <h3 className={`text-2xl font-bold mb-4 tracking-tight ${variant === 'accent' ? 'text-white' : ''}`}>{title}</h3>
+                <p className={`text-base leading-relaxed font-inter font-medium opacity-70 ${variant === 'accent' ? 'text-indigo-50' : ''}`}>{description}</p>
+            </div>
+
+            <div className="mt-8 pt-8 border-t border-current/5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                <span>Learn More</span>
+                <div className="w-8 h-px bg-current" />
             </div>
         </motion.div>
     );
@@ -40,83 +58,97 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, del
 
 export const FeaturesSection: React.FC = () => {
     return (
-        <section className="py-32 px-4 md:px-6 bg-slate-50">
-            <div className="container mx-auto max-w-7xl">
-                <div className="text-center mb-20">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        className="inline-block text-sky-600 font-bold tracking-wider uppercase text-xs mb-4"
-                    >
-                        Capabilities
-                    </motion.div>
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight"
-                    >
-                        Why Choose <span className="text-indigo-600 underline decoration-4 decoration-indigo-200 underline-offset-4">Active</span>?
-                    </motion.h2>
+        <section className="py-40 px-4 md:px-6 bg-slate-50 relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
+            <div className="container mx-auto max-w-7xl relative z-10">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
+                    <div className="max-w-2xl">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="inline-flex items-center gap-2 text-indigo-600 font-black tracking-[0.2em] uppercase text-[10px] mb-4 bg-indigo-50 px-3 py-1 rounded-full"
+                        >
+                            <Target className="w-3 h-3" />
+                            <span>Engineered for Velocity</span>
+                        </motion.div>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter"
+                        >
+                            Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">Active?</span>
+                        </motion.h2>
+                    </div>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="text-xl text-slate-500 max-w-2xl mx-auto font-light"
+                        transition={{ delay: 0.2 }}
+                        className="text-xl text-slate-500 max-w-md font-light leading-relaxed font-inter"
                     >
-                        We've redesigned the hiring stack from the bottom up to prioritize speed and responsiveness.
+                        We've built a high-frequency hiring stack designed for candidates who value momentum over bureaucracy.
                     </motion.p>
                 </div>
 
-                {/* Bento Grid Layout - Organic & Asymmetrical */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(250px,auto)]">
-                    {/* Hero Feature - Spans 2 cols */}
+                {/* Refined Bento Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[minmax(400px,auto)]">
+                    {/* Hero Feature */}
                     <FeatureCard
                         icon={<Bot />}
-                        title="AI Hiring Assistant"
-                        description="Your personal recruiter. Auto-generates JDs, screens candidates 24/7, and filters out ghost jobs instantly so you focus on people."
+                        title="AI Hiring Agent"
+                        description="Your high-fidelity personal recruiter. Auto-generates precision JDs, filters 24/7, and eradicates ghost jobs so you focus on actual talent."
                         delay={0}
-                        className="md:col-span-2 md:row-span-1 bg-gradient-to-br from-white to-blue-50/50"
+                        variant="accent"
+                        className="md:col-span-8"
                     />
 
                     <FeatureCard
                         icon={<Zap />}
-                        title="Active Ecosystem"
-                        description="The 4-day rule: Jobs and profiles expire if inactive. No stale data."
+                        title="The 4-Day Pulse"
+                        description="Jobs expire if inactive for 4 days. Stay relevant in a zero-stale-data ecosystem."
                         delay={0.1}
-                        className="bg-slate-900 !text-white !border-slate-800"
+                        variant="dark"
+                        className="md:col-span-4"
                     />
 
                     <FeatureCard
                         icon={<FileText />}
-                        title="Resume Analyzer"
-                        description="Instant ATS scoring. Beat the bots with real-time keyword optimization."
+                        title="ATS Optimizer"
+                        description="Real-time resume scoring and keyword injection to ensure you bypass the algorithmic gatekeepers."
                         delay={0.2}
+                        variant="light"
+                        className="md:col-span-4"
+                    />
+
+                    <FeatureCard
+                        icon={<Target />}
+                        title="Trajectory Matching"
+                        description="We align you with companies based on growth velocity, cultural trajectory, and role impact."
+                        delay={0.3}
+                        variant="light"
+                        className="md:col-span-5"
                     />
 
                     <FeatureCard
                         icon={<Users />}
-                        title="Insider Connections"
-                        description="Find alumni at Google, Microsoft, and more who actually want to help."
-                        delay={0.3}
-                    />
-
-                    {/* Tall Feature - Spans 1 col but 2 rows visually conceptually (here just regular but distinctive) */}
-                    <FeatureCard
-                        icon={<Target />}
-                        title="Smart Matching"
-                        description="Forget keywords. Our AI matches on culture, velocity, and trajectory."
+                        title="Alumni Network"
+                        description="Direct bridges to alumni at Fortune 500 and Top-Tier startups."
                         delay={0.4}
-                        className="md:col-span-1 bg-sky-50 border-sky-100"
+                        variant="light"
+                        className="md:col-span-3"
                     />
 
                     <FeatureCard
                         icon={<Trophy />}
-                        title="Skill Challenges"
-                        description="Don't just say you can code. Prove it and earn verified badges."
+                        title="Verified Skill Challenges"
+                        description="Proof is the new currency. Complete verified assessments and earn badges that top-tier companies actually trust."
                         delay={0.5}
-                        className="md:col-span-3"
+                        variant="glass"
+                        className="md:col-span-12 !min-h-[300px]"
                     />
                 </div>
             </div>
