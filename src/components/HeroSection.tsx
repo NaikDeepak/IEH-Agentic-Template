@@ -1,80 +1,125 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
-import { JobSearchBar } from './JobSearchBar';
-import { PopularTags } from './PopularTags';
+import { Search, ArrowRight, Star, DollarSign } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
     return (
-        <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-white selection:bg-indigo-100 selection:text-indigo-900 pt-16">
+        <section className="relative w-full pt-2 md:pt-4 pb-12 md:pb-20 px-2 md:px-6 flex flex-col items-center overflow-hidden bg-slate-50 font-sans">
 
-            {/* Premium Background Mesh */}
-            <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none opacity-60">
-                <div className="absolute -top-[20%] left-[10%] w-[70vw] h-[70vw] bg-indigo-50/50 rounded-full blur-[140px] animate-pulse duration-[8000ms]" />
-                <div className="absolute bottom-0 -right-[10%] w-[50vw] h-[50vw] bg-sky-50/50 rounded-full blur-[140px] animate-pulse duration-[6000ms]" />
-            </div>
+            {/* Main Rounded Container */}
+            <div className="w-full max-w-[1400px] bg-[#dae3e5] rounded-[2rem] md:rounded-[3.5rem] relative overflow-hidden flex flex-col md:flex-row items-center font-outfit text-slate-800 shadow-2xl ring-1 ring-slate-900/5">
 
-            <div className="container mx-auto px-4 md:px-6 relative z-10 flex flex-col items-center text-center max-w-5xl">
 
-                {/* Trust Badge */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white text-[10px] font-bold tracking-[0.1em] uppercase mb-10 shadow-xl shadow-indigo-500/10"
-                >
-                    <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-                    <span>AI-powered recruitment platform for India</span>
-                </motion.div>
 
-                {/* Headline */}
-                <motion.h1
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.1, type: "spring" }}
-                    className="text-6xl md:text-8xl font-black tracking-tight text-slate-900 mb-8 leading-[1.05]"
-                >
-                    Build your career with <br />
-                    <span className="relative inline-block">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-500">
-                            Absolute Confidence.
-                        </span>
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: "100%" }}
-                            transition={{ duration: 1, delay: 0.8 }}
-                            className="absolute -bottom-2 left-0 h-1.5 bg-indigo-100/50 rounded-full -z-10"
-                        />
-                    </span>
-                </motion.h1>
+                {/* Big Text Background - Responsive sizes */}
+                <div className="absolute top-[12%] md:top-16 left-0 right-0 z-0 pointer-events-none select-none flex flex-col items-start justify-center pl-6 md:pl-16 overflow-hidden">
+                    <h1 className="text-[13vw] md:text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 md:translate-y-2 mix-blend-overlay md:mix-blend-normal">
+                        INDIA
+                    </h1>
 
-                <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl font-light leading-relaxed font-inter"
-                >
-                    <span className="text-slate-900 font-semibold block mb-2">Connecting Talent with Opportunity, Intelligently.</span>
-                    IEH is the only AI-native hiring ecosystem that prioritizes responsiveness and cultural velocity for India's tech landscape.
-                </motion.p>
+                    {/* Desktop: Single Line for EMPLOYMENT HUB */}
+                    <h1 className="hidden md:block md:text-[8vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text md:translate-y-2 md:mix-blend-normal">
+                        EMPLOYMENT HUB
+                    </h1>
 
-                {/* Integrated Search Bar */}
-                <JobSearchBar />
+                    {/* Mobile: Split Lines for EMPLOYMENT and HUB */}
+                    <h1 className="md:hidden text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
+                        EMPLOYMENT
+                    </h1>
+                    <h1 className="md:hidden text-[13vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
+                        HUB
+                    </h1>
+                </div>
 
-                {/* Integrated Tags */}
-                <PopularTags />
+                {/* Content Container (Mobile: Column, Desktop: Row) */}
+                <div className="relative z-20 w-full flex flex-col md:flex-row pt-32 md:pt-0 min-h-[600px] md:min-h-[800px]">
 
-                {/* Scroll Indicator */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5 }}
-                    className="mt-20 flex flex-col items-center gap-2"
-                >
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Explore Capabilities</span>
-                    <div className="w-px h-12 bg-gradient-to-b from-indigo-500 to-transparent opacity-30" />
-                </motion.div>
+                    {/* Left Side: Content */}
+                    <div className="w-full md:w-1/2 px-6 md:pl-20 md:pr-0 py-8 md:pt-96 md:pb-20 flex flex-col gap-6 md:gap-10 order-2 md:order-1 items-center md:items-start text-center md:text-left">
 
-            </div>
-        </section>
+                        {/* Search Bar */}
+                        <div className="bg-white p-2 md:p-2.5 rounded-full shadow-2xl flex items-center w-full max-w-sm md:max-w-md z-30 transition-transform hover:scale-[1.02]">
+                            <Search className="w-5 h-5 md:w-6 md:h-6 text-slate-400 ml-3 md:ml-4 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Search 'Java Developer', 'HR Manager'..."
+                                className="flex-1 bg-transparent border-none outline-none px-3 md:px-4 text-sm md:text-base placeholder:text-slate-400 text-slate-800 min-w-0 font-medium"
+                            />
+                            <button className="w-10 h-10 md:w-12 md:h-12 bg-slate-900 rounded-full flex items-center justify-center text-white hover:bg-indigo-600 transition-colors shrink-0 shadow-md">
+                                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
+                            </button>
+                        </div>
+
+                        {/* Trending Pills */}
+                        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start relative z-30">
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Trending:</span>
+                            {['Java', 'Python', 'Sales', 'Accounting'].map((skill) => (
+                                <span key={skill} className="px-3 py-1.5 bg-white/60 backdrop-blur-md border border-white/50 rounded-full text-[10px] md:text-xs font-semibold text-slate-700 cursor-pointer hover:bg-white hover:shadow-sm transition-all">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+
+                        <p className="text-slate-600 text-sm md:text-lg max-w-sm md:max-w-md leading-relaxed font-medium relative z-30">
+                            Connecting India's top talent with actively hiring companies. <br className="hidden md:block" /> No ghosting, just real opportunities.
+                        </p>
+
+                        {/* Social Proof / Stats */}
+                        <div className="bg-white/60 backdrop-blur-xl p-4 md:p-5 rounded-3xl w-full max-w-xs shadow-lg border border-white/80 relative z-30 flex flex-col gap-3 hover:bg-white/80 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="font-bold text-sm text-slate-800">Trusted by Recruiters</span>
+                                <div className="flex gap-0.5">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="flex -space-x-3">
+                                    {[1, 3, 5, 8].map((i) => (
+                                        <div key={i} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                                            <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
+                                        </div >
+                                    ))}
+                                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-900 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">
+                                        +50k
+                                    </div>
+                                </div >
+                                <div className="text-xs font-semibold text-slate-700 leading-tight">
+                                    Active<br />Candidates
+                                </div>
+                            </div >
+                        </div >
+                    </div >
+
+                    {/* Right Side: Image */}
+                    < div className="w-full md:w-1/2 relative h-[400px] md:h-full flex items-end justify-center order-1 md:order-2 overflow-hidden md:overflow-visible" >
+
+
+                        {/* Masked Image Container */}
+                        < div className="relative w-full h-[110%] md:h-[115%] flex items-end justify-center bottom-[-10%] md:bottom-[-5%]" >
+                            <img
+                                src="/images/hero.png"
+                                alt="Indian Tech Professional"
+                                className="h-full w-auto object-cover max-w-none md:max-w-full"
+                                style={{ maskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)' }}
+                            />
+
+                            {/* Floating Value Card (Desktop Only) */}
+                            <div className="hidden md:flex absolute bottom-40 -left-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 z-30 items-center gap-4 animate-bounce-slow">
+                                <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
+                                    <DollarSign className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-bold text-slate-900">12k+ Active Jobs</p>
+                                    <p className="text-xs text-slate-500 font-medium">Hiring Now</p>
+                                </div>
+                            </div>
+                        </div >
+                    </div >
+
+                </div >
+
+            </div >
+        </section >
     );
 };
