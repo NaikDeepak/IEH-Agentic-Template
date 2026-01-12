@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, ChevronDown } from 'lucide-react';
 
@@ -6,6 +6,23 @@ export const JobSearchBar: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [location, setLocation] = useState('Remote');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        if (isDropdownOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isDropdownOpen]);
 
     const locations = ['Remote', 'Hybrid', 'Office', 'Bangalore', 'Mumbai', 'Delhi'];
 
@@ -31,10 +48,12 @@ export const JobSearchBar: React.FC = () => {
                     className="flex-grow bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 text-lg py-2 font-inter"
                 />
 
-                <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 relative">
+                <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 relative" ref={dropdownRef}>
                     <button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors py-2"
+                        aria-expanded={isDropdownOpen}
+                        aria-haspopup="listbox"
                     >
                         <MapPin className="w-4 h-4" />
                         <span className="text-sm font-semibold whitespace-nowrap">{location}</span>
@@ -48,10 +67,13 @@ export const JobSearchBar: React.FC = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
                                 className="absolute top-full right-0 mt-4 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 overflow-hidden z-50"
+                                role="listbox"
                             >
                                 {locations.map((loc) => (
                                     <button
                                         key={loc}
+                                        role="option"
+                                        aria-selected={location === loc}
                                         onClick={() => {
                                             setLocation(loc);
                                             setIsDropdownOpen(false);
