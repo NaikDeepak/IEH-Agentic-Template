@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "start": "node index.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
@@ -15,14 +16,16 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@google/genai": "^1.35.0",
+    "@sentry/nextjs": "^10.32.1",
     "@tailwindcss/vite": "^4.0.0",
+    "express": "^4.22.1",
     "firebase": "^12.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@google/genai": "^1.35.0",
     "@playwright/test": "^1.57.0",
     "@sentry/react": "^10.32.1",
     "@sentry/vite-plugin": "^4.6.1",
