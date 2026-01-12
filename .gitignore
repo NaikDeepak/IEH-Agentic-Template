@@ -51,3 +51,9 @@ playwright/.cache/
 
 # OS Generated Files
 Thumbs.db
+
+# Next.js (prevent misidentification)
+.next/
+next.config.js
+next.config.ts
+*.cache  
