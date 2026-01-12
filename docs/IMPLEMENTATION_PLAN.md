@@ -23,7 +23,7 @@ Build a "Visionary" MVP of India Employment Hub, an AI-first recruitment platfor
 
 ### Phase 2: Core Platform UI (Frontend)
 #### [NEW] Landing Page
-- [ ] Document Landing Page Specs in `docs/landing.md`.
+- [ ] Document Landing Page Specs in `docs/features/landing.md`.
 - [ ] **Hero Section**: High-impact "Vision" slider/video.
 - [ ] **Problem/Solution**: Interactive components.
 - [ ] **Feature Highlights**: Cards for Active System, AI Assistant.

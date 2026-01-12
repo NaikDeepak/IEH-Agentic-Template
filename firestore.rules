@@ -20,8 +20,14 @@ rules_version = '2';
                      // role is immutable once set
                      && (resource.data.role == null || request.resource.data.role == resource.data.role);
 
-       // Allow creation of a user document.
-       allow create: if request.auth != null && request.auth.uid == userId;
+       // Allow creation of a user document with strict validation
+       allow create: if request.auth != null 
+                     && request.auth.uid == userId
+                     && request.resource.data.keys().hasOnly([
+                       'uid', 'email', 'displayName', 'photoURL', 'role', 'last_login', 'created_at'
+                     ])
+                     && request.resource.data.role == null
+                     && request.resource.data.email == request.auth.token.email;
      }
 
     // Add other rules for other collections here.

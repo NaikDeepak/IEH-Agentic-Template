@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
     onAuthStateChanged,
     signInWithPopup,
@@ -13,13 +13,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState(true);
-    const didInitRef = useRef(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Prevent duplicate Firestore writes in dev StrictMode
-        if (didInitRef.current) return;
-        didInitRef.current = true;
-
         let isMounted = true;
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -48,18 +44,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         };
                         setUserData(newUserData);
 
-                        await setDoc(userDocRef, {
-                            ...newUserData,
-                            last_login: serverTimestamp(),
-                            created_at: serverTimestamp()
-                        }, { merge: true });
+                        await setDoc(
+                            userDocRef,
+                            {
+                                ...newUserData,
+                                last_login: serverTimestamp(),
+                                created_at: serverTimestamp()
+                            },
+                            { merge: true }
+                        );
                     }
                 } catch (err: unknown) {
                     const error = err as { code?: string; message?: string };
                     console.error("Firestore Error:", error);
-                    if (error.code === 'unavailable' || error.message?.includes('offline')) {
-                        console.warn("Firestore database might not be initialized or API is disabled in this project.");
-                    }
+                    setError(error.message || "An error occurred while fetching user data.");
                 }
             } else {
                 setUserData(null);
@@ -74,45 +72,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, []);
 
-    const loginWithGoogle = async () => {
+    const loginWithGoogle = useCallback(async () => {
+        setError(null);
         try {
             await signInWithPopup(auth, googleProvider);
-        } catch (error) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             console.error("Google Sign-In Error:", error);
-            throw error;
+            setError(error.message || "Failed to sign in with Google.");
+            throw err;
         }
-    };
+    }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
+        setError(null);
         try {
             await signOut(auth);
-        } catch (error) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             console.error("Logout Error:", error);
-            throw error;
+            setError(error.message || "Failed to sign out.");
+            throw err;
         }
-    };
+    }, []);
 
-    const refreshUserData = async () => {
+    const refreshUserData = useCallback(async () => {
         if (!user) return;
         try {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 setUserData(userDoc.data() as UserData);
             }
-        } catch (error) {
+        } catch (err: unknown) {
+            const error = err as { message?: string };
             console.error("Error refreshing user data:", error);
-            throw error;
+            setError(error.message || "Failed to refresh user data.");
+            throw err;
         }
-    };
+    }, [user]);
 
-    const value: AuthContextType = {
+    const clearError = useCallback(() => {
+        setError(null);
+    }, []);
+
+    const value: AuthContextType = useMemo(() => ({
         user,
         userData,
         loading,
+        error,
         loginWithGoogle,
         logout,
-        refreshUserData
-    };
+        refreshUserData,
+        clearError
+    }), [user, userData, loading, error, loginWithGoogle, logout, refreshUserData, clearError]);
 
     return (
         <AuthContext.Provider value={value}>
