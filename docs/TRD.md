@@ -6,13 +6,13 @@
 
 ## 2. Technology Stack
 -   **Frontend:**
-    -   **Framework:** Next.js 14+ (App Router).
+    -   **Framework:** Vite (React SPA).
     -   **Language:** TypeScript.
-    -   **Styling:** Tailwind CSS (Shadcn/UI components).
+    -   **Styling:** Tailwind CSS 4.0.
     -   **State Management:** React Context / Zustand (if complex).
     -   **Icons:** Lucide React.
 -   **Backend / Services:**
-    -   **Primary Logic:** Next.js Server Actions / API Routes.
+    -   **Primary Logic:** Node.js (Express) on Cloud Run / App Hosting.
     -   **Auth & Database:** Google Firebase (Auth, Firestore).
     -   **AI Engine:** Google Gemini API (`gemini-2.0-flash`).
     -   **Automation:** n8n (Webhooks).

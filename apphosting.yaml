@@ -1,0 +1,6 @@
+kind: AppHostingConfiguration
+schemaVersion: v1
+runConfig:
+  command: npm start
+buildConfig:
+  runCommand: npm run build
