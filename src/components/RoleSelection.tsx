@@ -16,7 +16,7 @@ export const RoleSelection: React.FC = () => {
                 const userDoc = await transaction.get(userDocRef);
 
                 if (!userDoc.exists()) {
-                    // Create doc if it happens to be missing
+                    // Create doc with the selected role (now allowed by rules)
                     transaction.set(userDocRef, {
                         uid: user.uid,
                         email: user.email,
