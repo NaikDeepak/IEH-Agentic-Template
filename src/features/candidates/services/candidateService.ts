@@ -42,7 +42,9 @@ export const CandidateService = {
 
             // Prepare update data - remove bio/resume_url from top-level payload to avoid rule rejection
             const updateData: Partial<UserProfile> & { updated_at: ReturnType<typeof serverTimestamp> } = {
-                ...restUpdates,
+                ...Object.fromEntries(
+                    Object.entries(restUpdates).filter(([, v]) => (v as unknown) !== undefined)
+                ),
                 updated_at: serverTimestamp()
             };
 

@@ -84,7 +84,9 @@ export const JobService = {
         try {
             const docRef = doc(db, JOBS_COLLECTION, jobId);
             const updateData: Partial<JobPosting> & { updated_at: ReturnType<typeof serverTimestamp> } = {
-                ...updates,
+                ...Object.fromEntries(
+                    Object.entries(updates).filter(([, v]) => (v as unknown) !== undefined)
+                ),
                 updated_at: serverTimestamp()
             };
 

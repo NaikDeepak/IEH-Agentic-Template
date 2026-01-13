@@ -35,7 +35,7 @@ export const Header: React.FC = () => {
                     {/* Mobile Menu Toggle */}
                     <button
                         className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                        onClick={() => { setIsMenuOpen(!isMenuOpen); }}
+                        onClick={() => { setIsMenuOpen((open) => !open); }}
                         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                         aria-expanded={isMenuOpen}
                         aria-controls="mobile-menu"

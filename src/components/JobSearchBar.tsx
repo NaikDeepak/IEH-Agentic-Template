@@ -50,7 +50,7 @@ export const JobSearchBar: React.FC = () => {
 
                 <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 relative" ref={dropdownRef}>
                     <button
-                        onClick={() => { setIsDropdownOpen(!isDropdownOpen); }}
+                        onClick={() => { setIsDropdownOpen((open) => !open); }}
                         className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors py-2"
                         aria-expanded={isDropdownOpen}
                         aria-haspopup="listbox"
