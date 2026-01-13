@@ -19,36 +19,45 @@ export const CandidateService = {
         try {
             const userRef = doc(db, USERS_COLLECTION, uid);
 
-            // Prepare update data with proper typing
+            const { bio, ...restUpdates } = updates;
+
+            // Prepare update data - remove bio as it's not a top-level field in UserProfile
             const updateData: Partial<UserProfile> & { updated_at: ReturnType<typeof serverTimestamp> } = {
-                ...updates,
+                ...restUpdates,
                 updated_at: serverTimestamp()
             };
 
-            // 1. Check if we need to regenerate embedding
-            // Ideally we should see if skills or bio changed. 
-            if (updates.skills || updates.bio) {
+            // 1. Check if we need to regenerate embedding or map bio
+            const shouldRegenEmbedding = ('skills' in updates) || ('bio' in updates) || ('displayName' in updates);
 
-                // Fetch current data to merge if needed, or just use what we have? 
-                // For accurate embedding, we want the FULL profile context.
-                // So let's fetch the current doc.
+            if (shouldRegenEmbedding) {
                 const snap = await getDoc(userRef);
-                const currentData = snap.data() as UserProfile | undefined;
-
-                if (currentData) {
-                    const finalSkills = updates.skills || currentData.skills || [];
-                    const finalBio = updates.bio || currentData.parsed_data?.summary || "";
-                    const displayName = updates.displayName || currentData.displayName || "";
-
-                    const semanticText = `
-                Candidate: ${displayName}
-                Skills: ${finalSkills.join(", ")}
-                Bio: ${finalBio}
-            `.trim();
-
-                    const embedding = await generateEmbedding(semanticText);
-                    updateData.embedding = embedding;
+                if (!snap.exists()) {
+                    throw new Error(`User ${uid} not found`);
                 }
+
+                const currentData = snap.data() as UserProfile;
+
+                // Map bio to parsed_data.summary if provided (supporting empty string)
+                if (bio !== undefined) {
+                    updateData.parsed_data = {
+                        ...(currentData.parsed_data ?? {}),
+                        summary: bio
+                    };
+                }
+
+                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : (currentData.skills ?? []);
+                const finalBio = ('bio' in updates) ? (updates.bio ?? "") : (currentData.parsed_data?.summary ?? "");
+                const displayName = ('displayName' in updates) ? (updates.displayName ?? "") : (currentData.displayName ?? "");
+
+                const semanticText = `
+                    Candidate: ${displayName}
+                    Skills: ${finalSkills.join(", ")}
+                    Bio: ${finalBio}
+                `.trim();
+
+                const embedding = await generateEmbedding(semanticText);
+                updateData.embedding = embedding;
             }
 
             // 2. Update Firestore

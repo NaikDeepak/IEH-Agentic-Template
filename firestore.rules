@@ -44,21 +44,63 @@ rules_version = '2';
 
     // Jobs Collection
     match /jobs/{jobId} {
-      allow read: if true; // Public read for now
-      allow create: if request.auth != null 
+      allow read: if true;
+
+      allow create: if request.auth != null
                     && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
-                    && request.resource.data.employer_id == request.auth.uid;
-      allow update: if request.auth != null 
-                    && resource.data.employer_id == request.auth.uid;
+                    && request.resource.data.employer_id == request.auth.uid
+                    && request.resource.data.keys().hasOnly([
+                      'employer_id',
+                      'title',
+                      'description',
+                      'skills',
+                      'location',
+                      'type',
+                      'work_mode',
+                      'salary_range',
+                      'status',
+                      'created_at',
+                      'updated_at',
+                      'embedding'
+                    ]);
+
+      allow update: if request.auth != null
+                    && resource.data.employer_id == request.auth.uid
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'title',
+                      'description',
+                      'skills',
+                      'location',
+                      'type',
+                      'work_mode',
+                      'salary_range',
+                      'status',
+                      'updated_at',
+                      'embedding'
+                    ])
+                    // ownership is immutable
+                    && request.resource.data.employer_id == resource.data.employer_id;
     }
 
     // Applications Collection
     match /applications/{appId} {
-      allow create: if request.auth != null 
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'seeker';
-      allow read: if request.auth != null 
+      allow create: if request.auth != null
+                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'seeker'
+                    // prevent arbitrary field injection
+                    && request.resource.data.keys().hasOnly([
+                      'candidate_id',
+                      'job_id',
+                      'created_at',
+                      'status'
+                    ])
+                    // bind application to caller
+                    && request.resource.data.candidate_id == request.auth.uid
+                    // job must exist
+                    && exists(/databases/$(database)/documents/jobs/$(request.resource.data.job_id));
+
+      allow read: if request.auth != null
                   && (
-                    resource.data.candidate_id == request.auth.uid 
+                    resource.data.candidate_id == request.auth.uid
                     || get(/databases/$(database)/documents/jobs/$(resource.data.job_id)).data.employer_id == request.auth.uid
                   );
     }
