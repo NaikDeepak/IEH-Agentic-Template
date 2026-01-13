@@ -32,7 +32,9 @@ if (process.env.SENTRY_DSN) {
 // Helper to handle errors with details
 const handleError = (res, error, context) => {
     console.error(`${context} Error:`, error);
-    Sentry.captureException(error);
+    if (process.env.SENTRY_DSN) {
+        Sentry.captureException(error);
+    }
     const isProd = process.env.NODE_ENV === "production";
 
     res.status(500).json({

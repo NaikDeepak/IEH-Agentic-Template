@@ -39,7 +39,14 @@ service cloud.firestore {
                       'parsed_data',
                       'embedding'
                     ])
-                    && (resource.data.role == null || request.resource.data.role == resource.data.role);
+                    && (resource.data.role == null
+                        || !('role' in request.resource.data)
+                        || request.resource.data.role == resource.data.role)
+                    && ( !('embedding' in request.resource.data)
+                         || (request.resource.data.embedding is list
+                             && request.resource.data.embedding.size() == 768
+                             && request.resource.data.embedding[0] is number
+                             && request.resource.data.embedding[767] is number) );
     }
 
     // Jobs Collection
@@ -73,8 +80,26 @@ service cloud.firestore {
       // Only the job owner (employer) can update the job
       allow update: if request.auth != null
                     && resource.data.employer_id == request.auth.uid
+                    // restrict what can change
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'title',
+                      'description',
+                      'skills',
+                      'location',
+                      'type',
+                      'work_mode',
+                      'salary_range',
+                      'status',
+                      'updated_at',
+                      'embedding'
+                    ])
+                    // employer_id is immutable
                     && ( !('employer_id' in request.resource.data)
                          || request.resource.data.employer_id == resource.data.employer_id )
+                    // optional: validate status values if you use them
+                    && ( !('status' in request.resource.data)
+                         || request.resource.data.status in ['ACTIVE', 'PASSIVE', 'CLOSED'] )
+                    // validate embedding shape if present
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
                              && request.resource.data.embedding.size() == 768

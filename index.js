@@ -63,10 +63,13 @@ const generateEmbedding = async (text, apiKey) => {
         model: "text-embedding-004",
         contents: [{ parts: [{ text }] }],
     });
-    if (!response?.embeddings?.[0]?.values) {
-        throw new Error("Invalid embedding response from Gemini API");
+    if (response?.embedding?.values) {
+        return response.embedding.values;
     }
-    return response.embeddings[0].values;
+    if (response?.embeddings?.[0]?.values) {
+        return response.embeddings[0].values;
+    }
+    throw new Error("Invalid embedding response from Gemini API");
 };
 
 export const embeddingHandler = async (req, res) => {

@@ -1,9 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
-
 // Server-only: Lazy initialization to avoid crashes on client-side imports
-let ai: GoogleGenAI | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let ai: any | null = null;
 
-function getAI(): GoogleGenAI {
+async function getAI() {
     const apiKey = process.env?.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -13,6 +12,7 @@ function getAI(): GoogleGenAI {
     }
 
     if (!ai) {
+        const { GoogleGenAI } = await import("@google/genai");
         ai = new GoogleGenAI({ apiKey });
     }
     return ai;
@@ -30,7 +30,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     try {
         // Note: In the new @google/genai SDK, we access models via ai.models
         // We strictly use the model name 'text-embedding-004' for cost/performance balance
-        const response = await getAI().models.embedContent({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response: any = await (await getAI()).models.embedContent({
             model: "text-embedding-004",
             contents: [
                 {
@@ -39,11 +40,17 @@ export async function generateEmbedding(text: string): Promise<number[]> {
             ],
         });
 
-        if (!response || !response.embeddings || !response.embeddings[0] || !response.embeddings[0].values) {
-            throw new Error("Invalid embedding response from Gemini API");
+        // Check for 'embedding' (singular) - often used in newer SDK versions/single requests
+        if (response?.embedding?.values) {
+            return response.embedding.values;
         }
 
-        return response.embeddings[0].values;
+        // Check for 'embeddings' (plural) - used in batch requests or older SDK versions
+        if (response?.embeddings?.[0]?.values) {
+            return response.embeddings[0].values;
+        }
+
+        throw new Error("Invalid embedding response from Gemini API");
     } catch (error) {
         console.error("Failed to generate embedding:", error);
         // Return empty array or throw depending on strictness. For MVP, we throw to catch issues early.
