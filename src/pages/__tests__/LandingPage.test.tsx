@@ -7,9 +7,9 @@ describe('LandingPage', () => {
         render(<LandingPage />);
 
         // Check for Hero Section (Headline)
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Find your dream job/i);
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/India Employment Hub - AI Powered Recruitment Platform/i);
 
         // Check for Features Section (Section Title)
-        expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(/Why Choose Active/i);
+        expect(screen.getByRole('heading', { level: 2, name: /Trending Job Roles/i })).toBeInTheDocument();
     });
 });

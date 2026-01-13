@@ -1,70 +1,112 @@
-import '@testing-library/jest-dom'
-import { vi } from 'vitest'
+import { vi, type Mock } from 'vitest';
+import '@testing-library/jest-dom';
 
-// Mock IntersectionObserver
-class IntersectionObserver {
-    private readonly callback: IntersectionObserverCallback
-
-    observe = vi.fn((target: Element) => {
-        // Simulate the element being in view to unblock whileInView animations.
-        const entry = [{ isIntersecting: true, target }] as unknown as IntersectionObserverEntry[]
-        this.callback(entry, this)
-    })
-    disconnect = vi.fn()
-    unobserve = vi.fn()
-    takeRecords = vi.fn(() => [])
-    root: Element | Document | null = null
-    rootMargin: string = ''
-    thresholds: ReadonlyArray<number> = []
-
-    constructor(callback: IntersectionObserverCallback) {
-        this.callback = callback
-    }
+interface GlobalMocks {
+    sentryCaptureException: Mock<(error: unknown) => void>;
 }
 
-Object.defineProperty(window, 'IntersectionObserver', {
-    writable: true,
-    configurable: true,
-    value: IntersectionObserver,
-});
-
-Object.defineProperty(globalThis, 'IntersectionObserver', {
-    writable: true,
-    configurable: true,
-    value: IntersectionObserver,
-});
-
-// Mock ResizeObserver
-class ResizeObserver {
-    observe = vi.fn()
-    disconnect = vi.fn()
-    unobserve = vi.fn()
-    constructor() { }
+declare global {
+    var __MOCKS__: GlobalMocks;
 }
 
-Object.defineProperty(window, 'ResizeObserver', {
-    writable: true,
-    configurable: true,
-    value: ResizeObserver,
-});
+// Global Registry for Mocks (to bridge different module resolution contexts)
+globalThis.__MOCKS__ = {
+    sentryCaptureException: vi.fn<(error: unknown) => void>(),
+};
 
-Object.defineProperty(globalThis, 'ResizeObserver', {
-    writable: true,
-    configurable: true,
-    value: ResizeObserver,
-});
+// Global Mocks for Browser APIs
+class MockIntersectionObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+}
+global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
-// Mock window.matchMedia
+class MockResizeObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+}
+global.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: vi.fn().mockImplementation(query => ({
+    value: vi.fn().mockImplementation((query: string) => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: vi.fn(), // deprecated
-        removeListener: vi.fn(), // deprecated
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
     })),
 });
+
+// Global Mock for Fetch
+global.fetch = vi.fn();
+
+// Global Mock for Gemini API
+class MockGoogleGenAI {
+    get models() {
+        return {
+            embedContent: vi.fn().mockResolvedValue({ embedding: { values: new Array(768).fill(0.1) } }),
+            generateContent: vi.fn().mockResolvedValue({
+                text: () => 'Mocked JD',
+                data: { candidates: [{ content: { parts: [{ text: 'Mocked JD' }] } }] }
+            }),
+        };
+    }
+}
+
+vi.mock('@google/genai', () => {
+    return {
+        GoogleGenAI: MockGoogleGenAI
+    };
+});
+
+// Global Mock for Firebase Functions
+vi.mock('firebase-functions/v2/https', () => ({
+    onRequest: vi.fn((handler: (req: unknown, res: unknown) => void) => handler),
+}));
+
+// Global Mock for Firebase Admin
+vi.mock('firebase-admin/app', () => ({
+    initializeApp: vi.fn(),
+    applicationDefault: vi.fn(),
+}));
+
+vi.mock('firebase-admin/firestore', () => ({
+    getFirestore: vi.fn(() => ({
+        collection: vi.fn(() => ({
+            doc: vi.fn(() => ({
+                set: vi.fn(),
+                get: vi.fn(),
+            })),
+        })),
+    })),
+    FieldValue: {
+        serverTimestamp: vi.fn(),
+    },
+}));
+
+// Global Mock for Google Auth
+vi.mock('google-auth-library', () => ({
+    GoogleAuth: class {
+        getClient = vi.fn().mockResolvedValue({
+            getAccessToken: vi.fn().mockResolvedValue('test-token'),
+        });
+    },
+}));
+
+// Global Mock for Sentry
+vi.mock('@sentry/node', () => ({
+    init: vi.fn(),
+    captureException: (error: unknown) => { globalThis.__MOCKS__.sentryCaptureException(error); },
+    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({})),
+}));
+vi.mock('@sentry/react', () => ({
+    init: vi.fn(),
+    captureException: (error: unknown) => { globalThis.__MOCKS__.sentryCaptureException(error); },
+    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({})),
+}));

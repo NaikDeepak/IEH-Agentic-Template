@@ -7,10 +7,10 @@ describe('HeroSection', () => {
         render(<HeroSection />);
 
         // Check for AI Search Badge
-        expect(screen.getByText(/AI-Powered Job Search/i)).toBeInTheDocument();
+        expect(screen.getByText(/Trusted by Recruiters/i)).toBeInTheDocument();
 
         // Check for Search Input
-        expect(screen.getByPlaceholderText(/Ex: Product Designer/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/Search 'Java Developer'/i)).toBeInTheDocument();
 
         // Check for Search Button
         expect(screen.getByRole('button', { name: /Search/i })).toBeInTheDocument();

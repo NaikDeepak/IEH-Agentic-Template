@@ -1,155 +1,133 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, FileText, Zap, Users, Trophy, Target, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, ArrowLeft } from 'lucide-react';
 
-interface FeatureCardProps {
-    icon: React.ReactNode;
+interface ServiceCardProps {
     title: string;
-    description: string;
-    delay: number;
+    image: string;
+    tags: string[];
     className?: string;
-    variant?: 'light' | 'dark' | 'glass' | 'accent';
+    dark?: boolean;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, delay, className = "", variant = 'light' }) => {
-    const variants = {
-        light: "bg-white border-slate-100 text-slate-900",
-        dark: "bg-slate-900 border-slate-800 text-white",
-        glass: "bg-white/40 backdrop-blur-md border-white/40 text-slate-900",
-        accent: "bg-gradient-to-br from-indigo-600 to-blue-600 border-indigo-500 text-white shadow-xl shadow-indigo-500/20"
-    };
-
+const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className = "", dark = false }) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay, type: "spring", bounce: 0.2 }}
-            className={`bento-card p-10 flex flex-col justify-between group ${variants[variant]} ${className}`}
+        <motion.button
+            whileHover={{ y: -5 }}
+            className={`relative rounded-[2rem] overflow-hidden p-6 h-[320px] flex flex-col justify-between group text-left w-full outline-none focus:ring-2 focus:ring-indigo-500 ${className} ${dark ? 'text-white' : 'text-slate-900'}`}
+            aria-label={`View jobs for ${title}`}
         >
-            <div className={`absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-700 ${variant === 'dark' ? 'bg-indigo-400' : 'bg-indigo-300'}`} />
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className={`absolute inset-0 ${dark ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-white/90 via-white/40 to-transparent'}`} />
+            </div>
 
+            {/* Content */}
             <div className="relative z-10">
-                <div className="flex justify-between items-start mb-10">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm ${variant === 'light' ? 'bg-slate-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white' : 'bg-white/10 text-white group-hover:bg-white group-hover:text-indigo-600'}`}>
-                        {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<{ className?: string }>, {
-                            className: "w-8 h-8 transition-colors"
-                        }) : icon}
-                    </div>
-                    <motion.div
-                        whileHover={{ scale: 1.2, rotate: 15 }}
-                        className={`p-2 rounded-full cursor-pointer transition-colors ${variant === 'light' ? 'text-slate-300 hover:text-indigo-600 hover:bg-indigo-50' : 'text-white/30 hover:text-white hover:bg-white/10'}`}
-                    >
-                        <ArrowUpRight className="w-6 h-6" />
-                    </motion.div>
+                <h3 className="text-xl font-black uppercase tracking-tight mb-4">{title}</h3>
+                <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, i) => (
+                        <span key={i} className={`text-[10px] font-bold px-3 py-1 rounded-full border backdrop-blur-sm ${dark ? 'border-white/30 bg-white/10 text-white' : 'border-slate-300 bg-white/50 text-slate-700'}`}>
+                            {tag}
+                        </span>
+                    ))}
                 </div>
-
-                <h3 className={`text-2xl font-bold mb-4 tracking-tight ${variant === 'accent' ? 'text-white' : ''}`}>{title}</h3>
-                <p className={`text-base leading-relaxed font-inter font-medium opacity-70 ${variant === 'accent' ? 'text-indigo-50' : ''}`}>{description}</p>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-current/5 flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                <span>Learn More</span>
-                <div className="w-8 h-px bg-current" />
+            <div className="relative z-10 flex justify-end">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${dark ? 'bg-white text-black hover:scale-110' : 'bg-black text-white hover:scale-110'}`}>
+                    <ArrowUpRight className="w-5 h-5" aria-hidden="true" />
+                </div>
             </div>
-        </motion.div>
+        </motion.button>
     );
 };
 
 export const FeaturesSection: React.FC = () => {
     return (
-        <section className="py-40 px-4 md:px-6 bg-slate-50 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <section className="py-24 px-4 md:px-6 bg-white font-sans">
+            <div className="container mx-auto max-w-6xl">
 
-            <div className="container mx-auto max-w-7xl relative z-10">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
-                    <div className="max-w-2xl">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="inline-flex items-center gap-2 text-indigo-600 font-black tracking-[0.2em] uppercase text-[10px] mb-4 bg-indigo-50 px-3 py-1 rounded-full"
-                        >
-                            <Target className="w-3 h-3" />
-                            <span>Engineered for Velocity</span>
-                        </motion.div>
-                        <motion.h2
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter"
-                        >
-                            Why Choose <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">Active?</span>
-                        </motion.h2>
-                    </div>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="text-xl text-slate-500 max-w-md font-light leading-relaxed font-inter"
-                    >
-                        We've built a high-frequency hiring stack designed for candidates who value momentum over bureaucracy.
-                    </motion.p>
+                {/* Header */}
+                <div className="mb-12">
+                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-4">
+                        Trending Job Roles
+                    </h2>
+                    <p className="text-slate-500 max-w-2xl text-lg">
+                        Explore top career opportunities across high-demand sectors, from technology to creative arts, matching your skills with the best employers.
+                    </p>
                 </div>
 
-                {/* Refined Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 auto-rows-[minmax(400px,auto)]">
-                    {/* Hero Feature */}
-                    <FeatureCard
-                        icon={<Bot />}
-                        title="AI Hiring Agent"
-                        description="Your high-fidelity personal recruiter. Auto-generates precision JDs, filters 24/7, and eradicates ghost jobs so you focus on actual talent."
-                        delay={0}
-                        variant="accent"
-                        className="md:col-span-8"
+                {/* Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+                    {/* Creative & Design */}
+                    <ServiceCard
+                        title="CREATIVE & DESIGN"
+                        image="/images/feature_creative.png"
+                        tags={['UI/UX Design', '3D Modeling', 'Game Art', 'Animation']}
+                        className="md:col-span-4 bg-slate-100"
                     />
 
-                    <FeatureCard
-                        icon={<Zap />}
-                        title="The 4-Day Pulse"
-                        description="Jobs expire if inactive for 4 days. Stay relevant in a zero-stale-data ecosystem."
-                        delay={0.1}
-                        variant="dark"
-                        className="md:col-span-4"
+                    {/* Media & Production */}
+                    <ServiceCard
+                        title="MEDIA & PRODUCTION"
+                        image="/images/feature_video.png"
+                        tags={['Video Editing', 'Motion Graphics', 'Cinematography', 'Sound Design']}
+                        className="md:col-span-4 bg-slate-100"
+                        dark
                     />
 
-                    <FeatureCard
-                        icon={<FileText />}
-                        title="ATS Optimizer"
-                        description="Real-time resume scoring and keyword injection to ensure you bypass the algorithmic gatekeepers."
-                        delay={0.2}
-                        variant="light"
-                        className="md:col-span-4"
+                    {/* Brand Identity */}
+                    <ServiceCard
+                        title="BRAND IDENTITY"
+                        image="/images/feature_graphic.png"
+                        tags={['Logo Design', 'Illustration', 'Brand Strategy', 'Visual Identity']}
+                        className="md:col-span-4 bg-slate-100"
                     />
 
-                    <FeatureCard
-                        icon={<Target />}
-                        title="Trajectory Matching"
-                        description="We align you with companies based on growth velocity, cultural trajectory, and role impact."
-                        delay={0.3}
-                        variant="light"
-                        className="md:col-span-5"
-                    />
+                    {/* Digital Marketing */}
+                    <div className="md:col-span-8 flex flex-col md:flex-row gap-6 p-1 rounded-[2.5rem] bg-slate-50 border border-slate-100 min-h-[300px] overflow-hidden group hover:shadow-xl transition-all duration-500">
+                        {/* This mimics the wide card in the bottom right of the reference */}
+                        <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden rounded-[2rem]">
+                            <img src="/images/feature_marketing.png" className="absolute inset-0 w-full h-full object-cover" />
+                        </div>
+                        <div className="w-full md:w-1/2 p-6 md:py-10 flex flex-col justify-between">
+                            <div>
+                                <h3 className="text-2xl font-black uppercase tracking-tight mb-4 text-slate-900">Digital Marketing</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {['SEO Specialist', 'Content Manager', 'Growth Hacker', 'PPC Expert', 'Social Media'].map((tag, i) => (
+                                        <span key={i} className="text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-600">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex justify-end mt-6">
+                                <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <ArrowUpRight className="w-5 h-5" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <FeatureCard
-                        icon={<Users />}
-                        title="Alumni Network"
-                        description="Direct bridges to alumni at Fortune 500 and Top-Tier startups."
-                        delay={0.4}
-                        variant="light"
-                        className="md:col-span-3"
-                    />
+                    {/* Navigation/More */}
+                    <div className="md:col-span-4 flex items-center justify-center gap-4">
+                        <button
+                            className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none"
+                            aria-label="View previous trending jobs"
+                        >
+                            <ArrowLeft className="w-6 h-6 text-slate-400" aria-hidden="true" />
+                        </button>
+                        <button
+                            className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-slate-900 outline-none"
+                            aria-label="View next trending jobs"
+                        >
+                            <ArrowRight className="w-6 h-6" aria-hidden="true" />
+                        </button>
+                    </div>
 
-                    <FeatureCard
-                        icon={<Trophy />}
-                        title="Verified Skill Challenges"
-                        description="Proof is the new currency. Complete verified assessments and earn badges that top-tier companies actually trust."
-                        delay={0.5}
-                        variant="glass"
-                        className="md:col-span-12 !min-h-[300px]"
-                    />
                 </div>
             </div>
         </section>
