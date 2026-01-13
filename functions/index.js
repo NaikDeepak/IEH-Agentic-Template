@@ -48,7 +48,7 @@ const handleError = (res, error, context) => {
 // --- API Logic via Helper Functions ---
 
 // Helper to generate embedding (reusable)
-const generateEmbedding = async (text, apiKey) => {
+export const generateEmbedding = async (text, apiKey) => {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.embedContent({
         model: "text-embedding-004",
@@ -67,7 +67,7 @@ const generateEmbedding = async (text, apiKey) => {
 
 // --- Route Handlers ---
 
-const generateJdHandler = async (req, res) => {
+export const generateJdHandler = async (req, res) => {
     try {
         const { role, skills, experience } = req.body;
         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
@@ -90,7 +90,7 @@ const generateJdHandler = async (req, res) => {
     }
 };
 
-const embeddingHandler = async (req, res) => {
+export const embeddingHandler = async (req, res) => {
     try {
         const rawText = req.body?.text;
 
@@ -119,7 +119,7 @@ const embeddingHandler = async (req, res) => {
     }
 };
 
-const searchJobsHandler = async (req, res) => {
+export const searchJobsHandler = async (req, res) => {
     try {
         const { query: searchQuery, limit = 10 } = req.body;
 
