@@ -1,0 +1,46 @@
+import { GoogleGenAI } from "@google/genai";
+
+// Server-side (Cloud Run): uses GEMINI_API_KEY from apphosting.yaml secrets
+// Client-side (dev): uses VITE_GEMINI_API_KEY from .env
+const apiKey = typeof process !== 'undefined' && process.env?.GEMINI_API_KEY
+    ? process.env.GEMINI_API_KEY
+    : import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!apiKey) {
+    throw new Error(
+        "GEMINI_API_KEY is required. Set GEMINI_API_KEY in Cloud Run secrets or VITE_GEMINI_API_KEY in .env for local development."
+    );
+}
+
+const ai = new GoogleGenAI({ apiKey });
+
+/**
+ * Generates a vector embedding for the given text using gemini-embedding-exp-03-07 or text-embedding-004.
+ * We use 'text-embedding-004' as the stable standard for now.
+ */
+export async function generateEmbedding(text: string): Promise<number[]> {
+    if (!text.trim()) return [];
+
+    try {
+        // Note: In the new @google/genai SDK, we access models via ai.models
+        // We strictly use the model name 'text-embedding-004' for cost/performance balance
+        const response = await ai.models.embedContent({
+            model: "text-embedding-004",
+            contents: [
+                {
+                    parts: [{ text }],
+                },
+            ],
+        });
+
+        if (!response || !response.embeddings || !response.embeddings[0] || !response.embeddings[0].values) {
+            throw new Error("Invalid embedding response from Gemini API");
+        }
+
+        return response.embeddings[0].values;
+    } catch (error) {
+        console.error("Failed to generate embedding:", error);
+        // Return empty array or throw depending on strictness. For MVP, we throw to catch issues early.
+        throw error;
+    }
+}

@@ -4,3 +4,6 @@ runConfig:
   command: npm start
 buildConfig:
   runCommand: npm run build
+env:
+  - variable: GEMINI_API_KEY
+    secret: gemini-api-key
