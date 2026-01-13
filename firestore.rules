@@ -7,6 +7,7 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
 
+      // Allow creation of a user document with strict validation
       allow create: if request.auth != null
                     && request.auth.uid == userId
                     && request.resource.data.keys().hasOnly([
@@ -18,9 +19,27 @@ service cloud.firestore {
                       'last_login',
                       'created_at',
                       'updated_at'
-                    ]);
+                    ])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.email == request.auth.token.email
+                    && (
+                      request.resource.data.role == null
+                      || request.resource.data.role in ['seeker', 'employer']
+                    );
 
-      allow update: if request.auth != null && request.auth.uid == userId;
+      // Only allow safe user-controlled fields to change; role is immutable once set
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                      'displayName',
+                      'photoURL',
+                      'last_login',
+                      'updated_at',
+                      'skills',
+                      'parsed_data',
+                      'embedding'
+                    ])
+                    && (resource.data.role == null || request.resource.data.role == resource.data.role);
     }
 
     // Jobs Collection

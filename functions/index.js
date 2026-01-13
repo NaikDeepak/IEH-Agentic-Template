@@ -33,11 +33,13 @@ if (process.env.SENTRY_DSN) {
 const handleError = (res, error, context) => {
     console.error(`${context} Error:`, error);
     Sentry.captureException(error);
-    // Return detailed error for debugging
+    const isProd = process.env.NODE_ENV === "production";
+
     res.status(500).json({
         error: `Failed to ${context}`,
-        details: error.message,
-        stack: error.stack
+        ...(isProd
+            ? {}
+            : { details: error?.message, stack: error?.stack }),
     });
 };
 
@@ -148,12 +150,17 @@ const searchJobsHandler = async (req, res) => {
         });
         const client = await auth.getClient();
         const accessToken = await client.getAccessToken();
+        const token = typeof accessToken === "string" ? accessToken : accessToken?.token;
+
+        if (!token) {
+            throw new Error("Failed to acquire access token for Firestore REST API");
+        }
 
         const response = await fetch(fetchUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken.token}`
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 structuredQuery: {

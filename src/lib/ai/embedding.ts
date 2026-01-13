@@ -1,18 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Server-only: must be provided via runtime secret (never expose via VITE_* env vars)
-const apiKey =
-    typeof process !== 'undefined' && process.env?.GEMINI_API_KEY
-        ? process.env.GEMINI_API_KEY
-        : undefined;
+// Server-only: Lazy initialization to avoid crashes on client-side imports
+let ai: GoogleGenAI | null = null;
 
-if (!apiKey) {
-    throw new Error(
-        "GEMINI_API_KEY is required. Set GEMINI_API_KEY in Cloud Run secrets."
-    );
+function getAI(): GoogleGenAI {
+    const apiKey = process.env?.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        throw new Error(
+            "GEMINI_API_KEY is required. Set GEMINI_API_KEY in Cloud Run secrets."
+        );
+    }
+
+    if (!ai) {
+        ai = new GoogleGenAI({ apiKey });
+    }
+    return ai;
 }
-
-const ai = new GoogleGenAI({ apiKey });
 
 /**
  * Generates a vector embedding for the given text using gemini-embedding-exp-03-07 or text-embedding-004.
@@ -26,7 +30,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     try {
         // Note: In the new @google/genai SDK, we access models via ai.models
         // We strictly use the model name 'text-embedding-004' for cost/performance balance
-        const response = await ai.models.embedContent({
+        const response = await getAI().models.embedContent({
             model: "text-embedding-004",
             contents: [
                 {
