@@ -66,7 +66,8 @@ rules_version = '2';
                     ])
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
-                             && request.resource.data.embedding.size() == 768) )
+                             && request.resource.data.embedding.size() == 768
+                             && request.resource.data.embedding[0] is number) )
                     && ( !('skills' in request.resource.data)
                          || request.resource.data.skills is list );
 
@@ -84,12 +85,19 @@ rules_version = '2';
                       'updated_at',
                       'embedding'
                     ])
-                    && request.resource.data.employer_id == resource.data.employer_id;
+                    && request.resource.data.employer_id == resource.data.employer_id
+                    && ( !('embedding' in request.resource.data)
+                         || (request.resource.data.embedding is list
+                             && request.resource.data.embedding.size() == 768
+                             && request.resource.data.embedding[0] is number) )
+                    && ( !('skills' in request.resource.data)
+                         || request.resource.data.skills is list );
     }
 
     // Applications Collection
     match /applications/{appId} {
       allow create: if request.auth != null
+                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
                     && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'seeker'
                     // prevent arbitrary field injection
                     && request.resource.data.keys().hasOnly([

@@ -48,6 +48,47 @@ app.post('/api/ai/generate-jd', async (req, res) => {
     }
 });
 
+app.post('/api/embedding', async (req, res) => {
+    try {
+        const { text } = req.body;
+
+        if (!text) {
+            return res.status(400).json({ error: 'Text is required' });
+        }
+
+        // Use GEMINI_API_KEY if available (preferred for this specific feature based on prior context), 
+        // fallback to API_KEY.
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+
+        if (!apiKey) {
+            console.error('Missing API Key for embedding');
+            return res.status(500).json({ error: 'Server configuration error' });
+        }
+
+        const ai = new GoogleGenAI({ apiKey });
+
+        const response = await ai.models.embedContent({
+            model: "text-embedding-004",
+            contents: [
+                {
+                    parts: [{ text }],
+                },
+            ],
+        });
+
+        if (!response || !response.embeddings || !response.embeddings[0] || !response.embeddings[0].values) {
+            throw new Error("Invalid embedding response from Gemini API");
+        }
+
+        res.json({ embedding: response.embeddings[0].values });
+
+    } catch (error) {
+        console.error('Embedding Generation Error:', error);
+        Sentry.captureException(error);
+        res.status(500).json({ error: 'Failed to generate embedding' });
+    }
+});
+
 // All other GET requests serve the index.html (SPA support)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));

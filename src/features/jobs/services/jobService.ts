@@ -7,10 +7,26 @@ import {
     getDoc
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { generateEmbedding } from "../../../lib/ai/embedding";
-import type { CreateJobInput, JobPosting, JobType, WorkMode } from "../types";
+import type { CreateJobInput, JobPosting } from "../types";
+
+
 
 const JOBS_COLLECTION = "jobs";
+
+async function fetchEmbedding(text: string): Promise<number[]> {
+    const res = await fetch("/api/embedding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Embedding service failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.embedding ?? [];
+}
 
 export const JobService = {
     /**
@@ -28,7 +44,7 @@ export const JobService = {
         Description: ${input.description}
       `.trim();
 
-            const embedding = await generateEmbedding(semanticText);
+            const embedding = await fetchEmbedding(semanticText);
 
             // 2. Prepare Data
             const jobData: Omit<JobPosting, 'id'> = {
@@ -79,12 +95,12 @@ export const JobService = {
 
                 const currentData = snap.data() as JobPosting;
 
-                const finalTitle = ('title' in updates) ? (updates.title ?? "") : currentData.title;
-                const finalDescription = ('description' in updates) ? (updates.description ?? "") : currentData.description;
-                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : (currentData.skills ?? []);
-                const finalLocation = ('location' in updates) ? (updates.location ?? "") : currentData.location;
-                const finalType = ('type' in updates) ? (updates.type as JobType) : currentData.type;
-                const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode as WorkMode) : currentData.work_mode;
+                const finalTitle = ('title' in updates) ? (updates.title ?? currentData.title) : currentData.title;
+                const finalDescription = ('description' in updates) ? (updates.description ?? currentData.description) : currentData.description;
+                const finalSkills = ('skills' in updates) ? (updates.skills ?? currentData.skills ?? []) : (currentData.skills ?? []);
+                const finalLocation = ('location' in updates) ? (updates.location ?? currentData.location) : currentData.location;
+                const finalType = ('type' in updates) ? (updates.type ?? currentData.type) : currentData.type;
+                const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode;
 
                 const semanticText = `
                     Title: ${finalTitle}
@@ -94,7 +110,7 @@ export const JobService = {
                     Description: ${finalDescription}
                 `.trim();
 
-                const embedding = await generateEmbedding(semanticText);
+                const embedding = await fetchEmbedding(semanticText);
                 updateData.embedding = embedding;
 
                 if ('skills' in updates) {
