@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:full": "concurrently \"npm start\" \"npm run dev\"",
     "build": "tsc -b && vite build",
     "start": "node index.js",
     "lint": "eslint .",
@@ -19,6 +20,7 @@
     "@google/genai": "^1.35.0",
     "@sentry/node": "^10.32.1",
     "@tailwindcss/vite": "^4.0.0",
+    "dotenv": "^17.2.3",
     "express": "^4.22.1",
     "firebase": "^12.7.0",
     "react": "^19.2.0",
@@ -36,6 +38,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.16",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

@@ -7,6 +7,7 @@ import {
     getDoc
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import type { CreateJobInput, JobPosting } from "../types";
 
 
@@ -25,7 +26,13 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     }
 
     const data = await res.json();
-    return data.embedding ?? [];
+    const embedding = data?.embedding;
+
+    if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
+        throw new Error("Embedding service returned invalid vector");
+    }
+
+    return embedding as number[];
 }
 
 export const JobService = {

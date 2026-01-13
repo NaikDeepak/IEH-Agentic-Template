@@ -5,7 +5,21 @@ import {
     getDoc
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { generateEmbedding } from "../../../lib/ai/embedding";
+// NOTE: embeddings must be generated server-side via /api/embedding (never import server-only SDKs in the browser)
+async function fetchEmbedding(text: string): Promise<number[]> {
+    const res = await fetch("/api/embedding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Embedding service failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.embedding ?? [];
+}
 import type { UpdateProfileInput, UserProfile } from "../types";
 
 const USERS_COLLECTION = "users";
@@ -57,7 +71,7 @@ export const CandidateService = {
                     Bio: ${finalBio}
                 `.trim();
 
-                const embedding = await generateEmbedding(semanticText);
+                const embedding = await fetchEmbedding(semanticText);
                 updateData.embedding = embedding;
             }
 

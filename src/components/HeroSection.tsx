@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { searchJobs } from '../lib/ai/search';
 import { Search, ArrowRight, Star, DollarSign } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSearch = async () => {
+        if (!searchTerm.trim()) return;
+
+        setIsLoading(true);
+        try {
+            console.log("Initiating search for:", searchTerm);
+            // This triggers the /api/embedding call
+            const results = await searchJobs(searchTerm);
+            console.log("Search Results:", results);
+        } catch (error) {
+            console.error("Search failed:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section className="relative w-full pt-2 md:pt-4 pb-12 md:pb-20 px-2 md:px-6 flex flex-col items-center overflow-hidden bg-slate-50 font-sans">
 
@@ -70,12 +90,17 @@ export const HeroSection: React.FC = () => {
                             <Search className="w-5 h-5 md:w-6 md:h-6 text-slate-400 ml-3 md:ml-4 shrink-0" aria-hidden="true" />
                             <input
                                 type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 placeholder="Search 'Java Developer'..."
                                 aria-label="Search jobs for 'Java Developer' or 'HR Manager'"
                                 className="flex-1 bg-transparent border-none outline-none px-3 md:px-4 text-sm md:text-base placeholder:text-slate-400 text-slate-800 min-w-0 font-medium"
                             />
                             <button
-                                className="w-10 h-10 md:w-12 md:h-12 bg-slate-900 rounded-full flex items-center justify-center text-white hover:bg-indigo-600 transition-colors shrink-0 shadow-md"
+                                onClick={handleSearch}
+                                disabled={isLoading}
+                                className={`w-10 h-10 md:w-12 md:h-12 bg-slate-900 rounded-full flex items-center justify-center text-white hover:bg-indigo-600 transition-colors shrink-0 shadow-md ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 aria-label="Submit job search"
                             >
                                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />

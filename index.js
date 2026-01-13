@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import 'dotenv/config';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 import * as Sentry from "@sentry/node";
@@ -48,52 +49,159 @@ app.post('/api/ai/generate-jd', async (req, res) => {
     }
 });
 
-app.post('/api/embedding', async (req, res) => {
-    try {
-        const { text } = req.body;
+// Helper to generate embedding (reusable)
+const generateEmbedding = async (text, apiKey) => {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.embedContent({
+        model: "text-embedding-004",
+        contents: [{ parts: [{ text }] }],
+    });
+    if (!response?.embeddings?.[0]?.values) {
+        throw new Error("Invalid embedding response from Gemini API");
+    }
+    return response.embeddings[0].values;
+};
 
+export const embeddingHandler = async (req, res) => {
+    try {
+        const rawText = req.body?.text;
+
+        if (typeof rawText !== 'string') {
+            return res.status(400).json({ error: 'Text is required' });
+        }
+
+        const text = rawText.trim();
         if (!text) {
             return res.status(400).json({ error: 'Text is required' });
         }
 
-        // Use GEMINI_API_KEY if available (preferred for this specific feature based on prior context), 
-        // fallback to API_KEY.
-        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+        if (text.length > 5000) {
+            return res.status(413).json({ error: 'Text is too long' });
+        }
 
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
         if (!apiKey) {
-            console.error('Missing API Key for embedding');
             return res.status(500).json({ error: 'Server configuration error' });
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-
-        const response = await ai.models.embedContent({
-            model: "text-embedding-004",
-            contents: [
-                {
-                    parts: [{ text }],
-                },
-            ],
-        });
-
-        if (!response || !response.embeddings || !response.embeddings[0] || !response.embeddings[0].values) {
-            throw new Error("Invalid embedding response from Gemini API");
-        }
-
-        res.json({ embedding: response.embeddings[0].values });
+        const values = await generateEmbedding(text, apiKey);
+        res.json({ embedding: values });
 
     } catch (error) {
         console.error('Embedding Generation Error:', error);
         Sentry.captureException(error);
         res.status(500).json({ error: 'Failed to generate embedding' });
     }
-});
+};
+
+export const searchJobsHandler = async (req, res) => {
+    try {
+        const { query: searchQuery, limit = 10 } = req.body;
+
+        if (!searchQuery || typeof searchQuery !== 'string') {
+            return res.status(400).json({ error: 'Query string is required' });
+        }
+
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ error: 'Server configuration error' });
+        }
+
+        // 1. Generate Embedding
+        const queryVector = await generateEmbedding(searchQuery, apiKey);
+
+        // 2. Call Firestore REST API for Vector Search
+        const projectId = process.env.VITE_FIREBASE_PROJECT_ID || 'india-emp-hub';
+        const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
+
+        // Using Web API Key for public access (since rules allow read)
+        const firebaseApiKey = process.env.VITE_FIREBASE_API_KEY;
+
+        const response = await fetch(`${url}?key=${firebaseApiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                structuredQuery: {
+                    from: [{ collectionId: 'jobs' }],
+                    findNearest: {
+                        vectorField: { fieldPath: 'embedding' },
+                        queryVector: {
+                            mapValue: {
+                                fields: {
+                                    __type__: { stringValue: "__vector__" },
+                                    value: {
+                                        arrayValue: {
+                                            values: queryVector.map(v => ({ doubleValue: v }))
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        distanceMeasure: 'COSINE',
+                        limit: Number(limit)
+                    }
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Firestore REST API failed: ${response.status} ${errText}`);
+        }
+
+        const data = await response.json();
+
+        // 3. Transform response to clean objects
+        // REST API returns [{document: {name, fields: {...}, createTime, ...}}, {readTime: ...}]
+        const jobs = data
+            .filter(item => item.document) // Filter out metadata items
+            .map(item => {
+                const doc = item.document;
+                const id = doc.name.split('/').pop();
+                const fields = doc.fields || {};
+
+                // Helper to unwrap Firestore JSON syntax
+                const unwrap = (field) => {
+                    const key = Object.keys(field)[0];
+                    if (key === 'stringValue') return field.stringValue;
+                    if (key === 'integerValue') return Number(field.integerValue);
+                    if (key === 'doubleValue') return Number(field.doubleValue);
+                    if (key === 'booleanValue') return field.booleanValue;
+                    if (key === 'arrayValue') return (field.arrayValue.values || []).map(unwrap);
+                    if (key === 'mapValue') return Object.fromEntries(Object.entries(field.mapValue.fields || {}).map(([k, v]) => [k, unwrap(v)]));
+                    return null;
+                };
+
+                const unwrappedData = Object.fromEntries(
+                    Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
+                );
+
+                return { id, ...unwrappedData };
+            });
+
+        res.json({ jobs });
+
+    } catch (error) {
+        console.error('Job Search Error:', error);
+        Sentry.captureException(error);
+        res.status(500).json({ error: 'Failed to search jobs' });
+    }
+};
+
+app.post('/api/embedding', embeddingHandler);
+app.post('/api/jobs/search', searchJobsHandler);
 
 // All other GET requests serve the index.html (SPA support)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+// Create a named export for the app as well
+export { app };
+
+// Only listen if run directly (ESM check)
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
+}
