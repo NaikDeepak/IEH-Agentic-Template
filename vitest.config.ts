@@ -6,11 +6,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
     plugins: [react()],
     resolve: {
-        alias: {
-            '@google/genai': '/Users/deepaknaik/Downloads/1. AI Live/IEH/node_modules/@google/genai',
-            'google-auth-library': '/Users/deepaknaik/Downloads/1. AI Live/IEH/node_modules/google-auth-library',
-            '@sentry/node': '/Users/deepaknaik/Downloads/1. AI Live/IEH/node_modules/@sentry/node'
-        }
+        alias: {}
     },
     test: {
         environment: 'jsdom',

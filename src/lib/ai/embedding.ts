@@ -40,14 +40,22 @@ export async function generateEmbedding(text: string): Promise<number[]> {
             ],
         });
 
+        const validate = (values: unknown) => {
+            if (!Array.isArray(values) || values.length !== EMBEDDING_DIMENSION) return null;
+            if (!Number.isFinite(values[0] as number) || !Number.isFinite(values[EMBEDDING_DIMENSION - 1] as number)) return null;
+            return values as number[];
+        };
+
         // Check for 'embedding' (singular) - often used in newer SDK versions/single requests
         if (response?.embedding?.values) {
-            return response.embedding.values;
+            const v = validate(response.embedding.values);
+            if (v) return v;
         }
 
         // Check for 'embeddings' (plural) - used in batch requests or older SDK versions
         if (response?.embeddings?.[0]?.values) {
-            return response.embeddings[0].values;
+            const v = validate(response.embeddings[0].values);
+            if (v) return v;
         }
 
         throw new Error("Invalid embedding response from Gemini API");

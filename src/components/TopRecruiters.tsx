@@ -12,7 +12,7 @@ export const TopRecruiters: React.FC = () => (
                     <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2 block">Top Employers</span>
                     <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 uppercase tracking-tight">Hiring Now</h2>
                     <p className="text-slate-500 mb-8 text-lg">Join thousands of companies using IEH to find their next superstar. From tech giants to fast-growing startups.</p>
-                    <button className="px-8 py-4 bg-slate-900 text-white font-bold rounded-full hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 group">
+                    <button type="button" className="px-8 py-4 bg-slate-900 text-white font-bold rounded-full hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 group">
                         Explore Companies
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </button>
