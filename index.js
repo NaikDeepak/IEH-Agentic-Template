@@ -4,6 +4,13 @@ import 'dotenv/config';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 import * as Sentry from "@sentry/node";
+import { initializeApp, applicationDefault } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+
+// Initialize Firebase Admin SDK
+// This automatically uses GOOGLE_APPLICATION_CREDENTIALS or default credentials in Cloud Run
+initializeApp();
+const db = getFirestore();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
