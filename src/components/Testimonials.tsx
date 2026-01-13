@@ -46,7 +46,7 @@ export const Testimonials: React.FC = () => {
 
                                     <div className="hidden md:flex flex-col items-end">
                                         <div className="flex gap-1 mb-1">
-                                            {[...Array(5)].map((_, i) => (
+                                            {Array.from({ length: 5 }).map((_, i) => (
                                                 <Star key={i} className="w-4 h-4 fill-slate-900 text-slate-900" />
                                             ))}
                                         </div>

@@ -11,10 +11,8 @@ export const HeroSection: React.FC = () => {
 
         setIsLoading(true);
         try {
-            console.log("Initiating search for:", searchTerm);
             // This triggers the /api/embedding call
-            const results = await searchJobs(searchTerm);
-            console.log("Search Results:", results);
+            await searchJobs(searchTerm);
         } catch (error) {
             console.error("Search failed:", error);
         } finally {
@@ -63,7 +61,7 @@ export const HeroSection: React.FC = () => {
                             <div className="flex items-center justify-between">
                                 <span className="font-bold text-sm text-slate-800">Trusted by Recruiters</span>
                                 <div className="flex gap-0.5">
-                                    {[...Array(5)].map((_, i) => (
+                                    {Array.from({ length: 5 }).map((_, i) => (
                                         <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                                     ))}
                                 </div>
@@ -91,7 +89,7 @@ export const HeroSection: React.FC = () => {
                             <input
                                 type="text"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => { setSearchTerm(e.target.value); }}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                 placeholder="Search 'Java Developer'..."
                                 aria-label="Search jobs for 'Java Developer' or 'HR Manager'"

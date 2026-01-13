@@ -39,16 +39,16 @@ describe('Frontend Services Logic', () => {
             };
 
             // Mock embedding API
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: new Array(768).fill(0.1) })
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (addDoc as any).mockResolvedValueOnce({ id: 'job123' });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             const jobId = await JobService.createJob(input as any);
 
             expect(jobId).toBe('job123');
@@ -64,20 +64,20 @@ describe('Frontend Services Logic', () => {
             const updates = { title: 'Senior Software Engineer' };
 
             // Mock getDoc for current data
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (getDoc as any).mockResolvedValueOnce({
                 exists: () => true,
                 data: () => ({ title: 'Software Engineer', skills: ['React'], location: 'US', type: 'FT', work_mode: 'REMOTE', description: 'desc' })
             });
 
             // Mock embedding API
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: new Array(768).fill(0.2) })
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             await JobService.updateJob(jobId, updates as any);
 
             expect(updateDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
@@ -92,19 +92,19 @@ describe('Frontend Services Logic', () => {
             const uid = 'user123';
             const updates = { skills: ['Node.js'] };
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (getDoc as any).mockResolvedValueOnce({
                 exists: () => true,
                 data: () => ({ skills: ['React'], parsed_data: { summary: 'bio' } })
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: [0.5] })
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             await CandidateService.updateProfile(uid, updates as any);
 
             expect(updateDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
@@ -116,7 +116,7 @@ describe('Frontend Services Logic', () => {
 
     describe('searchJobs', () => {
         it('should call the backend API and return jobs', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ jobs: [{ id: '1', title: 'Job 1' }] })

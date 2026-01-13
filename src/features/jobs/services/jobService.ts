@@ -14,6 +14,10 @@ import type { CreateJobInput, JobPosting } from "../types";
 
 const JOBS_COLLECTION = "jobs";
 
+interface EmbeddingResponse {
+    embedding?: number[];
+}
+
 async function fetchEmbedding(text: string): Promise<number[]> {
     const res = await fetch("/api/embedding", {
         method: "POST",
@@ -22,17 +26,17 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     });
 
     if (!res.ok) {
-        throw new Error(`Embedding service failed: ${res.status}`);
+        throw new Error(`Embedding service failed: ${res.status.toString()}`);
     }
 
-    const data = await res.json();
-    const embedding = data?.embedding;
+    const data = (await res.json()) as EmbeddingResponse;
+    const embedding = data.embedding;
 
     if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
         throw new Error("Embedding service returned invalid vector");
     }
 
-    return embedding as number[];
+    return embedding;
 }
 
 export const JobService = {
@@ -104,7 +108,7 @@ export const JobService = {
 
                 const finalTitle = ('title' in updates) ? (updates.title ?? currentData.title) : currentData.title;
                 const finalDescription = ('description' in updates) ? (updates.description ?? currentData.description) : currentData.description;
-                const finalSkills = ('skills' in updates) ? (updates.skills ?? currentData.skills ?? []) : (currentData.skills ?? []);
+                const finalSkills = ('skills' in updates) ? (updates.skills ?? currentData.skills) : currentData.skills;
                 const finalLocation = ('location' in updates) ? (updates.location ?? currentData.location) : currentData.location;
                 const finalType = ('type' in updates) ? (updates.type ?? currentData.type) : currentData.type;
                 const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode;

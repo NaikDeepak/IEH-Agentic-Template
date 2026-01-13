@@ -16,18 +16,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        let isMounted = true;
-
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (!isMounted) return;
             setUser(user);
 
             if (user) {
                 try {
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userDocRef);
-
-                    if (!isMounted) return;
 
                     if (userDoc.exists()) {
                         setUserData(userDoc.data() as UserData);
@@ -57,17 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 } catch (err: unknown) {
                     const error = err as { code?: string; message?: string };
                     console.error("Firestore Error:", error);
-                    setError(error.message || "An error occurred while fetching user data.");
+                    setError(error.message ?? "An error occurred while fetching user data.");
                 }
             } else {
                 setUserData(null);
             }
 
-            if (isMounted) setLoading(false);
+            setLoading(false);
         });
 
         return () => {
-            isMounted = false;
             unsubscribe();
         };
     }, []);
@@ -79,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err: unknown) {
             const error = err as { message?: string };
             console.error("Google Sign-In Error:", error);
-            setError(error.message || "Failed to sign in with Google.");
+            setError(error.message ?? "Failed to sign in with Google.");
             throw err;
         }
     }, []);
@@ -91,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err: unknown) {
             const error = err as { message?: string };
             console.error("Logout Error:", error);
-            setError(error.message || "Failed to sign out.");
+            setError(error.message ?? "Failed to sign out.");
             throw err;
         }
     }, []);
@@ -106,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err: unknown) {
             const error = err as { message?: string };
             console.error("Error refreshing user data:", error);
-            setError(error.message || "Failed to refresh user data.");
+            setError(error.message ?? "Failed to refresh user data.");
             throw err;
         }
     }, [user]);

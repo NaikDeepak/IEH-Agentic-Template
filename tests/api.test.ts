@@ -27,9 +27,9 @@ vi.mock('@sentry/node', () => ({
 }));
 
 describe('API Endpoint: /api/embedding', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let req: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let res: any;
 
     beforeEach(() => {

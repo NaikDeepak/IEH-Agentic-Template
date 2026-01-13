@@ -14,8 +14,8 @@ class IntersectionObserver {
     unobserve = vi.fn()
     takeRecords = vi.fn(() => [])
     root: Element | Document | null = null
-    rootMargin: string = ''
-    thresholds: ReadonlyArray<number> = []
+    rootMargin = ''
+    thresholds: readonly number[] = []
 
     constructor(callback: IntersectionObserverCallback) {
         this.callback = callback
@@ -39,7 +39,6 @@ class ResizeObserver {
     observe = vi.fn()
     disconnect = vi.fn()
     unobserve = vi.fn()
-    constructor() { }
 }
 
 Object.defineProperty(window, 'ResizeObserver', {
@@ -57,7 +56,7 @@ Object.defineProperty(globalThis, 'ResizeObserver', {
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: vi.fn().mockImplementation(query => ({
+    value: vi.fn().mockImplementation((query: string) => ({
         matches: false,
         media: query,
         onchange: null,

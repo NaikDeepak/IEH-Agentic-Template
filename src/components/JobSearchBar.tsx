@@ -43,14 +43,14 @@ export const JobSearchBar: React.FC = () => {
                     aria-label="Job search"
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => { setSearchTerm(e.target.value); }}
                     placeholder="Ex: Product Designer in Bangalore..."
                     className="flex-grow bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 text-lg py-2 font-inter"
                 />
 
                 <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 relative" ref={dropdownRef}>
                     <button
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        onClick={() => { setIsDropdownOpen(!isDropdownOpen); }}
                         className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors py-2"
                         aria-expanded={isDropdownOpen}
                         aria-haspopup="listbox"

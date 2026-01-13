@@ -53,9 +53,9 @@ global.fetch = vi.fn();
 import { generateJdHandler, embeddingHandler, searchJobsHandler } from '../functions/index.js';
 
 describe('Functions: API Handlers', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let req: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let res: any;
 
     beforeEach(() => {
@@ -121,7 +121,7 @@ describe('Functions: API Handlers', () => {
                 embedding: { values: [0.1] }
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ([{

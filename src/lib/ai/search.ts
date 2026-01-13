@@ -14,7 +14,11 @@
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching job documents with their IDs and data
  */
-export async function searchJobs(searchQuery: string, limitCount = 10) {
+interface JobSearchResult {
+    jobs?: unknown[];
+}
+
+export async function searchJobs(searchQuery: string, limitCount = 10): Promise<unknown[]> {
     try {
         const response = await fetch('/api/jobs/search', {
             method: 'POST',
@@ -24,11 +28,11 @@ export async function searchJobs(searchQuery: string, limitCount = 10) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Search failed: ${response.status} ${errorText}`);
+            throw new Error(`Search failed: ${response.status.toString()} ${errorText}`);
         }
 
-        const data = await response.json();
-        return data.jobs || [];
+        const data = (await response.json()) as JobSearchResult;
+        return data.jobs ?? [];
 
     } catch (error) {
         console.error("Vector Search failed (Server-Side):", error);

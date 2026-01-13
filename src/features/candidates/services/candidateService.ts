@@ -6,6 +6,10 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 // NOTE: embeddings must be generated server-side via /api/embedding (never import server-only SDKs in the browser)
+interface EmbeddingResponse {
+    embedding?: number[];
+}
+
 async function fetchEmbedding(text: string): Promise<number[]> {
     const res = await fetch("/api/embedding", {
         method: "POST",
@@ -14,10 +18,10 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     });
 
     if (!res.ok) {
-        throw new Error(`Embedding service failed: ${res.status}`);
+        throw new Error(`Embedding service failed: ${res.status.toString()}`);
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as EmbeddingResponse;
     return data.embedding ?? [];
 }
 import type { UpdateProfileInput, UserProfile } from "../types";
@@ -61,9 +65,9 @@ export const CandidateService = {
                     };
                 }
 
-                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : (currentData.skills ?? []);
-                const finalBio = ('bio' in updates) ? (updates.bio ?? "") : (currentData.parsed_data?.summary ?? "");
-                const displayName = ('displayName' in updates) ? (updates.displayName ?? "") : (currentData.displayName ?? "");
+                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : currentData.skills;
+                const finalBio = updates.bio ?? currentData.parsed_data?.summary ?? "";
+                const displayName = updates.displayName ?? currentData.displayName;
 
                 const semanticText = `
                     Candidate: ${displayName}
