@@ -8,6 +8,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
@@ -21,6 +22,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }

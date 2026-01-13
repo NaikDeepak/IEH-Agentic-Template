@@ -5,6 +5,8 @@ import {
     getDoc
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import type { UpdateProfileInput, UserProfile } from "../types";
+
 // NOTE: embeddings must be generated server-side via /api/embedding (never import server-only SDKs in the browser)
 interface EmbeddingResponse {
     embedding?: number[];
@@ -24,7 +26,6 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     const data = (await res.json()) as EmbeddingResponse;
     return data.embedding ?? [];
 }
-import type { UpdateProfileInput, UserProfile } from "../types";
 
 const USERS_COLLECTION = "users";
 
