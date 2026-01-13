@@ -1,27 +1,27 @@
 rules_version = '2';
- 
- service cloud.firestore {
-   match /databases/{database}/documents {
-     // Users can read and update their own user document.
-     // They cannot change their role once it has been set.
-     match /users/{userId} {
-       allow read: if request.auth != null && request.auth.uid == userId;
 
-       allow create: if request.auth != null
-                     && request.auth.uid == userId
-                     && request.resource.data.keys().hasOnly([
-                       'uid',
-                       'email',
-                       'displayName',
-                       'photoURL',
-                       'role',
-                       'last_login',
-                       'created_at',
-                       'updated_at',
-       allow create: if true;
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and update their own user document.
+    // They cannot change their role once it has been set.
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
 
-       allow update: if true;
-     }
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.keys().hasOnly([
+                      'uid',
+                      'email',
+                      'displayName',
+                      'photoURL',
+                      'role',
+                      'last_login',
+                      'created_at',
+                      'updated_at'
+                    ]);
+
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
 
     // Jobs Collection
     match /jobs/{jobId} {
@@ -45,10 +45,6 @@ rules_version = '2';
                       'updated_at',
                       'embedding'
                     ])
-                    && ( !('embedding' in request.resource.data)
-                         || (request.resource.data.embedding is list
-      allow create: if request.auth != null
-                    // Additional validation to ensure the job data structure is correct
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
                              && request.resource.data.embedding.size() == 768
