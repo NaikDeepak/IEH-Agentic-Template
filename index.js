@@ -123,8 +123,9 @@ export const searchJobsHandler = async (req, res) => {
 
         // Using Web API Key for public access (since rules allow read)
         const firebaseApiKey = process.env.VITE_FIREBASE_API_KEY;
+        const fetchUrl = firebaseApiKey ? `${url}?key=${firebaseApiKey}` : url;
 
-        const response = await fetch(`${url}?key=${firebaseApiKey}`, {
+        const response = await fetch(fetchUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -182,6 +183,9 @@ export const searchJobsHandler = async (req, res) => {
                 const unwrappedData = Object.fromEntries(
                     Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
                 );
+
+                // Remove large embedding vector to optimize response payload
+                delete unwrappedData.embedding;
 
                 return { id, ...unwrappedData };
             });
