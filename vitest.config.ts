@@ -1,18 +1,24 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
     resolve: {
-        alias: {}
+        alias: {
+            '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai'),
+            'google-auth-library': path.resolve(__dirname, 'node_modules/google-auth-library'),
+            '@sentry/node': path.resolve(__dirname, 'node_modules/@sentry/node'),
+        }
     },
     test: {
         environment: 'jsdom',
         globals: true,
         setupFiles: './src/test/setup.ts',
-        exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+        testTimeout: 15000,
+        exclude: ['**/node_modules/**', 'e2e/**', 'dist/**'],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],

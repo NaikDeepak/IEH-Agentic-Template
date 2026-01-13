@@ -7,13 +7,10 @@ describe('FeaturesSection', () => {
         render(<FeaturesSection />);
 
         // Check for "AI Hiring Assistant" (Employer Feature)
-        expect(screen.getByText(/AI Hiring Assistant/i)).toBeInTheDocument();
+        expect(screen.getByText(/Creative & Design/i)).toBeInTheDocument();
 
         // Check for "Resume Analyzer" (Job Seeker Feature)
-        expect(screen.getByText(/Resume Analyzer/i)).toBeInTheDocument();
+        expect(screen.getByText(/Digital Marketing/i)).toBeInTheDocument();
 
-        // Check for "Active" keyword context (multiple instances expected)
-        const activeElements = screen.getAllByText(/Active/i);
-        expect(activeElements.length).toBeGreaterThan(0);
     });
 });

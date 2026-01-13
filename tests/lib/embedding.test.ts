@@ -29,7 +29,7 @@ vi.mock('@google/genai', () => {
 describe('Lib: Embedding Service', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        process.env.GEMINI_API_KEY = 'test-key';
+        process.env['GEMINI_API_KEY'] = 'test-key';
     });
 
     it('should return empty array if text is empty', async () => {
@@ -70,7 +70,7 @@ describe('Lib: Embedding Service', () => {
     });
 
     it('should throw error if GEMINI_API_KEY is missing (when getAI is called)', async () => {
-        delete process.env.GEMINI_API_KEY;
+        delete process.env['GEMINI_API_KEY'];
 
         // Note: verify that the error happens inside the function call
         // Since we are mocking dynamic import, the strict process.env check might need to be simulated carefully.

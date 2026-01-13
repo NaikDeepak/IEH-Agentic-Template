@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+// @ts-expect-error - JS import in TS test
 import { embeddingHandler } from '../index.js';
 
 // Mock Sentry
@@ -27,15 +28,15 @@ vi.mock('@sentry/node', () => ({
 }));
 
 describe('API Endpoint: /api/embedding', () => {
-     
+
     let req: any;
-     
+
     let res: any;
 
     beforeEach(() => {
         vi.clearAllMocks();
         // Reset env
-        process.env.GEMINI_API_KEY = 'test-key';
+        process.env['GEMINI_API_KEY'] = 'test-key';
 
         req = {
             body: {}
@@ -75,8 +76,8 @@ describe('API Endpoint: /api/embedding', () => {
     });
 
     it('should return 500 if API Key is missing', async () => {
-        delete process.env.GEMINI_API_KEY;
-        delete process.env.API_KEY;
+        delete process.env['GEMINI_API_KEY'];
+        delete process.env['API_KEY'];
 
         req.body = { text: 'valid text' };
         await embeddingHandler(req, res);

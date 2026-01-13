@@ -65,7 +65,7 @@ export const CandidateService = {
                     };
                 }
 
-                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : currentData.skills;
+                const finalSkills = updates.skills ?? currentData.skills ?? [];
                 const finalBio = updates.bio ?? currentData.parsed_data?.summary ?? "";
                 const displayName = updates.displayName ?? currentData.displayName;
 
