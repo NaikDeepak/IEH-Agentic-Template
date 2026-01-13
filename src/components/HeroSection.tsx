@@ -101,16 +101,16 @@ export const HeroSection: React.FC = () => {
 
 
                         {/* Masked Image Container */}
-                        <div className="relative w-full h-[110%] md:h-[115%] flex items-end justify-end bottom-[-10%] md:bottom-[-5%]" >
+                        <div className="relative w-full h-[90%] md:h-[95%] flex items-end justify-end bottom-0 md:bottom-[-2.5%]" >
                             <img
                                 src="/images/hero.png"
                                 alt="Indian Tech Professional"
-                                className="h-full w-auto object-cover max-w-none md:max-w-full"
+                                className="h-full w-auto object-cover max-w-none md:max-w-full translate-x-[20%] md:translate-x-[15%]"
                                 style={{ maskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)' }}
                             />
 
                             {/* Floating Value Card (Desktop Only) */}
-                            <div className="hidden md:flex absolute bottom-40 -left-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 z-30 items-center gap-4 animate-bounce-slow">
+                            <div className="hidden md:flex absolute bottom-40 left-16 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100 z-30 items-center gap-4 animate-bounce-slow">
                                 <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
                                     <DollarSign className="w-6 h-6" />
                                 </div>
