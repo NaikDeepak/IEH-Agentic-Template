@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { generateEmbedding } from "../../../lib/ai/embedding";
-import type { CreateJobInput, JobPosting } from "../types";
+import type { CreateJobInput, JobPosting, JobType, WorkMode } from "../types";
 
 const JOBS_COLLECTION = "jobs";
 
@@ -61,8 +61,16 @@ export const JobService = {
                 updated_at: serverTimestamp()
             };
 
-            // If semantic fields change, regenerate embedding
-            if (updates.title || updates.description || updates.skills) {
+            // If semantic fields change, regenerate embedding (use key-presence, not truthiness)
+            const shouldRegenEmbedding =
+                ('title' in updates) ||
+                ('description' in updates) ||
+                ('skills' in updates) ||
+                ('location' in updates) ||
+                ('type' in updates) ||
+                ('work_mode' in updates);
+
+            if (shouldRegenEmbedding) {
                 const snap = await getDoc(docRef);
 
                 if (!snap.exists()) {
@@ -71,13 +79,12 @@ export const JobService = {
 
                 const currentData = snap.data() as JobPosting;
 
-                // Merge current data with updates for complete embedding context
-                const finalTitle = updates.title || currentData.title;
-                const finalDescription = updates.description || currentData.description;
-                const finalSkills = updates.skills || currentData.skills;
-                const finalLocation = currentData.location;
-                const finalType = currentData.type;
-                const finalWorkMode = currentData.work_mode;
+                const finalTitle = ('title' in updates) ? (updates.title ?? "") : currentData.title;
+                const finalDescription = ('description' in updates) ? (updates.description ?? "") : currentData.description;
+                const finalSkills = ('skills' in updates) ? (updates.skills ?? []) : (currentData.skills ?? []);
+                const finalLocation = ('location' in updates) ? (updates.location ?? "") : currentData.location;
+                const finalType = ('type' in updates) ? (updates.type as JobType) : currentData.type;
+                const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode as WorkMode) : currentData.work_mode;
 
                 const semanticText = `
                     Title: ${finalTitle}
@@ -90,9 +97,8 @@ export const JobService = {
                 const embedding = await generateEmbedding(semanticText);
                 updateData.embedding = embedding;
 
-                // Normalize skills if being updated
-                if (updates.skills) {
-                    updateData.skills = updates.skills.map(s => s.toLowerCase());
+                if ('skills' in updates) {
+                    updateData.skills = finalSkills.map(s => s.toLowerCase());
                 }
             }
 

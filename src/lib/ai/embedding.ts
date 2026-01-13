@@ -1,14 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Server-side (Cloud Run): uses GEMINI_API_KEY from apphosting.yaml secrets
-// Client-side (dev): uses VITE_GEMINI_API_KEY from .env
-const apiKey = typeof process !== 'undefined' && process.env?.GEMINI_API_KEY
-    ? process.env.GEMINI_API_KEY
-    : import.meta.env.VITE_GEMINI_API_KEY;
+// Server-only: must be provided via runtime secret (never expose via VITE_* env vars)
+const apiKey =
+    typeof process !== 'undefined' && process.env?.GEMINI_API_KEY
+        ? process.env.GEMINI_API_KEY
+        : undefined;
 
 if (!apiKey) {
     throw new Error(
-        "GEMINI_API_KEY is required. Set GEMINI_API_KEY in Cloud Run secrets or VITE_GEMINI_API_KEY in .env for local development."
+        "GEMINI_API_KEY is required. Set GEMINI_API_KEY in Cloud Run secrets."
     );
 }
 

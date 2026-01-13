@@ -19,9 +19,10 @@ export const CandidateService = {
         try {
             const userRef = doc(db, USERS_COLLECTION, uid);
 
-            const { bio, ...restUpdates } = updates;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { bio, resume_url: _resumeUrl, ...restUpdates } = updates;
 
-            // Prepare update data - remove bio as it's not a top-level field in UserProfile
+            // Prepare update data - remove bio/resume_url from top-level payload to avoid rule rejection
             const updateData: Partial<UserProfile> & { updated_at: ReturnType<typeof serverTimestamp> } = {
                 ...restUpdates,
                 updated_at: serverTimestamp()

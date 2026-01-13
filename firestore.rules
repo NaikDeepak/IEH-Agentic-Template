@@ -44,9 +44,10 @@ rules_version = '2';
 
     // Jobs Collection
     match /jobs/{jobId} {
-      allow read: if true;
+      allow read: if request.auth != null;
 
       allow create: if request.auth != null
+                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
                     && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
                     && request.resource.data.employer_id == request.auth.uid
                     && request.resource.data.keys().hasOnly([
@@ -62,7 +63,12 @@ rules_version = '2';
                       'created_at',
                       'updated_at',
                       'embedding'
-                    ]);
+                    ])
+                    && ( !('embedding' in request.resource.data)
+                         || (request.resource.data.embedding is list
+                             && request.resource.data.embedding.size() == 768) )
+                    && ( !('skills' in request.resource.data)
+                         || request.resource.data.skills is list );
 
       allow update: if request.auth != null
                     && resource.data.employer_id == request.auth.uid
@@ -78,7 +84,6 @@ rules_version = '2';
                       'updated_at',
                       'embedding'
                     ])
-                    // ownership is immutable
                     && request.resource.data.employer_id == resource.data.employer_id;
     }
 
