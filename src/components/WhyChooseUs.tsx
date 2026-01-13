@@ -47,21 +47,21 @@ export const WhyChooseUs: React.FC = () => {
 
                         <div className="space-y-8">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0" aria-hidden="true">
                                     <Users className="w-5 h-5 text-slate-700" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-900 uppercase tracking-tight mb-1">Seamless Application Process</h4>
+                                    <h3 className="font-bold text-slate-900 uppercase tracking-tight mb-1">Seamless Application Process</h3>
                                     <p className="text-sm text-slate-500 leading-relaxed">Our user-friendly platform ensures a smooth experience. Track your applications, schedule interviews, and communicate with recruiters effortlessly.</p>
                                 </div>
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center shrink-0" aria-hidden="true">
                                     <ShieldCheck className="w-5 h-5 text-slate-700" />
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-slate-900 uppercase tracking-tight mb-1">Verified & Secure</h4>
+                                    <h3 className="font-bold text-slate-900 uppercase tracking-tight mb-1">Verified & Secure</h3>
                                     <p className="text-sm text-slate-500 leading-relaxed">Your safety and privacy are our top priorities. We verify all employers and implement robust measures to protect your data and personal information.</p>
                                 </div>
                             </div>

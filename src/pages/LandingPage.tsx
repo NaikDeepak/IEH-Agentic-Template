@@ -8,13 +8,13 @@ import { TopRecruiters } from '../components/TopRecruiters';
 
 export const LandingPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900 font-sans">
+        <main className="min-h-screen bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900 font-sans">
             <HeroSection />
             <FeaturesSection />
             <WhyChooseUs />
             <TopRecruiters />
             <Testimonials />
             <Footer />
-        </div>
+        </main>
     );
 };

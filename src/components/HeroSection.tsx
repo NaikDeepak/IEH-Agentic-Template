@@ -11,57 +11,32 @@ export const HeroSection: React.FC = () => {
 
 
                 {/* Big Text Background - Responsive sizes */}
-                <div className="absolute top-[12%] md:top-16 left-0 right-0 z-0 pointer-events-none select-none flex flex-col items-start justify-center pl-6 md:pl-16 overflow-hidden">
-                    <h1 className="text-[13vw] md:text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 md:translate-y-2 mix-blend-overlay md:mix-blend-normal">
+                <div className="absolute top-[12%] md:top-16 left-0 right-0 z-0 pointer-events-none select-none flex flex-col items-start justify-center pl-6 md:pl-16 overflow-hidden" aria-hidden="true">
+                    <span className="text-[13vw] md:text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 md:translate-y-2 mix-blend-overlay md:mix-blend-normal">
                         INDIA
-                    </h1>
+                    </span>
 
                     {/* Desktop: Single Line for EMPLOYMENT HUB */}
-                    <h1 className="hidden md:block md:text-[8vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text md:translate-y-2 md:mix-blend-normal">
+                    <span className="hidden md:block md:text-[8vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text md:translate-y-2 md:mix-blend-normal">
                         EMPLOYMENT HUB
-                    </h1>
+                    </span>
 
                     {/* Mobile: Split Lines for EMPLOYMENT and HUB */}
-                    <h1 className="md:hidden text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
+                    <span className="md:hidden text-[11vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
                         EMPLOYMENT
-                    </h1>
-                    <h1 className="md:hidden text-[13vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
+                    </span>
+                    <span className="md:hidden text-[13vw] font-black text-white leading-[0.85] tracking-tighter text-left uppercase whitespace-nowrap mask-image-text translate-y-0 mix-blend-overlay">
                         HUB
-                    </h1>
+                    </span>
                 </div>
 
                 {/* Content Container (Mobile: Column, Desktop: Row) */}
                 <div className="relative z-20 w-full flex flex-col md:flex-row pt-32 md:pt-0 min-h-[600px] md:min-h-[800px]">
 
                     {/* Left Side: Content */}
-                    <div className="w-full md:w-1/2 px-6 md:pl-20 md:pr-0 py-8 md:pt-96 md:pb-20 flex flex-col gap-6 md:gap-10 order-2 md:order-1 items-center md:items-start text-center md:text-left">
-
-                        {/* Search Bar */}
-                        <div className="bg-white p-2 md:p-2.5 rounded-full shadow-2xl flex items-center w-full max-w-sm md:max-w-md z-30 transition-transform hover:scale-[1.02]">
-                            <Search className="w-5 h-5 md:w-6 md:h-6 text-slate-400 ml-3 md:ml-4 shrink-0" />
-                            <input
-                                type="text"
-                                placeholder="Search 'Java Developer', 'HR Manager'..."
-                                className="flex-1 bg-transparent border-none outline-none px-3 md:px-4 text-sm md:text-base placeholder:text-slate-400 text-slate-800 min-w-0 font-medium"
-                            />
-                            <button className="w-10 h-10 md:w-12 md:h-12 bg-slate-900 rounded-full flex items-center justify-center text-white hover:bg-indigo-600 transition-colors shrink-0 shadow-md">
-                                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                        </div>
-
-                        {/* Trending Pills */}
-                        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start relative z-30">
-                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Trending:</span>
-                            {['Java', 'Python', 'Sales', 'Accounting'].map((skill) => (
-                                <span key={skill} className="px-3 py-1.5 bg-white/60 backdrop-blur-md border border-white/50 rounded-full text-[10px] md:text-xs font-semibold text-slate-700 cursor-pointer hover:bg-white hover:shadow-sm transition-all">
-                                    {skill}
-                                </span>
-                            ))}
-                        </div>
-
-                        <p className="text-slate-600 text-sm md:text-lg max-w-sm md:max-w-md leading-relaxed font-medium relative z-30">
-                            Connecting India's top talent with actively hiring companies. <br className="hidden md:block" /> No ghosting, just real opportunities.
-                        </p>
+                    <div className="w-full md:w-1/2 px-6 md:pl-20 md:pr-0 py-8 md:pt-88 md:pb-20 flex flex-col gap-6 md:gap-10 order-2 md:order-1 items-center md:items-start text-center md:text-left">
+                        {/* Hidden SEO H1 */}
+                        <h1 className="sr-only">India Employment Hub - AI Powered Recruitment Platform</h1>
 
                         {/* Social Proof / Stats */}
                         <div className="bg-white/60 backdrop-blur-xl p-4 md:p-5 rounded-3xl w-full max-w-xs shadow-lg border border-white/80 relative z-30 flex flex-col gap-3 hover:bg-white/80 transition-colors">
@@ -76,8 +51,8 @@ export const HeroSection: React.FC = () => {
                             <div className="flex items-center gap-4">
                                 <div className="flex -space-x-3">
                                     {[1, 3, 5, 8].map((i) => (
-                                        <div key={i} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
-                                            <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
+                                        <div key={i} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden text-transparent">
+                                            <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="Candidate profile snippet" />
                                         </div >
                                     ))}
                                     <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-900 border-2 border-white flex items-center justify-center text-white text-[10px] font-bold">
@@ -89,14 +64,44 @@ export const HeroSection: React.FC = () => {
                                 </div>
                             </div >
                         </div >
+
+                        {/* Search Bar */}
+                        <div className="bg-white p-2 md:p-2.5 rounded-full shadow-2xl flex items-center w-full max-w-sm md:max-w-md z-30 transition-transform hover:scale-[1.02]">
+                            <Search className="w-5 h-5 md:w-6 md:h-6 text-slate-400 ml-3 md:ml-4 shrink-0" aria-hidden="true" />
+                            <input
+                                type="text"
+                                placeholder="Search 'Java Developer'..."
+                                aria-label="Search jobs for 'Java Developer' or 'HR Manager'"
+                                className="flex-1 bg-transparent border-none outline-none px-3 md:px-4 text-sm md:text-base placeholder:text-slate-400 text-slate-800 min-w-0 font-medium"
+                            />
+                            <button
+                                className="w-10 h-10 md:w-12 md:h-12 bg-slate-900 rounded-full flex items-center justify-center text-white hover:bg-indigo-600 transition-colors shrink-0 shadow-md"
+                                aria-label="Submit job search"
+                            >
+                                <ArrowRight className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />
+                            </button>
+                        </div>
+
+                        {/* Trending Pills */}
+                        <div className="flex flex-wrap gap-2 items-center justify-center md:justify-start relative z-30">
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Trending:</span>
+                            {['Java', 'Python', 'Sales', 'Accounting'].map((skill) => (
+                                <button
+                                    key={skill}
+                                    className="px-3 py-1.5 bg-white/60 backdrop-blur-md border border-white/50 rounded-full text-[10px] md:text-xs font-semibold text-slate-700 hover:bg-white hover:shadow-sm transition-all focus:ring-2 focus:ring-indigo-500 outline-none"
+                                >
+                                    {skill}
+                                </button>
+                            ))}
+                        </div>
                     </div >
 
                     {/* Right Side: Image */}
-                    < div className="w-full md:w-1/2 relative h-[400px] md:h-full flex items-end justify-center order-1 md:order-2 overflow-hidden md:overflow-visible" >
+                    <div className="w-full md:w-1/2 relative h-[400px] md:h-full flex items-end justify-end order-1 md:order-2 overflow-hidden md:overflow-visible pr-0" >
 
 
                         {/* Masked Image Container */}
-                        < div className="relative w-full h-[110%] md:h-[115%] flex items-end justify-center bottom-[-10%] md:bottom-[-5%]" >
+                        <div className="relative w-full h-[110%] md:h-[115%] flex items-end justify-end bottom-[-10%] md:bottom-[-5%]" >
                             <img
                                 src="/images/hero.png"
                                 alt="Indian Tech Professional"

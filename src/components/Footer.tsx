@@ -21,10 +21,20 @@ export const Footer: React.FC = () => (
                         The AI-powered job portal connecting India's top talent with active employers. Smart matching, no ghosting.
                     </p>
                     <div className="flex gap-4">
-                        {[<Twitter key="tw" />, <Facebook key="fb" />, <Instagram key="ig" />, <Linkedin key="li" />].map((icon, i) => (
-                            <div key={i} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer text-white">
-                                {React.cloneElement(icon as React.ReactElement<{ className?: string }>, { className: "w-5 h-5" })}
-                            </div>
+                        {[
+                            { Icon: Twitter, label: "Twitter" },
+                            { Icon: Facebook, label: "Facebook" },
+                            { Icon: Instagram, label: "Instagram" },
+                            { Icon: Linkedin, label: "LinkedIn" }
+                        ].map(({ Icon, label }, i) => (
+                            <a
+                                key={i}
+                                href="#"
+                                aria-label={label}
+                                className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer text-white focus:ring-2 focus:ring-white outline-none"
+                            >
+                                <Icon className="w-5 h-5" aria-hidden="true" />
+                            </a>
                         ))}
                     </div>
                 </div>

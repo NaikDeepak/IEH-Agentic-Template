@@ -36,16 +36,22 @@ export const Header: React.FC = () => {
                     <button
                         className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={isMenuOpen}
+                        aria-controls="mobile-menu"
                     >
-                        {isMenuOpen ? <X /> : <Menu />}
+                        {isMenuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
                     </button>
                 </div>
             </div>
 
             {/* Mobile Navigation Drawer */}
             {isMenuOpen && (
-                <div className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl animate-in fade-in slide-in-from-top-4 duration-200">
-                    <nav className="flex flex-col p-4 space-y-4">
+                <div
+                    id="mobile-menu"
+                    className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl animate-in fade-in slide-in-from-top-4 duration-200"
+                >
+                    <nav className="flex flex-col p-4 space-y-4" aria-label="Mobile navigation">
                         {['Find Jobs', 'Post a Job', 'AI Prep', 'Pricing'].map((item) => (
                             <a
                                 key={item}

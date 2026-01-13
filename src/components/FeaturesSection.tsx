@@ -12,13 +12,14 @@ interface ServiceCardProps {
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className = "", dark = false }) => {
     return (
-        <motion.div
+        <motion.button
             whileHover={{ y: -5 }}
-            className={`relative rounded-[2rem] overflow-hidden p-6 h-[320px] flex flex-col justify-between group cursor-pointer ${className} ${dark ? 'text-white' : 'text-slate-900'}`}
+            className={`relative rounded-[2rem] overflow-hidden p-6 h-[320px] flex flex-col justify-between group text-left w-full outline-none focus:ring-2 focus:ring-indigo-500 ${className} ${dark ? 'text-white' : 'text-slate-900'}`}
+            aria-label={`View jobs for ${title}`}
         >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className={`absolute inset-0 ${dark ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-white/90 via-white/40 to-transparent'}`} />
             </div>
 
@@ -36,10 +37,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
 
             <div className="relative z-10 flex justify-end">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${dark ? 'bg-white text-black hover:scale-110' : 'bg-black text-white hover:scale-110'}`}>
-                    <ArrowUpRight className="w-5 h-5" />
+                    <ArrowUpRight className="w-5 h-5" aria-hidden="true" />
                 </div>
             </div>
-        </motion.div>
+        </motion.button>
     );
 };
 
@@ -113,11 +114,17 @@ export const FeaturesSection: React.FC = () => {
 
                     {/* Navigation/More */}
                     <div className="md:col-span-4 flex items-center justify-center gap-4">
-                        <button className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors">
-                            <ArrowLeft className="w-6 h-6 text-slate-400" />
+                        <button
+                            className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none"
+                            aria-label="View previous trending jobs"
+                        >
+                            <ArrowLeft className="w-6 h-6 text-slate-400" aria-hidden="true" />
                         </button>
-                        <button className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition-colors">
-                            <ArrowRight className="w-6 h-6" />
+                        <button
+                            className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-slate-900 outline-none"
+                            aria-label="View next trending jobs"
+                        >
+                            <ArrowRight className="w-6 h-6" aria-hidden="true" />
                         </button>
                     </div>
 
