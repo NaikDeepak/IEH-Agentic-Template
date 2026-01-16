@@ -2,12 +2,19 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import {
     onAuthStateChanged,
     signInWithPopup,
-    signOut,
     type User as FirebaseUser
 } from 'firebase/auth';
-import { auth, googleProvider, db } from '../lib/firebase';
+import {
+    auth,
+    googleProvider,
+    db,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut
+} from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
+import { updateProfile } from 'firebase/auth';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -78,6 +85,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
+    const loginWithEmail = useCallback(async (email: string, password: string) => {
+        setError(null);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (err: unknown) {
+            const error = err as { message?: string };
+            console.error("Email Login Error:", error);
+            setError(error.message ?? "Failed to sign in with email.");
+            throw err;
+        }
+    }, []);
+
+    const signupWithEmail = useCallback(async (email: string, password: string, displayName: string) => {
+        setError(null);
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName });
+        } catch (err: unknown) {
+            const error = err as { message?: string };
+            console.error("Email Signup Error:", error);
+            setError(error.message ?? "Failed to sign up with email.");
+            throw err;
+        }
+    }, []);
+
     const logout = useCallback(async () => {
         setError(null);
         try {
@@ -115,10 +147,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         error,
         loginWithGoogle,
+        loginWithEmail,
+        signupWithEmail,
         logout,
         refreshUserData,
         clearError
-    }), [user, userData, loading, error, loginWithGoogle, logout, refreshUserData, clearError]);
+    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, logout, refreshUserData, clearError]);
 
     return (
         <AuthContext.Provider value={value}>
