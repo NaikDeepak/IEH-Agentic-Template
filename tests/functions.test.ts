@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { generateJdHandler, embeddingHandler, searchJobsHandler } from '../functions/index.js';
 import { GoogleGenAI } from '@google/genai';
 import * as Sentry from '@sentry/node';
@@ -92,7 +92,7 @@ describe('Functions: API Handlers', () => {
                 generateContent: vi.fn(),
             } as any);
 
-            (global.fetch as vi.Mock).mockResolvedValueOnce({
+            (global.fetch as Mock).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ([{
                     document: {
