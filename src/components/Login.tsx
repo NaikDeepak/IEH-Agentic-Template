@@ -25,6 +25,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
         e.preventDefault();
         setIsEmailLoading(true);
         try {
+             
             await loginWithEmail(formData.email, formData.password);
             // Redirect will be handled by auth state change
         } catch (err) {
@@ -126,11 +127,11 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                                 </div>
                             </div>
 
-                            {error && (
+                            {error ? (
                                 <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100">
                                     {error}
                                 </div>
-                            )}
+                            ) : null}
 
                             <button
                                 type="submit"

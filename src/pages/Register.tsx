@@ -12,20 +12,25 @@ export const Register: React.FC = () => {
         confirmPassword: ''
     });
 
+    const [validationError, setValidationError] = useState<string | null>(null);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
         if (error) clearError();
+        if (validationError) setValidationError(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
-            // Internal validation error
+            setValidationError('Passwords do not match');
             return;
         }
 
+        setValidationError(null);
         setIsLoading(true);
         try {
+             
             await signupWithEmail(formData.email, formData.password, formData.name);
             // Redirect will be handled by AuthProvider state change or navigation
         } catch (err) {
@@ -110,9 +115,8 @@ export const Register: React.FC = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className={`w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none ${
-                                    formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-500 focus:ring-red-500' : ''
-                                }`}
+                                className={`w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-500 focus:ring-red-500' : ''
+                                    }`}
                             />
                         </div>
                         {formData.confirmPassword && formData.password !== formData.confirmPassword && (
@@ -120,9 +124,9 @@ export const Register: React.FC = () => {
                         )}
                     </div>
 
-                    {error && (
+                    {(error ?? validationError) && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100">
-                            {error}
+                            {error ?? validationError}
                         </div>
                     )}
 
