@@ -66,33 +66,33 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | - | Pending |
-| AUTH-02 | - | Pending |
-| AUTH-03 | - | Pending |
-| MKT-01 | - | Pending |
-| MKT-02 | - | Pending |
-| MKT-03 | - | Pending |
-| MATCH-01 | - | Pending |
-| MATCH-02 | - | Pending |
-| MATCH-03 | - | Pending |
-| EMP-01 | - | Pending |
-| EMP-02 | - | Pending |
-| EMP-03 | - | Pending |
-| EMP-04 | - | Pending |
-| SEEK-01 | - | Pending |
-| SEEK-02 | - | Pending |
-| SEEK-03 | - | Pending |
-| SEEK-04 | - | Pending |
-| SEEK-05 | - | Pending |
-| SEEK-06 | - | Pending |
-| GROW-01 | - | Pending |
-| GROW-02 | - | Pending |
-| GROW-03 | - | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| MKT-01 | Phase 2 | Pending |
+| MKT-02 | Phase 2 | Pending |
+| MKT-03 | Phase 2 | Pending |
+| MATCH-01 | Phase 3 | Pending |
+| MATCH-02 | Phase 3 | Pending |
+| MATCH-03 | Phase 3 | Pending |
+| EMP-01 | Phase 4 | Pending |
+| EMP-02 | Phase 4 | Pending |
+| EMP-03 | Phase 4 | Pending |
+| EMP-04 | Phase 4 | Pending |
+| SEEK-01 | Phase 5 | Pending |
+| SEEK-02 | Phase 5 | Pending |
+| SEEK-03 | Phase 5 | Pending |
+| SEEK-04 | Phase 5 | Pending |
+| SEEK-05 | Phase 5 | Pending |
+| SEEK-06 | Phase 5 | Pending |
+| GROW-01 | Phase 6 | Pending |
+| GROW-02 | Phase 6 | Pending |
+| GROW-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 0 (Run create-roadmap next)
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-16*
