@@ -48,10 +48,11 @@ export const Register: React.FC = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 ml-1">Full Name</label>
+                        <label htmlFor="name" className="text-sm font-medium text-gray-700 ml-1">Full Name</label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
+                                id="name"
                                 type="text"
                                 name="name"
                                 required
@@ -64,10 +65,11 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
+                        <label htmlFor="email" className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
+                                id="email"
                                 type="email"
                                 name="email"
                                 required
@@ -80,10 +82,11 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 ml-1">Password</label>
+                        <label htmlFor="password" className="text-sm font-medium text-gray-700 ml-1">Password</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
+                                id="password"
                                 type="password"
                                 name="password"
                                 required
@@ -96,10 +99,11 @@ export const Register: React.FC = () => {
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
+                        <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
+                                id="confirmPassword"
                                 type="password"
                                 name="confirmPassword"
                                 required
