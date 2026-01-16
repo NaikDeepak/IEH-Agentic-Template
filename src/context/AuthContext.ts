@@ -6,7 +6,8 @@ export interface UserData {
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
-    role: 'seeker' | 'employer' | null;
+    role: 'seeker' | 'employer' | 'admin' | null;
+    employerRole?: 'owner' | 'recruiter' | 'hiring_manager';
 }
 
 export interface AuthContextType {
