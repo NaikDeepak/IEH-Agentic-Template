@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 
 export const Register: React.FC = () => {
@@ -30,7 +31,7 @@ export const Register: React.FC = () => {
         setValidationError(null);
         setIsLoading(true);
         try {
-             
+
             await signupWithEmail(formData.email, formData.password, formData.name);
             // Redirect will be handled by AuthProvider state change or navigation
         } catch (err) {
@@ -149,12 +150,12 @@ export const Register: React.FC = () => {
                 <div className="text-center pt-4">
                     <p className="text-gray-500 text-sm">
                         Already have an account?{' '}
-                        <button
-                            onClick={() => window.location.href = '/login'}
+                        <Link
+                            to="/login"
                             className="text-indigo-600 font-bold hover:underline"
                         >
                             Sign In
-                        </button>
+                        </Link>
                     </p>
                 </div>
             </div>

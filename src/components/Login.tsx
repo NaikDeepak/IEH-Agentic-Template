@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn, User, LogOut, Mail, Lock, Loader2, UserPlus } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface LoginProps {
     variant?: 'card' | 'navbar';
@@ -9,7 +9,6 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     const { loginWithGoogle, loginWithEmail, user, loading, logout, error, clearError } = useAuth();
-    const navigate = useNavigate();
     const [isEmailLoading, setIsEmailLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
@@ -25,7 +24,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
         e.preventDefault();
         setIsEmailLoading(true);
         try {
-             
+
             await loginWithEmail(formData.email, formData.password);
             // Redirect will be handled by auth state change
         } catch (err) {
@@ -46,13 +45,13 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     if (variant === 'navbar') {
         if (!user) {
             return (
-                <button
-                    onClick={() => navigate('/login')}
+                <Link
+                    to="/login"
                     className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
                 >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
-                </button>
+                </Link>
             );
         }
 
