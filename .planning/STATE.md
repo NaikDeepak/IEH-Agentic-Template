@@ -43,6 +43,9 @@ Progress: ██████████ 100%
 | 2026-02-07 | 02-05 | Visual Status Indicators | Green for active, Gray for passive; familiar traffic light pattern. |
 | 2026-02-07 | 02-04 | App-level Activity Tracking | Placed tracking in `App.tsx` root for reliable user heartbeat. |
 | 2026-02-07 | 02-04 | Active-First Sorting | Sort by Status (ASC) then LastActive (DESC) for engagement. |
+| 2026-02-07 | 02-03 | Integrate into Reaper | Minimize cold starts/billing by combining lifecycle logic. |
+| 2026-02-07 | 02-03 | 24-48h Warning Window | Simple "once-per-reaper-run" logic for MVP. |
+| 2026-02-07 | 02-03 | Gmail SMTP Env Vars | Secrets management for email credentials. |
 | 2026-02-07 | 02-02 | Batch Limit of 500 | Adhering to Firestore best practices for batch operations. |
 | 2026-02-07 | 02-01 | 4-Day Activity Expiration | Keep marketplace "fresh"; passive after 4 days. |
 | 2026-02-07 | 02-01 | 1-Hour Activity Debounce | Reduce Firestore writes while maintaining precision. |
