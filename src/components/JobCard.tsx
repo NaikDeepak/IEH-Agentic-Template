@@ -6,11 +6,12 @@ import type { Job } from '../types';
 
 interface JobCardProps {
   job: Job;
+  matchScore?: number;
   className?: string;
   onClick?: () => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, className = '', onClick }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick }) => {
   const { title, location, type, salaryRange, status, expiresAt, createdAt } = job;
 
   const formatSalary = (range: NonNullable<Job['salaryRange']>) => {
@@ -37,6 +38,12 @@ export const JobCard: React.FC<JobCardProps> = ({ job, className = '', onClick }
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   };
 
+  const getMatchScoreColor = (score: number) => {
+    if (score >= 80) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+    if (score >= 50) return 'bg-amber-100 text-amber-800 border-amber-200';
+    return 'bg-slate-100 text-slate-600 border-slate-200';
+  };
+
   return (
     <div
       className={`bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-4 cursor-pointer group ${className}`}
@@ -51,16 +58,23 @@ export const JobCard: React.FC<JobCardProps> = ({ job, className = '', onClick }
       }}
     >
       <div className="flex justify-between items-start">
-        <div>
+        <div className="flex-1 pr-2">
           <h3 className="font-semibold text-lg text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
             {title}
           </h3>
           <p className="text-sm text-gray-500 mt-1">Company Name</p>
         </div>
-        <StatusBadge
-          status={status}
-          expiresAt={getDisplayDate(expiresAt)}
-        />
+        <div className="flex flex-col items-end gap-2">
+          <StatusBadge
+            status={status}
+            expiresAt={getDisplayDate(expiresAt)}
+          />
+          {matchScore !== undefined && (
+            <div className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getMatchScoreColor(matchScore)}`}>
+              {Math.round(matchScore)}% Match
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-600">
