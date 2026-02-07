@@ -13,7 +13,7 @@ IEH is an AI-powered job board for the Indian IT/ITES sector that enforces an "A
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation & Identity** - Secure RBAC auth and admin oversight
-- [ ] **Phase 2: Marketplace Mechanics** - "Active System" logic and hygiene
+- [x] **Phase 2: Marketplace Mechanics** - "Active System" logic and hygiene
 - [ ] **Phase 3: Semantic Matching Engine** - Bi-directional vector search
 - [ ] **Phase 4: Employer Suite** - AI generation and ATS tools
 - [ ] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
@@ -111,7 +111,7 @@ Phases execute in numeric order.
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
-| 2. Marketplace Mechanics | 4/7 | In Progress | - |
+| 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
 | 3. Semantic Matching Engine | 0/TBD | Not started | - |
 | 4. Employer Suite | 0/TBD | Not started | - |
 | 5. Seeker Tools | 0/TBD | Not started | - |

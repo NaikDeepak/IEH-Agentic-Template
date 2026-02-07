@@ -66,12 +66,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| MKT-01 | Phase 2 | Pending |
-| MKT-02 | Phase 2 | Pending |
-| MKT-03 | Phase 2 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| MKT-01 | Phase 2 | Complete |
+| MKT-02 | Phase 2 | Complete |
+| MKT-03 | Phase 2 | Complete |
 | MATCH-01 | Phase 3 | Pending |
 | MATCH-02 | Phase 3 | Pending |
 | MATCH-03 | Phase 3 | Pending |
