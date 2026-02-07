@@ -158,6 +158,7 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
                 if (key === "integerValue") return Number(field.integerValue);
                 if (key === "doubleValue") return Number(field.doubleValue);
                 if (key === "booleanValue") return field.booleanValue;
+                if (key === "timestampValue") return field.timestampValue;
                 if (key === "arrayValue") return (field.arrayValue.values || []).map(unwrap);
                 if (key === "mapValue")
                     return Object.fromEntries(
