@@ -67,6 +67,128 @@ export const generateEmbedding = async (text, apiKey) => {
     throw new Error("Invalid embedding response from Gemini API");
 };
 
+// Helper to run vector search via Firestore REST API
+const runVectorSearch = async (collectionName, queryVector, filters = [], limit = 10) => {
+    const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || "india-emp-hub";
+    const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
+
+    // Using Web API Key for public access
+    const firebaseApiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
+
+    let fetchUrl = url;
+    if (firebaseApiKey) {
+        fetchUrl += `?key=${firebaseApiKey}`;
+    }
+
+    const auth = new GoogleAuth({
+        scopes: "https://www.googleapis.com/auth/cloud-platform"
+    });
+    const client = await auth.getClient();
+    const accessToken = await client.getAccessToken();
+    const token = typeof accessToken === "string" ? accessToken : accessToken?.token;
+
+    if (!token) {
+        throw new Error("Failed to acquire access token for Firestore REST API");
+    }
+
+    // Construct structured query
+    const structuredQuery = {
+        from: [{ collectionId: collectionName }],
+        findNearest: {
+            vectorField: { fieldPath: "embedding" },
+            queryVector: {
+                mapValue: {
+                    fields: {
+                        __type__: { stringValue: "__vector__" },
+                        value: {
+                            arrayValue: {
+                                values: queryVector.map((v) => ({ doubleValue: v })),
+                            },
+                        },
+                    },
+                },
+            },
+            distanceMeasure: "COSINE",
+            limit: Number(limit),
+        },
+    };
+
+    // Add filters if present
+    if (filters.length > 0) {
+        if (filters.length === 1) {
+            structuredQuery.where = filters[0];
+        } else {
+            structuredQuery.where = {
+                compositeFilter: {
+                    op: "AND",
+                    filters: filters
+                }
+            };
+        }
+    }
+
+    const response = await fetch(fetchUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ structuredQuery }),
+    });
+
+    if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Firestore REST API failed: ${response.status} ${errText}`);
+    }
+
+    const data = await response.json();
+
+    // Transform response
+    return data
+        .filter((item) => item.document)
+        .map((item) => {
+            const doc = item.document;
+            const id = doc.name.split("/").pop();
+            const fields = doc.fields || {};
+
+            // Helper to unwrap Firestore JSON syntax
+            const unwrap = (field) => {
+                const key = Object.keys(field)[0];
+                if (key === "stringValue") return field.stringValue;
+                if (key === "integerValue") return Number(field.integerValue);
+                if (key === "doubleValue") return Number(field.doubleValue);
+                if (key === "booleanValue") return field.booleanValue;
+                if (key === "arrayValue") return (field.arrayValue.values || []).map(unwrap);
+                if (key === "mapValue")
+                    return Object.fromEntries(
+                        Object.entries(field.mapValue.fields || {}).map(([k, v]) => [
+                            k,
+                            unwrap(v),
+                        ])
+                    );
+                return null;
+            };
+
+            const unwrappedData = Object.fromEntries(
+                Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
+            );
+
+            // Remove large embedding vector from response
+            delete unwrappedData.embedding;
+
+            return { id, ...unwrappedData };
+        });
+};
+
+// Helper to construct equality filter
+const createFilter = (field, value) => ({
+    fieldFilter: {
+        field: { fieldPath: field },
+        op: "EQUAL",
+        value: { stringValue: value }
+    }
+});
+
 // --- Route Handlers ---
 
 export const generateJdHandler = async (req, res) => {
@@ -137,101 +259,9 @@ export const searchJobsHandler = async (req, res) => {
         // 1. Generate Embedding
         const queryVector = await generateEmbedding(searchQuery, apiKey);
 
-        // 2. Call Firestore REST API for Vector Search
-        const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || "india-emp-hub";
-        const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
-
-        // Using Web API Key for public access
-        const firebaseApiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
-
-        let fetchUrl = url;
-        if (firebaseApiKey) {
-            fetchUrl += `?key=${firebaseApiKey}`;
-        }
-
-        const auth = new GoogleAuth({
-            scopes: "https://www.googleapis.com/auth/cloud-platform"
-        });
-        const client = await auth.getClient();
-        const accessToken = await client.getAccessToken();
-        const token = typeof accessToken === "string" ? accessToken : accessToken?.token;
-
-        if (!token) {
-            throw new Error("Failed to acquire access token for Firestore REST API");
-        }
-
-        const response = await fetch(fetchUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                structuredQuery: {
-                    from: [{ collectionId: "jobs" }],
-                    findNearest: {
-                        vectorField: { fieldPath: "embedding" },
-                        queryVector: {
-                            mapValue: {
-                                fields: {
-                                    __type__: { stringValue: "__vector__" },
-                                    value: {
-                                        arrayValue: {
-                                            values: queryVector.map((v) => ({ doubleValue: v })),
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                        distanceMeasure: "COSINE",
-                        limit: Number(limit),
-                    },
-                },
-            }),
-        });
-
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Firestore REST API failed: ${response.status} ${errText}`);
-        }
-
-        const data = await response.json();
-
-        // 3. Transform response to clean objects
-        const jobs = data
-            .filter((item) => item.document) // Filter out metadata items
-            .map((item) => {
-                const doc = item.document;
-                const id = doc.name.split("/").pop();
-                const fields = doc.fields || {};
-
-                // Helper to unwrap Firestore JSON syntax
-                const unwrap = (field) => {
-                    const key = Object.keys(field)[0];
-                    if (key === "stringValue") return field.stringValue;
-                    if (key === "integerValue") return Number(field.integerValue);
-                    if (key === "doubleValue") return Number(field.doubleValue);
-                    if (key === "booleanValue") return field.booleanValue;
-                    if (key === "arrayValue") return (field.arrayValue.values || []).map(unwrap);
-                    if (key === "mapValue")
-                        return Object.fromEntries(
-                            Object.entries(field.mapValue.fields || {}).map(([k, v]) => [
-                                k,
-                                unwrap(v),
-                            ])
-                        );
-                    return null;
-                };
-
-                const unwrappedData = Object.fromEntries(
-                    Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
-                );
-
-                // Remove large embedding vector from response
-                delete unwrappedData.embedding;
-
-                return { id, ...unwrappedData };
-            });
+        // 2. Run Vector Search with 'active' status filter
+        const filters = [createFilter("status", "active")];
+        const jobs = await runVectorSearch("jobs", queryVector, filters, limit);
 
         res.json({ jobs });
     } catch (error) {
@@ -239,16 +269,66 @@ export const searchJobsHandler = async (req, res) => {
     }
 };
 
+export const searchCandidatesHandler = async (req, res) => {
+    try {
+        const { query: searchQuery, limit = 10 } = req.body;
+
+        if (!searchQuery || typeof searchQuery !== "string") {
+            return res.status(400).json({ error: "Query string is required" });
+        }
+
+        const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
+        }
+
+        // 1. Generate Embedding
+        const queryVector = await generateEmbedding(searchQuery, apiKey);
+
+        // 2. Run Vector Search with filters (status=active AND role=seeker)
+        const filters = [
+            createFilter("status", "active"),
+            createFilter("role", "seeker")
+        ];
+
+        const candidatesRaw = await runVectorSearch("users", queryVector, filters, limit);
+
+        // 3. Filter out sensitive data
+        const candidates = candidatesRaw.map(c => {
+            // whitelist public fields
+            const {
+                id, displayName, bio, skills, experience,
+                location, photoURL, jobTitle, availability,
+                preferredRole, linkedIn, portfolio, github
+            } = c;
+
+            return {
+                id, displayName, bio, skills, experience,
+                location, photoURL, jobTitle, availability,
+                preferredRole, linkedIn, portfolio, github
+            };
+        });
+
+        res.json({ candidates });
+    } catch (error) {
+        handleError(res, error, "search candidates");
+    }
+};
+
+
 // --- Route Definitions ---
 
 app.post("/ai/generate-jd", generateJdHandler);
 app.post("/embedding", embeddingHandler);
 app.post("/jobs/search", searchJobsHandler);
+app.post("/candidates/search", searchCandidatesHandler);
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
 app.post("/api/ai/generate-jd", generateJdHandler);
 app.post("/api/embedding", embeddingHandler);
 app.post("/api/jobs/search", searchJobsHandler);
+app.post("/api/candidates/search", searchCandidatesHandler);
+
 
 // Expose the Express API as a single Cloud Function
 export const api = onRequest(app);
