@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
+import { trackUserActivity } from './lib/activity';
 import { LandingPage } from './pages/LandingPage'
 import { Register } from './pages/Register'
 import { Header } from './components/Header'
@@ -9,6 +12,14 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      void trackUserActivity(user.uid);
+    }
+  }, [user]);
+
   return (
     <Router>
       <Routes>
