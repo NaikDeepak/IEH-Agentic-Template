@@ -42,7 +42,7 @@ export interface Job {
 
   // Job details
   location?: string;
-  type?: 'full-time' | 'part-time' | 'contract' | 'freelance';
+  type?: 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship';
   salaryRange?: {
     min: number;
     max: number;
