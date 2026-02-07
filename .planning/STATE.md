@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 
 ## Current Position
 
-Phase: 2 of 6 (Marketplace Mechanics)
-Plan: 8 of 8 (02-08-PLAN.md)
-Status: Phase 2 verified and complete
-Last activity: 2026-02-08 — Completed Job Activity Initialization (02-08)
+Phase: 3 of 6 (Semantic Matching)
+Plan: 1 of 4 (03-01-PLAN.md)
+Status: In progress
+Last activity: 2026-02-08 — Completed Search Infrastructure (03-01)
 
-Progress: ██████████ 100%
+Progress: ██████████ 100% (Phase 2), Phase 3 Started
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: ~11m
-- Total execution time: ~1.0 hours
+- Total execution time: ~1.2 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: ██████████ 100%
 |-------|-------|-------|----------|
 | 1. Foundation & Identity | 3 | 3 | 12.5m |
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
+| 3. Semantic Matching | 1 | 4 | 15m |
 
 **Recent Trend:**
-- Last 5 plans: 02-04, 02-05, 02-06, 02-07, 02-08
-- Trend: Gap Closure & Stabilization
+- Last 5 plans: 02-06, 02-07, 02-08, 03-01
+- Trend: Consistent velocity
 
 ## Accumulated Context
 
@@ -40,6 +41,10 @@ Progress: ██████████ 100%
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-08 | 03-01 | Firestore REST API for Vector Search | Continued using REST API pattern for stability and lightweight implementation in Cloud Functions. |
+| 2026-02-08 | 03-01 | Backend-Side Filtering | Enforced filters (status='active') on backend to optimize payload and enforce marketplace rules. |
+| 2026-02-08 | 03-01 | Whitelisting Candidate Fields | Explicitly selected public fields to prevent leaking private data like email/phone. |
+| 2026-02-08 | 03-01 | Timestamp Unwrapping | Added custom handling for Firestore REST API timestamp format. |
 | 2026-02-08 | 02-08 | Client-Side Expiration Calc | Calculate expiration (now + 4 days) on client to ensure immediate availability in payload. |
 | 2026-02-08 | 02-07 | Type Mapping Layer | Perform data transformation in `JobsPage` to adapt backend snake_case to frontend camelCase without global refactors. |
 | 2026-02-08 | 02-07 | Client-Side Filtering | "Active First" sorting is handled by backend query; frontend displays as received. |
@@ -72,7 +77,7 @@ Progress: ██████████ 100%
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 02-08-PLAN.md
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
 
 Config (if exists):
