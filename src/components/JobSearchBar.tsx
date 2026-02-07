@@ -2,11 +2,25 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, ChevronDown } from 'lucide-react';
 
-export const JobSearchBar: React.FC = () => {
+interface JobSearchBarProps {
+    onSearch?: (query: string, location: string) => void;
+}
+
+export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [location, setLocation] = useState('Remote');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const handleSearch = () => {
+        onSearch?.(searchTerm, location);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -44,6 +58,7 @@ export const JobSearchBar: React.FC = () => {
                     type="text"
                     value={searchTerm}
                     onChange={(e) => { setSearchTerm(e.target.value); }}
+                    onKeyDown={handleKeyDown}
                     placeholder="Ex: Product Designer in Bangalore..."
                     className="flex-grow bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 text-lg py-2 font-inter"
                 />
@@ -88,7 +103,9 @@ export const JobSearchBar: React.FC = () => {
                     </AnimatePresence>
                 </div>
 
-                <button className="ml-4 bg-indigo-600 text-white rounded-full px-8 py-3 font-semibold text-lg hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 flex items-center gap-2">
+                <button
+                    onClick={handleSearch}
+                    className="ml-4 bg-indigo-600 text-white rounded-full px-8 py-3 font-semibold text-lg hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 flex items-center gap-2">
                     Search
                 </button>
             </div>
