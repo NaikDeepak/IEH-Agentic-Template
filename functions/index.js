@@ -200,10 +200,24 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
                 Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
             );
 
+            // Calculate Match Score
+            // Handle both plain array and VectorValue object structure
+            const vec = Array.isArray(unwrappedData.embedding)
+                ? unwrappedData.embedding
+                : unwrappedData.embedding?.value;
+
+            let matchScore = 0;
+            if (vec && Array.isArray(vec)) {
+                // Cosine Similarity = Dot Product (for normalized vectors)
+                const dotProduct = vec.reduce((sum, val, i) => sum + val * queryVector[i], 0);
+                // Clamp to 0-100
+                matchScore = Math.max(0, Math.min(100, Math.round(dotProduct * 100)));
+            }
+
             // Remove large embedding vector from response
             delete unwrappedData.embedding;
 
-            return { id, ...unwrappedData };
+            return { id, matchScore, ...unwrappedData };
         });
 };
 
@@ -283,10 +297,13 @@ export const searchJobsHandler = async (req, res) => {
             return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
         }
 
-        // 1. Generate Embedding
-        const queryVector = await generateEmbedding(searchQuery, apiKey);
+        // 1. Expand Query
+        const expandedQuery = await expandQuery(searchQuery, "finding a job", apiKey);
 
-        // 2. Run Vector Search with 'active' status filter
+        // 2. Generate Embedding
+        const queryVector = await generateEmbedding(expandedQuery, apiKey);
+
+        // 3. Run Vector Search with 'active' status filter
         const filters = [createFilter("status", "active")];
         const jobs = await runVectorSearch("jobs", queryVector, filters, limit);
 
@@ -309,10 +326,13 @@ export const searchCandidatesHandler = async (req, res) => {
             return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
         }
 
-        // 1. Generate Embedding
-        const queryVector = await generateEmbedding(searchQuery, apiKey);
+        // 1. Expand Query
+        const expandedQuery = await expandQuery(searchQuery, "finding a candidate", apiKey);
 
-        // 2. Run Vector Search with filters (status=active AND role=seeker)
+        // 2. Generate Embedding
+        const queryVector = await generateEmbedding(expandedQuery, apiKey);
+
+        // 3. Run Vector Search with filters (status=active AND role=seeker)
         const filters = [
             createFilter("status", "active"),
             createFilter("role", "seeker")
@@ -320,17 +340,17 @@ export const searchCandidatesHandler = async (req, res) => {
 
         const candidatesRaw = await runVectorSearch("users", queryVector, filters, limit);
 
-        // 3. Filter out sensitive data
+        // 4. Filter out sensitive data
         const candidates = candidatesRaw.map(c => {
             // whitelist public fields
             const {
-                id, displayName, bio, skills, experience,
+                id, matchScore, displayName, bio, skills, experience,
                 location, photoURL, jobTitle, availability,
                 preferredRole, linkedIn, portfolio, github
             } = c;
 
             return {
-                id, displayName, bio, skills, experience,
+                id, matchScore, displayName, bio, skills, experience,
                 location, photoURL, jobTitle, availability,
                 preferredRole, linkedIn, portfolio, github
             };
