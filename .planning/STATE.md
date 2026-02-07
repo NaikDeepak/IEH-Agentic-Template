@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 2 of 6 (Marketplace Mechanics)
-Plan: 2 of 5 (02-02-PLAN.md)
+Plan: 4 of 5 (02-04-PLAN.md)
 Status: Phase 2 in progress
-Last activity: 2026-02-07 — Completed The Reaper (02-02)
+Last activity: 2026-02-07 — Completed Active First Logic (02-04)
 
-Progress: ███████░░░ 70%
+Progress: ████████░░ 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 12.5m
-- Total execution time: 0.5 hours
+- Total execution time: 0.6 hours
 
 **By Phase:**
 
@@ -40,6 +40,8 @@ Progress: ███████░░░ 70%
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-07 | 02-04 | App-level Activity Tracking | Placed tracking in `App.tsx` root for reliable user heartbeat. |
+| 2026-02-07 | 02-04 | Active-First Sorting | Sort by Status (ASC) then LastActive (DESC) for engagement. |
 | 2026-02-07 | 02-02 | Batch Limit of 500 | Adhering to Firestore best practices for batch operations. |
 | 2026-02-07 | 02-01 | 4-Day Activity Expiration | Keep marketplace "fresh"; passive after 4 days. |
 | 2026-02-07 | 02-01 | 1-Hour Activity Debounce | Reduce Firestore writes while maintaining precision. |
