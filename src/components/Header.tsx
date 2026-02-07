@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Login } from './Login';
 import { Menu, X } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { userData } = useAuth();
 
     const navItems = [
         { label: 'Find Jobs', path: '/jobs' },
@@ -12,6 +14,11 @@ export const Header: React.FC = () => {
         { label: 'AI Prep', path: '#ai-prep' },
         { label: 'Pricing', path: '#pricing' },
     ];
+
+    if (userData?.role === 'employer') {
+        // Insert "Find Talent" after "Find Jobs"
+        navItems.splice(1, 0, { label: 'Find Talent', path: '/employer/search' });
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100/50">

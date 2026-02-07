@@ -10,6 +10,7 @@ import { Login } from './components/Login'
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import { JobsPage } from './pages/JobsPage'
+import { TalentSearch } from './pages/employer/TalentSearch'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
@@ -90,6 +91,20 @@ function App() {
                 <Header />
                 <main className="flex-grow p-8">
                   <h1 className="text-2xl font-bold">Post a Job (Placeholder)</h1>
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/search"
+          element={
+            <ProtectedRoute allowedRoles={['employer']}>
+              <div className="min-h-screen bg-slate-50 flex flex-col">
+                <Header />
+                <main className="flex-grow">
+                  <TalentSearch />
                 </main>
               </div>
             </ProtectedRoute>
