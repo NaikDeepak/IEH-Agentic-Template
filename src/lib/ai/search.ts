@@ -13,6 +13,7 @@ export interface CandidateSearchResult {
     linkedIn?: string;
     portfolio?: string;
     github?: string;
+    matchScore?: number;
 }
 
 // Response wrappers
