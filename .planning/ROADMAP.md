@@ -45,14 +45,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Inactive/spam postings are flagged and downranked in listings
 **Research**: Unlikely (Cloud Functions scheduled tasks)
 **Plans**: 8 plans
-- [ ] 02-marketplace-mechanics-01-PLAN.md — Schema & Activity Tracking
-- [ ] 02-marketplace-mechanics-02-PLAN.md — The Reaper (Scheduled Function)
-- [ ] 02-marketplace-mechanics-03-PLAN.md — Notification System
-- [ ] 02-marketplace-mechanics-04-PLAN.md — Active-First Sorting Logic
-- [ ] 02-marketplace-mechanics-05-PLAN.md — Active System UI Components
-- [ ] 02-marketplace-mechanics-06-PLAN.md — Fix integration gaps (Enum & Email)
-- [ ] 02-marketplace-mechanics-07-PLAN.md — Create Jobs Page (Gap Closure)
-- [ ] 02-marketplace-mechanics-08-PLAN.md — Fix Job Creation Timestamps (Gap Closure)
+- [x] 02-marketplace-mechanics-01-PLAN.md — Schema & Activity Tracking
+- [x] 02-marketplace-mechanics-02-PLAN.md — The Reaper (Scheduled Function)
+- [x] 02-marketplace-mechanics-03-PLAN.md — Notification System
+- [x] 02-marketplace-mechanics-04-PLAN.md — Active-First Sorting Logic
+- [x] 02-marketplace-mechanics-05-PLAN.md — Active System UI Components
+- [x] 02-marketplace-mechanics-06-PLAN.md — Fix integration gaps (Enum & Email)
+- [x] 02-marketplace-mechanics-07-PLAN.md — Create Jobs Page (Gap Closure)
+- [x] 02-marketplace-mechanics-08-PLAN.md — Fix Job Creation Timestamps (Gap Closure)
 
 ### Phase 3: Semantic Matching Engine
 **Goal**: Intelligent bi-directional matching between candidates and jobs
@@ -64,7 +64,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Matches reflect specific understanding of India IT/ITES/BPO domain
 **Research**: Likely (Vector Search tuning)
 **Research topics**: Firestore Vector Search tuning, embedding model selection for Indian context
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 03-semantic-matching-01-PLAN.md — Backend Infrastructure & Indexes
+- [ ] 03-semantic-matching-02-PLAN.md — Intelligence Layer (Expansion & Scoring)
+- [ ] 03-semantic-matching-03-PLAN.md — Talent Search UI
+- [ ] 03-semantic-matching-04-PLAN.md — Job Search UI
 
 ### Phase 4: Employer Suite
 **Goal**: Productivity tools for job creation and candidate management
@@ -112,7 +116,7 @@ Phases execute in numeric order.
 |-------|----------------|--------|-----------|
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
-| 3. Semantic Matching Engine | 0/TBD | Not started | - |
+| 3. Semantic Matching Engine | 0/4 | Not started | - |
 | 4. Employer Suite | 0/TBD | Not started | - |
 | 5. Seeker Tools | 0/TBD | Not started | - |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
@@ -189,9 +193,9 @@ Phases execute in numeric order.
 | AUTH-01 | Phase 1 | Completed |
 | AUTH-02 | Phase 1 | Completed |
 | AUTH-03 | Phase 1 | Completed |
-| MKT-01 | Phase 2 | Pending |
-| MKT-02 | Phase 2 | Pending |
-| MKT-03 | Phase 2 | Pending |
+| MKT-01 | Phase 2 | Completed |
+| MKT-02 | Phase 2 | Completed |
+| MKT-03 | Phase 2 | Completed |
 | MATCH-01 | Phase 3 | Pending |
 | MATCH-02 | Phase 3 | Pending |
 | MATCH-03 | Phase 3 | Pending |
