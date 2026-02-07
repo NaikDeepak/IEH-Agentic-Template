@@ -19,6 +19,8 @@ export interface JobPosting {
         currency: string;
     };
     status: JobStatus;
+    lastActiveAt?: Timestamp | FieldValue;
+    expiresAt?: Timestamp | FieldValue;
     created_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
     embedding?: number[]; // Vector embedding for search
