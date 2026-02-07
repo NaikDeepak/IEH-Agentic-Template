@@ -44,11 +44,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Candidates automatically expire to "Passive" status after 4 days of no applications
   3. Inactive/spam postings are flagged and downranked in listings
 **Research**: Unlikely (Cloud Functions scheduled tasks)
-**Plans**: 4 plans
+**Plans**: 7 plans
 - [ ] 02-marketplace-mechanics-01-PLAN.md — Schema & Activity Tracking
 - [ ] 02-marketplace-mechanics-02-PLAN.md — The Reaper (Scheduled Function)
 - [ ] 02-marketplace-mechanics-03-PLAN.md — Notification System
-- [ ] 02-marketplace-mechanics-04-PLAN.md — UI Indicators & Manual Refresh
+- [ ] 02-marketplace-mechanics-04-PLAN.md — Active-First Sorting Logic
+- [ ] 02-marketplace-mechanics-05-PLAN.md — Active System UI Components
+- [ ] 02-marketplace-mechanics-06-PLAN.md — Fix integration gaps (Enum & Email)
+- [ ] 02-marketplace-mechanics-07-PLAN.md — Create Jobs Page (Gap Closure)
 
 ### Phase 3: Semantic Matching Engine
 **Goal**: Intelligent bi-directional matching between candidates and jobs
@@ -107,7 +110,7 @@ Phases execute in numeric order.
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
-| 2. Marketplace Mechanics | 0/4 | In Progress | - |
+| 2. Marketplace Mechanics | 4/7 | In Progress | - |
 | 3. Semantic Matching Engine | 0/TBD | Not started | - |
 | 4. Employer Suite | 0/TBD | Not started | - |
 | 5. Seeker Tools | 0/TBD | Not started | - |
