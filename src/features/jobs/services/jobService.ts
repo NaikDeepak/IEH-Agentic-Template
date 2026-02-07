@@ -66,7 +66,7 @@ export const JobService = {
             // 2. Prepare Data
             const jobData: Omit<JobPosting, 'id'> = {
                 ...input,
-                status: 'ACTIVE',
+                status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
                 embedding: embedding,
@@ -161,7 +161,7 @@ export const JobService = {
             // Sort by status (Active first) and then recency
             const q = query(
                 jobsRef,
-                where("status", "in", ["ACTIVE", "PASSIVE"]),
+                where("status", "in", ["active", "passive"]),
                 orderBy("status", "asc"),
                 orderBy("lastActiveAt", "desc"),
                 limit(limitCount)

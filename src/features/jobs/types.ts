@@ -1,6 +1,6 @@
 import type { Timestamp, FieldValue } from "firebase/firestore";
 
-export type JobStatus = 'ACTIVE' | 'PASSIVE' | 'CLOSED';
+export type JobStatus = 'active' | 'passive' | 'closed';
 export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
 export type WorkMode = 'REMOTE' | 'HYBRID' | 'ONSITE';
 
@@ -18,6 +18,7 @@ export interface JobPosting {
         max: number;
         currency: string;
     };
+    contactEmail: string;
     status: JobStatus;
     lastActiveAt?: Timestamp | FieldValue;
     expiresAt?: Timestamp | FieldValue;
@@ -34,4 +35,5 @@ export interface CreateJobInput {
     type: JobType;
     work_mode: WorkMode;
     employer_id: string; // Ideally passed from Auth Context
+    contactEmail: string;
 }
