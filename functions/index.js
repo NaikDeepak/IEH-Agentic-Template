@@ -8,6 +8,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleAuth } from "google-auth-library";
+import nodemailer from "nodemailer";
 
 dotenv.config({ path: ".env.production" });
 dotenv.config();
@@ -261,6 +262,83 @@ export const reaper = onSchedule("every 24 hours", async (event) => {
     console.log(`Reaper started at ${now.toISOString()}`);
 
     try {
+        // 1. Send Expiration Warnings (24-48h window)
+        const sendWarnings = async () => {
+            if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+                console.log("Skipping email warnings: Missing credentials.");
+                return 0;
+            }
+
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const dayAfter = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+            const processWarning = async (collectionName, typeName) => {
+                const ref = db.collection(collectionName);
+                // Find items expiring tomorrow (between 24h and 48h from now)
+                const snapshot = await ref
+                    .where("status", "==", "active")
+                    .where("expiresAt", ">", tomorrow)
+                    .where("expiresAt", "<", dayAfter)
+                    .get();
+
+                if (snapshot.empty) return 0;
+
+                let sent = 0;
+                const emails = [];
+
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+                    // Try common email fields
+                    const recipient = data.email || data.contactEmail || data.applicationEmail;
+
+                    if (recipient) {
+                        const subject = `Action Required: Your ${typeName} will expire soon`;
+                        const html = `
+                            <div style="font-family: sans-serif; padding: 20px;">
+                                <h2>Your ${typeName} is expiring</h2>
+                                <p>Your active ${typeName} will expire in approximately 24 hours and become invisible to users.</p>
+                                <p><strong>Action Required:</strong> Log in to the platform to renew your activity status.</p>
+                                <p style="margin-top: 20px; color: #666;">India Emp Hub Notification</p>
+                            </div>
+                        `;
+
+                        emails.push(
+                            transporter.sendMail({
+                                from: `"India Emp Hub" <${process.env.EMAIL_USER}>`,
+                                to: recipient,
+                                subject,
+                                html
+                            }).catch(err => {
+                                console.error(`Failed to email ${recipient} for doc ${doc.id}:`, err);
+                            })
+                        );
+                        sent++;
+                    }
+                }
+                await Promise.all(emails);
+                return sent;
+            };
+
+            const [jobsWarned, usersWarned] = await Promise.all([
+                processWarning("jobs", "Job Posting"),
+                processWarning("users", "Profile")
+            ]);
+
+            console.log(`Warnings sent. Jobs: ${jobsWarned}, Users: ${usersWarned}`);
+            return jobsWarned + usersWarned;
+        };
+
+        await sendWarnings();
+
+        // 2. Demote Expired Items
         const processCollection = async (collectionName) => {
             const ref = db.collection(collectionName);
             const snapshot = await ref
