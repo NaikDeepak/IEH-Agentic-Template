@@ -4,10 +4,16 @@ import {
     serverTimestamp,
     doc,
     updateDoc,
-    getDoc
+    getDoc,
+    query,
+    where,
+    orderBy,
+    getDocs,
+    limit
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
+import { trackJobActivity } from "../../../lib/activity";
 import type { CreateJobInput, JobPosting } from "../types";
 
 
@@ -132,8 +138,67 @@ export const JobService = {
             }
 
             await updateDoc(docRef, updateData);
+
+            // Updating a job counts as activity
+            void trackJobActivity(jobId);
         } catch (error) {
             console.error("Error updating job:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Fetch jobs with "Active First" sorting.
+     * Priority:
+     * 1. Status: ACTIVE (alphabetically before PASSIVE)
+     * 2. lastActiveAt: Descending (most recently active first)
+     */
+    async getJobs(limitCount = 20): Promise<JobPosting[]> {
+        try {
+            const jobsRef = collection(db, JOBS_COLLECTION);
+
+            // Filter for ACTIVE and PASSIVE jobs (exclude CLOSED)
+            // Sort by status (Active first) and then recency
+            const q = query(
+                jobsRef,
+                where("status", "in", ["ACTIVE", "PASSIVE"]),
+                orderBy("status", "asc"),
+                orderBy("lastActiveAt", "desc"),
+                limit(limitCount)
+            );
+
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as JobPosting));
+        } catch (error) {
+            console.error("Error fetching jobs:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get a specific job by ID.
+     * @param jobId The job ID
+     * @param isOwner If true, records activity for this job (keeps it active)
+     */
+    async getJobById(jobId: string, isOwner = false): Promise<JobPosting | null> {
+        try {
+            const docRef = doc(db, JOBS_COLLECTION, jobId);
+            const snap = await getDoc(docRef);
+
+            if (!snap.exists()) {
+                return null;
+            }
+
+            if (isOwner) {
+                void trackJobActivity(jobId);
+            }
+
+            return { id: snap.id, ...snap.data() } as JobPosting;
+        } catch (error) {
+            console.error("Error fetching job:", error);
             throw error;
         }
     }
