@@ -49,6 +49,32 @@ const handleError = (res, error, context) => {
 
 // --- API Logic via Helper Functions ---
 
+// Helper to expand query using LLM
+export const expandQuery = async (originalQuery, context, apiKey) => {
+    try {
+        const ai = new GoogleGenAI({ apiKey });
+        const target = context === "finding a job" ? "job" : "candidate";
+        const prompt = `You are an expert IT recruiter in India. Expand this search query into a detailed semantic description of the ideal ${target}. Include related skills, tools, and alternative titles. Keep it under 100 words. Query: ${originalQuery}`;
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: prompt,
+        });
+
+        const expandedText = response.text() || response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!expandedText) {
+             throw new Error("Empty response from LLM");
+        }
+
+        console.log(`Query Expansion (${context}): "${originalQuery}" -> "${expandedText.substring(0, 100)}..."`);
+        return expandedText;
+    } catch (error) {
+        console.warn(`Query expansion failed for "${originalQuery}". Using original query. Error: ${error.message}`);
+        return originalQuery;
+    }
+};
+
 // Helper to generate embedding (reusable)
 export const generateEmbedding = async (text, apiKey) => {
     const ai = new GoogleGenAI({ apiKey });
