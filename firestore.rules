@@ -18,7 +18,11 @@ service cloud.firestore {
                       'role',
                       'last_login',
                       'created_at',
-                      'updated_at'
+                      'updated_at',
+                      // Activity tracking
+                      'status',
+                      'lastActiveAt',
+                      'expiresAt'
                     ])
                     && request.resource.data.uid == request.auth.uid
                     && request.resource.data.email == request.auth.token.email
@@ -37,7 +41,11 @@ service cloud.firestore {
                       'updated_at',
                       'skills',
                       'parsed_data',
-                      'embedding'
+                      'embedding',
+                      // Activity tracking
+                      'status',
+                      'lastActiveAt',
+                      'expiresAt'
                     ])
                     && (resource.data.role == null
                         || !('role' in request.resource.data)
@@ -46,7 +54,10 @@ service cloud.firestore {
                          || (request.resource.data.embedding is list
                              && request.resource.data.embedding.size() == 768
                              && request.resource.data.embedding[0] is number
-                             && request.resource.data.embedding[767] is number) );
+                             && request.resource.data.embedding[767] is number) )
+                    // Validate expiresAt if present (max 4 days + 1 hour buffer)
+                    && ( !('expiresAt' in request.resource.data)
+                         || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
     }
 
     // Jobs Collection
@@ -69,7 +80,10 @@ service cloud.firestore {
                       'status',
                       'created_at',
                       'updated_at',
-                      'embedding'
+                      'embedding',
+                      // Activity tracking
+                      'lastActiveAt',
+                      'expiresAt'
                     ])
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
@@ -91,20 +105,26 @@ service cloud.firestore {
                       'salary_range',
                       'status',
                       'updated_at',
-                      'embedding'
+                      'embedding',
+                      // Activity tracking
+                      'lastActiveAt',
+                      'expiresAt'
                     ])
                     // employer_id is immutable
                     && ( !('employer_id' in request.resource.data)
                          || request.resource.data.employer_id == resource.data.employer_id )
                     // optional: validate status values if you use them
                     && ( !('status' in request.resource.data)
-                         || request.resource.data.status in ['ACTIVE', 'PASSIVE', 'CLOSED'] )
+                         || request.resource.data.status in ['active', 'passive', 'closed'] )
                     // validate embedding shape if present
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
                              && request.resource.data.embedding.size() == 768
                              && request.resource.data.embedding[0] is number
-                             && request.resource.data.embedding[767] is number) );
+                             && request.resource.data.embedding[767] is number) )
+                    // Validate expiresAt if present (max 4 days + 1 hour buffer)
+                    && ( !('expiresAt' in request.resource.data)
+                         || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
     }
 
     // Applications Collection
