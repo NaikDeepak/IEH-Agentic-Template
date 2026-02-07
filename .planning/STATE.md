@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 3 of 6 (Semantic Matching)
-Plan: 1 of 4 (03-01-PLAN.md)
+Plan: 2 of 4 (03-02-PLAN.md)
 Status: In progress
-Last activity: 2026-02-08 — Completed Search Infrastructure (03-01)
+Last activity: 2026-02-08 — Completed Query Expansion & Scoring (03-02)
 
-Progress: ██████████ 100% (Phase 2), Phase 3 Started
+Progress: ██████████ 100% (Phase 2), Phase 3 In Progress
 
 ## Performance Metrics
 
@@ -41,6 +41,8 @@ Progress: ██████████ 100% (Phase 2), Phase 3 Started
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-08 | 03-02 | Manual Score Calculation | Calculated `matchScore` manually using dot product of embeddings in the cloud function to ensure consistent percentage scoring (0-100%) for the frontend. |
+| 2026-02-08 | 03-02 | Fallback Mechanism | Implemented a try/catch block in `expandQuery` to return the original query if the LLM fails. |
 | 2026-02-08 | 03-01 | Firestore REST API for Vector Search | Continued using REST API pattern for stability and lightweight implementation in Cloud Functions. |
 | 2026-02-08 | 03-01 | Backend-Side Filtering | Enforced filters (status='active') on backend to optimize payload and enforce marketplace rules. |
 | 2026-02-08 | 03-01 | Whitelisting Candidate Fields | Explicitly selected public fields to prevent leaking private data like email/phone. |
@@ -77,7 +79,7 @@ Progress: ██████████ 100% (Phase 2), Phase 3 Started
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
 
 Config (if exists):
