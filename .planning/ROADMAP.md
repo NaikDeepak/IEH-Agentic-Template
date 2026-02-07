@@ -44,7 +44,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Candidates automatically expire to "Passive" status after 4 days of no applications
   3. Inactive/spam postings are flagged and downranked in listings
 **Research**: Unlikely (Cloud Functions scheduled tasks)
-**Plans**: 7 plans
+**Plans**: 8 plans
 - [ ] 02-marketplace-mechanics-01-PLAN.md — Schema & Activity Tracking
 - [ ] 02-marketplace-mechanics-02-PLAN.md — The Reaper (Scheduled Function)
 - [ ] 02-marketplace-mechanics-03-PLAN.md — Notification System
@@ -52,6 +52,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] 02-marketplace-mechanics-05-PLAN.md — Active System UI Components
 - [ ] 02-marketplace-mechanics-06-PLAN.md — Fix integration gaps (Enum & Email)
 - [ ] 02-marketplace-mechanics-07-PLAN.md — Create Jobs Page (Gap Closure)
+- [ ] 02-marketplace-mechanics-08-PLAN.md — Fix Job Creation Timestamps (Gap Closure)
 
 ### Phase 3: Semantic Matching Engine
 **Goal**: Intelligent bi-directional matching between candidates and jobs
