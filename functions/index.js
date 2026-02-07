@@ -1,4 +1,5 @@
 import { onRequest } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import express from "express";
 import { GoogleGenAI } from "@google/genai";
 import * as Sentry from "@sentry/node";
@@ -250,3 +251,66 @@ app.post("/api/jobs/search", searchJobsHandler);
 
 // Expose the Express API as a single Cloud Function
 export const api = onRequest(app);
+
+// --- Scheduled Functions ---
+
+export const reaper = onSchedule("every 24 hours", async (event) => {
+    const now = new Date();
+    const batchLimit = 500;
+
+    console.log(`Reaper started at ${now.toISOString()}`);
+
+    try {
+        const processCollection = async (collectionName) => {
+            const ref = db.collection(collectionName);
+            const snapshot = await ref
+                .where("status", "==", "active")
+                .where("expiresAt", "<", now)
+                .get();
+
+            if (snapshot.empty) {
+                console.log(`No expired ${collectionName} found.`);
+                return 0;
+            }
+
+            let count = 0;
+            let batch = db.batch();
+            let operationCount = 0;
+
+            for (const doc of snapshot.docs) {
+                batch.update(doc.ref, {
+                    status: "passive",
+                    updatedAt: now
+                });
+                operationCount++;
+                count++;
+
+                if (operationCount >= batchLimit) {
+                    await batch.commit();
+                    batch = db.batch();
+                    operationCount = 0;
+                }
+            }
+
+            if (operationCount > 0) {
+                await batch.commit();
+            }
+
+            console.log(`Demoted ${count} ${collectionName} to passive.`);
+            return count;
+        };
+
+        const [jobsDemoted, usersDemoted] = await Promise.all([
+            processCollection("jobs"),
+            processCollection("users")
+        ]);
+
+        console.log(`Reaper finished. Jobs: ${jobsDemoted}, Users: ${usersDemoted}`);
+
+    } catch (error) {
+        console.error("Reaper failed:", error);
+        if (process.env.SENTRY_DSN) {
+            Sentry.captureException(error);
+        }
+    }
+});
