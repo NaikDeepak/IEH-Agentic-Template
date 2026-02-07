@@ -9,6 +9,7 @@ import { RoleSelection } from './components/RoleSelection'
 import { Login } from './components/Login'
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import { JobsPage } from './pages/JobsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
@@ -35,6 +36,11 @@ function App() {
               </main>
             </div>
           }
+        />
+
+        <Route
+          path="/jobs"
+          element={<JobsPage />}
         />
 
         <Route
@@ -99,7 +105,7 @@ function App() {
                 <Routes>
                   <Route index element={<AdminDashboard />} />
                   <Route path="users" element={<div>Users Management (Placeholder)</div>} />
-                  <Route path="jobs" element={<div>Jobs Management (Placeholder)</div>} />
+                  <Route path="jobs" element={<JobsPage />} />
                   <Route path="settings" element={<div>Admin Settings (Placeholder)</div>} />
                 </Routes>
               </AdminLayout>
