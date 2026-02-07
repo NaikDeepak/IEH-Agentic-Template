@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 2 of 6 (Marketplace Mechanics)
-Plan: 4 of 5 (02-04-PLAN.md)
-Status: Phase 2 in progress
-Last activity: 2026-02-07 — Completed Active First Logic (02-04)
+Plan: 5 of 5 (02-05-PLAN.md)
+Status: Phase 2 complete
+Last activity: 2026-02-07 — Completed Active System UI (02-05)
 
-Progress: ████████░░ 80%
+Progress: ██████████ 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 12.5m
-- Total execution time: 0.6 hours
+- Total plans completed: 7
+- Average duration: ~11m
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation & Identity | 3 | 3 | 12.5m |
-| 2. Marketplace Mechanics | 1 | 5 | ~5m |
+| 2. Marketplace Mechanics | 5 | 5 | ~10m |
 
 **Recent Trend:**
-- Last 5 plans: 01-02, 01-03, 02-01
+- Last 5 plans: 01-03, 02-01, 02-02, 02-04, 02-05
 - Trend: Implementation
 
 ## Accumulated Context
@@ -40,6 +40,7 @@ Progress: ████████░░ 80%
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-07 | 02-05 | Visual Status Indicators | Green for active, Gray for passive; familiar traffic light pattern. |
 | 2026-02-07 | 02-04 | App-level Activity Tracking | Placed tracking in `App.tsx` root for reliable user heartbeat. |
 | 2026-02-07 | 02-04 | Active-First Sorting | Sort by Status (ASC) then LastActive (DESC) for engagement. |
 | 2026-02-07 | 02-02 | Batch Limit of 500 | Adhering to Firestore best practices for batch operations. |
@@ -55,6 +56,7 @@ Progress: ████████░░ 80%
 
 - Implement RBAC protection for `/admin` routes (Plan 01-02/01-01 follow-up)
 - Create actual management pages for Users, Jobs, and Settings.
+- Connect Job Feed UI to `jobService` (Next Phase).
 
 ### Blockers/Concerns
 
@@ -64,7 +66,7 @@ Progress: ████████░░ 80%
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 02-02-PLAN.md
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
 
 Config (if exists):
