@@ -9,7 +9,8 @@ import {
     where,
     orderBy,
     getDocs,
-    limit
+    limit,
+    Timestamp
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
@@ -64,11 +65,16 @@ export const JobService = {
             const embedding = await fetchEmbedding(semanticText);
 
             // 2. Prepare Data
+            const now = new Date();
+            const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
+
             const jobData: Omit<JobPosting, 'id'> = {
                 ...input,
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
+                lastActiveAt: serverTimestamp(),
+                expiresAt: Timestamp.fromDate(expirationDate),
                 embedding: embedding,
                 skills: input.skills.map(s => s.toLowerCase()) // Normalize skills
             };
