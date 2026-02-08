@@ -308,6 +308,58 @@ export const generateJdHandler = async (req, res) => {
     }
 };
 
+export const generateJobAssistHandler = async (req, res) => {
+    try {
+        const { jd } = req.body;
+        const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+
+        if (!jd) {
+            return res.status(400).json({ error: "Job description (jd) is required" });
+        }
+
+        if (!apiKey) {
+            return res.status(500).json({ error: "Server configuration error: API Key missing" });
+        }
+
+        const ai = new GoogleGenAI({ apiKey });
+
+        const prompt = `
+            You are an expert HR assistant. Based on the following Job Description (JD), provide two things in valid JSON format:
+            1. Generate 3-5 screening questions to ask candidates during their application. Each should have a "question" and a "hint" (guidance for the candidate).
+            2. Provide 3-5 optimization suggestions to improve the JD (e.g., clarity, missing details, tone).
+
+            JD:
+            ${jd}
+
+            Return ONLY a JSON object:
+            {
+                "questions": [
+                    { "question": "...", "hint": "..." }
+                ],
+                "suggestions": [
+                    "...", "..."
+                ]
+            }
+        `;
+
+        const result = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: prompt,
+        });
+
+        const text = result.text() || result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        // Extract JSON block if present
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonStr = jsonMatch ? jsonMatch[0] : text;
+
+        const data = JSON.parse(jsonStr);
+        res.json(data);
+    } catch (error) {
+        handleError(res, error, "generate job assist data");
+    }
+};
+
 export const embeddingHandler = async (req, res) => {
     try {
         const rawText = req.body?.text;
@@ -419,6 +471,7 @@ export const searchCandidatesHandler = async (req, res) => {
 // --- Route Definitions ---
 
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
+app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
 app.post("/jobs/search", searchJobsHandler); // Public search allowed? Usually yes, but maybe strictly authenticated? Leaving public for now as per requirements usually, or auth? The frontend uses it. Frontend sends token. Let's keep it open or auth?
 // The prompt said "Protect candidates/search".
@@ -426,6 +479,7 @@ app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), 
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
 app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
+app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
 app.post("/api/jobs/search", searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
