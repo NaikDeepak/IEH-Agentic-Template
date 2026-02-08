@@ -192,7 +192,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                         onClick={logout}
                         className="w-full py-4 px-6 text-sm font-black uppercase tracking-widest text-black bg-white border-2 border-black hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                     >
-                        Terminiate Session
+                        Terminate Session
                     </button>
                 )}
             </div>
