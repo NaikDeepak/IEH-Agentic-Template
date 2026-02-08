@@ -106,8 +106,9 @@ export const JobsPage: React.FC = () => {
             employerId: posting.employer_id,
             title: posting.title,
             description: posting.description,
-            // Map JobStatus to ActivityStatus ('closed' -> 'passive')
-            status: posting.status === 'active' ? 'active' : 'passive',
+            // Map JobStatus to ActivityStatus explicitly
+            status: posting.status === 'active' ? 'active' :
+                    posting.status === 'passive' ? 'passive' : 'closed',
             // Fallback to created_at if activity timestamps are missing
             lastActiveAt: posting.lastActiveAt ?? posting.created_at,
             expiresAt: posting.expiresAt ?? posting.created_at,
@@ -120,77 +121,89 @@ export const JobsPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col font-sans text-black selection:bg-black selection:text-white">
             <Header />
 
-            <main className="flex-grow container mx-auto px-4 py-8">
-                <div className="flex flex-col gap-8">
+            <main className="flex-grow container mx-auto px-4 md:px-8 py-12 max-w-7xl">
+                <div className="flex flex-col gap-16">
+
+                    {/* Header / Title Section */}
+                    <div className="flex flex-col gap-6 border-b-2 border-black pb-8">
+                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-0 leading-none">
+                            Open Positions
+                        </h1>
+                        <p className="text-xl md:text-2xl font-light text-gray-500 max-w-2xl leading-relaxed tracking-tight">
+                            Find your next role in our curated list of opportunities. <br/>
+                            <span className="text-black font-medium">Powered by semantic search.</span>
+                        </p>
+                    </div>
+
                     {/* Search Section */}
-                    <div className="w-full flex justify-center py-4 relative">
+                    <div className="w-full relative z-10">
                         <JobSearchBar onSearch={handleSearch} />
                     </div>
 
                     {/* Search Status / Clear */}
                     {isSearching && (
-                        <div className="flex items-center justify-between bg-indigo-50 border border-indigo-100 rounded-lg p-4 -mt-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between border-l-4 border-black pl-6 py-2 gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
                             <div>
-                                <h2 className="text-lg font-semibold text-indigo-900">
+                                <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 mb-1">
                                     Search Results
                                 </h2>
-                                <p className="text-sm text-indigo-700">
-                                    Showing top matches for <span className="font-bold">"{currentSearchQuery}"</span> based on semantic meaning.
+                                <p className="text-2xl font-bold text-black tracking-tight">
+                                    "{currentSearchQuery}" <span className="text-gray-400 font-normal italic">in context</span>
                                 </p>
                             </div>
                             <button
                                 onClick={handleClearSearch}
-                                className="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 rounded-md border border-slate-200 hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                                className="group flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-black hover:text-white transition-all duration-200 font-mono text-xs uppercase tracking-widest font-bold"
                             >
                                 <X className="w-4 h-4" />
-                                Clear Search
+                                Clear Filters
                             </button>
                         </div>
                     )}
 
                     {/* Content Section */}
                     {loading ? (
-                        <div className="flex justify-center items-center h-64">
-                            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                        <div className="flex flex-col justify-center items-center h-64 gap-6">
+                            <Loader2 className="w-12 h-12 animate-spin text-black" />
+                            <span className="font-mono text-sm uppercase tracking-widest animate-pulse font-bold">Processing Data...</span>
                         </div>
                     ) : error ? (
-                        <div className="text-center text-red-500 py-12">
-                            {error}
+                        <div className="border-4 border-black p-12 text-center bg-gray-50">
+                            <h3 className="text-3xl font-black text-black uppercase mb-4">System Error</h3>
+                            <p className="font-mono text-gray-500 mb-8">{error}</p>
                             {isSearching && (
-                                <div className="mt-4">
-                                    <button
-                                        onClick={handleClearSearch}
-                                        className="text-indigo-600 underline hover:text-indigo-800"
-                                    >
-                                        Return to browse
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={handleClearSearch}
+                                    className="px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                                >
+                                    Reset Search
+                                </button>
                             )}
                         </div>
                     ) : displayedJobs.length === 0 ? (
-                        <div className="text-center text-slate-500 py-12">
-                            <h3 className="text-xl font-semibold mb-2">
-                                {isSearching ? "No matching jobs found" : "No active jobs found"}
+                        <div className="py-24 border-y-2 border-dashed border-gray-200 text-center">
+                            <h3 className="text-4xl font-black text-gray-300 uppercase tracking-tighter mb-4">
+                                {isSearching ? "0 Matches Found" : "No Active Roles"}
                             </h3>
-                            <p>
+                            <p className="font-mono text-gray-400 uppercase tracking-widest text-sm">
                                 {isSearching
-                                    ? "Try adjusting your search terms or location."
-                                    : "Check back later for new opportunities."}
+                                    ? "Refine your parameters or clear filters."
+                                    : "Check back later for updates."}
                             </p>
                             {isSearching && (
                                 <button
                                     onClick={handleClearSearch}
-                                    className="mt-4 text-indigo-600 font-medium hover:underline"
+                                    className="mt-8 px-8 py-3 border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors"
                                 >
-                                    Clear search
+                                    Clear Search
                                 </button>
                             )}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
                             {displayedJobs.map((job) => (
                                 <JobCard
                                     key={job.id}

@@ -1,6 +1,6 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
 
-export type ActivityStatus = 'active' | 'passive';
+export type ActivityStatus = 'active' | 'passive' | 'closed';
 
 export type UserRole = 'seeker' | 'employer' | 'admin';
 
