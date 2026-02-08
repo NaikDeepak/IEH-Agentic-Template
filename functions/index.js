@@ -399,13 +399,13 @@ export const searchCandidatesHandler = async (req, res) => {
             const {
                 id, matchScore, displayName, bio, skills, experience,
                 location, photoURL, jobTitle, availability,
-                preferredRole, linkedIn, portfolio, github
+                preferredRole, linkedIn, portfolio, github, status
             } = c;
 
             return {
                 id, matchScore, displayName, bio, skills, experience,
                 location, photoURL, jobTitle, availability,
-                preferredRole, linkedIn, portfolio, github
+                preferredRole, linkedIn, portfolio, github, status
             };
         });
 
