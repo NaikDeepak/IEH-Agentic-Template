@@ -4,9 +4,15 @@ export type JobStatus = 'active' | 'passive' | 'closed';
 export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
 export type WorkMode = 'REMOTE' | 'HYBRID' | 'ONSITE';
 
+export interface ScreeningQuestion {
+    question: string;
+    hint?: string;
+}
+
 export interface JobPosting {
     id?: string;
     employer_id: string;
+    company_id?: string;
     title: string;
     description: string;
     skills: string[];
@@ -20,6 +26,7 @@ export interface JobPosting {
     };
     contactEmail: string;
     status: JobStatus;
+    screening_questions?: ScreeningQuestion[];
     lastActiveAt?: Timestamp | FieldValue;
     expiresAt?: Timestamp | FieldValue;
     created_at: Timestamp | FieldValue;
@@ -35,10 +42,12 @@ export interface CreateJobInput {
     type: JobType;
     work_mode: WorkMode;
     employer_id: string; // Ideally passed from Auth Context
+    company_id?: string;
     contactEmail: string;
     salary_range?: {
         min: number;
         max: number;
         currency: string;
     };
+    screening_questions?: ScreeningQuestion[];
 }

@@ -16,8 +16,7 @@ import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { trackJobActivity } from "../../../lib/activity";
 import type { CreateJobInput, JobPosting } from "../types";
-
-
+import { CompanyService } from "../../companies/services/companyService";
 
 const JOBS_COLLECTION = "jobs";
 
@@ -52,7 +51,16 @@ export const JobService = {
      */
     async createJob(input: CreateJobInput): Promise<string> {
         try {
-            // 1. Generate Embedding (Client-side for MVP)
+            // 1. Fetch Company ID if not provided
+            let companyId = input.company_id;
+            if (!companyId) {
+                const company = await CompanyService.getCompanyByEmployerId(input.employer_id);
+                if (company) {
+                    companyId = company.id;
+                }
+            }
+
+            // 2. Generate Embedding (Client-side for MVP)
             // Combine relevant fields for semantic search: Title, Description, Skills, Location
             const semanticText = `
         Title: ${input.title}
@@ -64,12 +72,13 @@ export const JobService = {
 
             const embedding = await fetchEmbedding(semanticText);
 
-            // 2. Prepare Data
+            // 3. Prepare Data
             const now = new Date();
             const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
 
             const jobData = {
                 ...input,
+                company_id: companyId,
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
@@ -79,7 +88,7 @@ export const JobService = {
                 skills: input.skills.map(s => s.toLowerCase()) // Normalize skills
             };
 
-            // 3. Save to Firestore
+            // 4. Save to Firestore
             const docRef = await addDoc(collection(db, JOBS_COLLECTION), jobData);
 
             return docRef.id;
@@ -217,13 +226,7 @@ export const JobService = {
             const jobsRef = collection(db, JOBS_COLLECTION);
             const q = query(
                 jobsRef,
-                where("employer_id", "==", companyId), // Assuming employer_id is used for company linkage for now, or we might need a company_id field.
-                // Wait, Task 1 says employer_ids[] in Company.
-                // Usually, jobs are linked to an employer who belongs to a company.
-                // However, the task says "fetch and display active jobs for this company".
-                // Let's assume for now we link by employer_id or check if we need to add company_id to jobs.
-                // Re-reading task 3: "fetch and display active jobs for this company using JobService.getJobsByCompanyId"
-                // Let's check JobPosting type.
+                where("company_id", "==", companyId),
                 where("status", "==", "active"),
                 orderBy("created_at", "desc")
             );
