@@ -377,12 +377,28 @@ export const generateJobAssistHandler = async (req, res) => {
 
         const text = typeof result.text === 'function' ? result.text() : result.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        // Extract JSON block if present
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        const jsonStr = jsonMatch ? jsonMatch[0] : text;
+        if (!text) {
+            console.error("Gemini response text is empty:", JSON.stringify(result, null, 2));
+            throw new Error("Empty response from AI");
+        }
 
-        const data = JSON.parse(jsonStr);
-        res.json(data);
+        console.log("AI Raw Response:", text);
+
+        // Extract JSON block if present (handles markdown code blocks ```json ... ```)
+        let jsonStr = text;
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            jsonStr = jsonMatch[0];
+        }
+
+        try {
+            const data = JSON.parse(jsonStr);
+            res.json(data);
+        } catch (parseError) {
+            console.error("JSON Parse Error. Raw Text:", text);
+            console.error("Attempted to parse:", jsonStr);
+            throw new Error("AI returned invalid JSON format");
+        }
     } catch (error) {
         handleError(res, error, "generate job assist data");
     }
