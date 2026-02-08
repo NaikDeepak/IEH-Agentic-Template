@@ -58,7 +58,7 @@
             "flat": {}
           }
         }
-      ],
+      ]
     },
     {
       "collectionGroup": "jobs",
@@ -87,11 +87,11 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "role",
+          "fieldPath": "status",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "status",
+          "fieldPath": "role",
           "order": "ASCENDING"
         },
         {
