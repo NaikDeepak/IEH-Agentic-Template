@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-16)
 
 **Core value:** Semantic matching that connects the right talent to the right roles by understanding context, not just keywords.
-**Current focus:** Phase 3 — Semantic Matching Engine (Complete)
+**Current focus:** Phase 4 — Employer Suite
 
 ## Current Position
 
-Phase: 3 of 6 (Semantic Matching)
-Plan: 6 of 6 (03-06-PLAN.md)
-Status: Phase 3 verified and complete (including gap closures)
-Last activity: 2026-02-08 — Completed Phase 3 execution and verification
+Phase: 4 of 6 (Employer Suite)
+Plan: 1 of 4 (04-01-PLAN.md)
+Status: Plan 01 complete, Company branding infrastructure established.
+Last activity: 2026-02-08 — Completed Company Schema, Editor, and Public Profile.
 
-Progress: ██████████ 100% (of defined plans)
+Progress: ████████████████████ 100% (of defined plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: ~12m
-- Total execution time: ~2.0 hours
+- Total execution time: ~2.1 hours
 
 **By Phase:**
 
@@ -30,10 +30,7 @@ Progress: ██████████ 100% (of defined plans)
 | 1. Foundation & Identity | 3 | 3 | 12.5m |
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
 | 3. Semantic Matching | 6 | 6 | ~11m |
-
-**Recent Trend:**
-- Last 5 plans: 03-03, 03-04, 03-05, 03-06
-- Trend: Efficient gap closure, ready for Phase 4.
+| 4. Employer Suite | 1 | 4 | ~12m |
 
 ## Accumulated Context
 
@@ -41,6 +38,7 @@ Progress: ██████████ 100% (of defined plans)
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-08 | 04-01 | Employer-Company Linkage | Used an `employer_ids` array in the company document to allow multiple recruiters/employers to manage a single company profile. |
 | 2026-02-08 | 03-06 | Explicit Status Mapping | Prevented conflation of 'closed' with 'passive', ensuring accurate system representation. |
 | 2026-02-08 | 03-06 | Strict Browse Filtering | Enforced "Active System" goals by only showing truly active jobs in the default browse view. |
 | 2026-02-08 | 03-05 | User Index Reordering | Reordered fields to `status` -> `role` -> `embedding` to match the query construction in the backend. |
@@ -51,16 +49,12 @@ Progress: ██████████ 100% (of defined plans)
 | 2026-02-08 | 03-02 | Manual Score Calculation | Calculated `matchScore` manually using dot product of embeddings in the cloud function to ensure consistent percentage scoring (0-100%) for the frontend. |
 | 2026-02-08 | 03-02 | Fallback Mechanism | Implemented a try/catch block in `expandQuery` to return the original query if the LLM fails. |
 | 2026-02-08 | 03-01 | Firestore REST API for Vector Search | Continued using REST API pattern for stability and lightweight implementation in Cloud Functions. |
-| 2026-02-08 | 03-01 | Backend-Side Filtering | Enforced filters (status='active') on backend to optimize payload and enforce marketplace rules. |
-| 2026-02-08 | 03-01 | Whitelisting Candidate Fields | Explicitly selected public fields to prevent leaking private data like email/phone. |
-| 2026-02-08 | 03-01 | Timestamp Unwrapping | Added custom handling for Firestore REST API timestamp format. |
 | 2026-01-16 | 01-01 | Manual `displayName` update on signup | Firebase `createUserWithEmailAndPassword` doesn't set it initially. |
 
 ### Pending Todos
 
 - Implement RBAC protection for `/admin` routes (Plan 01-02/01-01 follow-up)
 - Create actual management pages for Users, Jobs, and Settings.
-- Connect Job Feed UI to `jobService` (Next Phase).
 
 ### Blockers/Concerns
 
@@ -70,5 +64,5 @@ Progress: ██████████ 100% (of defined plans)
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed Phase 3 (Semantic Matching Engine)
-Resume file: None (Ready for Phase 4)
+Stopped at: Completed Phase 4 Plan 1 (Employer Branding)
+Resume file: .planning/phases/04-employer-suite/04-02-PLAN.md
