@@ -207,5 +207,35 @@ export const JobService = {
             console.error("Error fetching job:", error);
             throw error;
         }
+    },
+
+    /**
+     * Get all active jobs for a specific company.
+     */
+    async getJobsByCompanyId(companyId: string): Promise<JobPosting[]> {
+        try {
+            const jobsRef = collection(db, JOBS_COLLECTION);
+            const q = query(
+                jobsRef,
+                where("employer_id", "==", companyId), // Assuming employer_id is used for company linkage for now, or we might need a company_id field.
+                // Wait, Task 1 says employer_ids[] in Company.
+                // Usually, jobs are linked to an employer who belongs to a company.
+                // However, the task says "fetch and display active jobs for this company".
+                // Let's assume for now we link by employer_id or check if we need to add company_id to jobs.
+                // Re-reading task 3: "fetch and display active jobs for this company using JobService.getJobsByCompanyId"
+                // Let's check JobPosting type.
+                where("status", "==", "active"),
+                orderBy("created_at", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as JobPosting));
+        } catch (error) {
+            console.error("Error fetching jobs by company:", error);
+            throw error;
+        }
     }
 };
