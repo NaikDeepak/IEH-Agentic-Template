@@ -11,7 +11,7 @@ export const PopularTags: React.FC = () => {
             transition={{ delay: 0.5 }}
             className="flex flex-wrap justify-center gap-3 mt-8"
         >
-            <span className="text-sm text-slate-400 font-medium self-center mr-2">Popular:</span>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500 self-center mr-2">Popular:</span>
             {TAGS.map((tag, i) => (
                 <motion.button
                     key={tag}
@@ -20,7 +20,7 @@ export const PopularTags: React.FC = () => {
                     transition={{ delay: 0.5 + (i * 0.05) }}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 text-sm font-medium hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md transition-all duration-200"
+                    className="px-3 py-1.5 border-2 border-black bg-white text-black text-xs font-bold font-mono uppercase tracking-wider hover:bg-black hover:text-white transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                 >
                     {tag}
                 </motion.button>

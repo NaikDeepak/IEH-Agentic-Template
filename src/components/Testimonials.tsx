@@ -3,56 +3,54 @@ import { Quote, ArrowLeft, ArrowRight, Star } from 'lucide-react';
 
 export const Testimonials: React.FC = () => {
     return (
-        <section className="py-24 px-4 md:px-6 bg-[#dae3e5] font-sans rounded-t-[3rem] -mt-10 relative z-10">
-            <div className="container mx-auto max-w-6xl">
-                <div className="flex flex-col md:flex-row items-start justify-between gap-12">
+        <section className="py-24 px-4 md:px-8 bg-gray-50 border-b-2 border-black font-sans">
+            <div className="container mx-auto max-w-7xl">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 border-2 border-black bg-white">
 
-                    {/* Left Side */}
-                    <div className="w-full md:w-1/3">
-                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tight mb-8">
-                            What Our <br /> Customers Say
-                        </h2>
-                        <div className="flex gap-4">
-                            <button className="w-12 h-12 rounded-full border border-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors">
-                                <ArrowLeft className="w-5 h-5" />
+                    {/* Left Header Panel */}
+                    <div className="lg:col-span-4 p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-black bg-[#003366] text-white flex flex-col justify-between min-h-[400px]">
+                        <div>
+                            <Quote className="w-12 h-12 mb-8 text-white/20" />
+                            <h2 className="text-5xl font-black uppercase tracking-tighter leading-none mb-6">
+                                Impact<br/>Stories
+                            </h2>
+                            <p className="font-mono text-sm opacity-70 max-w-xs leading-relaxed">
+                                REAL FEEDBACK FROM ENTERPRISE PARTNERS AND SUCCESSFUL CANDIDATES.
+                            </p>
+                        </div>
+                        <div className="flex gap-0 pt-12">
+                            <button className="w-14 h-14 border-2 border-white hover:bg-white hover:text-[#003366] flex items-center justify-center transition-colors">
+                                <ArrowLeft className="w-6 h-6" />
                             </button>
-                            <button className="w-12 h-12 rounded-full border border-slate-400 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors">
-                                <ArrowRight className="w-5 h-5" />
+                            <button className="w-14 h-14 border-2 border-l-0 border-white hover:bg-white hover:text-[#003366] flex items-center justify-center transition-colors">
+                                <ArrowRight className="w-6 h-6" />
                             </button>
                         </div>
                     </div>
 
-                    {/* Right Side (Card) */}
-                    <div className="w-full md:w-2/3">
-                        <div className="bg-[#eef4f5] p-10 rounded-[2.5rem] relative">
-                            <Quote className="w-12 h-12 text-slate-300 absolute top-10 left-10" />
-                            <div className="relative z-10 pl-8">
-                                <p className="text-xl md:text-2xl font-medium text-slate-700 leading-relaxed mb-8">
-                                    "We needed to fill a critical Senior Developer role quickly. India Employment Hub's Active Candidate system was a game-changer, helping us find and hire the perfect candidate in record time. Highly recommended for efficient recruitment."
-                                </p>
+                    {/* Right Content Panel */}
+                    <div className="lg:col-span-8 p-12 lg:p-20 flex flex-col justify-center">
+                        <div className="flex gap-1 mb-8">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className="w-5 h-5 fill-black text-black" />
+                            ))}
+                        </div>
 
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <img
-                                            src="/images/testimonial_ceo.png"
-                                            alt="Thomas Karlow"
-                                            className="w-14 h-14 rounded-full object-cover"
-                                        />
-                                        <div>
-                                            <h4 className="font-bold text-slate-900">Thomas Karlow</h4>
-                                            <p className="text-sm text-slate-500">CEO at Cakar Int.</p>
-                                        </div>
-                                    </div>
+                        <blockquote className="text-2xl md:text-4xl font-black uppercase leading-tight tracking-tight mb-12">
+                            "We reduced our time-to-hire by 40% using the Active Candidate system. The semantic matching is incredibly precise."
+                        </blockquote>
 
-                                    <div className="hidden md:flex flex-col items-end">
-                                        <div className="flex gap-1 mb-1">
-                                            {Array.from({ length: 5 }).map((_, i) => (
-                                                <Star key={i} className="w-4 h-4 fill-slate-900 text-slate-900" />
-                                            ))}
-                                        </div>
-                                        <span className="font-black text-slate-300 text-3xl tracking-widest">CAKAR</span>
-                                    </div>
-                                </div>
+                        <div className="flex items-center gap-6 border-t-2 border-black pt-8 w-full">
+                            <div className="w-16 h-16 bg-gray-200 border-2 border-black overflow-hidden">
+                                <img
+                                    src="/images/testimonial_ceo.png"
+                                    alt="Thomas Karlow"
+                                    className="w-full h-full object-cover filter grayscale"
+                                />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-lg uppercase tracking-wide">Thomas Karlow</h4>
+                                <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">CEO, CAKAR INT.</p>
                             </div>
                         </div>
                     </div>

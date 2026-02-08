@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowUpRight, ArrowRight } from 'lucide-react';
 
 interface ServiceCardProps {
     title: string;
@@ -14,31 +14,33 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
     return (
         <motion.button
             whileHover={{ y: -5 }}
-            className={`relative rounded-[2rem] overflow-hidden p-6 h-[320px] flex flex-col justify-between group text-left w-full outline-none focus:ring-2 focus:ring-indigo-500 ${className} ${dark ? 'text-white' : 'text-slate-900'}`}
+            className={`relative overflow-hidden p-8 h-[400px] flex flex-col justify-between group text-left w-full border-2 border-black outline-none transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${className} ${dark ? 'text-white' : 'text-black'}`}
             aria-label={`View jobs for ${title}`}
         >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className={`absolute inset-0 ${dark ? 'bg-gradient-to-t from-black/80 via-black/20 to-transparent' : 'bg-gradient-to-t from-white/90 via-white/40 to-transparent'}`} />
+                <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale group-hover:grayscale-0" />
+                <div className={`absolute inset-0 ${dark ? 'bg-black/70 group-hover:bg-black/50' : 'bg-white/80 group-hover:bg-white/60'} transition-colors duration-500`} />
             </div>
 
             {/* Content */}
-            <div className="relative z-10">
-                <h3 className="text-xl font-black uppercase tracking-tight mb-4">{title}</h3>
+            <div className="relative z-10 w-full">
+                <div className="flex justify-between items-start w-full border-b-2 border-current pb-4 mb-4">
+                    <h3 className="text-3xl font-black uppercase tracking-tighter leading-none">{title}</h3>
+                    <ArrowUpRight className="w-6 h-6 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </div>
+
                 <div className="flex flex-wrap gap-2">
                     {tags.map((tag, i) => (
-                        <span key={i} className={`text-[10px] font-bold px-3 py-1 rounded-full border backdrop-blur-sm ${dark ? 'border-white/30 bg-white/10 text-white' : 'border-slate-300 bg-white/50 text-slate-700'}`}>
+                        <span key={i} className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 border ${dark ? 'border-white text-white' : 'border-black text-black'}`}>
                             {tag}
                         </span>
                     ))}
                 </div>
             </div>
 
-            <div className="relative z-10 flex justify-end">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${dark ? 'bg-white text-black hover:scale-110' : 'bg-black text-white hover:scale-110'}`}>
-                    <ArrowUpRight className="w-5 h-5" aria-hidden="true" />
-                </div>
+            <div className="relative z-10">
+               <span className="text-xs font-mono font-bold uppercase tracking-widest border-b border-current pb-0.5 group-hover:pb-1 transition-all">Explore Roles</span>
             </div>
         </motion.button>
     );
@@ -46,86 +48,79 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
 
 export const FeaturesSection: React.FC = () => {
     return (
-        <section className="py-24 px-4 md:px-6 bg-white font-sans">
-            <div className="container mx-auto max-w-6xl">
+        <section className="py-24 px-4 md:px-8 bg-white font-sans text-black border-b-2 border-black">
+            <div className="container mx-auto max-w-7xl">
 
                 {/* Header */}
-                <div className="mb-12">
-                    <h2 className="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-4">
-                        Trending Job Roles
-                    </h2>
-                    <p className="text-slate-500 max-w-2xl text-lg">
-                        Explore top career opportunities across high-demand sectors, from technology to creative arts, matching your skills with the best employers.
+                <div className="mb-16 flex flex-col md:flex-row justify-between items-end border-b-2 border-black pb-8 gap-8">
+                    <div>
+                        <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-4 leading-[0.85]">
+                            Trending<br/>Sectors
+                        </h2>
+                    </div>
+                    <p className="text-gray-600 max-w-md text-sm font-mono uppercase tracking-wide text-right md:text-left">
+                        Curated opportunities across high-growth industries. Verified employers only.
                     </p>
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-0 border-2 border-black bg-black">
 
                     {/* Creative & Design */}
-                    <ServiceCard
-                        title="CREATIVE & DESIGN"
-                        image="/images/feature_creative.png"
-                        tags={['UI/UX Design', '3D Modeling', 'Game Art', 'Animation']}
-                        className="md:col-span-4 bg-slate-100"
-                    />
-
-                    {/* Media & Production */}
-                    <ServiceCard
-                        title="MEDIA & PRODUCTION"
-                        image="/images/feature_video.png"
-                        tags={['Video Editing', 'Motion Graphics', 'Cinematography', 'Sound Design']}
-                        className="md:col-span-4 bg-slate-100"
-                        dark
-                    />
-
-                    {/* Brand Identity */}
-                    <ServiceCard
-                        title="BRAND IDENTITY"
-                        image="/images/feature_graphic.png"
-                        tags={['Logo Design', 'Illustration', 'Brand Strategy', 'Visual Identity']}
-                        className="md:col-span-4 bg-slate-100"
-                    />
-
-                    {/* Digital Marketing */}
-                    <div className="md:col-span-8 flex flex-col md:flex-row gap-6 p-1 rounded-[2.5rem] bg-slate-50 border border-slate-100 min-h-[300px] overflow-hidden group hover:shadow-xl transition-all duration-500">
-                        {/* This mimics the wide card in the bottom right of the reference */}
-                        <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden rounded-[2rem]">
-                            <img src="/images/feature_marketing.png" className="absolute inset-0 w-full h-full object-cover" />
-                        </div>
-                        <div className="w-full md:w-1/2 p-6 md:py-10 flex flex-col justify-between">
-                            <div>
-                                <h3 className="text-2xl font-black uppercase tracking-tight mb-4 text-slate-900">Digital Marketing</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {['SEO Specialist', 'Content Manager', 'Growth Hacker', 'PPC Expert', 'Social Media'].map((tag, i) => (
-                                        <span key={i} className="text-[10px] font-bold px-3 py-1 rounded-full border border-slate-200 bg-white text-slate-600">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex justify-end mt-6">
-                                <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center cursor-pointer hover:bg-slate-800 transition-colors">
-                                    <ArrowUpRight className="w-5 h-5" />
-                                </div>
-                            </div>
-                        </div>
+                    <div className="md:col-span-4">
+                        <ServiceCard
+                            title="Creative & Design"
+                            image="/images/feature_creative.png"
+                            tags={['UI/UX', '3D Art', 'Motion']}
+                            className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white"
+                        />
                     </div>
 
-                    {/* Navigation/More */}
-                    <div className="md:col-span-4 flex items-center justify-center gap-4">
-                        <button
-                            className="w-14 h-14 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-indigo-500 outline-none"
-                            aria-label="View previous trending jobs"
-                        >
-                            <ArrowLeft className="w-6 h-6 text-slate-400" aria-hidden="true" />
-                        </button>
-                        <button
-                            className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-slate-900 outline-none"
-                            aria-label="View next trending jobs"
-                        >
-                            <ArrowRight className="w-6 h-6" aria-hidden="true" />
-                        </button>
+                    {/* Media & Production */}
+                    <div className="md:col-span-4">
+                        <ServiceCard
+                            title="Media Production"
+                            image="/images/feature_video.png"
+                            tags={['Editing', 'Sound', 'Camera']}
+                            className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-black"
+                            dark
+                        />
+                    </div>
+
+                    {/* Brand Identity */}
+                    <div className="md:col-span-4">
+                        <ServiceCard
+                            title="Brand Identity"
+                            image="/images/feature_graphic.png"
+                            tags={['Strategy', 'Visuals', 'Copy']}
+                            className="h-full border-0 bg-white"
+                        />
+                    </div>
+
+                    {/* Digital Marketing (Wide Card) */}
+                    <div className="md:col-span-12 border-t-2 border-black">
+                        <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden group bg-gray-100 flex flex-col md:flex-row">
+                            <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b-2 md:border-b-0 md:border-r-2 border-black bg-white z-10">
+                                <div>
+                                    <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">Digital<br/>Marketing</h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {['SEO Specialist', 'Growth', 'PPC', 'Social Media', 'Analytics'].map((tag, i) => (
+                                            <span key={i} className="text-xs font-mono font-bold uppercase tracking-wider px-3 py-1.5 border-2 border-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-default">
+                                                {tag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button className="flex items-center gap-4 text-lg font-bold uppercase tracking-wide group-hover:translate-x-2 transition-transform w-fit">
+                                    View 140+ Openings <ArrowRight className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="w-full md:w-1/2 relative overflow-hidden">
+                                <img src="/images/feature_marketing.png" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

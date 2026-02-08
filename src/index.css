@@ -1,73 +1,51 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-50: #f0f9ff;
-  --color-brand-100: #e0f2fe;
-  --color-brand-500: #0ea5e9;
-  --color-brand-600: #0284c7;
-  --color-brand-900: #0c4a6e;
-
   --font-sans: "Inter", system-ui, sans-serif;
   --font-outfit: "Outfit", sans-serif;
-  --font-inter: "Inter", sans-serif;
+  --font-mono: "Space Mono", monospace;
 
-  --animate-fade-in: fadeIn 0.5s ease-out;
-  --animate-slide-up: slideUp 0.5s ease-out;
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-marquee: marquee 25s linear infinite;
 
   @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-
-    100% {
-      opacity: 1;
-    }
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
 
   @keyframes slideUp {
-    0% {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    0% { transform: translateY(10px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
   }
 
-  --animate-spin-slow: spin 8s linear infinite;
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
 }
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased font-inter;
+    @apply bg-white text-black antialiased font-sans selection:bg-black selection:text-white;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     @apply font-outfit tracking-tight;
   }
 }
 
 @layer components {
-  .glass {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+  /* Brutalist Utilities */
+  .shadow-hard {
+    box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
   }
 
-  .glass-dark {
-    @apply bg-slate-900/80 backdrop-blur-md border border-slate-800 shadow-2xl;
+  .shadow-hard-sm {
+    box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
   }
 
-  .ai-glow {
-    @apply relative after:absolute after:-inset-1 after:bg-gradient-to-r after:from-indigo-500 after:to-blue-500 after:rounded-full after:opacity-20 after:blur-xl after:transition-all after:duration-500 hover:after:opacity-40;
-  }
-
-  .bento-card {
-    @apply relative overflow-hidden rounded-3xl border border-slate-100 bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1;
+  .border-thick {
+    @apply border-2 border-black;
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Briefcase, Clock, DollarSign } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { StatusBadge } from './StatusBadge';
 import type { Job } from '../types';
@@ -21,32 +21,33 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
   // Helper to safely handle Timestamp/FieldValue for display
   const getDisplayDate = (date: Timestamp | FieldValue | undefined) => {
     if (!date || date instanceof FieldValue) return null;
-    return date instanceof Timestamp ? date : date; // Assuming it could be Date if we loosen types later, but for now strict
+    return date instanceof Timestamp ? date : date;
   };
 
   const getRelativeTime = (date: Timestamp | FieldValue | undefined) => {
-    if (!date || date instanceof FieldValue) return 'Just now';
+    if (!date || date instanceof FieldValue) return 'JUST NOW';
     // If it's a Timestamp, convert to Date
     const d = date instanceof Timestamp ? date.toDate() : new Date(); // Fallback
 
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 60) return 'JUST NOW';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}M AGO`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}H AGO`;
+    return `${Math.floor(diffInSeconds / 86400)}D AGO`;
   };
 
   const getMatchScoreColor = (score: number) => {
-    if (score >= 80) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    if (score >= 50) return 'bg-amber-100 text-amber-800 border-amber-200';
-    return 'bg-slate-100 text-slate-600 border-slate-200';
+    // Minimalist color coding: Black/White/Gray scale with single accent
+    if (score >= 80) return 'bg-black text-white border-black';
+    if (score >= 50) return 'bg-gray-200 text-black border-gray-200';
+    return 'bg-white text-gray-500 border-gray-200';
   };
 
   return (
     <div
-      className={`bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col gap-4 cursor-pointer group ${className}`}
+      className={`group relative bg-white border-2 border-black p-6 flex flex-col gap-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer ${className}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -57,55 +58,64 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
         }
       }}
     >
-      <div className="flex justify-between items-start">
-        <div className="flex-1 pr-2">
-          <h3 className="font-semibold text-lg text-gray-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+      {/* Header Section */}
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <StatusBadge
+              status={status}
+              expiresAt={getDisplayDate(expiresAt)}
+              showLabel={false}
+              className="!p-0 !bg-transparent !border-0"
+            />
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gray-500">
+               {status === 'active' ? 'Active Hiring' : 'Closed'}
+            </span>
+          </div>
+          <h3 className="font-bold text-xl leading-tight text-black group-hover:text-[#003366] transition-colors line-clamp-2">
             {title}
           </h3>
-          <p className="text-sm text-gray-500 mt-1">Company Name</p>
+          <p className="text-sm font-medium text-gray-500 mt-1 uppercase tracking-wide">Company Name</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <StatusBadge
-            status={status}
-            expiresAt={getDisplayDate(expiresAt)}
-          />
-          {matchScore !== undefined && (
-            <div className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getMatchScoreColor(matchScore)}`}>
-              {Math.round(matchScore)}% Match
-            </div>
-          )}
-        </div>
+
+        {matchScore !== undefined && (
+          <div className={`px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider border ${getMatchScoreColor(matchScore)}`}>
+            {Math.round(matchScore)}% Match
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-wrap gap-y-2 gap-x-4 text-sm text-gray-600">
+      {/* Details Grid */}
+      <div className="grid grid-cols-2 gap-y-3 gap-x-2 border-t border-gray-100 pt-4">
         {location && (
-          <div className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-gray-400" />
-            <span>{location}</span>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Location</span>
+            <span className="text-sm font-semibold text-black truncate">{location}</span>
           </div>
         )}
         {type && (
-          <div className="flex items-center gap-1.5">
-            <Briefcase className="w-4 h-4 text-gray-400" />
-            <span className="capitalize">{type.replace('-', ' ')}</span>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Type</span>
+            <span className="text-sm font-semibold text-black capitalize truncate">{type.replace('-', ' ')}</span>
           </div>
         )}
         {salaryRange && (
-          <div className="flex items-center gap-1.5">
-            <DollarSign className="w-4 h-4 text-gray-400" />
-            <span>{formatSalary(salaryRange)}</span>
+          <div className="col-span-2 flex flex-col">
+            <span className="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-0.5">Salary Range</span>
+            <span className="text-sm font-mono font-medium text-black truncate">{formatSalary(salaryRange)}</span>
           </div>
         )}
       </div>
 
-      <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
-        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-           <Clock className="w-3.5 h-3.5" />
-           <span>{getRelativeTime(createdAt)}</span>
+      {/* Footer / Action */}
+      <div className="mt-auto pt-4 flex items-center justify-between border-t-2 border-black">
+        <div className="flex items-center gap-1.5 text-[10px] font-mono font-medium text-gray-400 uppercase tracking-wider">
+           <span>Posted {getRelativeTime(createdAt)}</span>
         </div>
-        <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-black group-hover:underline decoration-2 underline-offset-4">
           View Details
-        </button>
+          <ArrowUpRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </div>
       </div>
     </div>
   );

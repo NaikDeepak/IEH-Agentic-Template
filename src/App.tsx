@@ -10,6 +10,7 @@ import { Login } from './components/Login'
 import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import { JobsPage } from './pages/JobsPage'
+import { PostJob } from './pages/PostJob'
 import { TalentSearch } from './pages/employer/TalentSearch'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
@@ -29,7 +30,7 @@ function App() {
         <Route
           path="/"
           element={
-            <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
               <Header />
               <RoleSelection />
               <main className="flex-grow">
@@ -47,7 +48,7 @@ function App() {
         <Route
           path="/register"
           element={
-            <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
               <Header />
               <main className="flex-grow">
                 <Register />
@@ -59,7 +60,7 @@ function App() {
         <Route
           path="/login"
           element={
-            <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
               <Header />
               <main className="flex-grow flex items-center justify-center p-4">
                 <Login variant="card" />
@@ -73,10 +74,16 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute allowedRoles={['seeker', 'employer', 'admin']}>
-              <div className="min-h-screen bg-slate-50 flex flex-col">
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
-                <main className="flex-grow p-8">
-                  <h1 className="text-2xl font-bold">Dashboard (Placeholder)</h1>
+                <main className="flex-grow p-8 md:p-12">
+                  <div className="border-2 border-black p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-4xl mx-auto">
+                    <h1 className="text-5xl font-black uppercase tracking-tighter mb-4">Dashboard</h1>
+                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500 mb-8">
+                      Your command center is under construction.
+                    </p>
+                    <div className="h-2 w-24 bg-black"></div>
+                  </div>
                 </main>
               </div>
             </ProtectedRoute>
@@ -87,12 +94,7 @@ function App() {
           path="/post-job"
           element={
             <ProtectedRoute allowedRoles={['employer']}>
-              <div className="min-h-screen bg-slate-50 flex flex-col">
-                <Header />
-                <main className="flex-grow p-8">
-                  <h1 className="text-2xl font-bold">Post a Job (Placeholder)</h1>
-                </main>
-              </div>
+              <PostJob />
             </ProtectedRoute>
           }
         />
@@ -101,7 +103,7 @@ function App() {
           path="/employer/search"
           element={
             <ProtectedRoute allowedRoles={['employer']}>
-              <div className="min-h-screen bg-slate-50 flex flex-col">
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
                 <main className="flex-grow">
                   <TalentSearch />
@@ -119,9 +121,9 @@ function App() {
               <AdminLayout>
                 <Routes>
                   <Route index element={<AdminDashboard />} />
-                  <Route path="users" element={<div>Users Management (Placeholder)</div>} />
+                  <Route path="users" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Users Management (Placeholder)</div>} />
                   <Route path="jobs" element={<JobsPage />} />
-                  <Route path="settings" element={<div>Admin Settings (Placeholder)</div>} />
+                  <Route path="settings" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Admin Settings (Placeholder)</div>} />
                 </Routes>
               </AdminLayout>
             </ProtectedRoute>

@@ -8,7 +8,7 @@ import { TopRecruiters } from '../components/TopRecruiters';
 
 export const LandingPage: React.FC = () => {
     return (
-        <main className="min-h-screen bg-slate-50 selection:bg-indigo-100 selection:text-indigo-900 font-sans">
+        <main className="min-h-screen bg-white selection:bg-black selection:text-white font-sans">
             <HeroSection />
             <FeaturesSection />
             <WhyChooseUs />

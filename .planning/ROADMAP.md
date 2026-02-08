@@ -64,11 +64,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Matches reflect specific understanding of India IT/ITES/BPO domain
 **Research**: Likely (Vector Search tuning)
 **Research topics**: Firestore Vector Search tuning, embedding model selection for Indian context
-**Plans**: 4 plans
+**Plans**: 6 plans
 - [x] 03-semantic-matching-01-PLAN.md — Backend Infrastructure & Indexes
 - [x] 03-semantic-matching-02-PLAN.md — Intelligence Layer (Expansion & Scoring)
 - [x] 03-semantic-matching-03-PLAN.md — Talent Search UI
 - [x] 03-semantic-matching-04-PLAN.md — Job Search UI
+- [ ] 03-05-PLAN.md — Fix Vector Indexes and Search Responses (Gap Closure)
+- [ ] 03-06-PLAN.md — Standardize Status Logic and Filtering (Gap Closure)
 
 ### Phase 4: Employer Suite
 **Goal**: Productivity tools for job creation and candidate management
@@ -116,7 +118,7 @@ Phases execute in numeric order.
 |-------|----------------|--------|-----------|
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
-| 3. Semantic Matching Engine | 4/4 | Completed | 2026-02-08 |
+| 3. Semantic Matching Engine | 4/6 | In Progress | - |
 | 4. Employer Suite | 0/TBD | Not started | - |
 | 5. Seeker Tools | 0/TBD | Not started | - |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
@@ -213,6 +215,33 @@ Phases execute in numeric order.
 | GROW-02 | Phase 6 | Pending |
 | GROW-03 | Phase 6 | Pending |
 
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| AUTH-01 | Phase 1 | Completed |
+| AUTH-02 | Phase 1 | Completed |
+| AUTH-03 | Phase 1 | Completed |
+| MKT-01 | Phase 2 | Completed |
+| MKT-02 | Phase 2 | Completed |
+| MKT-03 | Phase 2 | Completed |
+| MATCH-01 | Phase 3 | Complete |
+| MATCH-02 | Phase 3 | Complete |
+| MATCH-03 | Phase 3 | Complete |
+| EMP-01 | Phase 4 | Pending |
+| EMP-02 | Phase 4 | Pending |
+| EMP-03 | Phase 4 | Pending |
+| EMP-04 | Phase 4 | Pending |
+| SEEK-01 | Phase 5 | Pending |
+| SEEK-02 | Phase 5 | Pending |
+| SEEK-03 | Phase 5 | Pending |
+| SEEK-04 | Phase 5 | Pending |
+| SEEK-05 | Phase 5 | Pending |
+| SEEK-06 | Phase 5 | Pending |
+| GROW-01 | Phase 6 | Pending |
+| GROW-02 | Phase 6 | Pending |
+| GROW-03 | Phase 6 | Pending |
+
 **Coverage:**
 - v1 requirements: 23 total
 - Mapped to phases: 23
@@ -220,3 +249,4 @@ Phases execute in numeric order.
 
 ---
 *Requirements defined: 2026-01-16*
+---

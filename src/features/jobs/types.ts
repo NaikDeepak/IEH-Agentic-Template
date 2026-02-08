@@ -36,4 +36,9 @@ export interface CreateJobInput {
     work_mode: WorkMode;
     employer_id: string; // Ideally passed from Auth Context
     contactEmail: string;
+    salary_range?: {
+        min: number;
+        max: number;
+        currency: string;
+    };
 }
