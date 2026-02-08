@@ -14,6 +14,7 @@ import { PostJob } from './pages/PostJob'
 import { TalentSearch } from './pages/employer/TalentSearch'
 import { CompanyEditor } from './pages/employer/CompanyEditor'
 import { CompanyProfile } from './pages/CompanyProfile'
+import { JobApplicants } from './pages/employer/JobApplicants'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
@@ -130,6 +131,15 @@ function App() {
                   <CompanyEditor />
                 </main>
               </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/jobs/:id/applicants"
+          element={
+            <ProtectedRoute allowedRoles={['employer']}>
+              <JobApplicants />
             </ProtectedRoute>
           }
         />
