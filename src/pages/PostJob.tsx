@@ -116,7 +116,14 @@ export const PostJob: React.FC = () => {
   const handleQuestionChange = (index: number, field: keyof ScreeningQuestion, value: string) => {
     setScreeningQuestions(prev => {
       const newQuestions = [...prev];
-      newQuestions[index] = { ...newQuestions[index], [field]: value };
+      const current = newQuestions[index];
+      if (!current) return prev;
+
+      if (field === 'question') {
+        newQuestions[index] = { ...current, question: value };
+      } else {
+        newQuestions[index] = { ...current, hint: value };
+      }
       return newQuestions;
     });
   };

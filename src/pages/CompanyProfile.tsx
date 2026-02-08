@@ -48,7 +48,7 @@ export const CompanyProfile: React.FC = () => {
         if (url.includes('youtube.com') || url.includes('youtu.be')) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = regExp.exec(url);
-            return (match?.[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
+            return (match?.[2]?.length === 11) ? `https://www.youtube.com/embed/${match[2]}` : null;
         }
         if (url.includes('vimeo.com')) {
             const regExp = /vimeo\.com\/(\d+)/;

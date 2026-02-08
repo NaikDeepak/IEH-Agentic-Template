@@ -62,24 +62,28 @@ skipped: 0
 
 - truth: "Application loads without syntax errors"
   status: failed
-  reason: "User reported: companyService.ts:13 Uncaught SyntaxError: The requested module '/src/features/companies/types.ts' does not provide an export named 'Company' (at companyService.ts:13:10)"
+  reason: "User reported: companyService.ts:13 Uncaught SyntaxError: The requested module '/src/features/companies/types.ts' does not provide an export named 'Company'"
   severity: blocker
   test: 1
+  root_cause: "Non-type import of 'Company' interface in an ESM environment. Interfaces are erased at runtime, causing the browser to fail when searching for a named export. Need to ensure all imports of Company use the 'import type' syntax."
 
 - truth: "AI generates screening questions on demand"
   status: failed
   reason: "User reported: failed - error - [ERROR]: AI Analysis failed. Please try again.installHook.js:1 Error: Failed to generate assistance data at handleAiGenerateAssist (PostJob.tsx:96:26)"
   severity: major
   test: 4
+  root_cause: "Potential JSON parsing failure in backend handler (functions/index.js) when Gemini returns malformed JSON or markdown-wrapped JSON that the regex fails to catch. Could also be caused by a missing GEMINI_API_KEY in the environment."
 
 - truth: "Job creation succeeds with embedding generation"
   status: failed
   reason: "User reported: Error posting job: Error: Embedding service failed: 404 at fetchEmbedding"
   severity: blocker
   test: 5
+  root_cause: "Routing mismatch for /api/embedding. The frontend calls /api/embedding but the local Express server might not have this route defined or the Vite proxy is pointing to a server that doesn't host the Cloud Function logic."
 
 - truth: "ATS Kanban board is accessible and functional"
   status: failed
   reason: "User reported: fail or unable to test we dont have the screen , and seeded data for it ro work"
   severity: major
   test: 6
+  root_cause: "1. Navigation link to Job Applicants (/employer/jobs/:id/applicants) is missing from the Header/Employer UI. 2. Lack of seed data for the 'applications' collection makes the Kanban board empty and untestable."

@@ -14,6 +14,13 @@ import nodemailer from "nodemailer";
 dotenv.config({ path: ".env.production" });
 dotenv.config();
 
+// Debug: Check Environment Variables
+console.log("Server Startup: Checking Environment Variables...");
+console.log("API_KEY present:", !!(process.env.API_KEY || process.env.GEMINI_API_KEY));
+console.log("SENTRY_DSN present:", !!process.env.SENTRY_DSN);
+console.log("FIREBASE_CONFIG present:", !!process.env.FIREBASE_CONFIG);
+
+
 // Initialize Firebase Admin SDK
 initializeApp();
 const db = getFirestore();
@@ -114,35 +121,53 @@ export const expandQuery = async (originalQuery, context, apiKey) => {
             contents: prompt,
         });
 
-        const expandedText = response.text() || response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const expandedText = (typeof response.text === 'function' ? response.text() : null) ||
+            response.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!expandedText) {
-             throw new Error("Empty response from LLM");
+            console.error("Expand Query Response:", JSON.stringify(response, null, 2));
+            // Fallback to original query instead of throwing if LLM fails
+            console.warn("LLM response empty/invalid, using original query.");
+            return originalQuery;
         }
 
         console.log(`Query Expansion (${context}): "${originalQuery}" -> "${expandedText.substring(0, 100)}..."`);
         return expandedText;
     } catch (error) {
-        console.warn(`Query expansion failed for "${originalQuery}". Using original query. Error: ${error.message}`);
+        console.error("Error expanding query:", error);
         return originalQuery;
     }
 };
 
 // Helper to generate embedding (reusable)
+// Helper to generate embedding (reusable)
 export const generateEmbedding = async (text, apiKey) => {
     const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.embedContent({
-        model: "text-embedding-004",
-        contents: [{ parts: [{ text }] }],
-    });
-    if (response.embedding?.values) {
-        return response.embedding.values;
-    }
-    // Fallback for different SDK return shapes just in case
-    if (response.embeddings?.[0]?.values) {
-        return response.embeddings[0].values;
-    }
 
+    // Validated model from listModels()
+    const model = "models/gemini-embedding-001";
+
+    try {
+        const response = await ai.models.embedContent({
+            model: model,
+            contents: [{ parts: [{ text }] }],
+            config: {
+                outputDimensionality: 768
+            }
+        });
+
+        if (response.embedding?.values) {
+            console.log(`Generated embedding length: ${response.embedding.values.length}`);
+            return response.embedding.values;
+        }
+        if (response.embeddings?.[0]?.values) {
+            console.log(`Generated embedding length: ${response.embeddings[0].values.length}`);
+            return response.embeddings[0].values;
+        }
+    } catch (error) {
+        console.error(`Embedding failed with model ${model}:`, error.message);
+        throw error;
+    }
     throw new Error("Invalid embedding response from Gemini API");
 };
 
@@ -302,7 +327,8 @@ export const generateJdHandler = async (req, res) => {
             contents: `Generate a professional job description for a ${role} with skills: ${skills} and experience: ${experience}.`,
         });
 
-        res.json({ jd: response.text() || response.data?.candidates?.[0]?.content?.parts?.[0]?.text });
+        const text = typeof response.text === 'function' ? response.text() : response.candidates?.[0]?.content?.parts?.[0]?.text;
+        res.json({ jd: text });
     } catch (error) {
         handleError(res, error, "generate job description");
     }
@@ -347,7 +373,7 @@ export const generateJobAssistHandler = async (req, res) => {
             contents: prompt,
         });
 
-        const text = result.text() || result.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const text = typeof result.text === 'function' ? result.text() : result.candidates?.[0]?.content?.parts?.[0]?.text;
 
         // Extract JSON block if present
         const jsonMatch = text.match(/\{[\s\S]*\}/);

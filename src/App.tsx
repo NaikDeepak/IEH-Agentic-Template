@@ -16,6 +16,7 @@ import { CompanyEditor } from './pages/employer/CompanyEditor'
 import { CompanyProfile } from './pages/CompanyProfile'
 import { JobApplicants } from './pages/employer/JobApplicants'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import FinancialDashboard from './pages/admin/FinancialDashboard';
 
 function App() {
   const { user } = useAuth();
@@ -154,6 +155,7 @@ function App() {
                   <Route index element={<AdminDashboard />} />
                   <Route path="users" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Users Management (Placeholder)</div>} />
                   <Route path="jobs" element={<JobsPage />} />
+                  <Route path="finance" element={<FinancialDashboard />} />
                   <Route path="settings" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Admin Settings (Placeholder)</div>} />
                 </Routes>
               </AdminLayout>

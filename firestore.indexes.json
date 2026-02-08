@@ -22,7 +22,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distanceMeasure": "COSINE",
+            "distance_measure": "COSINE",
             "flat": {}
           }
         }
@@ -36,7 +36,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distanceMeasure": "COSINE",
+            "distance_measure": "COSINE",
             "flat": {}
           }
         }
@@ -54,7 +54,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distanceMeasure": "COSINE",
+            "distance_measure": "COSINE",
             "flat": {}
           }
         }
@@ -76,7 +76,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distanceMeasure": "COSINE",
+            "distance_measure": "COSINE",
             "flat": {}
           }
         }
@@ -98,9 +98,37 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distanceMeasure": "COSINE",
+            "distance_measure": "COSINE",
             "flat": {}
           }
+        }
+      ]
+    },
+    {
+      "collectionGroup": "jobs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "expiresAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "expiresAt",
+          "order": "ASCENDING"
         }
       ]
     }

@@ -13,7 +13,7 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "@google/genai": "^1.35.0",
+    "@google/genai": "^1.40.0",
     "@sentry/node": "^10.32.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
