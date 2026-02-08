@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CompanyService } from '../features/companies/services/companyService';
 import { JobService } from '../features/jobs/services/jobService';
-import { Company } from '../features/companies/types';
-import { JobPosting } from '../features/jobs/types';
+import type { Company } from '../features/companies/types';
+import type { JobPosting } from '../features/jobs/types';
 import { Header } from '../components/Header';
 import { JobCard } from '../components/JobCard';
 import { Loader2, ArrowLeft, Globe, MapPin, ExternalLink } from 'lucide-react';
-import { Job } from '../types';
+import type { Job } from '../types';
 
 export const CompanyProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -72,7 +72,7 @@ export const CompanyProfile: React.FC = () => {
             title: posting.title,
             description: posting.description,
             status: posting.status === 'active' ? 'active' :
-                    posting.status === 'passive' ? 'passive' : 'closed',
+                posting.status === 'passive' ? 'passive' : 'closed',
             lastActiveAt: posting.lastActiveAt ?? posting.created_at,
             expiresAt: posting.expiresAt ?? posting.created_at,
             createdAt: posting.created_at,

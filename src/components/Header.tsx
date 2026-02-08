@@ -18,6 +18,8 @@ export const Header: React.FC = () => {
     if (userData?.role === 'employer') {
         // Insert "Find Talent" after "Find Jobs"
         navItems.splice(1, 0, { label: 'Find Talent', path: '/employer/search' });
+        // Insert "My Company" after "Post a Job"
+        navItems.splice(3, 0, { label: 'My Company', path: '/employer/company' });
     }
 
     return (

@@ -4,7 +4,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Application, ApplicationStatus } from '../types';
+import type { Application, ApplicationStatus } from '../types';
 import { ApplicantCard } from './ApplicantCard';
 
 interface KanbanColumnProps {
@@ -42,7 +42,7 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applicati
 
         {applications.length === 0 && (
           <div className="flex-grow flex items-center justify-center py-12 opacity-20">
-             <p className="font-mono text-[10px] uppercase font-bold text-center">No Applicants</p>
+            <p className="font-mono text-[10px] uppercase font-bold text-center">No Applicants</p>
           </div>
         )}
       </div>

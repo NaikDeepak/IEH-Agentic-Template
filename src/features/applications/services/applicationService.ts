@@ -10,7 +10,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { Application, ApplicationStatus, SubmitApplicationInput } from "../types";
+import type { Application, ApplicationStatus, SubmitApplicationInput } from "../types";
 
 const APPLICATIONS_COLLECTION = "applications";
 

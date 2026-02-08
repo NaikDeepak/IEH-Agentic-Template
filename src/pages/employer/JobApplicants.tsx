@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ApplicationService } from '../../features/applications/services/applicationService';
 import { KanbanBoard } from '../../features/applications/components/KanbanBoard';
-import { Application, ApplicationStatus } from '../../features/applications/types';
+import type { Application, ApplicationStatus } from '../../features/applications/types';
 import { JobService } from '../../features/jobs/services/jobService';
-import { JobPosting } from '../../features/jobs/types';
+import type { JobPosting } from '../../features/jobs/types';
 import { Header } from '../../components/Header';
 import { Loader2, ArrowLeft, Users, ExternalLink } from 'lucide-react';
 

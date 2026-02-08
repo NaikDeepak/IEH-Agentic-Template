@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { Application } from '../types';
+import type { Application } from '../types';
 import { User, Briefcase, Zap } from 'lucide-react';
 
 interface ApplicantCardProps {

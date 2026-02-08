@@ -7,15 +7,15 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragStartEvent,
-  DragEndEvent,
-  DragOverEvent,
+  type DragStartEvent,
+  type DragEndEvent,
+  type DragOverEvent,
   defaultDropAnimationSideEffects,
 } from '@dnd-kit/core';
 import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Application, ApplicationStatus } from '../types';
+import type { Application, ApplicationStatus } from '../types';
 import { KanbanColumn } from './KanbanColumn';
 import { ApplicantCard } from './ApplicantCard';
 

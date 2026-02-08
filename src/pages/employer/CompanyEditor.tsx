@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CompanyService } from '../../features/companies/services/companyService';
 import { useAuth } from '../../hooks/useAuth';
 import { Loader2, ArrowLeft, Save, Globe, MapPin, Video, FileText } from 'lucide-react';
-import { Company } from '../../features/companies/types';
+import type { Company } from '../../features/companies/types';
 
 export const CompanyEditor: React.FC = () => {
   const { user } = useAuth();

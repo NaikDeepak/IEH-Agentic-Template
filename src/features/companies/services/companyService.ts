@@ -10,7 +10,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
-import { Company } from "../types";
+import type { Company } from "../types";
 
 const COMPANIES_COLLECTION = "companies";
 
@@ -28,9 +28,9 @@ export const CompanyService = {
       where("employer_ids", "array-contains", uid)
     );
     const snap = await getDocs(q);
-    if (snap.empty) return null;
-    const doc = snap.docs[0];
-    return { id: doc.id, ...doc.data() } as Company;
+    const companyDoc = snap.docs[0];
+    if (!companyDoc) return null;
+    return { id: companyDoc.id, ...companyDoc.data() } as Company;
   },
 
   async createCompany(data: Omit<Company, "id" | "created_at" | "updated_at">): Promise<string> {
