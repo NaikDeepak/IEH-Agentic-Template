@@ -6,6 +6,7 @@ import candidatesRoutes from './features/candidates/candidates.routes.js';
 const router = express.Router();
 
 router.use('/ai', aiRoutes);
+router.use('/', aiRoutes); // Allow /api/embedding and /api/ai/embedding
 router.use('/jobs', jobsRoutes);
 router.use('/candidates', candidatesRoutes);
 

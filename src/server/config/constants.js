@@ -1,8 +1,8 @@
 export const CONSTANTS = {
     AI: {
         MODEL_FAST: 'gemini-2.0-flash',
-        MODEL_EMBEDDING: 'gemini-embedding-001', // Used in REST API URL
-        EMBEDDING_DIMENSIONS: 768,
+        MODEL_EMBEDDING: 'text-embedding-004', // Used in REST API URL
+        EMBEDDING_DIMENSIONS: 1536,
         API_VERSION: 'v1beta',
     },
     FIREBASE: {

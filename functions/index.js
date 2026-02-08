@@ -147,14 +147,14 @@ export const generateEmbedding = async (text, apiKey) => {
     const ai = new GoogleGenAI({ apiKey });
 
     // Validated model from listModels()
-    const model = "models/gemini-embedding-001";
+    const model = "models/text-embedding-004";
 
     try {
         const response = await ai.models.embedContent({
             model: model,
             contents: [{ parts: [{ text }] }],
             config: {
-                outputDimensionality: 768
+                outputDimensionality: 1536
             }
         });
 

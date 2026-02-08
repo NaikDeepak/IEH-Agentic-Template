@@ -20,7 +20,7 @@ function getAI(): GoogleGenAI {
  * Generates a vector embedding for the given text using gemini-embedding-exp-03-07 or text-embedding-004.
  * We use 'text-embedding-004' as the stable standard for now.
  */
-export const EMBEDDING_DIMENSION = 768;
+export const EMBEDDING_DIMENSION = 1536;
 
 export async function generateEmbedding(text: string): Promise<number[]> {
     if (!text.trim()) return [];
@@ -34,6 +34,9 @@ export async function generateEmbedding(text: string): Promise<number[]> {
                     parts: [{ text }],
                 },
             ],
+            config: {
+                outputDimensionality: 1536
+            }
         });
 
         const validate = (values: unknown): number[] | null => {
