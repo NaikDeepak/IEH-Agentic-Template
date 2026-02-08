@@ -22,7 +22,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distance_measure": "COSINE",
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
@@ -36,7 +36,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distance_measure": "COSINE",
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
@@ -54,7 +54,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distance_measure": "COSINE",
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
@@ -76,7 +76,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distance_measure": "COSINE",
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
@@ -98,7 +98,7 @@
           "fieldPath": "embedding",
           "vectorConfig": {
             "dimension": 768,
-            "distance_measure": "COSINE",
+            "distanceMeasure": "COSINE",
             "flat": {}
           }
         }
