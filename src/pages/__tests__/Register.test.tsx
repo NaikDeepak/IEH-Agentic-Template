@@ -49,11 +49,12 @@ describe('Register Component', () => {
         const nameInput = screen.getByPlaceholderText(/john doe/i);
         const emailInput = screen.getByPlaceholderText(/john@example.com/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
+        const [passwordInput, confirmInput] = passwordInputs;
 
         fireEvent.change(nameInput, { target: { value: 'Test User' } });
         fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-        fireEvent.change(passwordInputs[0], { target: { value: 'password123' } });
-        fireEvent.change(passwordInputs[1], { target: { value: 'password123' } });
+        if (passwordInput) fireEvent.change(passwordInput, { target: { value: 'password123' } });
+        if (confirmInput) fireEvent.change(confirmInput, { target: { value: 'password123' } });
 
         expect(nameInput).toHaveValue('Test User');
         expect(emailInput).toHaveValue('test@example.com');
@@ -65,10 +66,11 @@ describe('Register Component', () => {
         renderRegister();
 
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
+        const [passwordInput, confirmInput] = passwordInputs;
         const submitButton = screen.getByRole('button', { name: /sign up/i });
 
-        fireEvent.change(passwordInputs[0], { target: { value: 'password123' } });
-        fireEvent.change(passwordInputs[1], { target: { value: 'password456' } });
+        if (passwordInput) fireEvent.change(passwordInput, { target: { value: 'password123' } });
+        if (confirmInput) fireEvent.change(confirmInput, { target: { value: 'password456' } });
 
         fireEvent.click(submitButton);
 
@@ -85,12 +87,13 @@ describe('Register Component', () => {
         const nameInput = screen.getByPlaceholderText(/john doe/i);
         const emailInput = screen.getByPlaceholderText(/john@example.com/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
+        const [passwordInput, confirmInput] = passwordInputs;
         const submitButton = screen.getByRole('button', { name: /sign up/i });
 
         fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
         fireEvent.change(emailInput, { target: { value: 'jane@example.com' } });
-        fireEvent.change(passwordInputs[0], { target: { value: 'SecurePass123' } });
-        fireEvent.change(passwordInputs[1], { target: { value: 'SecurePass123' } });
+        if (passwordInput) fireEvent.change(passwordInput, { target: { value: 'SecurePass123' } });
+        if (confirmInput) fireEvent.change(confirmInput, { target: { value: 'SecurePass123' } });
 
         fireEvent.click(submitButton);
 

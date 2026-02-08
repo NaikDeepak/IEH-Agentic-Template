@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, Briefcase, MapPin, ExternalLink, Star } from 'lucide-react';
-import { CandidateSearchResult } from '../../../lib/ai/search';
+import type { CandidateSearchResult } from '../../../lib/ai/search';
 
 interface CandidateCardProps {
     candidate: CandidateSearchResult;

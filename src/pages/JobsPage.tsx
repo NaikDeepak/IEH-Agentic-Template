@@ -58,7 +58,7 @@ export const JobsPage: React.FC = () => {
 
             const mappedResults: JobWithMatch[] = results.map((result) => {
                 const posting = result as unknown as JobPosting;
-                const matchScore = (result._matchScore as number | undefined) ?? 0;
+                const matchScore = (result['_matchScore'] as number | undefined) ?? 0;
 
                 // Convert to percentage if it's a decimal (e.g., 0.85 -> 85)
                 // Assuming backend returns decimal 0-1 based on cosine similarity,
@@ -110,7 +110,8 @@ export const JobsPage: React.FC = () => {
             employerId: posting.employer_id,
             title: posting.title,
             description: posting.description,
-            status: posting.status,
+            // Map JobStatus to ActivityStatus ('closed' -> 'passive')
+            status: posting.status === 'active' ? 'active' : 'passive',
             // Fallback to created_at if activity timestamps are missing
             lastActiveAt: posting.lastActiveAt ?? posting.created_at,
             expiresAt: posting.expiresAt ?? posting.created_at,

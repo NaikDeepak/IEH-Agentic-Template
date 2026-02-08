@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Loader2 } from 'lucide-react';
-import { searchCandidates, CandidateSearchResult } from '../../lib/ai/search';
+import { searchCandidates } from '../../lib/ai/search';
+import type { CandidateSearchResult } from '../../lib/ai/search';
 import { CandidateCard } from '../../features/candidates/components/CandidateCard';
 
 export const TalentSearch: React.FC = () => {
