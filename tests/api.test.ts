@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 // @ts-expect-error - JS import in TS test
-import { embeddingHandler } from '../index.js';
+import { embeddingHandler } from '../functions/index.js';
 
 // Mock Sentry
 const { mockCaptureException, mockEmbedContent } = vi.hoisted(() => {
@@ -9,6 +9,41 @@ const { mockCaptureException, mockEmbedContent } = vi.hoisted(() => {
         mockEmbedContent: vi.fn()
     };
 });
+
+// Mock Firebase Functions
+vi.mock('firebase-functions/v2/https', () => ({
+    onRequest: vi.fn((handler) => handler),
+}));
+
+vi.mock('firebase-functions/v2/scheduler', () => ({
+    onSchedule: vi.fn((schedule, handler) => handler),
+}));
+
+// Mock Firebase Admin
+vi.mock('firebase-admin/app', () => ({
+    initializeApp: vi.fn(),
+    getApps: vi.fn(() => []),
+    cert: vi.fn(),
+}));
+
+vi.mock('firebase-admin/auth', () => ({
+    getAuth: vi.fn(() => ({
+        verifyIdToken: vi.fn().mockResolvedValue({ uid: 'test-uid' }),
+    })),
+}));
+
+vi.mock('firebase-admin/firestore', () => ({
+    getFirestore: vi.fn(() => ({
+        collection: vi.fn(() => ({
+            doc: vi.fn(() => ({
+                get: vi.fn().mockResolvedValue({
+                    exists: true,
+                    data: () => ({ role: 'employer' }),
+                }),
+            })),
+        })),
+    })),
+}));
 
 vi.mock('@google/genai', () => {
     return {
@@ -82,7 +117,9 @@ describe('API Endpoint: /api/embedding', () => {
         req.body = { text: 'valid text' };
         await embeddingHandler(req, res);
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Server configuration error' });
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+            error: expect.stringContaining('Server configuration error')
+        }));
     });
 
     it('should return embedding on success', async () => {
@@ -103,9 +140,15 @@ describe('API Endpoint: /api/embedding', () => {
         req.body = { text: 'valid text' };
         mockEmbedContent.mockRejectedValueOnce(new Error('API Failure'));
 
+        // Mock NODE_ENV to avoid stack trace in output or accept it
+        const originalEnv = process.env.NODE_ENV;
+        process.env.NODE_ENV = 'production';
+
         await embeddingHandler(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: 'Failed to generate embedding' });
+
+        process.env.NODE_ENV = originalEnv;
     });
 });

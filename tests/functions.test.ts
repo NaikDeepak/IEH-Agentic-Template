@@ -87,9 +87,14 @@ describe('Functions: API Handlers', () => {
                 embedding: { values: new Array(768).fill(0.1) }
             });
 
+            // Mock generateContent for expandQuery
+            const generateContentMock = vi.fn().mockResolvedValue({
+                text: () => 'expanded query'
+            });
+
             vi.spyOn(GoogleGenAI.prototype, 'models', 'get').mockReturnValue({
                 embedContent: embedContentMock,
-                generateContent: vi.fn(),
+                generateContent: generateContentMock,
             } as any);
 
             (global.fetch as Mock).mockResolvedValueOnce({

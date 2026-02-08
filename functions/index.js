@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import * as Sentry from "@sentry/node";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleAuth } from "google-auth-library";
@@ -22,6 +23,58 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+// Auth Middleware
+const authMiddleware = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    req.authToken = null;
+    req.user = null;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.slice(7);
+        req.authToken = token;
+
+        try {
+            const decodedToken = await getAuth().verifyIdToken(token);
+            req.user = { ...decodedToken };
+
+            try {
+                const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    req.user.role = userData.role;
+                    req.user.employerRole = userData.employerRole;
+                }
+            } catch (dbError) {
+                console.warn(`Failed to fetch user profile for ${decodedToken.uid}:`, dbError.message);
+            }
+        } catch (error) {
+            console.error('Token verification failed:', error.message);
+        }
+    }
+    next();
+};
+
+const requireAuth = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    next();
+};
+
+const requireRole = (allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+        if (!req.user.role || !allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ error: 'Insufficient permissions' });
+        }
+        next();
+    };
+};
+
+app.use(authMiddleware);
 
 // Initialize Sentry
 if (process.env.SENTRY_DSN) {
@@ -365,16 +418,17 @@ export const searchCandidatesHandler = async (req, res) => {
 
 // --- Route Definitions ---
 
-app.post("/ai/generate-jd", generateJdHandler);
-app.post("/embedding", embeddingHandler);
-app.post("/jobs/search", searchJobsHandler);
-app.post("/candidates/search", searchCandidatesHandler);
+app.post("/ai/generate-jd", requireAuth, generateJdHandler);
+app.post("/embedding", requireAuth, embeddingHandler);
+app.post("/jobs/search", searchJobsHandler); // Public search allowed? Usually yes, but maybe strictly authenticated? Leaving public for now as per requirements usually, or auth? The frontend uses it. Frontend sends token. Let's keep it open or auth?
+// The prompt said "Protect candidates/search".
+app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
-app.post("/api/ai/generate-jd", generateJdHandler);
-app.post("/api/embedding", embeddingHandler);
+app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
+app.post("/api/embedding", requireAuth, embeddingHandler);
 app.post("/api/jobs/search", searchJobsHandler);
-app.post("/api/candidates/search", searchCandidatesHandler);
+app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 
 // Expose the Express API as a single Cloud Function

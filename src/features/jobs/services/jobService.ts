@@ -68,7 +68,7 @@ export const JobService = {
             const now = new Date();
             const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
 
-            const jobData: Omit<JobPosting, 'id'> = {
+            const jobData = {
                 ...input,
                 status: 'active',
                 created_at: serverTimestamp(),
