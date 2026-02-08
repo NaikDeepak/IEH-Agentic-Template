@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-// @ts-expect-error - JS import in TS test
+
 import { embeddingHandler } from '../functions/index.js';
 
 // Mock Sentry
@@ -16,7 +16,7 @@ vi.mock('firebase-functions/v2/https', () => ({
 }));
 
 vi.mock('firebase-functions/v2/scheduler', () => ({
-    onSchedule: vi.fn((schedule, handler) => handler),
+    onSchedule: vi.fn((_schedule, handler) => handler),
 }));
 
 // Mock Firebase Admin
@@ -141,14 +141,14 @@ describe('API Endpoint: /api/embedding', () => {
         mockEmbedContent.mockRejectedValueOnce(new Error('API Failure'));
 
         // Mock NODE_ENV to avoid stack trace in output or accept it
-        const originalEnv = process.env.NODE_ENV;
-        process.env.NODE_ENV = 'production';
+        const originalEnv = process.env['NODE_ENV'];
+        process.env['NODE_ENV'] = 'production';
 
         await embeddingHandler(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: 'Failed to generate embedding' });
 
-        process.env.NODE_ENV = originalEnv;
+        process.env['NODE_ENV'] = originalEnv;
     });
 });

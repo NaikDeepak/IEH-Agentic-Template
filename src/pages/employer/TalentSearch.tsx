@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, ArrowRight } from 'lucide-react';
 import { searchCandidates } from '../../lib/ai/search';
 import type { CandidateSearchResult } from '../../lib/ai/search';
 import { CandidateCard } from '../../features/candidates/components/CandidateCard';
@@ -32,84 +32,92 @@ export const TalentSearch: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
-            <div className="container mx-auto px-4 py-8 max-w-5xl">
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Find Top Talent</h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto">
+        <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="container mx-auto px-4 md:px-8 py-12 max-w-7xl">
+
+                <div className="mb-12 border-b-2 border-black pb-8">
+                    <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-4">
+                        Find Top<br/>Talent
+                    </h1>
+                    <p className="text-gray-500 font-mono uppercase tracking-wide text-sm max-w-xl border-l-4 border-black pl-6 py-2">
                         Use natural language to find the perfect candidate.
-                        Try "React developer with 3 years experience" or "Marketing manager in Bangalore".
+                        <span className="block text-black font-bold mt-1">Try "React developer with 3 years experience"</span>
                     </p>
                 </div>
 
                 {/* Search Bar */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-                    <form onSubmit={handleSearch} className="flex gap-4">
-                        <div className="relative flex-grow">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Search className="h-5 w-5 text-gray-400" />
+                <div className="mb-16">
+                    <form onSubmit={handleSearch} className="relative w-full max-w-2xl">
+                        <div className="flex border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform focus-within:-translate-y-1 focus-within:translate-x-1 focus-within:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="pl-6 flex items-center justify-center border-r-2 border-black">
+                                <Search className="h-6 w-6 text-black" />
                             </div>
                             <input
                                 type="text"
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                                placeholder="Describe the candidate you are looking for..."
+                                className="flex-1 bg-transparent border-none outline-none px-6 py-5 text-black placeholder:text-gray-400 font-mono text-sm uppercase tracking-wider w-full"
+                                placeholder="DESCRIBE THE IDEAL CANDIDATE..."
                                 value={query}
                                 onChange={(e) => { setQuery(e.target.value); }}
                             />
+                            <button
+                                type="submit"
+                                disabled={loading || !query.trim()}
+                                className="bg-black text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-[#003366] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors border-l-2 border-black"
+                            >
+                                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
+                            </button>
                         </div>
-                        <button
-                            type="submit"
-                            disabled={loading || !query.trim()}
-                            className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
-                        >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Search'}
-                        </button>
                     </form>
                 </div>
 
                 {/* Results Area */}
-                <div className="space-y-6">
+                <div className="space-y-8">
                     {loading && (
-                        <div className="flex justify-center py-12">
-                            <div className="text-center">
-                                <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mx-auto mb-4" />
-                                <p className="text-gray-500">Searching our talent pool...</p>
-                            </div>
+                        <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-gray-200">
+                            <Loader2 className="w-12 h-12 animate-spin text-black mb-6" />
+                            <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">Scanning Talent Pool...</p>
                         </div>
                     )}
 
                     {error && (
-                        <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 text-center">
-                            {error}
+                        <div className="bg-red-50 border-2 border-red-600 p-6 text-center">
+                            <p className="font-mono text-sm font-bold text-red-600 uppercase tracking-wide">{error}</p>
                         </div>
                     )}
 
                     {!loading && !error && hasSearched && results.length === 0 && (
-                        <div className="text-center py-12 bg-white rounded-xl border border-gray-100 border-dashed">
-                            <p className="text-gray-500 text-lg">No candidates found matching your criteria.</p>
-                            <p className="text-gray-400 text-sm mt-2">Try adjusting your query or being less specific.</p>
+                        <div className="text-center py-24 border-2 border-dashed border-black bg-gray-50">
+                            <p className="text-3xl font-black uppercase tracking-tight text-gray-300 mb-2">0 Matches Found</p>
+                            <p className="font-mono text-xs font-bold uppercase tracking-widest text-gray-400">Try adjusting your criteria.</p>
                         </div>
                     )}
 
                     {!loading && results.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {results.map((candidate) => (
-                                <CandidateCard
-                                    key={candidate.id}
-                                    candidate={candidate}
-                                    onClick={() => {
-                                        // Placeholder for viewing candidate details
-                                        // Placeholder for viewing candidate details
-                                        // View candidate logic here
-                                    }}
-                                />
-                            ))}
+                        <div>
+                            <div className="flex items-center gap-2 mb-6">
+                                <span className="w-2 h-2 bg-black rounded-full"></span>
+                                <h2 className="font-mono text-sm font-bold uppercase tracking-widest">
+                                    {results.length} Candidates Found
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {results.map((candidate) => (
+                                    <CandidateCard
+                                        key={candidate.id}
+                                        candidate={candidate}
+                                        onClick={() => {
+                                            // Placeholder for viewing candidate details
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     )}
 
                     {!hasSearched && !loading && (
-                        <div className="text-center py-12">
-                            <p className="text-gray-400">Enter a query above to start searching.</p>
+                        <div className="py-24 text-center opacity-20">
+                            <Search className="w-24 h-24 mx-auto mb-4 text-black" strokeWidth={1} />
+                            <p className="text-4xl font-black uppercase tracking-tighter">Ready to Search</p>
                         </div>
                     )}
                 </div>

@@ -16,8 +16,7 @@ import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { trackJobActivity } from "../../../lib/activity";
 import type { CreateJobInput, JobPosting } from "../types";
-
-
+import { CompanyService } from "../../companies/services/companyService";
 
 const JOBS_COLLECTION = "jobs";
 
@@ -52,7 +51,16 @@ export const JobService = {
      */
     async createJob(input: CreateJobInput): Promise<string> {
         try {
-            // 1. Generate Embedding (Client-side for MVP)
+            // 1. Fetch Company ID if not provided
+            let companyId = input.company_id;
+            if (!companyId) {
+                const company = await CompanyService.getCompanyByEmployerId(input.employer_id);
+                if (company) {
+                    companyId = company.id;
+                }
+            }
+
+            // 2. Generate Embedding (Client-side for MVP)
             // Combine relevant fields for semantic search: Title, Description, Skills, Location
             const semanticText = `
         Title: ${input.title}
@@ -64,12 +72,13 @@ export const JobService = {
 
             const embedding = await fetchEmbedding(semanticText);
 
-            // 2. Prepare Data
+            // 3. Prepare Data
             const now = new Date();
             const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
 
             const jobData = {
                 ...input,
+                company_id: companyId,
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
@@ -79,7 +88,7 @@ export const JobService = {
                 skills: input.skills.map(s => s.toLowerCase()) // Normalize skills
             };
 
-            // 3. Save to Firestore
+            // 4. Save to Firestore
             const docRef = await addDoc(collection(db, JOBS_COLLECTION), jobData);
 
             return docRef.id;
@@ -163,11 +172,11 @@ export const JobService = {
         try {
             const jobsRef = collection(db, JOBS_COLLECTION);
 
-            // Filter for ACTIVE and PASSIVE jobs (exclude CLOSED)
-            // Sort by status (Active first) and then recency
+            // Filter for ACTIVE jobs only
+            // Sort by status and then recency
             const q = query(
                 jobsRef,
-                where("status", "in", ["active", "passive"]),
+                where("status", "==", "active"),
                 orderBy("status", "asc"),
                 orderBy("lastActiveAt", "desc"),
                 limit(limitCount)
@@ -205,6 +214,30 @@ export const JobService = {
             return { id: snap.id, ...snap.data() } as JobPosting;
         } catch (error) {
             console.error("Error fetching job:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get all active jobs for a specific company.
+     */
+    async getJobsByCompanyId(companyId: string): Promise<JobPosting[]> {
+        try {
+            const jobsRef = collection(db, JOBS_COLLECTION);
+            const q = query(
+                jobsRef,
+                where("company_id", "==", companyId),
+                where("status", "==", "active"),
+                orderBy("created_at", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as JobPosting));
+        } catch (error) {
+            console.error("Error fetching jobs by company:", error);
             throw error;
         }
     }

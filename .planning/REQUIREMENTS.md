@@ -7,28 +7,28 @@
 
 ### Authentication & Roles
 
-- [ ] **AUTH-01**: Users can sign up/login as Job Seeker or Employer (Email/Password, Google)
-- [ ] **AUTH-02**: Granular RBAC for Employers (Owner, Recruiter, Hiring Manager)
-- [ ] **AUTH-03**: Super Admin dashboard for system oversight and approvals
+- [x] **AUTH-01**: Users can sign up/login as Job Seeker or Employer (Email/Password, Google)
+- [x] **AUTH-02**: Granular RBAC for Employers (Owner, Recruiter, Hiring Manager)
+- [x] **AUTH-03**: Super Admin dashboard for system oversight and approvals
 
 ### Marketplace Mechanics ("The Active System")
 
-- [ ] **MKT-01**: Jobs automatically marked "Passive" if no recruiter action in 4 days
-- [ ] **MKT-02**: Candidates automatically marked "Passive" if no application made in 4 days
-- [ ] **MKT-03**: Ghost Job Filter to flag and downrank inactive/spam postings
+- [x] **MKT-01**: Jobs automatically marked "Passive" if no recruiter action in 4 days
+- [x] **MKT-02**: Candidates automatically marked "Passive" if no application made in 4 days
+- [x] **MKT-03**: Ghost Job Filter to flag and downrank inactive/spam postings
 
 ### Matching & Search
 
-- [ ] **MATCH-01**: Bi-directional semantic matching (Candidate <-> Job) using Vector Search
-- [ ] **MATCH-02**: Domain-specific tuning for India IT/ITES/BPO/KPO sectors
-- [ ] **MATCH-03**: Candidate Scoring Engine based on Experience, Skills, and Industry Context
+- [x] **MATCH-01**: Bi-directional semantic matching (Candidate <-> Job) using Vector Search
+- [x] **MATCH-02**: Domain-specific tuning for India IT/ITES/BPO/KPO sectors
+- [x] **MATCH-03**: Candidate Scoring Engine based on Experience, Skills, and Industry Context
 
 ### Employer Tools
 
-- [ ] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
-- [ ] **EMP-02**: AI Screening Question Generator based on job role
-- [ ] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
-- [ ] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
+- [x] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
+- [x] **EMP-02**: AI Screening Question Generator based on job role
+- [x] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
+- [x] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
 
 ### Job Seeker Tools
 
@@ -72,13 +72,13 @@
 | MKT-01 | Phase 2 | Complete |
 | MKT-02 | Phase 2 | Complete |
 | MKT-03 | Phase 2 | Complete |
-| MATCH-01 | Phase 3 | Pending |
-| MATCH-02 | Phase 3 | Pending |
-| MATCH-03 | Phase 3 | Pending |
-| EMP-01 | Phase 4 | Pending |
-| EMP-02 | Phase 4 | Pending |
-| EMP-03 | Phase 4 | Pending |
-| EMP-04 | Phase 4 | Pending |
+| MATCH-01 | Phase 3 | Complete |
+| MATCH-02 | Phase 3 | Complete |
+| MATCH-03 | Phase 3 | Complete |
+| EMP-01 | Phase 4 | Complete |
+| EMP-02 | Phase 4 | Complete |
+| EMP-03 | Phase 4 | Complete |
+| EMP-04 | Phase 4 | Complete |
 | SEEK-01 | Phase 5 | Pending |
 | SEEK-02 | Phase 5 | Pending |
 | SEEK-03 | Phase 5 | Pending |

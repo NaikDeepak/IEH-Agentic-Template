@@ -1,5 +1,4 @@
 import React from 'react';
-import { Circle } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 import type { ActivityStatus } from '../types';
 
@@ -17,8 +16,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   showLabel = true
 }) => {
   const isActive = status === 'active';
+  const isPassive = status === 'passive';
 
-  let tooltipText = isActive ? 'Active' : 'Passive';
+  let tooltipText = status.charAt(0).toUpperCase() + status.slice(1);
 
   if (isActive && expiresAt) {
     let expiryDate: Date;
@@ -50,21 +50,19 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     }
   }
 
-  const baseClasses = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors";
-  const activeClasses = "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100";
-  const passiveClasses = "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100";
+  const baseClasses = "inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-widest border-2 transition-colors";
+  const activeClasses = "bg-black text-white border-black";
+  const passiveClasses = "bg-white text-gray-400 border-gray-200";
+  const closedClasses = "bg-red-50 text-red-600 border-red-200";
 
   return (
     <div
-      className={`${baseClasses} ${isActive ? activeClasses : passiveClasses} ${className}`}
+      className={`${baseClasses} ${isActive ? activeClasses : isPassive ? passiveClasses : closedClasses} ${className}`}
       title={tooltipText}
     >
-      <Circle
-        className={`w-2 h-2 mr-1.5 fill-current ${isActive ? 'text-emerald-500' : 'text-gray-400'}`}
-        aria-hidden="true"
-      />
+      <span className={`w-2 h-2 ${isActive ? 'bg-emerald-400' : isPassive ? 'bg-gray-300' : 'bg-red-500'}`} aria-hidden="true" />
       {showLabel && (
-        <span className="capitalize">{status}</span>
+        <span>{status}</span>
       )}
     </div>
   );

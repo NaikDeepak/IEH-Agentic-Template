@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, ChevronDown } from 'lucide-react';
+import { Search, MapPin, ChevronDown, X } from 'lucide-react';
 
 interface JobSearchBarProps {
     onSearch?: (query: string, location: string) => void;
@@ -22,6 +22,10 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
         }
     };
 
+    const clearSearch = () => {
+        setSearchTerm('');
+    };
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -41,47 +45,57 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
     const locations = ['All', 'Remote', 'Hybrid', 'Office'];
 
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className="w-full max-w-3xl relative z-20"
-        >
-            <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition duration-500" />
+        <div className="w-full max-w-7xl mx-auto">
+            <div className="relative flex flex-col md:flex-row border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
 
-            <div className="relative flex items-center bg-white/80 backdrop-blur-xl rounded-full shadow-2xl border border-white/50 p-2 pl-6 transition-all focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-300">
+                {/* Search Input Section */}
+                <div className="flex-grow flex items-center px-6 py-4 border-b-2 md:border-b-0 md:border-r-2 border-black group focus-within:bg-gray-50 transition-colors">
+                    <Search className="w-5 h-5 text-black mr-4 flex-shrink-0" />
+                    <input
+                        aria-label="Job search"
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => { setSearchTerm(e.target.value); }}
+                        onKeyDown={handleKeyDown}
+                        placeholder="SEARCH ROLES (E.G. DESIGNER)..."
+                        className="flex-grow bg-transparent border-none outline-none text-black placeholder:text-gray-500 text-base font-mono uppercase tracking-tight w-full"
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={clearSearch}
+                            className="p-1 hover:bg-gray-200 rounded-none transition-colors"
+                        >
+                            <X className="w-4 h-4 text-black" />
+                        </button>
+                    )}
+                </div>
 
-                <Search className="w-6 h-6 text-indigo-500 mr-4 flex-shrink-0" />
-
-                <input
-                    aria-label="Job search"
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => { setSearchTerm(e.target.value); }}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Ex: Product Designer in Bangalore..."
-                    className="flex-grow bg-transparent border-none outline-none text-slate-900 placeholder:text-slate-400 text-lg py-2 font-inter"
-                />
-
-                <div className="hidden md:flex items-center border-l border-slate-200 pl-4 ml-4 relative" ref={dropdownRef}>
+                {/* Location Dropdown Section */}
+                <div className="relative md:w-64 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white" ref={dropdownRef}>
                     <button
                         onClick={() => { setIsDropdownOpen((open) => !open); }}
-                        className="flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-colors py-2"
+                        className="w-full h-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors text-left"
                         aria-expanded={isDropdownOpen}
                         aria-haspopup="listbox"
                     >
-                        <MapPin className="w-4 h-4" />
-                        <span className="text-sm font-semibold whitespace-nowrap">{location}</span>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                        <div className="flex items-center gap-3 overflow-hidden">
+                            <MapPin className="w-4 h-4 text-black flex-shrink-0" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Location</span>
+                                <span className="text-sm font-bold text-black uppercase tracking-wide truncate">{location}</span>
+                            </div>
+                        </div>
+                        <ChevronDown className={`w-4 h-4 text-black transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     <AnimatePresence>
                         {isDropdownOpen && (
                             <motion.div
-                                initial={{ opacity: 0, y: 10 }}
+                                initial={{ opacity: 0, y: -2 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className="absolute top-full right-0 mt-4 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 py-2 overflow-hidden z-50"
+                                exit={{ opacity: 0, y: -2 }}
+                                transition={{ duration: 0.1 }}
+                                className="absolute top-full left-0 right-0 border-2 border-t-0 border-black bg-white z-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                                 role="listbox"
                             >
                                 {locations.map((loc) => (
@@ -93,7 +107,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                             setLocation(loc);
                                             setIsDropdownOpen(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-indigo-50 hover:text-indigo-600 ${location === loc ? 'text-indigo-600 font-bold bg-indigo-50/50' : 'text-slate-600'}`}
+                                        className={`w-full text-left px-6 py-3 text-sm font-mono uppercase border-b border-gray-100 last:border-0 hover:bg-black hover:text-white transition-colors ${location === loc ? 'bg-gray-100 font-bold' : 'text-black'}`}
                                     >
                                         {loc}
                                     </button>
@@ -103,12 +117,14 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                     </AnimatePresence>
                 </div>
 
+                {/* Search Button */}
                 <button
                     onClick={handleSearch}
-                    className="ml-4 bg-indigo-600 text-white rounded-full px-8 py-3 font-semibold text-lg hover:bg-indigo-700 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 flex items-center gap-2">
-                    Search
+                    className="px-8 py-4 bg-black text-white hover:bg-[#003366] transition-colors duration-200 font-bold uppercase tracking-widest text-sm whitespace-nowrap active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+                >
+                    Find Jobs
                 </button>
             </div>
-        </motion.div>
+        </div>
     );
 };

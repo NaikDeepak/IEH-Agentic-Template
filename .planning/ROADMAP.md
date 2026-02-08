@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Identity** - Secure RBAC auth and admin oversight
 - [x] **Phase 2: Marketplace Mechanics** - "Active System" logic and hygiene
 - [x] **Phase 3: Semantic Matching Engine** - Bi-directional vector search
-- [ ] **Phase 4: Employer Suite** - AI generation and ATS tools
+- [x] **Phase 4: Employer Suite** - AI generation and ATS tools
 - [ ] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
 - [ ] **Phase 6: Growth & Monetization** - Referrals and subscriptions
 
@@ -64,11 +64,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Matches reflect specific understanding of India IT/ITES/BPO domain
 **Research**: Likely (Vector Search tuning)
 **Research topics**: Firestore Vector Search tuning, embedding model selection for Indian context
-**Plans**: 4 plans
+**Plans**: 6 plans
 - [x] 03-semantic-matching-01-PLAN.md — Backend Infrastructure & Indexes
 - [x] 03-semantic-matching-02-PLAN.md — Intelligence Layer (Expansion & Scoring)
 - [x] 03-semantic-matching-03-PLAN.md — Talent Search UI
 - [x] 03-semantic-matching-04-PLAN.md — Job Search UI
+- [x] 03-05-PLAN.md — Fix Vector Indexes and Search Responses (Gap Closure)
+- [x] 03-06-PLAN.md — Standardize Status Logic and Filtering (Gap Closure)
 
 ### Phase 4: Employer Suite
 **Goal**: Productivity tools for job creation and candidate management
@@ -80,7 +82,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Employer can track applicants through Kanban pipeline stages
   4. Employer branding page is viewable by candidates
 **Research**: Unlikely (Standard CRUD + GenAI SDK usage)
-**Plans**: TBD
+**Plans**: 5 plans
+- [x] 04-01-PLAN.md — Employer Branding & Company Profile
+- [x] 04-02-PLAN.md — AI-Powered Job Posting with Screening Questions
+- [x] 04-03-PLAN.md — Basic ATS Kanban Board
+- [ ] 04-04-PLAN.md — Critical API & Syntax Fixes (Gap Closure)
+- [ ] 04-05-PLAN.md — ATS Pipeline Accessibility & Data (Gap Closure)
 
 ### Phase 5: Seeker Tools
 **Goal**: AI-powered preparation, analysis, and career insights
@@ -116,46 +123,40 @@ Phases execute in numeric order.
 |-------|----------------|--------|-----------|
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
-| 3. Semantic Matching Engine | 4/4 | Completed | 2026-02-08 |
-| 4. Employer Suite | 0/TBD | Not started | - |
+| 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
+| 4. Employer Suite | 3/5 | In Progress | - |
 | 5. Seeker Tools | 0/TBD | Not started | - |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
 
-**Requirements (if exists):**
-# Requirements: IEH (AI Job Board)
+## Requirements
 
 **Defined:** 2026-01-16
 **Core Value:** Active ecosystem connecting IT/ITES talent with opportunity using semantic matching and AI tools.
 
-## v1 Requirements
+### v1 Requirements
 
-### Authentication & Roles
+#### Authentication & Roles
+- [x] **AUTH-01**: Users can sign up/login as Job Seeker or Employer (Email/Password, Google)
+- [x] **AUTH-02**: Granular RBAC for Employers (Owner, Recruiter, Hiring Manager)
+- [x] **AUTH-03**: Super Admin dashboard for system oversight and approvals
 
-- [ ] **AUTH-01**: Users can sign up/login as Job Seeker or Employer (Email/Password, Google)
-- [ ] **AUTH-02**: Granular RBAC for Employers (Owner, Recruiter, Hiring Manager)
-- [ ] **AUTH-03**: Super Admin dashboard for system oversight and approvals
+#### Marketplace Mechanics ("The Active System")
+- [x] **MKT-01**: Jobs automatically marked "Passive" if no recruiter action in 4 days
+- [x] **MKT-02**: Candidates automatically marked "Passive" if no application made in 4 days
+- [x] **MKT-03**: Ghost Job Filter to flag and downrank inactive/spam postings
 
-### Marketplace Mechanics ("The Active System")
+#### Matching & Search
+- [x] **MATCH-01**: Bi-directional semantic matching (Candidate <-> Job) using Vector Search
+- [x] **MATCH-02**: Domain-specific tuning for India IT/ITES/BPO/KPO sectors
+- [x] **MATCH-03**: Candidate Scoring Engine based on Experience, Skills, and Industry Context
 
-- [ ] **MKT-01**: Jobs automatically marked "Passive" if no recruiter action in 4 days
-- [ ] **MKT-02**: Candidates automatically marked "Passive" if no application made in 4 days
-- [ ] **MKT-03**: Ghost Job Filter to flag and downrank inactive/spam postings
+#### Employer Tools
+- [x] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
+- [x] **EMP-02**: AI Screening Question Generator based on job role
+- [x] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
+- [x] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
 
-### Matching & Search
-
-- [ ] **MATCH-01**: Bi-directional semantic matching (Candidate <-> Job) using Vector Search
-- [ ] **MATCH-02**: Domain-specific tuning for India IT/ITES/BPO/KPO sectors
-- [ ] **MATCH-03**: Candidate Scoring Engine based on Experience, Skills, and Industry Context
-
-### Employer Tools
-
-- [ ] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
-- [ ] **EMP-02**: AI Screening Question Generator based on job role
-- [ ] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
-- [ ] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
-
-### Job Seeker Tools
-
+#### Job Seeker Tools
 - [ ] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
 - [ ] **SEEK-02**: Real-time Skill Gap Analysis against target roles
 - [ ] **SEEK-03**: Simulated Interview Prep (Role-specific questions & feedback)
@@ -163,21 +164,20 @@ Phases execute in numeric order.
 - [ ] **SEEK-05**: Real-time Salary/Market Index
 - [ ] **SEEK-06**: Insider Connections (Identify alumni/network at target companies)
 
-### Growth & Monetization
-
+#### Growth & Monetization
 - [ ] **GROW-01**: Referral System (Cash/Credits for successful hires)
 - [ ] **GROW-02**: Affiliate Program for job seekers (Points for referrals)
 - [ ] **GROW-03**: Subscription management (Employer tiers, Seeker premium packs)
 
-## v2 Requirements (Deferred)
+### v2 Requirements (Deferred)
 
-### Compliance & Advanced AI
+#### Compliance & Advanced AI
 - **COMP-01**: Explainable Scoring (XAI) - Regulatory requirement (EU/NYC) deferred
 - **COMP-02**: Autonomous Career Agents - Proactive market monitoring
 - **COMP-03**: Predictive Career Pathing - 5-year trajectory mapping
 - **COMP-04**: Conversational Discovery - Natural language search interface
 
-## Out of Scope
+### Out of Scope
 
 | Feature | Reason |
 |---------|--------|
@@ -186,7 +186,7 @@ Phases execute in numeric order.
 | Automated "Ghost" Applications | Anti-feature: Spam generation, degrades platform trust |
 | Self-hosted Infrastructure | Constraint: Must use Firebase/Serverless ecosystem |
 
-## Traceability
+### Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -196,13 +196,13 @@ Phases execute in numeric order.
 | MKT-01 | Phase 2 | Completed |
 | MKT-02 | Phase 2 | Completed |
 | MKT-03 | Phase 2 | Completed |
-| MATCH-01 | Phase 3 | Complete |
-| MATCH-02 | Phase 3 | Complete |
-| MATCH-03 | Phase 3 | Complete |
-| EMP-01 | Phase 4 | Pending |
-| EMP-02 | Phase 4 | Pending |
-| EMP-03 | Phase 4 | Pending |
-| EMP-04 | Phase 4 | Pending |
+| MATCH-01 | Phase 3 | Completed |
+| MATCH-02 | Phase 3 | Completed |
+| MATCH-03 | Phase 3 | Completed |
+| EMP-01 | Phase 4 | Completed |
+| EMP-02 | Phase 4 | Completed |
+| EMP-03 | Phase 4 | Completed |
+| EMP-04 | Phase 4 | Completed |
 | SEEK-01 | Phase 5 | Pending |
 | SEEK-02 | Phase 5 | Pending |
 | SEEK-03 | Phase 5 | Pending |

@@ -7,14 +7,14 @@ interface AdminLayoutProps {
 
 const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-white font-sans text-black">
       <AdminSidebar />
       <div className="flex-1 flex flex-col">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-          <h1 className="text-xl font-semibold text-slate-800">Super Admin Panel</h1>
+        <header className="h-20 bg-white border-b-2 border-black flex items-center justify-between px-8">
+          <h1 className="text-2xl font-black uppercase tracking-tighter">Super Admin Panel</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-slate-500">Welcome, Admin</span>
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-gray-500">Welcome, Admin</span>
+            <div className="w-10 h-10 bg-black text-white border-2 border-black flex items-center justify-center font-bold font-mono">
               A
             </div>
           </div>

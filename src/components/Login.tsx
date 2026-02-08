@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { LogIn, User, LogOut, Mail, Lock, Loader2, UserPlus } from 'lucide-react';
+import { LogIn, User, LogOut, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface LoginProps {
@@ -24,9 +24,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
         e.preventDefault();
         setIsEmailLoading(true);
         try {
-
             await loginWithEmail(formData.email, formData.password);
-            // Redirect will be handled by auth state change
         } catch (err) {
             console.error(err);
         } finally {
@@ -37,7 +35,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     if (loading) {
         return (
             <div className={variant === 'navbar' ? 'h-9 w-9 flex items-center justify-center' : 'flex items-center justify-center min-h-[200px]'}>
-                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -47,7 +45,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
             return (
                 <Link
                     to="/login"
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+                    className="flex items-center gap-2 px-6 py-3 text-xs font-mono font-bold uppercase tracking-widest text-black border-2 border-black bg-white hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                 >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
@@ -56,14 +54,14 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
         }
 
         return (
-            <div className="flex items-center gap-3 bg-gray-50 pr-1 pl-3 py-1 rounded-full border border-gray-100">
-                <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+            <div className="flex items-center gap-3 bg-white pl-4 pr-1 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-black max-w-[120px] truncate">
                     {user.displayName?.split(' ')[0]}
                 </span>
                 <button
                     onClick={logout}
                     title="Sign Out"
-                    className="h-8 w-8 flex items-center justify-center rounded-full bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 transition-all shadow-sm"
+                    className="h-8 w-8 flex items-center justify-center bg-black text-white hover:bg-gray-800 transition-colors"
                 >
                     <LogOut className="w-4 h-4" />
                 </button>
@@ -73,86 +71,88 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
 
     // Default Card Variant
     return (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white p-8 rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 max-w-md w-full mx-auto">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white p-8 md:p-12 border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md w-full mx-auto relative">
+             {/* Decorative Corner */}
+             <div className="absolute top-0 right-0 w-8 h-8 bg-black"></div>
+             <div className="absolute top-0 right-0 w-8 h-8 bg-white border-2 border-black translate-x-2 -translate-y-2"></div>
+
             <div className="space-y-8 w-full">
-                <div className="space-y-2 text-center">
-                    <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="space-y-4 text-center">
+                    <div className="w-16 h-16 bg-black text-white border-2 border-black flex items-center justify-center mx-auto mb-6 shadow-[4px_4px_0px_0px_rgba(128,128,128,1)]">
                         {user ? <User className="w-8 h-8" /> : <LogIn className="w-8 h-8" />}
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-                        {user ? `Welcome back, ${user.displayName?.split(' ')[0]}` : 'Start Your Journey'}
+                    <h2 className="text-4xl font-black text-black uppercase tracking-tighter leading-none">
+                        {user ? `Welcome, ${user.displayName?.split(' ')[0]}` : 'Access Portal'}
                     </h2>
-                    <p className="text-gray-500 text-sm max-w-[280px] mx-auto">
+                    <p className="text-gray-500 text-xs font-mono font-bold uppercase tracking-widest max-w-[280px] mx-auto border-t-2 border-gray-100 pt-4 mt-4">
                         {user
-                            ? 'Maximize your career growth with AI-powered insights and a responsive network.'
-                            : 'Sign in to access premium job matches and AI interview preparation tools.'}
+                            ? 'Manage your career profile and applications.'
+                            : 'Enter credentials to access the employment hub.'}
                     </p>
                 </div>
 
                 {!user ? (
                     <div className="space-y-6">
-                        <form onSubmit={handleEmailLogin} className="space-y-4">
-                            <div className="space-y-1">
-                                <label htmlFor="login-email" className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Email Address</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    <input
-                                        id="login-email"
-                                        type="email"
-                                        name="email"
-                                        required
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="name@company.com"
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none text-sm"
-                                    />
-                                </div>
+                        <form onSubmit={handleEmailLogin} className="space-y-6">
+                            <div className="space-y-2">
+                                <label htmlFor="login-email" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                                    <Mail className="w-3 h-3" /> Email Identity
+                                </label>
+                                <input
+                                    id="login-email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="USER@EXAMPLE.COM"
+                                    className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                                />
                             </div>
 
-                            <div className="space-y-1">
-                                <label htmlFor="login-password" className="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1">Password</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                    <input
-                                        id="login-password"
-                                        type="password"
-                                        name="password"
-                                        required
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        placeholder="••••••••"
-                                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all outline-none text-sm"
-                                    />
-                                </div>
+                            <div className="space-y-2">
+                                <label htmlFor="login-password" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                                    <Lock className="w-3 h-3" /> Passcode
+                                </label>
+                                <input
+                                    id="login-password"
+                                    type="password"
+                                    name="password"
+                                    required
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                                />
                             </div>
 
                             {error ? (
-                                <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100">
-                                    {error}
+                                <div className="p-3 bg-red-50 text-red-600 text-xs font-mono font-bold uppercase tracking-wide border-2 border-red-100">
+                                    Error: {error}
                                 </div>
                             ) : null}
 
                             <button
                                 type="submit"
                                 disabled={isEmailLoading}
-                                className="w-full flex items-center justify-center gap-2 py-3 px-6 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                                className="w-full flex items-center justify-center gap-2 py-4 px-6 text-sm font-black uppercase tracking-widest text-white bg-black border-2 border-black hover:bg-white hover:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50"
                             >
-                                {isEmailLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
+                                {isEmailLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Authenticate'} <ArrowRight className="w-4 h-4" />
                             </button>
                         </form>
 
-                        <div className="relative">
+                        <div className="relative py-2">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-100"></div>
+                                <div className="w-full border-t-2 border-gray-100"></div>
                             </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-white px-2 text-gray-400 font-medium">Or continue with</span>
+                            <div className="relative flex justify-center">
+                                <span className="bg-white px-4 text-xs font-mono font-bold text-gray-400 uppercase tracking-widest">Or</span>
                             </div>
                         </div>
 
                         <button
                             onClick={loginWithGoogle}
-                            className="group w-full flex items-center justify-center gap-3 py-3 px-6 text-sm font-bold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 active:scale-[0.98] transition-all"
+                            className="w-full flex items-center justify-center gap-3 py-3 px-6 text-xs font-bold font-mono uppercase tracking-wider text-black bg-white border-2 border-black hover:bg-gray-50 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] transition-all"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -172,18 +172,17 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            Google Account
+                            Continue with Google
                         </button>
 
-                        <div className="text-center">
-                            <p className="text-gray-500 text-sm">
-                                New to IEH?{' '}
+                        <div className="text-center pt-4 border-t-2 border-gray-100">
+                            <p className="text-gray-500 text-xs font-mono uppercase tracking-wide">
+                                New User?{' '}
                                 <Link
                                     to="/register"
-                                    className="text-indigo-600 font-bold hover:underline inline-flex items-center gap-1"
+                                    className="text-black font-bold hover:underline decoration-2 underline-offset-4 inline-flex items-center gap-1 ml-1"
                                 >
-                                    <UserPlus className="w-4 h-4" />
-                                    Create an account
+                                    Create Account
                                 </Link>
                             </p>
                         </div>
@@ -191,9 +190,9 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                 ) : (
                     <button
                         onClick={logout}
-                        className="w-full py-3 px-6 text-sm font-bold text-gray-600 bg-gray-50 rounded-xl hover:bg-gray-100 active:scale-[0.98] transition-all border border-gray-100"
+                        className="w-full py-4 px-6 text-sm font-black uppercase tracking-widest text-black bg-white border-2 border-black hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                     >
-                        Sign Out from Account
+                        Terminate Session
                     </button>
                 )}
             </div>
