@@ -5,7 +5,8 @@ service cloud.firestore {
     // Users can read and update their own user document.
     // They cannot change their role once it has been set.
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Allow reading own profile OR reading any 'seeker' profile (for employers)
+      allow read: if request.auth != null && (request.auth.uid == userId || resource.data.role == 'seeker');
 
       // Allow creation of a user document with strict validation
       allow create: if request.auth != null
@@ -62,7 +63,10 @@ service cloud.firestore {
 
     // Jobs Collection
     match /jobs/{jobId} {
-      allow read: if request.auth != null;
+      // Allow public read access to ACTIVE jobs.
+      // Employers can read their own non-active jobs.
+      allow read: if resource.data.status in ['active', 'passive'] 
+                  || (request.auth != null && resource.data.employer_id == request.auth.uid);
 
       allow create: if request.auth != null
                     && exists(/databases/$(database)/documents/users/$(request.auth.uid))

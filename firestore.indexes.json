@@ -58,6 +58,28 @@
             "flat": {}
           }
         }
+      ],
+    },
+    {
+      "collectionGroup": "jobs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "work_mode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "embedding",
+          "vectorConfig": {
+            "dimension": 768,
+            "distanceMeasure": "COSINE",
+            "flat": {}
+          }
+        }
       ]
     },
     {

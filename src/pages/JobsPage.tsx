@@ -41,7 +41,7 @@ export const JobsPage: React.FC = () => {
     }, []);
 
     const handleSearch = async (term: string, location: string) => {
-        const query = [term, location !== 'Remote' ? location : ''].filter(Boolean).join(' ');
+        const query = term;
 
         if (!query.trim()) {
             handleClearSearch();
@@ -54,20 +54,16 @@ export const JobsPage: React.FC = () => {
             setIsSearching(true);
             setCurrentSearchQuery(query);
 
-            const results = await searchJobs(query);
+            // If location is 'All', don't pass it as a filter
+            const locationFilter = location === 'All' ? '' : location;
+            const results = await searchJobs(query, locationFilter);
 
             const mappedResults: JobWithMatch[] = results.map((result) => {
                 const posting = result as unknown as JobPosting;
-                const matchScore = (result['_matchScore'] as number | undefined) ?? 0;
+                const matchScore = (result['matchScore'] as number | undefined) ?? 0;
 
-                // Convert to percentage if it's a decimal (e.g., 0.85 -> 85)
-                // Assuming backend returns decimal 0-1 based on cosine similarity,
-                // but if it returns 0-100, we'll need to check.
-                // Context says "Display a badge X% Match".
-                // Usually cosine similarity is -1 to 1.
-                // Let's assume the API handles it or we normalize.
-                // If the score is <= 1, multiply by 100.
-                const normalizedScore = matchScore <= 1 ? matchScore * 100 : matchScore;
+                // Backend returns 0-100 based on cosine similarity * 100
+                const normalizedScore = matchScore;
 
                 return {
                     ...mapJobPostingToJob(posting),
@@ -98,11 +94,11 @@ export const JobsPage: React.FC = () => {
         let jobType: Job['type'] = undefined;
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (posting.type) {
-             const typeStr = posting.type.toLowerCase().replace('_', '-');
-             // specific mapping if needed, otherwise cast
-             if (['full-time', 'part-time', 'contract', 'freelance', 'internship'].includes(typeStr)) {
-                 jobType = typeStr as Job['type'];
-             }
+            const typeStr = posting.type.toLowerCase().replace('_', '-');
+            // specific mapping if needed, otherwise cast
+            if (['full-time', 'part-time', 'contract', 'freelance', 'internship'].includes(typeStr)) {
+                jobType = typeStr as Job['type'];
+            }
         }
 
         return {

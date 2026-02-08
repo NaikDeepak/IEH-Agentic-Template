@@ -1,3 +1,4 @@
+import { getAuth } from 'firebase/auth';
 
 export interface CandidateSearchResult {
     id: string;
@@ -26,18 +27,34 @@ interface CandidateSearchResponse {
 }
 
 /**
+ * Get the current user's Firebase ID token for authenticated API calls.
+ */
+async function getAuthToken(): Promise<string | null> {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return null;
+    return user.getIdToken();
+}
+
+/**
  * Performs a semantic search on the 'jobs' collection via the backend API.
  *
  * @param searchQuery - The user's natural language query (e.g., "Remote React developer jobs")
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching job documents
  */
-export async function searchJobs(searchQuery: string, limitCount = 10): Promise<Record<string, unknown>[]> {
+export async function searchJobs(searchQuery: string, locationFilter = '', limitCount = 10): Promise<Record<string, unknown>[]> {
     try {
+        const token = await getAuthToken();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch('/api/jobs/search', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: searchQuery, limit: limitCount })
+            headers,
+            body: JSON.stringify({ query: searchQuery, location: locationFilter, limit: limitCount })
         });
 
         if (!response.ok) {
@@ -63,9 +80,15 @@ export async function searchJobs(searchQuery: string, limitCount = 10): Promise<
  */
 export async function searchCandidates(searchQuery: string, limitCount = 10): Promise<CandidateSearchResult[]> {
     try {
+        const token = await getAuthToken();
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch('/api/candidates/search', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ query: searchQuery, limit: limitCount })
         });
 

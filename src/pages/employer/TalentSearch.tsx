@@ -99,7 +99,8 @@ export const TalentSearch: React.FC = () => {
                                     candidate={candidate}
                                     onClick={() => {
                                         // Placeholder for viewing candidate details
-                                        console.log('View candidate', candidate.id);
+                                        // Placeholder for viewing candidate details
+                                        // View candidate logic here
                                     }}
                                 />
                             ))}
@@ -108,7 +109,7 @@ export const TalentSearch: React.FC = () => {
 
                     {!hasSearched && !loading && (
                         <div className="text-center py-12">
-                             <p className="text-gray-400">Enter a query above to start searching.</p>
+                            <p className="text-gray-400">Enter a query above to start searching.</p>
                         </div>
                     )}
                 </div>

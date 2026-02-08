@@ -21,16 +21,32 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   let tooltipText = isActive ? 'Active' : 'Passive';
 
   if (isActive && expiresAt) {
-    const expiryDate = expiresAt instanceof Timestamp ? expiresAt.toDate() : expiresAt;
-    const now = new Date();
-    // Calculate difference in days
-    const diffTime = expiryDate.getTime() - now.getTime();
-    const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    let expiryDate: Date;
 
-    if (daysRemaining > 0) {
-      tooltipText = `Expires in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`;
+    // Handle FireStore Timestamp or serialized object
+    if (typeof (expiresAt as { toDate?: () => Date }).toDate === 'function') {
+      expiryDate = (expiresAt as { toDate: () => Date }).toDate();
+    } else if (typeof (expiresAt as { seconds?: number }).seconds === 'number') {
+      expiryDate = new Date((expiresAt as { seconds: number }).seconds * 1000);
+    } else if (expiresAt instanceof Date) {
+      expiryDate = expiresAt;
     } else {
-      tooltipText = 'Expiring soon';
+      // Fallback for strings or numbers
+      expiryDate = new Date(expiresAt as unknown as string | number);
+    }
+
+    // Only proceed if we have a valid date
+    if (!isNaN(expiryDate.getTime())) {
+      const now = new Date();
+      // Calculate difference in days
+      const diffTime = expiryDate.getTime() - now.getTime();
+      const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (daysRemaining > 0) {
+        tooltipText = `Expires in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}`;
+      } else {
+        tooltipText = 'Expiring soon';
+      }
     }
   }
 

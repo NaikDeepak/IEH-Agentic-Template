@@ -8,7 +8,7 @@ interface JobSearchBarProps {
 
 export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [location, setLocation] = useState('Remote');
+    const [location, setLocation] = useState('All');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +38,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
         };
     }, [isDropdownOpen]);
 
-    const locations = ['Remote', 'Hybrid', 'Office', 'Bangalore', 'Mumbai', 'Delhi'];
+    const locations = ['All', 'Remote', 'Hybrid', 'Office'];
 
     return (
         <motion.div
