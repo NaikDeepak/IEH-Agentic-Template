@@ -29,6 +29,7 @@ export const RoleSelection: React.FC = () => {
                         displayName: user.displayName,
                         photoURL: user.photoURL,
                         role,
+                        ...(role === 'employer' ? { employerRole: 'owner' } : {}),
                         created_at: serverTimestamp(),
                         updated_at: serverTimestamp(),
                         last_login: serverTimestamp()
@@ -41,6 +42,7 @@ export const RoleSelection: React.FC = () => {
                 if (!data.role) {
                     transaction.update(userDocRef, {
                         role,
+                        ...(role === 'employer' ? { employerRole: 'owner' } : {}),
                         updated_at: serverTimestamp()
                     });
                 }

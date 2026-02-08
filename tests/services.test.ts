@@ -12,6 +12,10 @@ vi.mock('firebase/firestore', () => ({
     updateDoc: vi.fn(),
     getDoc: vi.fn(),
     getFirestore: vi.fn(() => ({})),
+    Timestamp: {
+        fromDate: vi.fn((date) => date),
+        now: vi.fn(() => new Date())
+    }
 }));
 
 import { addDoc, updateDoc, getDoc } from 'firebase/firestore';
@@ -122,12 +126,13 @@ describe('Frontend Services Logic', () => {
                 json: async () => ({ jobs: [{ id: '1', title: 'Job 1' }] })
             });
 
-            const results = await searchJobs('engineer', 5);
+            // Pass undefined/null for location to use default, or empty string
+            const results = await searchJobs('engineer', '', 5);
 
             expect(results).toHaveLength(1);
             expect(global.fetch).toHaveBeenCalledWith('/api/jobs/search', expect.objectContaining({
                 method: 'POST',
-                body: JSON.stringify({ query: 'engineer', limit: 5 })
+                body: JSON.stringify({ query: 'engineer', location: '', limit: 5 })
             }));
         });
     });
