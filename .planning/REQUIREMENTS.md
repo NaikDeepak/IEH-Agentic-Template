@@ -72,9 +72,9 @@
 | MKT-01 | Phase 2 | Complete |
 | MKT-02 | Phase 2 | Complete |
 | MKT-03 | Phase 2 | Complete |
-| MATCH-01 | Phase 3 | Pending |
-| MATCH-02 | Phase 3 | Pending |
-| MATCH-03 | Phase 3 | Pending |
+| MATCH-01 | Phase 3 | Complete |
+| MATCH-02 | Phase 3 | Complete |
+| MATCH-03 | Phase 3 | Complete |
 | EMP-01 | Phase 4 | Pending |
 | EMP-02 | Phase 4 | Pending |
 | EMP-03 | Phase 4 | Pending |

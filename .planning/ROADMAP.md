@@ -69,8 +69,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 03-semantic-matching-02-PLAN.md — Intelligence Layer (Expansion & Scoring)
 - [x] 03-semantic-matching-03-PLAN.md — Talent Search UI
 - [x] 03-semantic-matching-04-PLAN.md — Job Search UI
-- [ ] 03-05-PLAN.md — Fix Vector Indexes and Search Responses (Gap Closure)
-- [ ] 03-06-PLAN.md — Standardize Status Logic and Filtering (Gap Closure)
+- [x] 03-05-PLAN.md — Fix Vector Indexes and Search Responses (Gap Closure)
+- [x] 03-06-PLAN.md — Standardize Status Logic and Filtering (Gap Closure)
 
 ### Phase 4: Employer Suite
 **Goal**: Productivity tools for job creation and candidate management
