@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 4 of 6 (Employer Suite)
-Plan: 1 of 4 (04-01-PLAN.md)
-Status: Plan 01 complete, Company branding infrastructure established.
-Last activity: 2026-02-08 — Completed Company Schema, Editor, and Public Profile.
+Plan: 3 of 3 (04-03-PLAN.md)
+Status: Phase 4 complete. Employer Suite fully implemented.
+Last activity: 2026-02-08 — Completed Basic ATS Kanban Board.
 
 Progress: ████████████████████ 100% (of defined plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 20
 - Average duration: ~12m
-- Total execution time: ~2.1 hours
+- Total execution time: ~2.3 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: ████████████████████ 100% (of 
 | 1. Foundation & Identity | 3 | 3 | 12.5m |
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
 | 3. Semantic Matching | 6 | 6 | ~11m |
-| 4. Employer Suite | 1 | 4 | ~12m |
+| 4. Employer Suite | 3 | 3 | ~10m |
 
 ## Accumulated Context
 
@@ -38,6 +38,8 @@ Progress: ████████████████████ 100% (of 
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-08 | 04-03 | ATS Kanban Implementation | Implemented a drag-and-drop Kanban board using @dnd-kit for applicant status management. Used optimistic updates in the UI for a snappy experience while persisting changes to Firestore. |
+| 2026-02-08 | 04-02 | Automated Company Linking | Updated `JobService.createJob` to automatically fetch and link the employer's `company_id` if not explicitly provided, ensuring all jobs are branded. |
 | 2026-02-08 | 04-01 | Employer-Company Linkage | Used an `employer_ids` array in the company document to allow multiple recruiters/employers to manage a single company profile. |
 | 2026-02-08 | 03-06 | Explicit Status Mapping | Prevented conflation of 'closed' with 'passive', ensuring accurate system representation. |
 | 2026-02-08 | 03-06 | Strict Browse Filtering | Enforced "Active System" goals by only showing truly active jobs in the default browse view. |
@@ -55,6 +57,7 @@ Progress: ████████████████████ 100% (of 
 
 - Implement RBAC protection for `/admin` routes (Plan 01-02/01-01 follow-up)
 - Create actual management pages for Users, Jobs, and Settings.
+- Phase 5: Implement Seeker-side application flow and AI prep tools.
 
 ### Blockers/Concerns
 
@@ -64,5 +67,5 @@ Progress: ████████████████████ 100% (of 
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed Phase 4 Plan 1 (Employer Branding)
-Resume file: .planning/phases/04-employer-suite/04-02-PLAN.md
+Stopped at: Completed Phase 4 (Employer Suite)
+Resume file: .planning/phases/05-seeker-tools/05-01-PLAN.md (to be created)
