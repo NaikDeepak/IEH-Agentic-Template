@@ -168,9 +168,13 @@ service cloud.firestore {
                     && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
                     && request.resource.data.employer_ids.hasAll([request.auth.uid]);
 
-      // Allow updates by employers associated with the company
+      // Allow updates by employers associated with the company.
+      // Require that the caller is still an employer and prevent changes to employer_ids
       allow update: if request.auth != null
-                    && resource.data.employer_ids.hasAny([request.auth.uid]);
+                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
+                    && resource.data.employer_ids.hasAny([request.auth.uid])
+                    && request.resource.data.employer_ids == resource.data.employer_ids;
     }
   }
 }
