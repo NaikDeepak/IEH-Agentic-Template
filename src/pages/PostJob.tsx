@@ -3,14 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { JobService } from '../features/jobs/services/jobService';
 import { useAuth } from '../hooks/useAuth';
 import { Header } from '../components/Header';
-import { Loader2, ArrowLeft } from 'lucide-react';
-import type { JobType, WorkMode, CreateJobInput } from '../features/jobs/types';
+import { Loader2, ArrowLeft, Sparkles, Plus, Trash2, Info, Lightbulb } from 'lucide-react';
+import type { JobType, WorkMode, CreateJobInput, ScreeningQuestion } from '../features/jobs/types';
+
+interface JdResponse {
+  jd: string;
+}
+
+interface AssistResponse {
+  questions?: ScreeningQuestion[];
+  suggestions?: string[];
+}
 
 export const PostJob: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [generatingJd, setGeneratingJd] = useState(false);
+  const [generatingAssist, setGeneratingAssist] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -25,6 +36,90 @@ export const PostJob: React.FC = () => {
     salaryMax: '',
     currency: 'USD'
   });
+
+  const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const handleAiGenerateJd = async () => {
+    if (!formData.title || !formData.skills) {
+      setError("Please provide at least a Job Title and some Skills to generate a description.");
+      return;
+    }
+
+    try {
+      setGeneratingJd(true);
+      setError(null);
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/ai/generate-jd', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          role: formData.title,
+          skills: formData.skills,
+          experience: "relevant experience"
+        })
+      });
+
+      if (!res.ok) throw new Error("Failed to generate JD");
+      const data = (await res.json()) as JdResponse;
+      setFormData(prev => ({ ...prev, description: data.jd }));
+    } catch (err) {
+      console.error(err);
+      setError("AI Generation failed. Please try again.");
+    } finally {
+      setGeneratingJd(false);
+    }
+  };
+
+  const handleAiGenerateAssist = async () => {
+    if (!formData.description) {
+      setError("Please provide a Job Description first to generate screening questions.");
+      return;
+    }
+
+    try {
+      setGeneratingAssist(true);
+      setError(null);
+      const token = await user?.getIdToken();
+      const res = await fetch('/api/ai/generate-job-assist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ jd: formData.description })
+      });
+
+      if (!res.ok) throw new Error("Failed to generate assistance data");
+      const data = (await res.json()) as AssistResponse;
+      setScreeningQuestions(data.questions ?? []);
+      setSuggestions(data.suggestions ?? []);
+    } catch (err) {
+      console.error(err);
+      setError("AI Analysis failed. Please try again.");
+    } finally {
+      setGeneratingAssist(false);
+    }
+  };
+
+  const addQuestion = () => {
+    setScreeningQuestions(prev => [...prev, { question: '', hint: '' }]);
+  };
+
+  const removeQuestion = (index: number) => {
+    setScreeningQuestions(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuestionChange = (index: number, field: keyof ScreeningQuestion, value: string) => {
+    setScreeningQuestions(prev => {
+      const newQuestions = [...prev];
+      newQuestions[index] = { ...newQuestions[index], [field]: value };
+      return newQuestions;
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -52,7 +147,8 @@ export const PostJob: React.FC = () => {
           min: Number(formData.salaryMin),
           max: Number(formData.salaryMax),
           currency: formData.currency
-        }
+        },
+        screening_questions: screeningQuestions.filter(q => q.question.trim())
       };
 
       await JobService.createJob(jobData);
@@ -116,7 +212,22 @@ export const PostJob: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="description" className={labelClasses}>Description</label>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="description" className={labelClasses}>Description</label>
+                <button
+                  type="button"
+                  onClick={() => void handleAiGenerateJd()}
+                  disabled={generatingJd || !formData.title}
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                >
+                  {generatingJd ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3 h-3" />
+                  )}
+                  AI Generate
+                </button>
+              </div>
               <textarea
                 id="description"
                 required
@@ -127,6 +238,92 @@ export const PostJob: React.FC = () => {
                 placeholder="Describe the role, responsibilities, and requirements..."
                 className={inputClasses}
               />
+              {suggestions.length > 0 && (
+                <div className="mt-4 border-2 border-black p-4 bg-yellow-50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lightbulb className="w-4 h-4 text-black" />
+                    <span className="text-xs font-black uppercase tracking-widest">Optimization Suggestions</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {suggestions.map((s, i) => (
+                      <li key={i} className="text-xs font-mono flex gap-2">
+                        <span className="text-black">•</span> {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* AI Assistance & Screening Questions */}
+          <div className="border-4 border-black p-8 bg-gray-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
+                <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
+                  Add questions to filter candidates effectively.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleAiGenerateAssist()}
+                disabled={generatingAssist || !formData.description}
+                className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-black text-white px-6 py-3 hover:bg-gray-800 disabled:bg-gray-300 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              >
+                {generatingAssist ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-[#FFD700]" />
+                )}
+                AI Suggest Questions
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {screeningQuestions.map((q, index) => (
+                <div key={index} className="bg-white border-2 border-black p-6 relative group">
+                  <button
+                    type="button"
+                    onClick={() => { removeQuestion(index); }}
+                    className="absolute -top-3 -right-3 bg-red-600 text-white p-2 border-2 border-black hover:bg-red-700 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label htmlFor={`q-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 block">Question {index + 1}</label>
+                      <input
+                        id={`q-${index}`}
+                        value={q.question}
+                        onChange={(e) => { handleQuestionChange(index, 'question', e.target.value); }}
+                        placeholder="e.g. How many years of experience do you have with React?"
+                        className={`${inputClasses} py-2`}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor={`h-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
+                        <Info className="w-3 h-3" /> Hint (Optional guidance for candidate)
+                      </label>
+                      <input
+                        id={`h-${index}`}
+                        value={q.hint}
+                        onChange={(e) => { handleQuestionChange(index, 'hint', e.target.value); }}
+                        placeholder="e.g. Please mention specific projects or length of time."
+                        className={`${inputClasses} py-2 text-xs opacity-70`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addQuestion}
+                className="w-full border-2 border-dashed border-black py-4 flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> Add Question Manually
+              </button>
             </div>
           </div>
 
