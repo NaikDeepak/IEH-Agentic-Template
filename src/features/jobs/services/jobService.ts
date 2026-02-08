@@ -163,11 +163,11 @@ export const JobService = {
         try {
             const jobsRef = collection(db, JOBS_COLLECTION);
 
-            // Filter for ACTIVE and PASSIVE jobs (exclude CLOSED)
-            // Sort by status (Active first) and then recency
+            // Filter for ACTIVE jobs only
+            // Sort by status and then recency
             const q = query(
                 jobsRef,
-                where("status", "in", ["active", "passive"]),
+                where("status", "==", "active"),
                 orderBy("status", "asc"),
                 orderBy("lastActiveAt", "desc"),
                 limit(limitCount)
