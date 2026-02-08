@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Identity** - Secure RBAC auth and admin oversight
 - [x] **Phase 2: Marketplace Mechanics** - "Active System" logic and hygiene
 - [x] **Phase 3: Semantic Matching Engine** - Bi-directional vector search
-- [ ] **Phase 4: Employer Suite** - AI generation and ATS tools
+- [x] **Phase 4: Employer Suite** - AI generation and ATS tools
 - [ ] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
 - [ ] **Phase 6: Growth & Monetization** - Referrals and subscriptions
 
@@ -149,10 +149,10 @@ Phases execute in numeric order.
 - [x] **MATCH-03**: Candidate Scoring Engine based on Experience, Skills, and Industry Context
 
 #### Employer Tools
-- [ ] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
-- [ ] **EMP-02**: AI Screening Question Generator based on job role
-- [ ] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
-- [ ] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
+- [x] **EMP-01**: AI JD Generator (Gemini-powered) with optimization suggestions
+- [x] **EMP-02**: AI Screening Question Generator based on job role
+- [x] **EMP-03**: Built-in Basic ATS (Kanban pipeline, status tracking, automated follow-ups)
+- [x] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
 
 #### Job Seeker Tools
 - [ ] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
@@ -197,10 +197,10 @@ Phases execute in numeric order.
 | MATCH-01 | Phase 3 | Completed |
 | MATCH-02 | Phase 3 | Completed |
 | MATCH-03 | Phase 3 | Completed |
-| EMP-01 | Phase 4 | Pending |
-| EMP-02 | Phase 4 | Pending |
-| EMP-03 | Phase 4 | Pending |
-| EMP-04 | Phase 4 | Pending |
+| EMP-01 | Phase 4 | Completed |
+| EMP-02 | Phase 4 | Completed |
+| EMP-03 | Phase 4 | Completed |
+| EMP-04 | Phase 4 | Completed |
 | SEEK-01 | Phase 5 | Pending |
 | SEEK-02 | Phase 5 | Pending |
 | SEEK-03 | Phase 5 | Pending |
