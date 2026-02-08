@@ -139,8 +139,9 @@ async function seedJobs(): Promise<void> {
       updated_at: FieldValue.serverTimestamp(),
       lastActiveAt,
       expiresAt,
-      // Placeholder embedding (will be regenerated when job is updated)
-      embedding: FieldValue.vector(new Array(768).fill(0))
+      // Placeholder embedding (must be non-zero magnitude for cosine distance)
+      // We use a unit vector [1, 0, 0...] to ensure valid vector math
+      embedding: FieldValue.vector([1, ...new Array(767).fill(0)])
     };
 
     const docRef = await jobsRef.add(jobData);

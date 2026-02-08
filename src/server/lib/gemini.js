@@ -106,7 +106,7 @@ export const expandQuery = async (query, context) => {
             contents: prompt,
         });
 
-        const expandedText = response.text();
+        const expandedText = typeof response.text === 'function' ? response.text() : response.text;
         return expandedText || query;
     } catch (e) {
         console.warn("Query expansion failed", e);
