@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-16)
 
 **Core value:** Semantic matching that connects the right talent to the right roles by understanding context, not just keywords.
-**Current focus:** Phase 3 — Semantic Matching Engine (Complete)
+**Current focus:** Phase 3 — Semantic Matching Engine (Gap Closure)
 
 ## Current Position
 
 Phase: 3 of 6 (Semantic Matching)
-Plan: 4 of 4 (03-04-PLAN.md)
-Status: Phase 3 verified and complete
-Last activity: 2026-02-08 — Completed Phase 3: Semantic Matching Engine
+Plan: 5 of 6 (03-05-PLAN.md)
+Status: Gap closure for search infrastructure complete
+Last activity: 2026-02-08 — Fixed Firestore indexes and candidate whitelists
 
-Progress: ██████████ 100%
+Progress: █████████░ 94% (of defined plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: ~12m
-- Total execution time: ~1.8 hours
+- Total execution time: ~1.9 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: ██████████ 100%
 |-------|-------|-------|----------|
 | 1. Foundation & Identity | 3 | 3 | 12.5m |
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
-| 3. Semantic Matching | 4 | 4 | ~12m |
+| 3. Semantic Matching | 5 | 6 | ~12m |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 03-03, 03-04
-- Trend: Consistent velocity, parallel execution
+- Last 5 plans: 03-02, 03-03, 03-04, 03-05
+- Trend: Maintaining high velocity through gap closure plans.
 
 ## Accumulated Context
 
@@ -41,6 +41,8 @@ Progress: ██████████ 100%
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-08 | 03-05 | User Index Reordering | Reordered fields to `status` -> `role` -> `embedding` to match the query construction in the backend. |
+| 2026-02-08 | 03-05 | Status Whitelisting | Added `status` to candidate search results to allow the frontend to display activity markers. |
 | 2026-02-08 | 03-03 | Match Score Colors | Used Traffic Light system (Green > 80%, Yellow > 50%) for relevance cues. |
 | 2026-02-08 | 03-03 | Simple Role Check | Used `userData.role` check in Header instead of complex permission system. |
 | 2026-02-08 | 03-04 | Frontend Match Score Normalization | Normalized decimal match scores (0-1) to percentages (0-100) on the client side for display. |
@@ -82,33 +84,5 @@ Progress: ██████████ 100%
 ## Session Continuity
 
 Last session: 2026-02-08
-Stopped at: Completed Phase 3 — Semantic Matching Engine
-Resume file: None
-
-Config (if exists):
-{
-  "mode": "interactive",
-  "depth": "standard",
-  "parallelization": {
-    "enabled": true,
-    "plan_level": true,
-    "task_level": false,
-    "skip_checkpoints": true,
-    "max_concurrent_agents": 3,
-    "min_plans_for_parallel": 2
-  },
-  "gates": {
-    "confirm_project": true,
-    "confirm_phases": true,
-    "confirm_roadmap": true,
-    "confirm_breakdown": true,
-    "confirm_plan": true,
-    "execute_next_plan": true,
-    "issues_review": true,
-    "confirm_transition": true
-  },
-  "safety": {
-    "always_confirm_destructive": true,
-    "always_confirm_external_services": true
-  }
-}
+Stopped at: Completed Plan 03-05 (Fix Vector Indexes and Search Responses)
+Resume file: .planning/phases/03-semantic-matching/03-06-PLAN.md
