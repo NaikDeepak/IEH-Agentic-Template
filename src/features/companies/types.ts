@@ -6,6 +6,7 @@ export interface Company {
   logo?: string;
   banner?: string;
   bio: string;
+  tagline?: string;
   website: string;
   video_url?: string;
   tech_stack?: string[];

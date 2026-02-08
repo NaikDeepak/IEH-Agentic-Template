@@ -12,6 +12,8 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import { JobsPage } from './pages/JobsPage'
 import { PostJob } from './pages/PostJob'
 import { TalentSearch } from './pages/employer/TalentSearch'
+import { CompanyEditor } from './pages/employer/CompanyEditor'
+import { CompanyProfile } from './pages/CompanyProfile'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
@@ -43,6 +45,11 @@ function App() {
         <Route
           path="/jobs"
           element={<JobsPage />}
+        />
+
+        <Route
+          path="/companies/:id"
+          element={<CompanyProfile />}
         />
 
         <Route
@@ -107,6 +114,20 @@ function App() {
                 <Header />
                 <main className="flex-grow">
                   <TalentSearch />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/company"
+          element={
+            <ProtectedRoute allowedRoles={['employer']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow">
+                  <CompanyEditor />
                 </main>
               </div>
             </ProtectedRoute>
