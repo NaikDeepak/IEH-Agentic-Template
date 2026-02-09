@@ -2,9 +2,6 @@ import { initializeApp } from "firebase/app";
 import {
     getAuth,
     GoogleAuthProvider,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -23,7 +20,11 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-export { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut };
+export {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut
+} from "firebase/auth";
 
 // Setting standard prompt for Google account shift as requested in auth.md
 googleProvider.setCustomParameters({ prompt: 'select_account' });

@@ -32,7 +32,7 @@ describe('Functions: API Handlers', () => {
         it('should generate JD on success', async () => {
             req.body = { role: 'Dev', skills: 'JS', experience: '5y' };
             const generateContentMock = vi.fn().mockResolvedValueOnce({
-                text: () => 'Mocked JD'
+                text: () => JSON.stringify({ jd: 'Mocked JD' })
             });
 
             vi.spyOn(GoogleGenAI.prototype, 'models', 'get').mockReturnValue({
@@ -84,7 +84,7 @@ describe('Functions: API Handlers', () => {
         it('should return search results', async () => {
             req.body = { query: 'test' };
             const embedContentMock = vi.fn().mockResolvedValueOnce({
-                embedding: { values: new Array(768).fill(0.1) }
+                embedding: { values: new Array(1536).fill(0.1) }
             });
 
             // Mock generateContent for expandQuery
