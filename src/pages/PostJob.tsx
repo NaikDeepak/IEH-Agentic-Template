@@ -211,15 +211,11 @@ export const PostJob: React.FC = () => {
         )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-12">
-          {/* Section 1: Role Definition */}
-          <div className="space-y-8">
-            <div className="border-b-2 border-black pb-2">
-              <h2 className="text-sm font-black uppercase tracking-[0.3em]">1. Role Definition</h2>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <label htmlFor="title" className={labelClasses}>Job Title</label>
+          {/* Section 1: The Lead */}
+          <div className="space-y-6">
+            <div className="bg-black text-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
+              <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.3em] mb-4 block text-gray-400">What's the position?</label>
+              <div className="flex flex-col md:flex-row gap-4">
                 <input
                   id="title"
                   required
@@ -227,11 +223,64 @@ export const PostJob: React.FC = () => {
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g. Senior Frontend Engineer"
+                  className="flex-grow bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-gray-700 py-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleAiGenerateJd()}
+                  disabled={generatingJd || !formData.title}
+                  className="flex items-center justify-center gap-3 bg-white text-black px-8 py-4 font-black uppercase tracking-widest hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 transition-all shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] active:shadow-none"
+                >
+                  {generatingJd ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-5 h-5 text-yellow-500" />
+                  )}
+                  Auto-Fill Details
+                </button>
+              </div>
+              <p className="text-[10px] font-mono mt-4 text-gray-500 uppercase tracking-widest">
+                Tip: Enter a title and click "Auto-Fill" to generate a full JD and suggested skills using AI.
+              </p>
+            </div>
+          </div>
+
+          {/* Section 2: Role Details */}
+          <div className="space-y-12">
+            <div className="grid grid-cols-1 gap-8">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label htmlFor="description" className={labelClasses}>Job Description</label>
+                  {formData.description && (
+                    <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">AI Generated • Editable</span>
+                  )}
+                </div>
+                <textarea
+                  id="description"
+                  required
+                  name="description"
+                  rows={10}
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Describe the role, responsibilities, and requirements..."
                   className={inputClasses}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="skills" className={labelClasses}>Core Skills (Comma separated)</label>
+                <input
+                  id="skills"
+                  required
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleChange}
+                  placeholder="e.g. React, TypeScript, Node.js"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="location" className={labelClasses}>Location</label>
                   <input
@@ -240,27 +289,12 @@ export const PostJob: React.FC = () => {
                     name="location"
                     value={formData.location}
                     onChange={handleChange}
-                    placeholder="e.g. Berlin, Germany or Remote"
+                    placeholder="e.g. Remote or City"
                     className={inputClasses}
                   />
                 </div>
                 <div>
-                  <label htmlFor="skills" className={labelClasses}>Skills (Comma separated)</label>
-                  <input
-                    id="skills"
-                    required
-                    name="skills"
-                    value={formData.skills}
-                    onChange={handleChange}
-                    placeholder="React, TypeScript, Node.js"
-                    className={inputClasses}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="type" className={labelClasses}>Employment Type</label>
+                  <label htmlFor="type" className={labelClasses}>Type</label>
                   <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClasses}>
                     <option value="FULL_TIME">FULL TIME</option>
                     <option value="PART_TIME">PART TIME</option>
@@ -269,7 +303,7 @@ export const PostJob: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="work_mode" className={labelClasses}>Work Mode</label>
+                  <label htmlFor="work_mode" className={labelClasses}>Mode</label>
                   <select id="work_mode" name="work_mode" value={formData.work_mode} onChange={handleChange} className={inputClasses}>
                     <option value="REMOTE">REMOTE</option>
                     <option value="HYBRID">HYBRID</option>
@@ -278,62 +312,28 @@ export const PostJob: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Suggestions (Visible if generated) */}
+            {suggestions.length > 0 && (
+              <div className="border-2 border-black p-6 bg-yellow-50 relative">
+                <div className="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                  <Lightbulb className="w-3 h-3" /> AI Optimization Tips
+                </div>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                  {suggestions.map((s, i) => (
+                    <li key={i} className="text-xs font-mono flex gap-2 items-start">
+                      <span className="text-black font-bold">›</span> {s}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
-          {/* Section 2: Details & AI Assistance */}
+          {/* Section 3: Screening & Quality */}
           <div className="space-y-8">
-            <div className="border-b-2 border-black pb-2">
-              <h2 className="text-sm font-black uppercase tracking-[0.3em]">2. Details & AI Assistance</h2>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label htmlFor="description" className={labelClasses}>Job Description</label>
-                <button
-                  type="button"
-                  onClick={() => void handleAiGenerateJd()}
-                  disabled={generatingJd || !formData.title}
-                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
-                >
-                  {generatingJd ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-3 h-3" />
-                  )}
-                  AI Generate JD
-                </button>
-              </div>
-              <textarea
-                id="description"
-                required
-                name="description"
-                rows={8}
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe the role, responsibilities, and requirements..."
-                className={inputClasses}
-              />
-
-              {suggestions.length > 0 && (
-                <div className="mt-4 border-2 border-black p-4 bg-yellow-50">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Lightbulb className="w-4 h-4 text-black" />
-                    <span className="text-xs font-black uppercase tracking-widest">Optimization Suggestions</span>
-                  </div>
-                  <ul className="space-y-1">
-                    {suggestions.map((s, i) => (
-                      <li key={i} className="text-xs font-mono flex gap-2">
-                        <span className="text-black">•</span> {s}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* Screening Questions Box */}
             <div className="border-4 border-black p-8 bg-gray-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                 <div>
                   <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
                   <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
@@ -349,7 +349,7 @@ export const PostJob: React.FC = () => {
                   {generatingAssist ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Sparkles className="w-4 h-4 text-[#FFD700]" />
+                    <Sparkles className="w-4 h-4 text-yellow-400" />
                   )}
                   AI Suggest Questions
                 </button>
