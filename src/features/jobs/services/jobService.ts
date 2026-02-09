@@ -25,7 +25,7 @@ interface EmbeddingResponse {
 }
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const res = await fetch("/api/embedding", {
+    const res = await fetch("/api/ai/embedding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
