@@ -323,14 +323,39 @@ export const generateJdHandler = async (req, res) => {
 
         const ai = new GoogleGenAI({ apiKey });
 
-        // Using gemini-2.0-flash as per cost-optimization rules
+        const prompt = `
+            As an expert IT recruiter, generate a professional job description and a list of key skills for a ${role}.
+            Experience level: ${experience || 'not specified'}.
+            ${skills ? `Initial skills provided: ${skills}.` : ''}
+
+            Return your response in valid JSON format:
+            {
+                "jd": "full job description text here...",
+                "suggestedSkills": ["skill1", "skill2", "skill3", "skill4", "skill5"]
+            }
+        `;
+
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
-            contents: `Generate a professional job description for a ${role} with skills: ${skills} and experience: ${experience}.`,
+            contents: prompt,
         });
 
         const text = typeof response.text === 'function' ? response.text() : response.candidates?.[0]?.content?.parts?.[0]?.text;
-        res.json({ jd: text });
+
+        if (!text) {
+            throw new Error("Empty response from AI");
+        }
+
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const jsonStr = jsonMatch ? jsonMatch[0] : text;
+
+        try {
+            const data = JSON.parse(jsonStr);
+            res.json(data);
+        } catch (parseError) {
+            console.error("JSON Parse Error in generateJd. Raw Text:", text);
+            throw new Error("AI returned invalid JSON format for JD");
+        }
     } catch (error) {
         handleError(res, error, "generate job description");
     }
@@ -382,9 +407,7 @@ export const generateJobAssistHandler = async (req, res) => {
             throw new Error("Empty response from AI");
         }
 
-        console.log("AI Raw Response:", text);
-
-        // Extract JSON block if present (handles markdown code blocks ```json ... ```)
+        // Extract JSON block if present
         let jsonStr = text;
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
@@ -393,11 +416,14 @@ export const generateJobAssistHandler = async (req, res) => {
 
         try {
             const data = JSON.parse(jsonStr);
-            res.json(data);
+            // Ensure data has expected structure even if partial
+            res.json({
+                questions: data.questions || [],
+                suggestions: data.suggestions || []
+            });
         } catch (parseError) {
-            console.error("JSON Parse Error. Raw Text:", text);
-            console.error("Attempted to parse:", jsonStr);
-            throw new Error("AI returned invalid JSON format");
+            console.error("JSON Parse Error in generateJobAssist. Raw Text:", text);
+            throw new Error("AI returned invalid JSON format for job assist");
         }
     } catch (error) {
         handleError(res, error, "generate job assist data");
@@ -517,13 +543,13 @@ export const searchCandidatesHandler = async (req, res) => {
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
-app.post("/jobs/search", searchJobsHandler); // Public search allowed? Usually yes, but maybe strictly authenticated? Leaving public for now as per requirements usually, or auth? The frontend uses it. Frontend sends token. Let's keep it open or auth?
-// The prompt said "Protect candidates/search".
+app.post("/jobs/search", searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
 app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
+app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
 app.post("/api/jobs/search", searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
