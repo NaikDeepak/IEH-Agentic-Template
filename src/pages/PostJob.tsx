@@ -8,6 +8,7 @@ import type { JobType, WorkMode, CreateJobInput, ScreeningQuestion } from '../fe
 
 interface JdResponse {
   jd: string;
+  suggestedSkills?: string[];
 }
 
 interface AssistResponse {
@@ -41,8 +42,8 @@ export const PostJob: React.FC = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const handleAiGenerateJd = async () => {
-    if (!formData.title || !formData.skills) {
-      setError("Please provide at least a Job Title and some Skills to generate a description.");
+    if (!formData.title) {
+      setError("Please provide a Job Title to generate a description.");
       return;
     }
 
@@ -58,17 +59,24 @@ export const PostJob: React.FC = () => {
         },
         body: JSON.stringify({
           role: formData.title,
-          skills: formData.skills,
+          skills: formData.skills || undefined,
           experience: "relevant experience"
         })
       });
 
-      if (!res.ok) throw new Error("Failed to generate JD");
+      if (!res.ok) {
+        const errorData = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(errorData.error ?? "Failed to generate JD");
+      }
       const data = (await res.json()) as JdResponse;
-      setFormData(prev => ({ ...prev, description: data.jd }));
+      setFormData(prev => ({
+        ...prev,
+        description: data.jd,
+        skills: data.suggestedSkills ? data.suggestedSkills.join(', ') : prev.skills
+      }));
     } catch (err) {
       console.error(err);
-      setError("AI Generation failed. Please try again.");
+      setError(err instanceof Error ? err.message : "AI Generation failed. Please try again.");
     } finally {
       setGeneratingJd(false);
     }
@@ -202,49 +210,110 @@ export const PostJob: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-8">
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 gap-6">
-            <div>
-              <label htmlFor="title" className={labelClasses}>Job Title</label>
-              <input
-                id="title"
-                required
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="e.g. Senior Frontend Engineer"
-                className={inputClasses}
-              />
+        <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-12">
+          {/* Section 1: Role Definition */}
+          <div className="space-y-8">
+            <div className="border-b-2 border-black pb-2">
+              <h2 className="text-sm font-black uppercase tracking-[0.3em]">1. Role Definition</h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6">
+              <div>
+                <label htmlFor="title" className={labelClasses}>Job Title</label>
+                <input
+                  id="title"
+                  required
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g. Senior Frontend Engineer"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="location" className={labelClasses}>Location</label>
+                  <input
+                    id="location"
+                    required
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="e.g. Berlin, Germany or Remote"
+                    className={inputClasses}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="skills" className={labelClasses}>Skills (Comma separated)</label>
+                  <input
+                    id="skills"
+                    required
+                    name="skills"
+                    value={formData.skills}
+                    onChange={handleChange}
+                    placeholder="React, TypeScript, Node.js"
+                    className={inputClasses}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="type" className={labelClasses}>Employment Type</label>
+                  <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClasses}>
+                    <option value="FULL_TIME">FULL TIME</option>
+                    <option value="PART_TIME">PART TIME</option>
+                    <option value="CONTRACT">CONTRACT</option>
+                    <option value="INTERNSHIP">INTERNSHIP</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="work_mode" className={labelClasses}>Work Mode</label>
+                  <select id="work_mode" name="work_mode" value={formData.work_mode} onChange={handleChange} className={inputClasses}>
+                    <option value="REMOTE">REMOTE</option>
+                    <option value="HYBRID">HYBRID</option>
+                    <option value="ONSITE">ON-SITE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Details & AI Assistance */}
+          <div className="space-y-8">
+            <div className="border-b-2 border-black pb-2">
+              <h2 className="text-sm font-black uppercase tracking-[0.3em]">2. Details & AI Assistance</h2>
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label htmlFor="description" className={labelClasses}>Description</label>
+                <label htmlFor="description" className={labelClasses}>Job Description</label>
                 <button
                   type="button"
                   onClick={() => void handleAiGenerateJd()}
                   disabled={generatingJd || !formData.title}
-                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                  className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-black text-white px-3 py-1 hover:bg-gray-800 disabled:bg-gray-200 disabled:text-gray-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]"
                 >
                   {generatingJd ? (
                     <Loader2 className="w-3 h-3 animate-spin" />
                   ) : (
                     <Sparkles className="w-3 h-3" />
                   )}
-                  AI Generate
+                  AI Generate JD
                 </button>
               </div>
               <textarea
                 id="description"
                 required
                 name="description"
-                rows={6}
+                rows={8}
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Describe the role, responsibilities, and requirements..."
                 className={inputClasses}
               />
+
               {suggestions.length > 0 && (
                 <div className="mt-4 border-2 border-black p-4 bg-yellow-50">
                   <div className="flex items-center gap-2 mb-2">
@@ -261,185 +330,146 @@ export const PostJob: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* AI Assistance & Screening Questions */}
-          <div className="border-4 border-black p-8 bg-gray-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-              <div>
-                <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
-                <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
-                  Add questions to filter candidates effectively.
-                </p>
+            {/* Screening Questions Box */}
+            <div className="border-4 border-black p-8 bg-gray-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                  <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
+                  <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
+                    Add questions to filter candidates effectively.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleAiGenerateAssist()}
+                  disabled={generatingAssist || !formData.description}
+                  className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-black text-white px-6 py-3 hover:bg-gray-800 disabled:bg-gray-300 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                >
+                  {generatingAssist ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4 text-[#FFD700]" />
+                  )}
+                  AI Suggest Questions
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => void handleAiGenerateAssist()}
-                disabled={generatingAssist || !formData.description}
-                className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-black text-white px-6 py-3 hover:bg-gray-800 disabled:bg-gray-300 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
-              >
-                {generatingAssist ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4 text-[#FFD700]" />
-                )}
-                AI Suggest Questions
-              </button>
-            </div>
 
-            <div className="space-y-6">
-              {screeningQuestions.map((q, index) => (
-                <div key={index} className="bg-white border-2 border-black p-6 relative group">
-                  <button
-                    type="button"
-                    onClick={() => { removeQuestion(index); }}
-                    className="absolute -top-3 -right-3 bg-red-600 text-white p-2 border-2 border-black hover:bg-red-700 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                  <div className="grid grid-cols-1 gap-4">
-                    <div>
-                      <label htmlFor={`q-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 block">Question {index + 1}</label>
-                      <input
-                        id={`q-${index}`}
-                        value={q.question}
-                        onChange={(e) => { handleQuestionChange(index, 'question', e.target.value); }}
-                        placeholder="e.g. How many years of experience do you have with React?"
-                        className={`${inputClasses} py-2`}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor={`h-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                        <Info className="w-3 h-3" /> Hint (Optional guidance for candidate)
-                      </label>
-                      <input
-                        id={`h-${index}`}
-                        value={q.hint}
-                        onChange={(e) => { handleQuestionChange(index, 'hint', e.target.value); }}
-                        placeholder="e.g. Please mention specific projects or length of time."
-                        className={`${inputClasses} py-2 text-xs opacity-70`}
-                      />
+              <div className="space-y-6">
+                {screeningQuestions.map((q, index) => (
+                  <div key={index} className="bg-white border-2 border-black p-6 relative group">
+                    <button
+                      type="button"
+                      onClick={() => { removeQuestion(index); }}
+                      className="absolute -top-3 -right-3 bg-red-600 text-white p-2 border-2 border-black hover:bg-red-700 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <label htmlFor={`q-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 block">Question {index + 1}</label>
+                        <input
+                          id={`q-${index}`}
+                          value={q.question}
+                          onChange={(e) => { handleQuestionChange(index, 'question', e.target.value); }}
+                          placeholder="e.g. How many years of experience do you have with React?"
+                          className={`${inputClasses} py-2`}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor={`h-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
+                          <Info className="w-3 h-3" /> Hint (Optional guidance for candidate)
+                        </label>
+                        <input
+                          id={`h-${index}`}
+                          value={q.hint}
+                          onChange={(e) => { handleQuestionChange(index, 'hint', e.target.value); }}
+                          placeholder="e.g. Please mention specific projects or length of time."
+                          className={`${inputClasses} py-2 text-xs opacity-70`}
+                        />
+                      </div>
                     </div>
                   </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  className="w-full border-2 border-dashed border-black py-4 flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                >
+                  <Plus className="w-4 h-4" /> Add Question Manually
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Compensation & Contact */}
+          <div className="space-y-8">
+            <div className="border-b-2 border-black pb-2">
+              <h2 className="text-sm font-black uppercase tracking-[0.3em]">3. Compensation & Contact</h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8">
+              <div className="border-2 border-black p-6">
+                <h3 className={labelClasses}>Salary Range</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <input
+                    type="number"
+                    name="salaryMin"
+                    value={formData.salaryMin}
+                    onChange={handleChange}
+                    placeholder="Min"
+                    className={inputClasses}
+                    aria-label="Minimum Salary"
+                  />
+                  <input
+                    type="number"
+                    name="salaryMax"
+                    value={formData.salaryMax}
+                    onChange={handleChange}
+                    placeholder="Max"
+                    className={inputClasses}
+                    aria-label="Maximum Salary"
+                  />
+                  <select name="currency" value={formData.currency} onChange={handleChange} className={inputClasses} aria-label="Currency">
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                  </select>
                 </div>
-              ))}
+              </div>
 
-              <button
-                type="button"
-                onClick={addQuestion}
-                className="w-full border-2 border-dashed border-black py-4 flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors"
-              >
-                <Plus className="w-4 h-4" /> Add Question Manually
-              </button>
+              <div>
+                <label htmlFor="contactEmail" className={labelClasses}>Contact Email (Where applications will be sent)</label>
+                <input
+                  id="contactEmail"
+                  required
+                  type="email"
+                  name="contactEmail"
+                  value={formData.contactEmail}
+                  onChange={handleChange}
+                  className={inputClasses}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Type & Mode */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="type" className={labelClasses}>Employment Type</label>
-              <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClasses}>
-                <option value="FULL_TIME">FULL TIME</option>
-                <option value="PART_TIME">PART TIME</option>
-                <option value="CONTRACT">CONTRACT</option>
-                <option value="INTERNSHIP">INTERNSHIP</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="work_mode" className={labelClasses}>Work Mode</label>
-              <select id="work_mode" name="work_mode" value={formData.work_mode} onChange={handleChange} className={inputClasses}>
-                <option value="REMOTE">REMOTE</option>
-                <option value="HYBRID">HYBRID</option>
-                <option value="ONSITE">ON-SITE</option>
-              </select>
-            </div>
+          <div className="pt-8">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-black text-white py-8 font-black uppercase tracking-[0.3em] text-xl hover:bg-gray-900 disabled:bg-gray-400 transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 active:shadow-none active:translate-x-0 active:translate-y-0 flex justify-center items-center gap-4"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  Publishing...
+                </>
+              ) : (
+                'Publish Job Posting'
+              )}
+            </button>
           </div>
-
-          {/* Location & Skills */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="location" className={labelClasses}>Location</label>
-              <input
-                id="location"
-                required
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                placeholder="e.g. Berlin, Germany or Remote"
-                className={inputClasses}
-              />
-            </div>
-            <div>
-              <label htmlFor="skills" className={labelClasses}>Skills (Comma separated)</label>
-              <input
-                id="skills"
-                required
-                name="skills"
-                value={formData.skills}
-                onChange={handleChange}
-                placeholder="React, TypeScript, Node.js"
-                className={inputClasses}
-              />
-            </div>
-          </div>
-
-          {/* Salary Range */}
-          <div className="border-2 border-black p-6">
-            <h3 className={labelClasses}>Salary Range</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input
-                type="number"
-                name="salaryMin"
-                value={formData.salaryMin}
-                onChange={handleChange}
-                placeholder="Min"
-                className={inputClasses}
-                aria-label="Minimum Salary"
-              />
-              <input
-                type="number"
-                name="salaryMax"
-                value={formData.salaryMax}
-                onChange={handleChange}
-                placeholder="Max"
-                className={inputClasses}
-                aria-label="Maximum Salary"
-              />
-              <select name="currency" value={formData.currency} onChange={handleChange} className={inputClasses} aria-label="Currency">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="GBP">GBP</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="contactEmail" className={labelClasses}>Contact Email</label>
-            <input
-              id="contactEmail"
-              required
-              type="email"
-              name="contactEmail"
-              value={formData.contactEmail}
-              onChange={handleChange}
-              className={inputClasses}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-6 font-black uppercase tracking-[0.2em] text-lg hover:bg-gray-900 disabled:bg-gray-400 transition-colors flex justify-center items-center gap-4"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-6 h-6 animate-spin" />
-                Publishing...
-              </>
-            ) : (
-              'Publish Job Posting'
-            )}
-          </button>
         </form>
       </main>
     </div>
