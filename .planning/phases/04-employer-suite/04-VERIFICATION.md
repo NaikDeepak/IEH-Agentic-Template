@@ -1,17 +1,16 @@
 ---
 phase: 04-employer-suite
-verified: 2026-02-09T12:00:00Z
+verified: 2026-02-09T18:45:00Z
 status: passed
 score: 4/4 must-haves verified
 re_verification:
-  previous_status: passed
-  previous_score: 4/4
+  previous_status: gaps_found
+  previous_score: 2/4
   gaps_closed:
-    - "ESM syntax errors resolved in PostJob.tsx"
-    - "AI JSON parsing made robust in Cloud Functions"
-    - "API routing fixed for embeddings"
-    - "Manage Jobs navigation added to Header"
-    - "Application seeding script created for UAT"
+    - "AI Screening Questions generation restored in PostJob.tsx"
+    - "JD generation with job title flow optimized"
+    - "API routes for AI standardized and consistent"
+    - "Backend AI service handles JSON parsing robustly"
 ---
 
 # Phase 04: Employer Suite Verification Report
@@ -19,7 +18,7 @@ re_verification:
 **Phase Goal:** Productivity tools for job creation and candidate management
 **Verified:** 2026-02-09
 **Status:** passed
-**Re-verification:** Yes — after gap closure (Plans 04-04, 04-05)
+**Re-verification:** Yes — after gap closure (Plan 04-06)
 
 ## Goal Achievement
 
@@ -27,10 +26,10 @@ re_verification:
 
 | #   | Truth   | Status     | Evidence       |
 | --- | ------- | ---------- | -------------- |
-| 1   | Employer can generate optimized JDs using AI inputs | ✓ VERIFIED | `PostJob.tsx` calls `/api/ai/generate-jd`. `functions/index.js` uses Gemini 2.0. |
-| 2   | Employer can generate role-specific screening questions | ✓ VERIFIED | `PostJob.tsx` calls `/api/ai/generate-job-assist`. Robust JSON extraction in `functions/index.js`. |
-| 3   | Employer can track applicants through Kanban pipeline stages | ✓ VERIFIED | `JobApplicants.tsx` uses `KanbanBoard.tsx` with `@dnd-kit`. Seeding script ensures data availability. |
-| 4   | Employer branding page is viewable by candidates | ✓ VERIFIED | `CompanyProfile.tsx` renders bio, video, and job library. |
+| 1   | Employer can generate optimized JDs using AI inputs | ✓ VERIFIED | `PostJob.tsx` (L54) calls \`/api/ai/generate-jd\`. \`ai.service.js\` implements \`generateJD\`. |
+| 2   | Employer can generate role-specific screening questions | ✓ VERIFIED | \`PostJob.tsx\` (L95) calls \`/api/ai/generate-job-assist\`. \`ai.service.js\` implements \`generateJobAssist\`. |
+| 3   | Employer can track applicants through Kanban pipeline stages | ✓ VERIFIED | \`JobApplicants.tsx\` (L131) uses \`KanbanBoard.tsx\` with full drag-and-drop capability. |
+| 4   | Employer branding page is viewable by candidates | ✓ VERIFIED | \`CompanyProfile.tsx\` exists and renders company data and job library. |
 
 **Score:** 4/4 truths verified
 
@@ -38,55 +37,54 @@ re_verification:
 
 | Artifact | Expected    | Status | Details |
 | -------- | ----------- | ------ | ------- |
-| `src/pages/PostJob.tsx` | JD creation with AI assistance | ✓ VERIFIED | Substantive (440+ lines), uses `import type`, wired to AI API. |
-| `functions/index.js` | Gemini backend handlers | ✓ VERIFIED | Substantive (670+ lines), fixed JSON regex, 1536d embeddings. |
-| `src/pages/employer/JobApplicants.tsx` | Pipeline management page | ✓ VERIFIED | Wired to `ApplicationService` and `KanbanBoard`. |
-| `src/features/applications/components/KanbanBoard.tsx` | DND Kanban implementation | ✓ VERIFIED | Full `@dnd-kit` implementation with drag overlay. |
-| `src/pages/CompanyProfile.tsx` | Public branding view | ✓ VERIFIED | Renders company metadata, video embed, and linked jobs. |
-| `src/lib/ai/embedding.ts` | Embedding utility | ✓ VERIFIED | Aligned to 1536 dimensions and `text-embedding-004`. |
-| `src/components/Header.tsx` | Navigation with Employer links | ✓ VERIFIED | Includes "Manage Jobs" and "Find Talent" for employers. |
+| \`src/pages/PostJob.tsx\` | JD creation with AI assistance | ✓ VERIFIED | Substantive (470+ lines). Wired to AI endpoints for JD and Question generation. |
+| \`src/server/features/ai/ai.service.js\` | Gemini backend logic | ✓ VERIFIED | Implements \`generateJD\` and \`generateJobAssist\` with robust JSON parsing. |
+| \`src/pages/employer/JobApplicants.tsx\` | Pipeline management page | ✓ VERIFIED | Wired to \`ApplicationService\` and \`KanbanBoard\`. |
+| \`src/features/applications/components/KanbanBoard.tsx\` | DND Kanban implementation | ✓ VERIFIED | Full \`@dnd-kit\` implementation for status transitions. |
+| \`src/server/routes.js\` | Standardized API routing | ✓ VERIFIED | Correctly routes \`/api/ai/*\` to the AI controller. |
 
 ### Key Link Verification
 
 | From | To  | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
-| `PostJob.tsx` | `/api/ai/generate-jd` | `fetch` | ✓ WIRED | Correctly sends role/skills; updates state. |
-| `JobApplicants.tsx` | `ApplicationService` | Method calls | ✓ WIRED | Fetches real applications from Firestore. |
-| `src/server/routes.js` | `aiRoutes` | `router.use` | ✓ WIRED | Maps `/api/embedding` and `/api/ai/*` correctly. |
+| \`PostJob.tsx\` | \`/api/ai/generate-jd\` | \`fetch\` | ✓ WIRED | Sends role/skills; updates form state with AI response. |
+| \`PostJob.tsx\` | \`/api/ai/generate-job-assist\` | \`fetch\` | ✓ WIRED | Sends JD; populates screening questions and suggestions. |
+| \`JobApplicants.tsx\` | \`ApplicationService\` | Method calls | ✓ WIRED | Fetches real applications and updates status on drop. |
+| \`src/server/routes.js\` | \`aiRoutes\` | \`router.use\` | ✓ WIRED | Maps \`/api/ai\` correctly for frontend consumption. |
 
 ### Requirements Coverage
 
 | Requirement | Status | Blocking Issue |
 | ----------- | ------ | -------------- |
-| EMP-01: AI JD Optimization | ✓ SATISFIED | Functional in `PostJob.tsx`. |
-| EMP-02: Screening Questions | ✓ SATISFIED | Generated by AI and saved to Firestore. |
+| EMP-01: AI JD Optimization | ✓ SATISFIED | Functional in \`PostJob.tsx\`. |
+| EMP-02: Screening Questions | ✓ SATISFIED | Generated via \`generate-job-assist\` and saved to Firestore. |
 | EMP-03: Kanban Pipeline | ✓ SATISFIED | Fully interactive and data-wired. |
-| EMP-04: Branding Page | ✓ SATISFIED | Publicly accessible via `/companies/:id`. |
+| EMP-04: Branding Page | ✓ SATISFIED | Publicly accessible via CompanyProfile. |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| `App.tsx` | 91 | Placeholder text | ℹ️ INFO | General dashboard is still "under construction". |
-| `PostJob.tsx` | 62 | Hardcoded prompt | ℹ️ INFO | "relevant experience" used as default in prompt. |
+| \`PostJob.tsx\` | 63 | Hardcoded value | ℹ️ INFO | "relevant experience" used as default if not provided. |
+| \`ai.service.js\` | 25, 59 | Regex parsing | ⚠️ WARNING | Relies on regex for JSON extraction; sensitive to LLM formatting. |
 
 ### Human Verification Required
 
-### 1. AI Generation Quality & Parsing
+### 1. AI Content Quality
 
-**Test:** Use "AI Generate" in `PostJob.tsx` multiple times.
-**Expected:** Description is generated reliably and JSON parsing of screening questions never fails.
-**Why human:** Subjective quality check and verification of parsing resilience with diverse LLM outputs.
+**Test:** Generate a JD for "Senior Product Manager" and then generate screening questions.
+**Expected:** The JD is professional and the screening questions are relevant to PM skills (e.g., roadmap, user research).
+**Why human:** Verify that Gemini output is high-quality and context-aware.
 
-### 2. Kanban Drag and Drop Persistance
+### 2. Kanban Drag Stability
 
-**Test:** Drag an applicant from 'Applied' to 'Interview' and refresh.
-**Expected:** Status update persists.
-**Why human:** Verify smooth UI interaction and backend sync.
+**Test:** Move an applicant between columns multiple times.
+**Expected:** UI remains responsive and the status update reflects accurately in the list.
+**Why human:** Verify \`@dnd-kit\` performance and Firestore sync smoothness.
 
 ### Gaps Summary
 
-Phase 04 is now structurally complete and fully verified. The critical gaps identified previously (ESM syntax, AI parsing, and missing navigation) have been successfully closed by Plans 04-04 and 04-05.
+Phase 04 goal of providing productivity tools for employers is now achieved. The AI assistance flow, which was previously broken, has been fully restored and standardized across the frontend and backend. The Kanban pipeline is fully functional and wired to real data.
 
 ---
 
