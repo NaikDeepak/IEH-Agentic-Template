@@ -39,7 +39,8 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     const embedding = data.embedding;
 
     if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
-        throw new Error("Embedding service returned invalid vector");
+        console.error(`Invalid embedding received. Expected ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : typeof embedding}`);
+        throw new Error(`Embedding service returned invalid vector. Expected dimension ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : 'non-array'}`);
     }
 
     return embedding;
