@@ -59,8 +59,10 @@ export const PostJob: React.FC = () => {
         },
         body: JSON.stringify({
           role: formData.title,
-          skills: formData.skills || "",
-          experience: "relevant experience"
+          skills: formData.skills || undefined,
+          location: formData.location || undefined,
+          type: formData.type,
+          workMode: formData.work_mode
         })
       });
 
@@ -211,41 +213,91 @@ export const PostJob: React.FC = () => {
         )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-12">
-          {/* Section 1: The Lead */}
+          {/* Section 1: The Basics */}
           <div className="space-y-6">
             <div className="bg-black text-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
               <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.3em] mb-4 block text-gray-400">What's the position?</label>
-              <div className="flex flex-col md:flex-row gap-4">
-                <input
-                  id="title"
-                  required
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="e.g. Senior Frontend Engineer"
-                  className="flex-grow bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-gray-700 py-2"
-                />
-                <button
-                  type="button"
-                  onClick={() => void handleAiGenerateJd()}
-                  disabled={generatingJd || !formData.title}
-                  className="flex items-center justify-center gap-3 bg-white text-black px-8 py-4 font-black uppercase tracking-widest hover:bg-gray-200 disabled:bg-gray-600 disabled:text-gray-400 transition-all shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)] active:shadow-none"
-                >
-                  {generatingJd ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-5 h-5 text-yellow-500" />
-                  )}
-                  Auto-Fill Details
-                </button>
-              </div>
-              <p className="text-[10px] font-mono mt-4 text-gray-500 uppercase tracking-widest">
-                Tip: Enter a title and click "Auto-Fill" to generate a full JD and suggested skills using AI.
-              </p>
+              <input
+                id="title"
+                required
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="e.g. Senior Frontend Engineer"
+                className="w-full bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-gray-700 py-2"
+              />
             </div>
           </div>
 
-          {/* Section 2: Role Details */}
+          {/* Section 2: Role Context */}
+          <div className="space-y-8">
+            <div>
+              <label htmlFor="skills" className={labelClasses}>Core Skills (Comma separated)</label>
+              <input
+                id="skills"
+                required
+                name="skills"
+                value={formData.skills}
+                onChange={handleChange}
+                placeholder="e.g. React, TypeScript, Node.js"
+                className={inputClasses}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label htmlFor="location" className={labelClasses}>Location</label>
+                <input
+                  id="location"
+                  required
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g. Remote or City"
+                  className={inputClasses}
+                />
+              </div>
+              <div>
+                <label htmlFor="type" className={labelClasses}>Type</label>
+                <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClasses}>
+                  <option value="FULL_TIME">FULL TIME</option>
+                  <option value="PART_TIME">PART TIME</option>
+                  <option value="CONTRACT">CONTRACT</option>
+                  <option value="INTERNSHIP">INTERNSHIP</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="work_mode" className={labelClasses}>Mode</label>
+                <select id="work_mode" name="work_mode" value={formData.work_mode} onChange={handleChange} className={inputClasses}>
+                  <option value="REMOTE">REMOTE</option>
+                  <option value="HYBRID">HYBRID</option>
+                  <option value="ONSITE">ON-SITE</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Generation Action */}
+          <div className="flex flex-col items-center gap-4 py-4 border-y-2 border-dashed border-gray-200">
+            <button
+              type="button"
+              onClick={() => void handleAiGenerateJd()}
+              disabled={generatingJd || !formData.title}
+              className="flex items-center justify-center gap-3 bg-black text-white px-8 py-4 font-black uppercase tracking-widest hover:bg-gray-800 disabled:bg-gray-400 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none w-full md:w-auto"
+            >
+              {generatingJd ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+              )}
+              Generate Description with AI
+            </button>
+            <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest text-center">
+              Uses Title, Skills, and Location to create a tailored description.
+            </p>
+          </div>
+
+          {/* Section 3: Description */}
           <div className="space-y-12">
             <div className="grid grid-cols-1 gap-8">
               <div>
@@ -265,51 +317,6 @@ export const PostJob: React.FC = () => {
                   placeholder="Describe the role, responsibilities, and requirements..."
                   className={inputClasses}
                 />
-              </div>
-
-              <div>
-                <label htmlFor="skills" className={labelClasses}>Core Skills (Comma separated)</label>
-                <input
-                  id="skills"
-                  required
-                  name="skills"
-                  value={formData.skills}
-                  onChange={handleChange}
-                  placeholder="e.g. React, TypeScript, Node.js"
-                  className={inputClasses}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label htmlFor="location" className={labelClasses}>Location</label>
-                  <input
-                    id="location"
-                    required
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="e.g. Remote or City"
-                    className={inputClasses}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="type" className={labelClasses}>Type</label>
-                  <select id="type" name="type" value={formData.type} onChange={handleChange} className={inputClasses}>
-                    <option value="FULL_TIME">FULL TIME</option>
-                    <option value="PART_TIME">PART TIME</option>
-                    <option value="CONTRACT">CONTRACT</option>
-                    <option value="INTERNSHIP">INTERNSHIP</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="work_mode" className={labelClasses}>Mode</label>
-                  <select id="work_mode" name="work_mode" value={formData.work_mode} onChange={handleChange} className={inputClasses}>
-                    <option value="REMOTE">REMOTE</option>
-                    <option value="HYBRID">HYBRID</option>
-                    <option value="ONSITE">ON-SITE</option>
-                  </select>
-                </div>
               </div>
             </div>
 
@@ -432,6 +439,7 @@ export const PostJob: React.FC = () => {
                     aria-label="Maximum Salary"
                   />
                   <select name="currency" value={formData.currency} onChange={handleChange} className={inputClasses} aria-label="Currency">
+                    <option value="INR">INR</option>
                     <option value="USD">USD</option>
                     <option value="EUR">EUR</option>
                     <option value="GBP">GBP</option>

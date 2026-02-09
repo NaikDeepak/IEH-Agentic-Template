@@ -5,10 +5,12 @@ import { generateEmbedding } from '../../lib/gemini.js';
 
 const ai = new GoogleGenAI({ apiKey: config.apiKey });
 
-export const generateJD = async (role, skills, experience) => {
+export const generateJD = async (role, skills, location, type, workMode) => {
     const prompt = `Generate a professional job description for a ${role}.
+${location ? `Location: ${location}` : ''}
+${type ? `Job Type: ${type}` : ''}
+${workMode ? `Work Mode: ${workMode}` : ''}
 ${skills ? `Skills to include: ${skills}` : 'Please suggest 5-8 relevant modern skills for this role.'}
-${experience ? `Experience required: ${experience}` : 'Assume relevant experience is needed.'}
 
 Format the response as a JSON object:
 {

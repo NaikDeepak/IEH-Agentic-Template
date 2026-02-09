@@ -2,14 +2,14 @@ import * as aiService from './ai.service.js';
 
 export const generateJD = async (req, res, next) => {
     try {
-        const { role, skills, experience } = req.body;
+        const { role, skills, location, type, workMode } = req.body;
         if (!role) {
             const error = new Error("Job Title (role) is required");
             error.statusCode = 400;
             throw error;
         }
 
-        const result = await aiService.generateJD(role, skills, experience);
+        const result = await aiService.generateJD(role, skills, location, type, workMode);
         res.json(result);
     } catch (error) {
         next(error);
