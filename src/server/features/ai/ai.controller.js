@@ -3,14 +3,30 @@ import * as aiService from './ai.service.js';
 export const generateJD = async (req, res, next) => {
     try {
         const { role, skills, experience } = req.body;
-        if (!role || !skills || !experience) {
-            const error = new Error("Missing required fields: role, skills, experience");
+        if (!role) {
+            const error = new Error("Job Title (role) is required");
             error.statusCode = 400;
             throw error;
         }
 
-        const jd = await aiService.generateJD(role, skills, experience);
-        res.json({ jd });
+        const result = await aiService.generateJD(role, skills, experience);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const generateJobAssist = async (req, res, next) => {
+    try {
+        const { jd } = req.body;
+        if (!jd) {
+            const error = new Error("Job Description (jd) is required");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const assistData = await aiService.generateJobAssist(jd);
+        res.json(assistData);
     } catch (error) {
         next(error);
     }
