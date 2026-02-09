@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 04-employer-suite
-source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-07-SUMMARY.md
-started: 2026-02-09T00:00:00Z
-updated: 2026-02-09T01:30:00Z
+source: [04-01, 04-02, 04-03, 04-06, 04-08]
+started: 2026-02-09T12:00:00Z
+updated: 2026-02-09T12:10:00Z
 ---
 
 ## Current Test
@@ -29,25 +29,26 @@ expected: |
   View Public Profile - changes should be visible.
 result: pass
 
-### 3. AI Job Posting Tools
+### 3. AI Job Posting Tools (Fix Verification)
 expected: |
   Navigate to "Post a Job".
   Enter a Job Title (e.g., "Senior React Developer").
-  Click "Generate Description" - AI should fill the JD field (now works without Skills).
+  Click "Generate Description" - AI should fill the JD field.
   Click "Generate Screening Questions" - AI should populate questions.
+  **Verify no "Missing required fields" error.**
 result: issue
-reported: "fail , as after entering Postion and clicking Auto Fill button , we get error [ERROR]: Missing required fields: role, skills, experience, after providing details the Auto Fill works But AI Suggest Questions still fails"
+reported: "User requested UI flow change: Arrange fields (Position, Skills, Location, Type, Mode) before JD generation for better flow. Still facing issues with generation."
 severity: major
 
-### 4. Job Creation & Listing
+### 4. Job Creation & Listing (Fix Verification)
 expected: |
   Complete the job post form and submit.
   Redirects to "Manage Jobs".
   New job appears in the list.
   Status should be "Active".
-result: issue
-reported: "fail, Error posting job: Error: Embedding service returned invalid vector at fetchEmbedding (jobService.ts:42:15) at async Object.createJob (jobService.ts:73:31) at async handleSubmit (PostJob.tsx:169:7)"
-severity: blocker
+  **Verify no "Embedding service returned invalid vector" error.**
+result: skipped
+reason: "User requested to hold testing to fix Test 3 issue first."
 
 ### 5. ATS Kanban Board
 expected: |
@@ -57,57 +58,24 @@ expected: |
   Verify applicant cards appear.
   Drag a card to a different column - status updates immediately.
 result: skipped
-reason: "User paused testing to fix blockers"
+reason: "User requested to hold testing to fix Test 3 issue first."
 
 ## Summary
 
 total: 5
 passed: 2
-issues: 2
+issues: 1
 pending: 0
-skipped: 1
+skipped: 2
 
 ## Gaps
 
-- truth: "AI tools (description & questions) work smoothly with minimal required fields"
+- truth: "Job posting flow is logical and AI generation works reliably"
   status: failed
-  reason: "User reported: fail , as after entering Postion and clicking Auto Fill button , we get error [ERROR]: Missing required fields: role, skills, experience, after providing details the Auto Fill works But AI Suggest Questions still fails"
+  reason: "User reported: Arrange fields (Position, Skills, Location, Type, Mode) before JD generation for better flow."
   severity: major
   test: 3
-  root_cause: "Frontend sends 'undefined' for skills/experience which JSON.stringify removes; backend requires them. Also potential API quota exhaustion."
-  artifacts:
-    - path: "src/pages/PostJob.tsx"
-      issue: "Sends undefined for optional fields"
-  missing:
-    - "Ensure default empty strings for skills/experience in API payload"
-    - "Add error handling for API quota limits"
-  debug_session: ".planning/debug/ai-tools-failure.md"
-
-- truth: "Job creation succeeds and generates embeddings"
-  status: failed
-  reason: "User reported: fail, Error posting job: Error: Embedding service returned invalid vector at fetchEmbedding (jobService.ts:42:15) at async Object.createJob (jobService.ts:73:31) at async handleSubmit (PostJob.tsx:169:7)"
-  severity: blocker
-  test: 4
-  root_cause: "Embedding dimension mismatch. Frontend expects 1536 (text-embedding-004), backend may be returning 768 (older model or config ignored) or failing silently."
-  artifacts:
-    - path: "src/features/jobs/services/jobService.ts"
-      issue: "Strict validation of embedding length"
-    - path: "functions/index.js"
-      issue: "Need to verify model output dimensions"
-  missing:
-    - "Verify backend model configuration for 1536 dimensions"
-    - "Relax frontend validation or ensure backend compliance"
-  debug_session: ".planning/debug/embedding-invalid-vector.md"
-
-- truth: "ATS Kanban board works for created jobs"
-  status: fixed
-  reason: "Fixed in plan 04-07"
-  severity: blocker
-  test: 5
-  root_cause: "Cascading failure from Job Creation + Implementation bug: ApplicantCard used useDraggable inside SortableContext (requires useSortable)."
-  artifacts:
-    - path: "src/features/applications/components/ApplicantCard.tsx"
-      issue: "Used useDraggable instead of useSortable"
-  missing:
-    - "Refactor ApplicantCard to use useSortable"
-  debug_session: ".planning/debug/resolved/ats-kanban-empty.md"
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
