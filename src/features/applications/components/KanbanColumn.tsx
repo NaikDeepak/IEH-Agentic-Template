@@ -32,11 +32,11 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applicati
         className="flex-grow min-h-[500px] bg-gray-50 border-2 border-dashed border-gray-200 p-3 flex flex-col gap-3 transition-colors hover:border-black"
       >
         <SortableContext
-          items={applications.map(app => app.id ?? '')}
+          items={applications.map(app => app.id).filter((id): id is string => !!id)}
           strategy={verticalListSortingStrategy}
         >
           {applications.map((application) => (
-            <ApplicantCard key={application.id} application={application} />
+            application.id && <ApplicantCard key={application.id} application={application} />
           ))}
         </SortableContext>
 
