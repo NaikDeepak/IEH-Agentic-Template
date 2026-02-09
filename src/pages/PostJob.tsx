@@ -59,7 +59,7 @@ export const PostJob: React.FC = () => {
         },
         body: JSON.stringify({
           role: formData.title,
-          skills: formData.skills || undefined,
+          skills: formData.skills || "",
           experience: "relevant experience"
         })
       });
