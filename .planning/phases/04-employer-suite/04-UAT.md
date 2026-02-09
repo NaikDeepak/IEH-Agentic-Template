@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-employer-suite
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-07-SUMMARY.md
 started: 2026-02-09T00:00:00Z
-updated: 2026-02-09T01:15:00Z
+updated: 2026-02-09T01:30:00Z
 ---
 
 ## Current Test
@@ -74,20 +74,30 @@ skipped: 1
   reason: "User reported: fail , as after entering Postion and clicking Auto Fill button , we get error [ERROR]: Missing required fields: role, skills, experience, after providing details the Auto Fill works But AI Suggest Questions still fails"
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Frontend sends 'undefined' for skills/experience which JSON.stringify removes; backend requires them. Also potential API quota exhaustion."
+  artifacts:
+    - path: "src/pages/PostJob.tsx"
+      issue: "Sends undefined for optional fields"
+  missing:
+    - "Ensure default empty strings for skills/experience in API payload"
+    - "Add error handling for API quota limits"
+  debug_session: ".planning/debug/ai-tools-failure.md"
 
 - truth: "Job creation succeeds and generates embeddings"
   status: failed
   reason: "User reported: fail, Error posting job: Error: Embedding service returned invalid vector at fetchEmbedding (jobService.ts:42:15) at async Object.createJob (jobService.ts:73:31) at async handleSubmit (PostJob.tsx:169:7)"
   severity: blocker
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Embedding dimension mismatch. Frontend expects 1536 (text-embedding-004), backend may be returning 768 (older model or config ignored) or failing silently."
+  artifacts:
+    - path: "src/features/jobs/services/jobService.ts"
+      issue: "Strict validation of embedding length"
+    - path: "functions/index.js"
+      issue: "Need to verify model output dimensions"
+  missing:
+    - "Verify backend model configuration for 1536 dimensions"
+    - "Relax frontend validation or ensure backend compliance"
+  debug_session: ".planning/debug/embedding-invalid-vector.md"
 
 - truth: "ATS Kanban board works for created jobs"
   status: fixed
