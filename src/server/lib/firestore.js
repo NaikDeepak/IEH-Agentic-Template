@@ -77,7 +77,17 @@ export const runVectorSearch = async (collectionName, queryVector, filters = [],
                 const magB = Math.sqrt(queryVector.reduce((sum, val) => sum + val * val, 0));
 
                 if (magA && magB) {
-                    const dotProduct = vecArray.reduce((sum, val, i) => sum + val * queryVector[i], 0);
+                    const len = Math.min(vecArray.length, queryVector.length);
+                    if (vecArray.length !== queryVector.length) {
+                        console.warn(`[Firestore] Vector dimension mismatch: stored=${vecArray.length}, query=${queryVector.length}`);
+                    }
+
+                    // Safe dot product calculation
+                    let dotProduct = 0;
+                    for (let i = 0; i < len; i++) {
+                        dotProduct += vecArray[i] * queryVector[i];
+                    }
+
                     const similarity = dotProduct / (magA * magB);
                     matchScore = Math.max(0, Math.min(100, Math.round(similarity * 100)));
                 }

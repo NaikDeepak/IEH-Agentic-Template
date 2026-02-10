@@ -42,9 +42,11 @@ export const EmployerJobs: React.FC = () => {
   };
 
   // Helper to map JobPosting to Job type expected by JobCard
-  const mapJobPostingToJob = (jp: JobPosting): Job => {
+  const mapJobPostingToJob = (jp: JobPosting & { id: string }): Job => {
+    const normalizedType = (jp.type.toLowerCase().replace('_', '-')) as Job['type'];
+
     return {
-      id: jp.id ?? '',
+      id: jp.id,
       employerId: jp.employer_id,
       title: jp.title,
       description: jp.description,
@@ -54,7 +56,7 @@ export const EmployerJobs: React.FC = () => {
       createdAt: jp.created_at,
       updatedAt: jp.updated_at,
       location: jp.location,
-      type: jp.type.toLowerCase().replace('_', '-') as Job['type'],
+      type: normalizedType,
       salaryRange: jp.salary_range
     };
   };
@@ -106,14 +108,20 @@ export const EmployerJobs: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {jobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={mapJobPostingToJob(job)}
-                onViewApplicants={() => { if (job.id) handleViewApplicants(job.id); }}
-                onClick={() => { if (job.id) void navigate(`/jobs?id=${job.id}`); }}
-              />
-            ))}
+            {jobs
+              .filter((job): job is JobPosting & { id: string } => !!job.id)
+              .map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={mapJobPostingToJob(job)}
+                  onViewApplicants={() => {
+                    handleViewApplicants(job.id);
+                  }}
+                  onClick={() => {
+                    void navigate(`/jobs?id=${job.id}`);
+                  }}
+                />
+              ))}
           </div>
         )}
       </main>

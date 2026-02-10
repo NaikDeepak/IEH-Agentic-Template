@@ -77,10 +77,13 @@ export const JobService = {
             const now = new Date();
             const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
 
+            // Destructure to separate company_bio for conditional inclusion
+            const { company_bio, ...restInput } = input;
+
             const jobData = {
-                ...input,
+                ...restInput,
                 company_id: companyId,
-                company_bio: input.company_bio ?? null,
+                ...(company_bio && { company_bio }),
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
