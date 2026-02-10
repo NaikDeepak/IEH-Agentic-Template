@@ -94,7 +94,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-09-PLAN.md — Context-Aware Job Posting Flow (Gap Closure)
 - [x] 04-10-PLAN.md — Relaxed AI Validation & Employer Dashboard (Gap Closure)
 - [x] 04-11-PLAN.md — Fix Dashboard Index & Company Prefill (Gap Closure)
-- [ ] 04-12-PLAN.md — Fix ATS Kanban Permissions (Gap Closure)
+- [x] 04-12-PLAN.md — Fix ATS Kanban Permissions (Gap Closure)
 
 ### Phase 5: Seeker Tools
 **Goal**: AI-powered preparation, analysis, and career insights

@@ -1,13 +1,12 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-employer-suite
 source: 04-01 through 04-11 summaries
 started: 2026-02-10T00:00:00Z
-updated: 2026-02-10T12:25:00Z
+updated: 2026-02-10T12:30:00Z
 ---
 
 ## Current Test
-<!-- OVERWRITE each test - shows where we are -->
 
 [testing complete]
 
@@ -71,7 +70,10 @@ skipped: 0
   reason: "User reported: step 4 fails , doesnt save  due to installHook.js:1 Failed to update status: FirebaseError: Missing or insufficient permissions."
   severity: blocker
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Missing 'allow update' rule in firestore.rules for applications collection."
+  artifacts:
+    - path: "firestore.rules"
+      issue: "No update permission for applications"
+  missing:
+    - "Add update rule allowing employer to change status"
+  debug_session: ".planning/debug/kanban-permission-error.md"
