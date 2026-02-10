@@ -11,6 +11,8 @@ import dotenv from "dotenv";
 import { GoogleAuth } from "google-auth-library";
 import nodemailer from "nodemailer";
 
+import { marketProxy } from "./src/marketProxy.js";
+
 dotenv.config({ path: ".env.production" });
 dotenv.config();
 
@@ -401,6 +403,7 @@ app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin'
 
 // Expose the Express API as a single Cloud Function
 export const api = onRequest(app);
+export { marketProxy };
 
 // --- Scheduled Functions ---
 
