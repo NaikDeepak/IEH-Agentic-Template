@@ -1,22 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 04-employer-suite
 source: [04-01, 04-02, 04-03, 04-06, 04-08, 04-09]
 started: 2026-02-09T12:00:00Z
-updated: 2026-02-09T12:45:00Z
+updated: 2026-02-09T12:55:00Z
 ---
 
 ## Current Test
 
-number: 4
-name: Job Creation & Listing (Fix Verification)
-expected: |
-  Complete the job post form and submit.
-  Redirects to "Manage Jobs".
-  New job appears in the list.
-  Status should be "Active".
-  **Verify no "Embedding service returned invalid vector" error.**
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -57,7 +49,7 @@ expected: |
   New job appears in the list.
   Status should be "Active".
   **Verify no "Embedding service returned invalid vector" error.**
-result: pending
+result: pass
 
 ### 5. ATS Kanban Board
 expected: |
@@ -66,14 +58,16 @@ expected: |
   If empty, run `npx tsx scripts/seed-applications.ts [jobId]`.
   Verify applicant cards appear.
   Drag a card to a different column - status updates immediately.
-result: pending
+result: issue
+reported: "from which screen I can check this"
+severity: major
 
 ## Summary
 
 total: 5
-passed: 2
-issues: 1
-pending: 2
+passed: 3
+issues: 2
+pending: 0
 skipped: 0
 
 ## Gaps
@@ -91,3 +85,13 @@ skipped: 0
     - "Restart local development server to apply backend changes"
     - "Verify no stale validation logic in build artifacts"
   debug_session: ".planning/debug/ai-generation-400-error.md"
+
+- truth: "ATS Kanban board is easily accessible and functional"
+  status: failed
+  reason: "User reported: from which screen I can check this"
+  severity: major
+  test: 5
+  root_cause: "Navigation/UX issue: The entry point to the Kanban board ('View Applicants' button) is not obvious or is missing from the Manage Jobs screen."
+  artifacts: []
+  missing: []
+  debug_session: ""
