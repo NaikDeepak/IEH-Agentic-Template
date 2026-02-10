@@ -32,6 +32,7 @@ export const searchJobs = async (searchQuery, location, limit = CONSTANTS.DEFAUL
 
     // 3. Generate Embedding
     const queryVector = await gemini.generateEmbedding(semanticQuery);
+    console.log(`[JobsService] Generated embedding length: ${queryVector ? queryVector.length : 'null'}`);
 
     // 4. Run Vector Search
     let jobs = await runVectorSearch(CONSTANTS.FIREBASE.COLLECTIONS.JOBS, queryVector, filters, limit, authToken);

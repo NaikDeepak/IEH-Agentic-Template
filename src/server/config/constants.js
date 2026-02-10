@@ -1,7 +1,7 @@
 export const CONSTANTS = {
     AI: {
         MODEL_FAST: 'gemini-2.0-flash',
-        MODEL_EMBEDDING: 'gemini-embedding-001', // Used in REST API URL
+        MODEL_EMBEDDING: 'models/gemini-embedding-001',
         EMBEDDING_DIMENSIONS: 768,
         API_VERSION: 'v1beta',
     },
@@ -11,7 +11,7 @@ export const CONSTANTS = {
             USERS: 'users',
         },
         URLS: {
-            FIRESTORE_RUN_QUERY: 'https://firestore.googleapis.com/v1/projects/{projectId}/databases/(default)/documents:runQuery',
+            FIRESTORE_RUN_QUERY: 'https://firestore.googleapis.com/v1beta1/projects/{projectId}/databases/(default)/documents:runQuery',
         }
     },
     DEFAULTS: {

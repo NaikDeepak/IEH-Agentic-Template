@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDraggable } from '@dnd-kit/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { Application } from '../types';
 import { User, Briefcase, Zap } from 'lucide-react';
 
@@ -8,13 +9,21 @@ interface ApplicantCardProps {
 }
 
 export const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => {
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({
         id: application.id ?? '',
     });
 
-    const style = transform ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    } : undefined;
+    const style = {
+        transform: CSS.Translate.toString(transform),
+        transition,
+    };
 
     return (
         <div
@@ -25,7 +34,7 @@ export const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => 
             className={`
                 bg-white border-2 border-black p-4 mb-3 cursor-grab active:cursor-grabbing
                 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all
-                ${isDragging ? 'opacity-50 shadow-none' : 'opacity-100'}
+                ${isDragging ? 'opacity-50 shadow-none z-50' : 'opacity-100'}
             `}
         >
             <div className="flex justify-between items-start mb-3">

@@ -9,7 +9,7 @@ Implement bi-directional semantic matching to connect candidates and jobs based 
 3.  **Scoring & Ranking**: Display a "Match Score" to users to indicate relevance.
 
 ## Key Concepts
--   **Vector Search**: Using Google's `text-embedding-004` model to convert text into 768-dimensional vectors.
+-   **Vector Search**: Using Google's `models/gemini-embedding-001` model to convert text into 768-dimensional vectors.
 -   **Cosine Similarity**: Measuring the angle between vectors to determine similarity.
 -   **Query Expansion**: Using a LLM to expand a user's short query into a richer semantic description before embedding.
 -   **Hard Filters vs. Soft Filters**:

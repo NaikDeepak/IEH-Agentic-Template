@@ -1,44 +1,69 @@
 import { GoogleGenAI } from '@google/genai';
+import { z } from "zod";
 import { config } from '../config/index.js';
 import { CONSTANTS } from '../config/constants.js';
 
 const ai = new GoogleGenAI({ apiKey: config.apiKey });
 
+// Zod Schema for Analyze Query Response
+const QueryAnalysisSchema = z.object({
+    semanticQuery: z.string(),
+    filters: z.object({
+        location: z.string().nullable().optional(),
+        work_mode: z.string().nullable().optional(),
+        min_salary: z.coerce.number().nullable().optional(),
+        job_type: z.string().nullable().optional()
+    }).optional().default({})
+});
+
 /**
- * Generate embedding for a given text using gemini-embedding-001/text-embedding-004
- * @param {string} text 
+ * Generate embedding for a given text using gemini-embedding-001
+ * @param {string} text
  * @returns {Promise<number[]>}
  */
 export const generateEmbedding = async (text) => {
     try {
-        const { MODEL_EMBEDDING, EMBEDDING_DIMENSIONS, API_VERSION } = CONSTANTS.AI;
+        const { MODEL_EMBEDDING } = CONSTANTS.AI;
 
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/${API_VERSION}/models/${MODEL_EMBEDDING}:embedContent?key=${config.apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: { parts: [{ text }] },
-                    outputDimensionality: EMBEDDING_DIMENSIONS
-                })
+        // Use the unified client entry point for the new @google/genai SDK
+        const response = await ai.models.embedContent({
+            model: MODEL_EMBEDDING,
+            contents: [{ parts: [{ text }] }],
+            outputDimensionality: CONSTANTS.AI.EMBEDDING_DIMENSIONS
+        });
+
+        // Simple Zod check for values (runtime validation)
+        const EmbeddingValuesSchema = z.array(z.number());
+
+        if (response.embedding?.values) {
+            let values = EmbeddingValuesSchema.parse(response.embedding.values);
+            // Matryoshka embedding slicing - if supported by model
+            if (values.length > CONSTANTS.AI.EMBEDDING_DIMENSIONS) {
+                console.warn(`[Gemini] Slicing embedding from ${values.length} to ${CONSTANTS.AI.EMBEDDING_DIMENSIONS}`);
+                values = values.slice(0, CONSTANTS.AI.EMBEDDING_DIMENSIONS);
             }
-        );
-
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Embedding API failed: ${response.status} ${errText}`);
+            console.log(`[Gemini] Generated embedding with dimension: ${values.length}`);
+            return values;
+        }
+        if (response.embeddings?.[0]?.values) {
+            let values = EmbeddingValuesSchema.parse(response.embeddings[0].values);
+            // Matryoshka embedding slicing
+            if (values.length > CONSTANTS.AI.EMBEDDING_DIMENSIONS) {
+                console.warn(`[Gemini] Slicing embedding from ${values.length} to ${CONSTANTS.AI.EMBEDDING_DIMENSIONS}`);
+                values = values.slice(0, CONSTANTS.AI.EMBEDDING_DIMENSIONS);
+            }
+            console.log(`[Gemini] Generated embedding with dimension: ${values.length}`);
+            return values;
         }
 
-        const data = await response.json();
-
-        if (data?.embedding?.values) {
-            return data.embedding.values;
-        }
-
+        console.error("Gemini Embedding Response:", JSON.stringify(response, null, 2));
         throw new Error("Invalid embedding response from Gemini API");
     } catch (error) {
         console.error("Embedding generation failed:", error);
+        // Log the full error object if it has a response property (common in Google APIs)
+        if (error.response) {
+            console.error("Error Response:", JSON.stringify(error.response, null, 2));
+        }
         throw error;
     }
 };
@@ -81,11 +106,19 @@ export const analyzeQuery = async (originalQuery, context) => {
 
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
-        const result = JSON.parse(responseText);
+        const rawResult = JSON.parse(responseText);
+
+        // Zod Validation
+        const result = QueryAnalysisSchema.parse(rawResult);
+
         return result;
 
     } catch (error) {
-        console.warn(`Query analysis failed for "${originalQuery}". Using defaults. Error: ${error.message}`);
+        if (error instanceof z.ZodError) {
+            console.warn(`Query analysis validation failed for "${originalQuery}":`, error.issues);
+        } else {
+            console.warn(`Query analysis failed for "${originalQuery}". Using defaults. Error: ${error.message}`);
+        }
         return {
             semanticQuery: originalQuery,
             filters: {}

@@ -19,12 +19,14 @@ export interface JobPosting {
     location: string;
     type: JobType;
     work_mode: WorkMode;
+    experience: string;
     salary_range?: {
         min: number;
         max: number;
         currency: string;
     };
     contactEmail: string;
+    company_bio?: string;
     status: JobStatus;
     screening_questions?: ScreeningQuestion[];
     lastActiveAt?: Timestamp | FieldValue;
@@ -41,8 +43,10 @@ export interface CreateJobInput {
     location: string;
     type: JobType;
     work_mode: WorkMode;
+    experience: string;
     employer_id: string; // Ideally passed from Auth Context
     company_id?: string;
+    company_bio?: string;
     contactEmail: string;
     salary_range?: {
         min: number;

@@ -1,4 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+
+import { EMBEDDING_DIMENSION, EMBEDDING_MODEL } from "./constants";
 
 // Server-only: Lazy initialization to avoid crashes on client-side imports
 let aiInstance: GoogleGenAI | null = null;
@@ -17,10 +20,22 @@ function getAI(): GoogleGenAI {
 }
 
 /**
- * Generates a vector embedding for the given text using gemini-embedding-exp-03-07 or text-embedding-004.
- * We use 'text-embedding-004' as the stable standard for now.
+ * Generates a vector embedding for the given text using gemini-embedding-001.
  */
-export const EMBEDDING_DIMENSION = 768;
+// Re-export for backward compatibility if needed, though direct import from constants is preferred
+export { EMBEDDING_DIMENSION } from "./constants";
+
+// Zod schema for a single embedding object
+const ContentEmbeddingSchema = z.object({
+    values: z.array(z.number()).length(EMBEDDING_DIMENSION)
+});
+
+// Zod schema for the overall Gemini response
+// Handles both 'embeddings' (plural) and 'embedding' (singular) fields
+const GeminiEmbeddingResponseSchema = z.object({
+    embeddings: z.array(ContentEmbeddingSchema).optional(),
+    embedding: ContentEmbeddingSchema.optional()
+});
 
 export async function generateEmbedding(text: string): Promise<number[]> {
     if (!text.trim()) return [];
@@ -28,39 +43,40 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     try {
         const client = getAI();
         const response = await client.models.embedContent({
-            model: "text-embedding-004",
+            model: EMBEDDING_MODEL,
             contents: [
                 {
                     parts: [{ text }],
                 },
             ],
+            config: {
+                outputDimensionality: EMBEDDING_DIMENSION
+            }
         });
 
-        const validate = (values: unknown): number[] | null => {
-            if (!Array.isArray(values) || values.length !== EMBEDDING_DIMENSION) return null;
-            const first = values[0] as number | undefined;
-            const last = values[EMBEDDING_DIMENSION - 1] as number | undefined;
-            if (first === undefined || last === undefined || !Number.isFinite(first) || !Number.isFinite(last)) return null;
-            return values as number[];
-        };
+        // Parse and validate the response structure using Zod
+        const parsed = GeminiEmbeddingResponseSchema.parse(response);
 
-        // The SDK defines embeddings as an array
-        if (response.embeddings?.[0]) {
-            const v = validate(response.embeddings[0].values);
-            if (v) return v;
+        // Check for singular 'embedding' first (standard for embedContent)
+        if (parsed.embedding) {
+            return parsed.embedding.values;
         }
 
-        // Add a fallthrough for potential singular embedding in future/other versions if needed, 
-        // but handle it via unknown cast to avoid type errors
-        const responseAny = response as unknown as { embedding?: { values: number[] } };
-        if (responseAny.embedding) {
-            const v = validate(responseAny.embedding.values);
-            if (v) return v;
+        // Check for plural 'embeddings' (legacy or batch fallback)
+        if (parsed.embeddings && parsed.embeddings.length > 0) {
+            const firstEmbedding = parsed.embeddings[0];
+            if (firstEmbedding) {
+                return firstEmbedding.values;
+            }
         }
 
-        throw new Error("Invalid embedding response from Gemini API");
+        throw new Error("Invalid embedding response structure: missing embedding data");
     } catch (error) {
-        console.error("Failed to generate embedding:", error);
+        if (error instanceof z.ZodError) {
+            console.error("Zod Validation Error in generateEmbedding:", error.issues);
+        } else {
+            console.error("Failed to generate embedding:", error);
+        }
         throw error;
     }
 }

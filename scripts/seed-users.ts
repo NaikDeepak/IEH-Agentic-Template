@@ -118,8 +118,49 @@ const sampleUsers: SeedUser[] = [
   }
 ];
 
+import { GoogleGenAI } from '@google/genai';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { CONSTANTS } from '../src/server/config/constants.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+
+async function getEmbedding(text: string): Promise<number[]> {
+  if (!ai) {
+    console.warn('Warning: No API_KEY found. Using placeholder embedding.');
+    return [1, ...new Array(767).fill(0)];
+  }
+  try {
+    const res = await ai.models.embedContent({
+      model: CONSTANTS.AI.MODEL_EMBEDDING,
+      contents: [{ parts: [{ text }] }],
+      config: {
+        outputDimensionality: CONSTANTS.AI.EMBEDDING_DIMENSIONS
+      }
+    });
+
+    const responseAny = res as any;
+    const values = responseAny.embedding?.values || responseAny.embeddings?.[0]?.values;
+
+    if (values && values.length === CONSTANTS.AI.EMBEDDING_DIMENSIONS) {
+      return values;
+    }
+    console.warn(`Warning: Invalid embedding length ${values?.length}. Using placeholder.`);
+    return [1, ...new Array(CONSTANTS.AI.EMBEDDING_DIMENSIONS - 1).fill(0)];
+  } catch (err) {
+    console.error('Embedding error:', err);
+    return [1, ...new Array(767).fill(0)];
+  }
+}
+
 async function seedUsers(): Promise<void> {
-  console.log('Seeding users (candidates) to Firestore...\n');
+  console.log('Seeding users (candidates) to Firestore with Real Embeddings...\n');
 
   const usersRef = db.collection(USERS_COLLECTION);
   const now = new Date();
@@ -131,6 +172,16 @@ async function seedUsers(): Promise<void> {
     // Expiration logic: 4 days from now if active
     const expiresAt = Timestamp.fromDate(new Date(now.getTime() + FOUR_DAYS_MS));
 
+    // Generate Real Embedding
+    const semanticText = `
+        Candidate: ${user.displayName}
+        Skills: ${user.skills.join(", ")}
+        Bio: ${user.bio}
+    `.trim();
+
+    console.log(`Generating embedding for: ${user.displayName}...`);
+    const embeddingVector = await getEmbedding(semanticText);
+
     // Create user document
     const userData = {
       ...user,
@@ -140,20 +191,18 @@ async function seedUsers(): Promise<void> {
       updated_at: FieldValue.serverTimestamp(),
       lastActiveAt,
       expiresAt,
-      // Placeholder embedding (must be non-zero magnitude for cosine distance)
-      // We use a unit vector [1, 0, 0...] to ensure valid vector math
-      embedding: FieldValue.vector([1, ...new Array(767).fill(0)])
+      embedding: FieldValue.vector(embeddingVector)
     };
 
     // Remove the id from the data payload, use it for document ID
     const { id, ...dataToSave } = userData;
 
     if (id) {
-        await usersRef.doc(id).set(dataToSave);
-        console.log(`✓ Created/Updated: ${user.displayName} (${id}) - ${user.status}`);
+      await usersRef.doc(id).set(dataToSave);
+      console.log(`✓ Created/Updated: ${user.displayName} (${id}) - ${user.status}`);
     } else {
-        const docRef = await usersRef.add(dataToSave);
-        console.log(`✓ Created: ${user.displayName} (${docRef.id}) - ${user.status}`);
+      const docRef = await usersRef.add(dataToSave);
+      console.log(`✓ Created: ${user.displayName} (${docRef.id}) - ${user.status}`);
     }
 
     created++;

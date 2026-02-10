@@ -32,7 +32,7 @@ describe('Functions: API Handlers', () => {
         it('should generate JD on success', async () => {
             req.body = { role: 'Dev', skills: 'JS', experience: '5y' };
             const generateContentMock = vi.fn().mockResolvedValueOnce({
-                text: () => 'Mocked JD'
+                text: () => JSON.stringify({ jd: 'Mocked JD' })
             });
 
             vi.spyOn(GoogleGenAI.prototype, 'models', 'get').mockReturnValue({
@@ -46,6 +46,7 @@ describe('Functions: API Handlers', () => {
         });
 
         it('should handle missing API key', async () => {
+            req.body = { role: 'Dev' };
             delete process.env['API_KEY'];
             delete process.env['GEMINI_API_KEY'];
 
@@ -60,7 +61,7 @@ describe('Functions: API Handlers', () => {
         it('should return embedding on success', async () => {
             req.body = { text: 'test' };
             const embedContentMock = vi.fn().mockResolvedValueOnce({
-                embedding: { values: [0.1, 0.2] }
+                embedding: { values: new Array(768).fill(0.1) }
             });
 
             vi.spyOn(GoogleGenAI.prototype, 'models', 'get').mockReturnValue({

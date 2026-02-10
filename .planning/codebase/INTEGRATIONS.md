@@ -8,7 +8,8 @@
 - Google Gemini API - Used for AI JD generation and text embeddings.
   - SDK/Client: `@google/genai`
   - Auth: `API_KEY` or `GEMINI_API_KEY` env vars.
-  - Models: `gemini-2.0-flash` (Generation), `text-embedding-004` (Embeddings).
+  - Models: `gemini-2.0-flash` (Generation), `models/gemini-embedding-001` (Embeddings).
+  - **Decision:** We normalized on `models/gemini-embedding-001` (768 dims) to avoid `text-embedding-004` deprecation (Jan 2026) and ensure stability with the `@google/genai` SDK.
 
 ## Data Storage
 

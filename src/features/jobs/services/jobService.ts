@@ -25,7 +25,7 @@ interface EmbeddingResponse {
 }
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const res = await fetch("/api/embedding", {
+    const res = await fetch("/api/ai/embedding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
@@ -39,7 +39,8 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     const embedding = data.embedding;
 
     if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
-        throw new Error("Embedding service returned invalid vector");
+        console.error(`Invalid embedding received. Expected ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : typeof embedding}`);
+        throw new Error(`Embedding service returned invalid vector. Expected dimension ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : 'non-array'}`);
     }
 
     return embedding;
@@ -76,9 +77,13 @@ export const JobService = {
             const now = new Date();
             const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
 
+            // Destructure to separate company_bio for conditional inclusion
+            const { company_bio, ...restInput } = input;
+
             const jobData = {
-                ...input,
+                ...restInput,
                 company_id: companyId,
+                ...(company_bio && { company_bio }),
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
@@ -118,6 +123,7 @@ export const JobService = {
                 ('skills' in updates) ||
                 ('location' in updates) ||
                 ('type' in updates) ||
+                ('company_bio' in updates) ||
                 ('work_mode' in updates);
 
             if (shouldRegenEmbedding) {
@@ -238,6 +244,29 @@ export const JobService = {
             } as JobPosting));
         } catch (error) {
             console.error("Error fetching jobs by company:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get all jobs created by a specific employer.
+     */
+    async getJobsByEmployerId(employerId: string): Promise<JobPosting[]> {
+        try {
+            const jobsRef = collection(db, JOBS_COLLECTION);
+            const q = query(
+                jobsRef,
+                where("employer_id", "==", employerId),
+                orderBy("created_at", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as JobPosting));
+        } catch (error) {
+            console.error("Error fetching jobs by employer:", error);
             throw error;
         }
     }

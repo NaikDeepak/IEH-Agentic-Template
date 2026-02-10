@@ -119,8 +119,50 @@ const sampleJobs: SeedJob[] = [
   }
 ];
 
+import { GoogleGenAI } from '@google/genai';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { CONSTANTS } from '../src/server/config/constants.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '../.env') });
+
+const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+
+async function getEmbedding(text: string): Promise<number[]> {
+  if (!ai) {
+    console.warn('Warning: No API_KEY found. Using placeholder embedding.');
+    return [1, ...new Array(767).fill(0)];
+  }
+  try {
+    const res = await ai.models.embedContent({
+      model: CONSTANTS.AI.MODEL_EMBEDDING,
+      contents: [{ parts: [{ text }] }],
+      config: {
+        outputDimensionality: CONSTANTS.AI.EMBEDDING_DIMENSIONS
+      }
+    });
+
+    // Handle SDK response variations (embedding vs embeddings)
+    const responseAny = res as any;
+    const values = responseAny.embedding?.values || responseAny.embeddings?.[0]?.values;
+
+    if (values && values.length === CONSTANTS.AI.EMBEDDING_DIMENSIONS) {
+      return values;
+    }
+    console.warn(`Warning: Invalid embedding length ${values?.length}. Using placeholder.`);
+    return [1, ...new Array(CONSTANTS.AI.EMBEDDING_DIMENSIONS - 1).fill(0)];
+  } catch (err) {
+    console.error('Embedding error:', err);
+    return [1, ...new Array(767).fill(0)];
+  }
+}
+
 async function seedJobs(): Promise<void> {
-  console.log('Seeding jobs to Firestore...\n');
+  console.log('Seeding jobs to Firestore with Real Embeddings...\n');
 
   const jobsRef = db.collection(JOBS_COLLECTION);
   const now = new Date();
@@ -131,6 +173,18 @@ async function seedJobs(): Promise<void> {
     const lastActiveAt = Timestamp.now();
     const expiresAt = Timestamp.fromDate(new Date(now.getTime() + FOUR_DAYS_MS));
 
+    // Generate Real Embedding
+    const semanticText = `
+        Title: ${job.title}
+        Skills: ${job.skills.join(", ")}
+        Location: ${job.location}
+        Type: ${job.type} (${job.work_mode})
+        Description: ${job.description}
+    `.trim();
+
+    console.log(`Generating embedding for: ${job.title}...`);
+    const embeddingVector = await getEmbedding(semanticText);
+
     // Create job document
     const jobData = {
       ...job,
@@ -139,9 +193,7 @@ async function seedJobs(): Promise<void> {
       updated_at: FieldValue.serverTimestamp(),
       lastActiveAt,
       expiresAt,
-      // Placeholder embedding (must be non-zero magnitude for cosine distance)
-      // We use a unit vector [1, 0, 0...] to ensure valid vector math
-      embedding: FieldValue.vector([1, ...new Array(767).fill(0)])
+      embedding: FieldValue.vector(embeddingVector)
     };
 
     const docRef = await jobsRef.add(jobData);

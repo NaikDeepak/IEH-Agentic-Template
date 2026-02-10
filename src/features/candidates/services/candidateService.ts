@@ -12,6 +12,8 @@ interface EmbeddingResponse {
     embedding?: number[];
 }
 
+import { EMBEDDING_DIMENSION } from "../../../lib/ai/constants";
+
 async function fetchEmbedding(text: string): Promise<number[]> {
     const res = await fetch("/api/embedding", {
         method: "POST",
@@ -24,7 +26,12 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     }
 
     const data = (await res.json()) as EmbeddingResponse;
-    return data.embedding ?? [];
+    const embedding = data.embedding ?? [];
+
+    if (embedding.length !== EMBEDDING_DIMENSION) {
+        console.warn(`Warning: Candidate embedding dimension mismatch. Expected ${EMBEDDING_DIMENSION}, got ${embedding.length}`);
+    }
+    return embedding;
 }
 
 const USERS_COLLECTION = "users";

@@ -18,6 +18,8 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applicati
     id: id,
   });
 
+  const validApps = applications.filter((app): app is Application & { id: string } => !!app.id);
+
   return (
     <div className="flex flex-col w-72 flex-shrink-0">
       <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2 px-2">
@@ -32,10 +34,10 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applicati
         className="flex-grow min-h-[500px] bg-gray-50 border-2 border-dashed border-gray-200 p-3 flex flex-col gap-3 transition-colors hover:border-black"
       >
         <SortableContext
-          items={applications.map(app => app.id ?? '')}
+          items={validApps.map(app => app.id)}
           strategy={verticalListSortingStrategy}
         >
-          {applications.map((application) => (
+          {validApps.map((application) => (
             <ApplicantCard key={application.id} application={application} />
           ))}
         </SortableContext>

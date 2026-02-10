@@ -20,38 +20,39 @@ if (!apiKey) {
 }
 const ai = new GoogleGenAI({ apiKey });
 
-// Helper to generate embedding using gemini-embedding-001 via REST to ensure 768 dim
+const EMBEDDING_DIMENSION = 768;
+
+// Helper to generate embedding using gemini-embedding-001 ensuring 768 dim via slicing
 async function generateEmbedding(text: string): Promise<number[] | null> {
     if (!text.trim()) return null;
 
     try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    content: { parts: [{ text }] },
-                    outputDimensionality: 768
-                })
-            }
-        );
+        const response = await ai.models.embedContent({
+            model: "models/gemini-embedding-001",
+            contents: [{ parts: [{ text }] }],
+            outputDimensionality: EMBEDDING_DIMENSION
+        });
 
-        if (!response.ok) {
-            console.error(`API Error: ${response.status} ${await response.text()}`);
+        // Handle response variations
+        let values: number[] | undefined;
+        if (response.embedding?.values) {
+            values = response.embedding.values;
+        } else if (response.embeddings?.[0]?.values) {
+            values = response.embeddings[0].values;
+        }
+
+        if (!values) {
+            console.error("No embedding values in response");
             return null;
         }
 
-        const data = await response.json();
-        const embedding = data.embedding?.values;
-
-        if (!embedding) {
-            console.error("Failed to generate embedding for text:", text.substring(0, 50) + "...");
-            return null;
+        // Apply slicing if needed (e.g. if API ignores outputDimensionality and returns 3072)
+        if (values.length > EMBEDDING_DIMENSION) {
+            values = values.slice(0, EMBEDDING_DIMENSION);
         }
 
-        console.log(`Embedding generated. Length: ${embedding.length}`);
-        return embedding;
+        console.log(`Generated embedding. Length: ${values.length}`);
+        return values;
     } catch (error) {
         console.error("Error generating embedding:", error);
         return null;

@@ -16,10 +16,15 @@ export const Header: React.FC = () => {
     ];
 
     if (userData?.role === 'employer') {
-        // Insert "Find Talent" after "Find Jobs"
-        navItems.splice(1, 0, { label: 'Find Talent', path: '/employer/search' });
-        // Insert "My Company" after "Post a Job"
-        navItems.splice(3, 0, { label: 'My Company', path: '/employer/company' });
+        const employerNavItems = [
+            { label: 'Find Talent', path: '/employer/search' },
+            { label: 'Manage Jobs', path: '/employer/jobs' }
+        ];
+        // Insert "Find Talent" and "Manage Jobs" after "Find Jobs" (at index 1)
+        navItems.splice(1, 0, ...employerNavItems);
+        // Insert "My Company" after "Post a Job".
+        // The index is now 4 (original 3 + 2 inserted items - 1 for 'Post a Job' itself)
+        navItems.splice(4, 0, { label: 'My Company', path: '/employer/company' });
     }
 
     return (

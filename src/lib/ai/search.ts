@@ -1,4 +1,5 @@
 import { getAuth } from 'firebase/auth';
+import { z } from "zod";
 
 export interface CandidateSearchResult {
     id: string;
@@ -17,14 +18,31 @@ export interface CandidateSearchResult {
     matchScore?: number;
 }
 
-// Response wrappers
-interface JobSearchResponse {
-    jobs?: Record<string, unknown>[]; // Using Record<string, unknown> because the backend returns serialized JSON
-}
+// Zod Schemas for runtime validation
+const JobResultSchema = z.record(z.string(), z.unknown());
+const JobSearchResponseSchema = z.object({
+    jobs: z.array(JobResultSchema).optional().default([])
+});
 
-interface CandidateSearchResponse {
-    candidates?: CandidateSearchResult[];
-}
+const CandidateResultSchema = z.object({
+    id: z.string(),
+    displayName: z.string().optional(),
+    bio: z.string().optional(),
+    skills: z.union([z.string(), z.array(z.string())]).optional(),
+    experience: z.string().optional(),
+    location: z.string().optional(),
+    photoURL: z.string().optional(),
+    jobTitle: z.string().optional(),
+    availability: z.string().optional(),
+    preferredRole: z.string().optional(),
+    linkedIn: z.string().optional(),
+    portfolio: z.string().optional(),
+    github: z.string().optional(),
+    matchScore: z.number().optional()
+});
+const CandidateSearchResponseSchema = z.object({
+    candidates: z.array(CandidateResultSchema).optional().default([])
+});
 
 /**
  * Get the current user's Firebase ID token for authenticated API calls.
@@ -62,8 +80,11 @@ export async function searchJobs(searchQuery: string, locationFilter = '', limit
             throw new Error(`Search failed: ${response.status.toString()} ${errorText}`);
         }
 
-        const data = (await response.json()) as JobSearchResponse;
-        return data.jobs ?? [];
+        const rawData = (await response.json()) as unknown;
+
+        // Validate with Zod
+        const data = JobSearchResponseSchema.parse(rawData);
+        return data.jobs;
 
     } catch (error) {
         console.error("Job Search failed:", error);
@@ -97,8 +118,12 @@ export async function searchCandidates(searchQuery: string, limitCount = 10): Pr
             throw new Error(`Search failed: ${response.status} ${errorText}`);
         }
 
-        const data = (await response.json()) as CandidateSearchResponse;
-        return data.candidates ?? [];
+        const rawData = (await response.json()) as unknown;
+
+        // Validate with Zod
+        const data = CandidateSearchResponseSchema.parse(rawData);
+        // Cast to CandidateSearchResult[] because Zod schema is slightly broader (optional fields) but effectively compatible
+        return data.candidates as CandidateSearchResult[];
 
     } catch (error) {
         console.error("Candidate Search failed:", error);

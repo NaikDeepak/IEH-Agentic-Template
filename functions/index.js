@@ -1,7 +1,7 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import express from "express";
-import { GoogleGenAI } from "@google/genai";
+import { generateJD, generateJobAssist, expandQuery, generateEmbedding } from "../src/lib/ai/generation.js";
 import * as Sentry from "@sentry/node";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
@@ -13,6 +13,8 @@ import nodemailer from "nodemailer";
 
 dotenv.config({ path: ".env.production" });
 dotenv.config();
+
+// Unified Constants for AI (Single Source of Truth) - Moved to src/lib/ai/generation.js
 
 // Debug: Check Environment Variables (only in non-production)
 if (process.env.NODE_ENV !== 'production') {
@@ -32,6 +34,15 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+// Debug: Log all requests (Only in non-production)
+if (process.env.NODE_ENV !== 'production') {
+    app.use((req, res, next) => {
+        console.log(`[API Request] ${req.method} ${req.originalUrl || req.url}`);
+        console.log(`[API Headers]`, JSON.stringify(req.headers, null, 2));
+        next();
+    });
+}
 
 // Auth Middleware
 const authMiddleware = async (req, res, next) => {
@@ -111,67 +122,9 @@ const handleError = (res, error, context) => {
 
 // --- API Logic via Helper Functions ---
 
-// Helper to expand query using LLM
-export const expandQuery = async (originalQuery, context, apiKey) => {
-    try {
-        const ai = new GoogleGenAI({ apiKey });
-        const target = context === "finding a job" ? "job" : "candidate";
-        const prompt = `You are an expert IT recruiter in India. Expand this search query into a detailed semantic description of the ideal ${target}. Include related skills, tools, and alternative titles. Keep it under 100 words. Query: ${originalQuery}`;
+// Helper to expand query using LLM logic moved to src/lib/ai/generation.js
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt,
-        });
-
-        const expandedText = (typeof response.text === 'function' ? response.text() : null) ||
-            response.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!expandedText) {
-            console.error("Expand Query Response:", JSON.stringify(response, null, 2));
-            // Fallback to original query instead of throwing if LLM fails
-            console.warn("LLM response empty/invalid, using original query.");
-            return originalQuery;
-        }
-
-        console.log(`Query Expansion (${context}): "${originalQuery}" -> "${expandedText.substring(0, 100)}..."`);
-        return expandedText;
-    } catch (error) {
-        console.error("Error expanding query:", error);
-        return originalQuery;
-    }
-};
-
-// Helper to generate embedding (reusable)
-// Helper to generate embedding (reusable)
-export const generateEmbedding = async (text, apiKey) => {
-    const ai = new GoogleGenAI({ apiKey });
-
-    // Validated model from listModels()
-    const model = "models/gemini-embedding-001";
-
-    try {
-        const response = await ai.models.embedContent({
-            model: model,
-            contents: [{ parts: [{ text }] }],
-            config: {
-                outputDimensionality: 768
-            }
-        });
-
-        if (response.embedding?.values) {
-            console.log(`Generated embedding length: ${response.embedding.values.length}`);
-            return response.embedding.values;
-        }
-        if (response.embeddings?.[0]?.values) {
-            console.log(`Generated embedding length: ${response.embeddings[0].values.length}`);
-            return response.embeddings[0].values;
-        }
-    } catch (error) {
-        console.error(`Embedding failed with model ${model}:`, error.message);
-        throw error;
-    }
-    throw new Error("Invalid embedding response from Gemini API");
-};
+// Helper to generate embedding logic moved to src/lib/ai/generation.js
 
 // Helper to run vector search via Firestore REST API
 const runVectorSearch = async (collectionName, queryVector, filters = [], limit = 10) => {
@@ -314,29 +267,26 @@ const createFilter = (field, value) => ({
 
 export const generateJdHandler = async (req, res) => {
     try {
-        const { role, skills, experience } = req.body;
         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+        console.log('[functions] generateJdHandler request:', req.body);
+
+        if (!req.body.role) {
+            return res.status(400).json({ error: "Job Title (role) is required" });
+        }
 
         if (!apiKey) {
             return res.status(500).json({ error: "Server configuration error: API Key missing" });
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-
-        // Using gemini-2.0-flash as per cost-optimization rules
-        const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: `Generate a professional job description for a ${role} with skills: ${skills} and experience: ${experience}.`,
-        });
-
-        const text = typeof response.text === 'function' ? response.text() : response.candidates?.[0]?.content?.parts?.[0]?.text;
-        res.json({ jd: text });
+        const data = await generateJD(req.body, apiKey);
+        res.json(data);
     } catch (error) {
         handleError(res, error, "generate job description");
     }
 };
 
 export const generateJobAssistHandler = async (req, res) => {
+    console.log('[generateJobAssistHandler] Started');
     try {
         const { jd } = req.body;
         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
@@ -349,39 +299,7 @@ export const generateJobAssistHandler = async (req, res) => {
             return res.status(500).json({ error: "Server configuration error: API Key missing" });
         }
 
-        const ai = new GoogleGenAI({ apiKey });
-
-        const prompt = `
-            You are an expert HR assistant. Based on the following Job Description (JD), provide two things in valid JSON format:
-            1. Generate 3-5 screening questions to ask candidates during their application. Each should have a "question" and a "hint" (guidance for the candidate).
-            2. Provide 3-5 optimization suggestions to improve the JD (e.g., clarity, missing details, tone).
-
-            JD:
-            ${jd}
-
-            Return ONLY a JSON object:
-            {
-                "questions": [
-                    { "question": "...", "hint": "..." }
-                ],
-                "suggestions": [
-                    "...", "..."
-                ]
-            }
-        `;
-
-        const result = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt,
-        });
-
-        const text = typeof result.text === 'function' ? result.text() : result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        // Extract JSON block if present
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        const jsonStr = jsonMatch ? jsonMatch[0] : text;
-
-        const data = JSON.parse(jsonStr);
+        const data = await generateJobAssist(jd, apiKey);
         res.json(data);
     } catch (error) {
         handleError(res, error, "generate job assist data");
@@ -391,24 +309,14 @@ export const generateJobAssistHandler = async (req, res) => {
 export const embeddingHandler = async (req, res) => {
     try {
         const rawText = req.body?.text;
-
-        if (typeof rawText !== "string") {
-            return res.status(400).json({ error: "Text is required" });
-        }
+        if (typeof rawText !== "string") return res.status(400).json({ error: "Text is required" });
 
         const text = rawText.trim();
-        if (!text) {
-            return res.status(400).json({ error: "Text is required" });
-        }
-
-        if (text.length > 5000) {
-            return res.status(413).json({ error: "Text is too long" });
-        }
+        if (!text) return res.status(400).json({ error: "Text is required" });
+        if (text.length > 5000) return res.status(413).json({ error: "Text is too long" });
 
         const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
-        }
+        if (!apiKey) return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
 
         const values = await generateEmbedding(text, apiKey);
         res.json({ embedding: values });
@@ -420,26 +328,15 @@ export const embeddingHandler = async (req, res) => {
 export const searchJobsHandler = async (req, res) => {
     try {
         const { query: searchQuery, limit = 10 } = req.body;
-
-        if (!searchQuery || typeof searchQuery !== "string") {
-            return res.status(400).json({ error: "Query string is required" });
-        }
+        if (!searchQuery || typeof searchQuery !== "string") return res.status(400).json({ error: "Query string is required" });
 
         const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
-        }
+        if (!apiKey) return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
 
-        // 1. Expand Query
         const expandedQuery = await expandQuery(searchQuery, "finding a job", apiKey);
-
-        // 2. Generate Embedding
         const queryVector = await generateEmbedding(expandedQuery, apiKey);
-
-        // 3. Run Vector Search with 'active' status filter
         const filters = [createFilter("status", "active")];
         const jobs = await runVectorSearch("jobs", queryVector, filters, limit);
-
         res.json({ jobs });
     } catch (error) {
         handleError(res, error, "search jobs");
@@ -449,23 +346,14 @@ export const searchJobsHandler = async (req, res) => {
 export const searchCandidatesHandler = async (req, res) => {
     try {
         const { query: searchQuery, limit = 10 } = req.body;
-
-        if (!searchQuery || typeof searchQuery !== "string") {
-            return res.status(400).json({ error: "Query string is required" });
-        }
+        if (!searchQuery || typeof searchQuery !== "string") return res.status(400).json({ error: "Query string is required" });
 
         const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-        if (!apiKey) {
-            return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
-        }
+        if (!apiKey) return res.status(500).json({ error: "Server configuration error: Gemini API Key missing" });
 
-        // 1. Expand Query
         const expandedQuery = await expandQuery(searchQuery, "finding a candidate", apiKey);
-
-        // 2. Generate Embedding
         const queryVector = await generateEmbedding(expandedQuery, apiKey);
 
-        // 3. Run Vector Search with filters (status=active AND role=seeker)
         const filters = [
             createFilter("status", "active"),
             createFilter("role", "seeker")
@@ -473,9 +361,7 @@ export const searchCandidatesHandler = async (req, res) => {
 
         const candidatesRaw = await runVectorSearch("users", queryVector, filters, limit);
 
-        // 4. Filter out sensitive data
         const candidates = candidatesRaw.map(c => {
-            // whitelist public fields
             const {
                 id, matchScore, displayName, bio, skills, experience,
                 location, photoURL, jobTitle, availability,
@@ -501,13 +387,13 @@ export const searchCandidatesHandler = async (req, res) => {
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
-app.post("/jobs/search", searchJobsHandler); // Public search allowed? Usually yes, but maybe strictly authenticated? Leaving public for now as per requirements usually, or auth? The frontend uses it. Frontend sends token. Let's keep it open or auth?
-// The prompt said "Protect candidates/search".
+app.post("/jobs/search", searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
 app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
+app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
 app.post("/api/jobs/search", searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);

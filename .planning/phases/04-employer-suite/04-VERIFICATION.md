@@ -1,14 +1,14 @@
 ---
 phase: 04-employer-suite
-verified: 2026-02-08T18:30:00Z
+verified: 2026-02-10T15:10:00Z
 status: passed
-score: 4/4 must-haves verified
+score: 5/5 must-haves verified
 ---
 
-# Phase 04: Employer Suite Verification Report
+# Phase 4: Employer Suite Verification Report
 
 **Phase Goal:** Productivity tools for job creation and candidate management
-**Verified:** 2026-02-08
+**Verified:** 2026-02-10
 **Status:** passed
 **Re-verification:** No — initial verification
 
@@ -18,67 +18,71 @@ score: 4/4 must-haves verified
 
 | #   | Truth   | Status     | Evidence       |
 | --- | ------- | ---------- | -------------- |
-| 1   | Employer can generate optimized JDs using AI inputs | ✓ VERIFIED | `PostJob.tsx` implements `handleAiGenerateJd` calling Gemini 2.0 via Cloud Functions. |
-| 2   | Employer can generate role-specific screening questions | ✓ VERIFIED | `PostJob.tsx` implements `handleAiGenerateAssist` which populates `screening_questions` state. |
-| 3   | Employer can track applicants through Kanban pipeline stages | ✓ VERIFIED | `JobApplicants.tsx` uses `KanbanBoard.tsx` (dnd-kit) with 6 stages and optimistic updates. |
-| 4   | Employer branding page is viewable by candidates | ✓ VERIFIED | `CompanyProfile.tsx` provides public view of company bio, video, and active jobs. |
+| 1   | Employer can generate optimized JDs using AI inputs | ✓ VERIFIED | `PostJob.tsx` calls `/api/ai/generate-jd`; `ai.controller.js` handles relaxed validation. |
+| 2   | Employer can generate and manage role-specific screening questions | ✓ VERIFIED | `PostJob.tsx` supports AI-generated questions and manual CRUD for screening questions. |
+| 3   | Employer can track applicants through Kanban pipeline stages | ✓ VERIFIED | `KanbanBoard.tsx` (dnd-kit) and `JobApplicants.tsx` (persistence) are fully implemented. |
+| 4   | Employer can navigate to and manage jobs via a dedicated dashboard | ✓ VERIFIED | `EmployerJobs.tsx` lists jobs with applicants link; `Header.tsx` provides navigation. |
+| 5   | Employer branding (bio) is automatically integrated into job postings | ✓ VERIFIED | `PostJob.tsx` fetches company bio via `CompanyService` and includes it in `createJob`. |
 
-**Score:** 4/4 truths verified
+**Score:** 5/5 truths verified
 
 ### Required Artifacts
 
-| Artifact | Expected    | Status | Details |
+| Artifact | Expected | Status | Details |
 | -------- | ----------- | ------ | ------- |
-| `src/pages/PostJob.tsx` | AI-JD generation UI | ✓ VERIFIED | Fully implemented with loading states and Gemini integration. |
-| `functions/index.js` | Gemini backend handlers | ✓ VERIFIED | Implements `generateJdHandler` and `generateJobAssistHandler`. |
-| `src/pages/employer/JobApplicants.tsx` | Pipeline management page | ✓ VERIFIED | Wired to `ApplicationService` and `KanbanBoard`. |
-| `src/features/applications/components/KanbanBoard.tsx` | DND Kanban component | ✓ VERIFIED | Substantive implementation using `@dnd-kit`. |
-| `src/pages/CompanyProfile.tsx` | Candidate branding view | ✓ VERIFIED | Renders bio, video embed, and job library. |
-| `src/pages/employer/CompanyEditor.tsx` | Employer branding editor | ✓ VERIFIED | Full CRUD for company profile. |
+| `src/server/features/ai/ai.controller.js` | Relaxed AI validation & defaults | ✓ VERIFIED | Implements defaults for optional JD fields. |
+| `src/pages/PostJob.tsx` | AI-assisted job posting flow | ✓ VERIFIED | Full implementation of generation, review, and screening. |
+| `src/pages/employer/EmployerJobs.tsx` | Employer-specific dashboard | ✓ VERIFIED | Fetches and displays employer's job list. |
+| `src/features/applications/components/KanbanBoard.tsx` | ATS Pipeline UI | ✓ VERIFIED | Substantive DnD implementation with multi-column support. |
+| `src/pages/employer/JobApplicants.tsx` | Applicant management page | ✓ VERIFIED | Connects dashboard to Kanban board with persistence. |
+| `firestore.indexes.json` | Composite query indices | ✓ VERIFIED | Contains critical `employer_id`/`created_at` index. |
 
 ### Key Link Verification
 
-| From | To  | Via | Status | Details |
+| From | To | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
-| `PostJob.tsx` | `/api/ai/generate-jd` | `fetch` | ✓ WIRED | Correctly sends role/skills and updates form state. |
-| `JobApplicants.tsx` | `ApplicationService` | Method calls | ✓ WIRED | Fetches job-specific applicants and updates status. |
-| `CompanyProfile.tsx` | `CompanyService` | Method calls | ✓ WIRED | Fetches company data and linked jobs for public view. |
+| `Header.tsx` | `/employer/jobs` | Link | ✓ WIRED | Role-based navigation for employers. |
+| `EmployerJobs.tsx` | `JobService.getJobsByEmployerId` | Service Call | ✓ WIRED | Correctly scoped job retrieval. |
+| `JobApplicants.tsx` | `KanbanBoard.tsx` | Component Prop | ✓ WIRED | Passes applications and status update handler. |
+| `PostJob.tsx` | `CompanyService.getCompanyByEmployerId` | useEffect | ✓ WIRED | Pre-fills company bio on mount. |
 
 ### Requirements Coverage
 
 | Requirement | Status | Blocking Issue |
 | ----------- | ------ | -------------- |
-| AI JD Optimization | ✓ SATISFIED | Implemented in `PostJob.tsx`. |
-| Screening Questions | ✓ SATISFIED | Implemented in `PostJob.tsx` and saved to Firestore. |
-| Kanban Pipeline | ✓ SATISFIED | Implemented in `JobApplicants.tsx`. |
-| Branding Page | ✓ SATISFIED | Implemented in `CompanyProfile.tsx`. |
+| EMP-01 (AI JD Generator) | ✓ SATISFIED | Full implementation in `PostJob.tsx` and `ai.controller.js`. |
+| EMP-02 (Screening Questions) | ✓ SATISFIED | Integrated into AI flow and manual UI in `PostJob.tsx`. |
+| EMP-03 (Basic ATS) | ✓ SATISFIED | Kanban board and pipeline management fully functional. |
+| EMP-04 (Employer Branding) | ✓ SATISFIED | `CompanyEditor.tsx` exists and bio pre-fill is implemented. |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| `App.tsx` | 91 | Placeholder text | ℹ️ INFO | General dashboard is still a placeholder, but specific employer tools are functional. |
-| `PostJob.tsx` | 62 | Hardcoded value | ℹ️ INFO | `experience: "relevant experience"` passed to AI prompt. |
+| None | - | - | - | - |
 
 ### Human Verification Required
 
-### 1. AI Generation Quality
+### 1. Kanban Drag-and-Drop Interaction
+**Test:** Log in as an employer, go to "Manage Jobs" -> "Applicants", and drag a candidate between columns.
+**Expected:** Smooth animation and status update persists on refresh.
+**Why human:** Verify UX smoothness and browser-level event handling.
 
-**Test:** Use "AI Generate" and "AI Suggest Questions" in the Post Job page.
-**Expected:** Meaningful JDs and relevant screening questions are generated.
-**Why human:** LLM output quality and prompt effectiveness need subjective evaluation.
+### 2. AI JD Content Quality
+**Test:** Generate a JD with minimal input (e.g., "Frontend Engineer", "React").
+**Expected:** Coherent description, relevant skills, and sensible screening questions.
+**Why human:** Evaluate semantic relevance and quality of GenAI output.
 
-### 2. Kanban Drag and Drop
-
-**Test:** Drag an applicant card between columns in the Job Applicants page.
-**Expected:** Card moves smoothly and status is persisted on refresh.
-**Why human:** Interaction feel and real-time state sync are best verified manually.
+### 3. Navigation Consistency
+**Test:** Click through the employer flow from Header -> Manage Jobs -> Applicants -> Back -> Post Job.
+**Expected:** Intuitive navigation without dead ends or missing back buttons.
+**Why human:** Verify flow ergonomics.
 
 ### Gaps Summary
 
-No functional gaps found. The Employer Suite is structurally complete and correctly wired to the backend services.
+No gaps identified. All core features of the Employer Suite (Phase 4) are implemented, substantive, and correctly wired. The system handles relaxed AI validation (Phase 04-10) and provides a clean ATS experience.
 
 ---
 
-_Verified: 2026-02-08_
+_Verified: 2026-02-10_
 _Verifier: Claude (gsd-verifier)_
