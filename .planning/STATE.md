@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 5 of 6 (Seeker Tools)
-Plan: 1 of 11 (Scaffolding)
-Status: In progress - Completed 05-01-PLAN.md
-Last activity: 2026-02-11 — Initialized seeker feature structure and resume input UI.
+Plan: 5 of 11 (Market Insights)
+Status: In progress - Completed 05-05-PLAN.md
+Last activity: 2026-02-11 — Implemented Adzuna market proxy and salary trends UI.
 
-Progress: ████████████████████░░░░░░ 75% (30/40 total planned tasks)
+Progress: █████████████████████░░░░░ 80% (32/40 total planned tasks)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
+- Total plans completed: 31
 - Average duration: ~12m
-- Total execution time: ~3.9 hours
+- Total execution time: ~4.0 hours
 
 **By Phase:**
 
@@ -31,7 +31,7 @@ Progress: ████████████████████░░░�
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
 | 3. Semantic Matching | 6 | 6 | ~11m |
 | 4. Employer Suite | 12 | 12 | ~12m |
-| 5. Seeker Tools | 1 | 11 | 2.5m |
+| 5. Seeker Tools | 2 | 11 | ~6m |
 
 ## Accumulated Context
 
@@ -39,6 +39,7 @@ Progress: ████████████████████░░░�
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-11 | 05-05 | Cloud Function JS Usage | Used JavaScript for Cloud Functions to match the existing project configuration and avoid complex TS build setups for the proxy. |
 | 2026-02-11 | 05-01 | Extension of Application Type | Reused existing Application interface but extended it with seeker-specific fields to avoid duplication. |
 | 2026-02-11 | 05-01 | Tabbed Resume Entry | Provided multiple entry points (Upload, Paste, LinkedIn) to reduce friction for seekers. |
 | 2026-02-10 | 04-12 | Cross-Collection Auth Check | Verified employer ownership via `get()` call to the linked job document in security rules. |
@@ -58,6 +59,6 @@ Progress: ████████████████████░░░�
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Phase 5 Plan 01 (Seeker Feature Scaffolding)
-Resume file: .planning/phases/05-seeker-tools/05-02-PLAN.md
-Session Continuity: Seeker scaffolding ready. Moving to Document Processing Service.
+Stopped at: Completed Phase 5 Plan 05 (Adzuna Market Proxy)
+Resume file: .planning/phases/05-seeker-tools/05-02-PLAN.md (Assuming next plan is 02 or continuing numerical sequence)
+Session Continuity: Market insights ready. Ready to continue seeker tool implementation.
