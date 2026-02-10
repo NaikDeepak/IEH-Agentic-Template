@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 04-employer-suite
-source: [04-01, 04-02, 04-03, 04-06, 04-08, 04-09]
-started: 2026-02-09T12:00:00Z
-updated: 2026-02-09T13:00:00Z
+source: 04-01, 04-02, 04-03, 04-06, 04-10
+started: 2026-02-10T11:15:00Z
+updated: 2026-02-10T11:40:00Z
 ---
 
 ## Current Test
@@ -12,94 +12,72 @@ updated: 2026-02-09T13:00:00Z
 
 ## Tests
 
-### 1. Employer Navigation
+### 1. Employer Profile & Dashboard Access
 expected: |
-  Log in as an employer.
-  Header should show "Manage Jobs" and "Company Profile" links.
-  Clicking "Manage Jobs" goes to /employer/jobs.
-  Clicking "Company Profile" goes to /employer/company.
-result: pass
-
-### 2. Company Profile Editor
-expected: |
-  Navigate to Company Profile.
-  Edit Bio, Tagline, Website, and Location.
-  Click Save.
-  Refresh page - changes should persist.
-  View Public Profile - changes should be visible.
-result: pass
-
-### 3. AI Job Posting Tools (New Flow Verification)
-expected: |
-  Navigate to "Post a Job".
-  **Verify Flow:** Title -> Skills -> Location/Type/Mode -> "Generate Description" Button -> JD Editor.
-  Enter Title (e.g., "Senior React Developer").
-  Enter Skills, Location, Type, and Mode.
-  Click "Generate Description with AI".
-  **Verify JD is generated** and includes context from the fields above.
-  **Verify no "Missing required fields" error.**
+  1. Login as an employer.
+  2. Verify "Company Profile" and "Manage Jobs" links appear in the header.
+  3. Click "Company Profile" -> Verify profile editor loads.
+  4. Click "Manage Jobs" -> Verify it goes to the dedicated Employer Dashboard (/employer/jobs), NOT the public job board.
 result: issue
-reported: "400 Bad Request. Error: Missing required fields: role, skills, experience at handleAiGenerateJd (PostJob.tsx:71:15)"
-severity: major
+reported: "issue with 4 - [DATABASE_ERROR] Failed to load your job postings."
+severity: blocker
 
-### 4. Job Creation & Listing (Fix Verification)
+### 2. AI Job Posting (New Flow)
 expected: |
-  Complete the job post form and submit.
-  Redirects to "Manage Jobs".
-  New job appears in the list.
-  Status should be "Active".
-  **Verify no "Embedding service returned invalid vector" error.**
+  1. Go to "Post a Job".
+  2. Enter ONLY a Job Title (e.g., "Product Manager").
+  3. Click the AI "Auto-Fill" or "Generate" button.
+  4. Expected: AI successfully generates Description and Skills WITHOUT errors about missing fields.
 result: pass
 
-### 5. ATS Kanban Board
+### 3. Job Submission
 expected: |
-  Click "View Applicants" on a job.
-  See Kanban board with columns (Applied, Screening, Interview, etc.).
-  If empty, run `npx tsx scripts/seed-applications.ts [jobId]`.
-  Verify applicant cards appear.
-  Drag a card to a different column - status updates immediately.
-result: issue
-reported: "from which screen I can check this"
-severity: major
+  1. Review the generated content.
+  2. Submit the job.
+  3. Expected: Success message, redirect to Employer Dashboard. New job appears in the "Active" list.
+result: pass
+
+### 4. ATS Access & Kanban
+expected: |
+  1. On the Employer Dashboard, find the job you just created.
+  2. Click the "View Applicants" (or "Track") button on the card.
+  3. Expected: Redirects to the ATS Kanban board for that job.
+result: pass
+
+### 5. ATS Functionality (Seed & Drag)
+expected: |
+  1. If board is empty, run in terminal: `npx tsx scripts/seed-applications.ts <job-id>` (or just `npx tsx scripts/seed-applications.ts` if it picks latest).
+  2. Refresh to see applicants.
+  3. Drag an applicant from "Applied" to "Screening".
+  4. Expected: Card moves and stays in the new column.
+result: pass
 
 ## Summary
 
 total: 5
-passed: 3
-issues: 2
+passed: 4
+issues: 1
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Job posting flow is logical and AI generation works reliably"
+- truth: "Employer can access their jobs dashboard"
   status: failed
-  reason: "User reported: 400 Bad Request. Error: Missing required fields: role, skills, experience"
-  severity: major
-  test: 3
-  root_cause: "Backend validation is too strict. Deployed cloud function or local server middleware requires 'skills' and 'experience' to be present and non-empty, but frontend sends empty strings or undefined if user hasn't filled them yet. Need to make these fields optional in backend validation."
-  artifacts:
-    - path: "src/pages/PostJob.tsx"
-      issue: "Frontend sends potential empty/undefined values for optional fields."
-    - path: "functions/index.js"
-      issue: "Backend validation logic enforces presence of optional fields."
-  missing:
-    - "Relax backend validation to allow empty skills/experience"
-    - "Ensure frontend sends default empty strings instead of undefined"
-  debug_session: ".planning/debug/ai-job-posting-400-error.md"
+  reason: "User reported: issue with 4 - [DATABASE_ERROR] Failed to load your job postings."
+  severity: blocker
+  test: 1
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
 
-- truth: "ATS Kanban board is easily accessible and functional"
+- truth: "Job posting form pre-fills company details"
   status: failed
-  reason: "User reported: from which screen I can check this"
-  severity: major
-  test: 5
-  root_cause: "Navigation/UX issue: The 'Manage Jobs' link points to public job listing instead of employer dashboard. JobCard component lacks a 'View Applicants' button for the job owner. The route exists but is unreachable via UI."
-  artifacts:
-    - path: "src/components/Header.tsx"
-      issue: "'Manage Jobs' link points to /jobs instead of /employer/jobs"
-    - path: "src/components/JobCard.tsx"
-      issue: "Missing 'View Applicants' button for job owner"
-  missing:
-    - "Update Header.tsx to point 'Manage Jobs' to employer dashboard"
-    - "Add 'View Applicants' button to JobCard when user is owner"
-  debug_session: ".planning/debug/ats-kanban-navigation-missing.md"
+  reason: "User reported: we can fetch and update the About us section rather than asking employer to fill as he is already logged in"
+  severity: minor
+  test: 2
+  root_cause: ""
+  artifacts: []
+  missing: []
+  debug_session: ""
