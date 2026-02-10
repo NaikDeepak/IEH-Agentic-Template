@@ -15,6 +15,7 @@ import { TalentSearch } from './pages/employer/TalentSearch'
 import { CompanyEditor } from './pages/employer/CompanyEditor'
 import { CompanyProfile } from './pages/CompanyProfile'
 import { JobApplicants } from './pages/employer/JobApplicants'
+import { EmployerJobs } from './pages/employer/EmployerJobs'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import FinancialDashboard from './pages/admin/FinancialDashboard';
 
@@ -132,6 +133,15 @@ function App() {
                   <CompanyEditor />
                 </main>
               </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/employer/jobs"
+          element={
+            <ProtectedRoute allowedRoles={['employer']}>
+              <EmployerJobs />
             </ProtectedRoute>
           }
         />

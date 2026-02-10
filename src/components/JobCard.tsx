@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Users } from 'lucide-react';
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { StatusBadge } from './StatusBadge';
 import type { Job } from '../types';
@@ -9,9 +9,10 @@ interface JobCardProps {
   matchScore?: number;
   className?: string;
   onClick?: () => void;
+  onViewApplicants?: (e: React.MouseEvent) => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants }) => {
   const { title, location, type, salaryRange, status, expiresAt, createdAt } = job;
 
   const formatSalary = (range: NonNullable<Job['salaryRange']>) => {
@@ -112,9 +113,24 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
         <div className="flex items-center gap-1.5 text-[10px] font-mono font-medium text-gray-400 uppercase tracking-wider">
            <span>Posted {getRelativeTime(createdAt)}</span>
         </div>
-        <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-black group-hover:underline decoration-2 underline-offset-4">
-          View Details
-          <ArrowUpRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+
+        <div className="flex items-center gap-4">
+          {onViewApplicants && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewApplicants(e);
+              }}
+              className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest bg-black text-white px-3 py-1.5 hover:bg-gray-800 transition-colors"
+            >
+              <Users className="w-3 h-3" />
+              Applicants
+            </button>
+          )}
+          <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-black group-hover:underline decoration-2 underline-offset-4">
+            View Details
+            <ArrowUpRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </div>
         </div>
       </div>
     </div>

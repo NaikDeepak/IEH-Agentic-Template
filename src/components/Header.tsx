@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
         // Insert "Find Talent" after "Find Jobs"
         navItems.splice(1, 0, { label: 'Find Talent', path: '/employer/search' });
         // Insert "Manage Jobs" after "Find Talent"
-        navItems.splice(2, 0, { label: 'Manage Jobs', path: '/jobs' });
+        navItems.splice(2, 0, { label: 'Manage Jobs', path: '/employer/jobs' });
         // Insert "My Company" after "Post a Job"
         navItems.splice(4, 0, { label: 'My Company', path: '/employer/company' });
     }

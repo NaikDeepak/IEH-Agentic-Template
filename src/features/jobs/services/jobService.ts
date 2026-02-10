@@ -241,5 +241,28 @@ export const JobService = {
             console.error("Error fetching jobs by company:", error);
             throw error;
         }
+    },
+
+    /**
+     * Get all jobs created by a specific employer.
+     */
+    async getJobsByEmployerId(employerId: string): Promise<JobPosting[]> {
+        try {
+            const jobsRef = collection(db, JOBS_COLLECTION);
+            const q = query(
+                jobsRef,
+                where("employer_id", "==", employerId),
+                orderBy("created_at", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            } as JobPosting));
+        } catch (error) {
+            console.error("Error fetching jobs by employer:", error);
+            throw error;
+        }
     }
 };
