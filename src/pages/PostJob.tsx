@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { JobService } from '../features/jobs/services/jobService';
 import { useAuth } from '../hooks/useAuth';
 import { Header } from '../components/Header';
-import { Loader2, ArrowLeft, Sparkles, Plus, Trash2, Info, Lightbulb } from 'lucide-react';
+import { Loader2, ArrowLeft, Sparkles, Plus, Trash2, Info, Lightbulb, Building2 } from 'lucide-react';
 import type { JobType, WorkMode, CreateJobInput, ScreeningQuestion } from '../features/jobs/types';
+import { CompanyService } from '../features/companies/services/companyService';
 
 interface JdResponse {
   jd: string;
@@ -36,11 +37,27 @@ export const PostJob: React.FC = () => {
     salaryMin: '',
     salaryMax: '',
     currency: 'USD',
-    experience: ''
+    experience: '',
+    company_bio: ''
   });
 
   const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    const fetchCompanyData = async () => {
+      if (!user) return;
+      try {
+        const company = await CompanyService.getCompanyByEmployerId(user.uid);
+        if (company?.bio) {
+          setFormData(prev => ({ ...prev, company_bio: company.bio }));
+        }
+      } catch (err) {
+        console.error("Error fetching company data:", err);
+      }
+    };
+    void fetchCompanyData();
+  }, [user]);
 
   const handleAiGenerateJd = async () => {
     if (!formData.title) {
@@ -61,9 +78,6 @@ export const PostJob: React.FC = () => {
         workMode: formData.work_mode,
         experience: formData.experience || ''
       };
-
-      console.log('[PostJob] AI Generate Request:', requestBody);
-
       const res = await fetch('/api/ai/generate-jd', {
         method: 'POST',
         headers: {
@@ -75,11 +89,9 @@ export const PostJob: React.FC = () => {
 
       if (!res.ok) {
         const errorData = (await res.json().catch(() => ({}))) as { error?: string };
-        console.error('[PostJob] AI Generate Error Response:', errorData);
         throw new Error(errorData.error ?? "Failed to generate JD");
       }
       const data = (await res.json()) as JdResponse;
-      console.log('[PostJob] Generator Response Data:', data); // Debug log
       setFormData(prev => ({
         ...prev,
         description: data.jd,
@@ -173,6 +185,7 @@ export const PostJob: React.FC = () => {
         experience: formData.experience,
         skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
         employer_id: user.uid,
+        company_bio: formData.company_bio,
         contactEmail: formData.contactEmail,
         salary_range: {
           min: Number(formData.salaryMin),
@@ -502,6 +515,29 @@ export const PostJob: React.FC = () => {
                   className={inputClasses}
                 />
               </div>
+            </div>
+          </div>
+
+          <div className="pt-8">
+            <div className="border-b-2 border-black pb-2 mb-8">
+              <h2 className="text-sm font-black uppercase tracking-[0.3em]">4. About the Company</h2>
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="company_bio" className={labelClasses}>Company Description</label>
+                <div className="flex items-center gap-1 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+                  <Building2 className="w-3 h-3" /> Pre-filled from profile
+                </div>
+              </div>
+              <textarea
+                id="company_bio"
+                name="company_bio"
+                rows={4}
+                value={formData.company_bio}
+                onChange={handleChange}
+                placeholder="Tell candidates about your company culture and mission..."
+                className={inputClasses}
+              />
             </div>
           </div>
 

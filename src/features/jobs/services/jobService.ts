@@ -80,6 +80,7 @@ export const JobService = {
             const jobData = {
                 ...input,
                 company_id: companyId,
+                company_bio: input.company_bio ?? null,
                 status: 'active',
                 created_at: serverTimestamp(),
                 updated_at: serverTimestamp(),
@@ -119,6 +120,7 @@ export const JobService = {
                 ('skills' in updates) ||
                 ('location' in updates) ||
                 ('type' in updates) ||
+                ('company_bio' in updates) ||
                 ('work_mode' in updates);
 
             if (shouldRegenEmbedding) {

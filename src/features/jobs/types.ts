@@ -26,6 +26,7 @@ export interface JobPosting {
         currency: string;
     };
     contactEmail: string;
+    company_bio?: string;
     status: JobStatus;
     screening_questions?: ScreeningQuestion[];
     lastActiveAt?: Timestamp | FieldValue;
@@ -45,6 +46,7 @@ export interface CreateJobInput {
     experience: string;
     employer_id: string; // Ideally passed from Auth Context
     company_id?: string;
+    company_bio?: string;
     contactEmail: string;
     salary_range?: {
         min: number;
