@@ -148,13 +148,21 @@ service cloud.firestore {
                     && request.resource.data.keys().hasOnly([
                       'candidate_id',
                       'job_id',
-                      'created_at',
-                      'status'
+                      'employer_id',
+                      'answers',
+                      'match_score',
+                      'status',
+                      'applied_at',
+                      'updated_at'
                     ])
                     // bind application to caller
                     && request.resource.data.candidate_id == request.auth.uid
                     // job must exist
                     && exists(/databases/$(database)/documents/jobs/$(request.resource.data.job_id));
+
+      allow update: if request.auth != null
+                    && get(/databases/$(database)/documents/jobs/$(resource.data.job_id)).data.employer_id == request.auth.uid
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'updated_at']);
 
       allow read: if request.auth != null
                   && (
