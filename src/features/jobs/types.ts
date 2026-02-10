@@ -19,6 +19,7 @@ export interface JobPosting {
     location: string;
     type: JobType;
     work_mode: WorkMode;
+    experience: string;
     salary_range?: {
         min: number;
         max: number;
@@ -41,6 +42,7 @@ export interface CreateJobInput {
     location: string;
     type: JobType;
     work_mode: WorkMode;
+    experience: string;
     employer_id: string; // Ideally passed from Auth Context
     company_id?: string;
     contactEmail: string;

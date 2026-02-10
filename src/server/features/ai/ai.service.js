@@ -12,10 +12,13 @@ ${type ? `Job Type: ${type}` : ''}
 ${workMode ? `Work Mode: ${workMode}` : ''}
 ${skills ? `Skills to include: ${skills}` : 'Please suggest 5-8 relevant modern skills for this role.'}
 
+Also generate 3-5 sharp, relevant screening questions for applicants (mix of technical and behavioral).
+
 Format the response as a JSON object:
 {
   "jd": "The full job description markdown text",
-  "suggestedSkills": ["skill1", "skill2", ...]
+  "suggestedSkills": ["skill1", "skill2", ...],
+  "screeningQuestions": [{"question": "string", "hint": "string"}]
 }`;
 
     const response = await ai.models.generateContent({
@@ -23,32 +26,49 @@ Format the response as a JSON object:
         contents: prompt,
     });
 
-    const text = response.text();
+    let text = '';
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    } else {
+        text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    }
+
+    if (!text) {
+        throw new Error("Empty response from AI");
+    }
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
         // Fallback to plain text if JSON extraction fails
-        return { jd: text, suggestedSkills: [] };
+        return { jd: text, suggestedSkills: [], screeningQuestions: [] };
     }
 
     try {
         return JSON.parse(jsonMatch[0]);
     } catch (e) {
-        return { jd: text, suggestedSkills: [] };
+        return { jd: text, suggestedSkills: [], screeningQuestions: [] };
     }
 };
 
 export const generateJobAssist = async (jd) => {
-    const prompt = `Analyze the following job description and provide:
-1. 3-5 relevant screening questions for candidates.
-2. 3 optimization suggestions for the job description to attract better talent.
+    const prompt = `You are a top-tier Tech Recruiter Consultant reviewing a client's DRAFT Job Description.
+    
+    Provide 3 CRITICAL & ACTIONABLE tips for the RECRUITER to improve this job post.
+        - 🛑 CRITICAL RULE: DO NOT give advice for a candidate's resume.
+        - 🛑 CRITICAL RULE: DO NOT say "quantify achievements". This is a JOB DESCRIPTION, not a RESUME. The role hasn't happened yet.
+        - FOCUS ON:
+            - **Selling the Vision:** Does the intro exciting? 
+            - **Clarity:** Is the "Responsibilities" section vague? (e.g. "Work on code" -> "Own the payment service")
+            - **Engineer Appeal:** Does it mention interesting tech challenges (scale, complexity)?
+        - Example of a GOOD tip: "The 'About Us' section is boring. Mention the specific scale challenges (e.g. 1M DAU) to hook senior engineers."
 
 Format the response as a JSON object with the following structure:
 {
-  "questions": [{"question": "string", "hint": "string"}],
   "suggestions": ["string"]
 }
 
-Job Description:
+Job Description Draft:
 ${jd}`;
 
     const response = await ai.models.generateContent({
@@ -56,7 +76,18 @@ ${jd}`;
         contents: prompt,
     });
 
-    const text = response.text();
+    let text = '';
+    if (typeof response.text === 'function') {
+        text = response.text();
+    } else if (typeof response.text === 'string') {
+        text = response.text;
+    } else {
+        text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    }
+
+    if (!text) {
+        throw new Error("Empty response from AI");
+    }
     // Extract JSON from potential markdown blocks
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {

@@ -14,6 +14,13 @@ import nodemailer from "nodemailer";
 dotenv.config({ path: ".env.production" });
 dotenv.config();
 
+// Unified Constants for AI (Single Source of Truth)
+const AI_CONSTANTS = {
+    MODEL_FAST: 'gemini-2.0-flash',
+    MODEL_EMBEDDING: 'models/gemini-embedding-001',
+    EMBEDDING_DIMENSIONS: 768,
+};
+
 // Debug: Check Environment Variables (only in non-production)
 if (process.env.NODE_ENV !== 'production') {
     console.log("Server Startup: Checking Environment Variables...");
@@ -32,6 +39,13 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors({ origin: true }));
 app.use(express.json());
+
+// Debug: Log all requests
+app.use((req, res, next) => {
+    console.log(`[API Request] ${req.method} ${req.originalUrl || req.url}`);
+    console.log(`[API Headers]`, JSON.stringify(req.headers, null, 2));
+    next();
+});
 
 // Auth Middleware
 const authMiddleware = async (req, res, next) => {
@@ -119,7 +133,7 @@ export const expandQuery = async (originalQuery, context, apiKey) => {
         const prompt = `You are an expert IT recruiter in India. Expand this search query into a detailed semantic description of the ideal ${target}. Include related skills, tools, and alternative titles. Keep it under 100 words. Query: ${originalQuery}`;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: AI_CONSTANTS.MODEL_FAST,
             contents: prompt,
         });
 
@@ -143,18 +157,19 @@ export const expandQuery = async (originalQuery, context, apiKey) => {
 
 // Helper to generate embedding (reusable)
 // Helper to generate embedding (reusable)
+// Helper to generate embedding (reusable)
 export const generateEmbedding = async (text, apiKey) => {
     const ai = new GoogleGenAI({ apiKey });
 
     // Validated model from listModels()
-    const model = "models/text-embedding-004";
+    const model = AI_CONSTANTS.MODEL_EMBEDDING;
 
     try {
         const response = await ai.models.embedContent({
             model: model,
             contents: [{ parts: [{ text }] }],
             config: {
-                outputDimensionality: 1536
+                outputDimensionality: AI_CONSTANTS.EMBEDDING_DIMENSIONS
             }
         });
 
@@ -166,11 +181,12 @@ export const generateEmbedding = async (text, apiKey) => {
             console.log(`Generated embedding length: ${response.embeddings[0].values.length}`);
             return response.embeddings[0].values;
         }
+        console.error("Gemini Embedding Response:", JSON.stringify(response, null, 2));
+        throw new Error("Invalid embedding response structure");
     } catch (error) {
         console.error(`Embedding failed with model ${model}:`, error.message);
         throw error;
     }
-    throw new Error("Invalid embedding response from Gemini API");
 };
 
 // Helper to run vector search via Firestore REST API
@@ -328,15 +344,18 @@ export const generateJdHandler = async (req, res) => {
             Experience level: ${experience || 'not specified'}.
             ${skills ? `Initial skills provided: ${skills}.` : ''}
 
+            Also generate 3-5 sharp, relevant screening questions for applicants (mix of technical and behavioral).
+
             Return your response in valid JSON format:
             {
                 "jd": "full job description text here...",
-                "suggestedSkills": ["skill1", "skill2", "skill3", "skill4", "skill5"]
+                "suggestedSkills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
+                "screeningQuestions": [{"question": "string", "hint": "string"}]
             }
         `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: AI_CONSTANTS.MODEL_FAST,
             contents: prompt,
         });
 
@@ -362,8 +381,11 @@ export const generateJdHandler = async (req, res) => {
 };
 
 export const generateJobAssistHandler = async (req, res) => {
+    console.log('[generateJobAssistHandler] Started');
     try {
         const { jd } = req.body;
+        console.log('[generateJobAssistHandler] Request body:', JSON.stringify(req.body, null, 2));
+
         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
 
         if (!jd) {
@@ -377,26 +399,27 @@ export const generateJobAssistHandler = async (req, res) => {
         const ai = new GoogleGenAI({ apiKey });
 
         const prompt = `
-            You are an expert HR assistant. Based on the following Job Description (JD), provide two things in valid JSON format:
-            1. Generate 3-5 screening questions to ask candidates during their application. Each should have a "question" and a "hint" (guidance for the candidate).
-            2. Provide 3-5 optimization suggestions to improve the JD (e.g., clarity, missing details, tone).
+            You are a top-tier Tech Recruiter Consultant reviewing a client's DRAFT Job Description.
+            
+            Provide 3 CRITICAL & ACTIONABLE tips for the RECRUITER to improve this job post.
+            - 🛑 CRITICAL RULE: DO NOT give advice for a candidate's resume.
+            - 🛑 CRITICAL RULE: DO NOT say "quantify achievements". This is a JOB DESCRIPTION, not a RESUME. The role hasn't happened yet.
+            - FOCUS ON:
+                - **Selling the Vision:** Does the intro exciting? 
+                - **Clarity:** Is the "Responsibilities" section vague? (e.g. "Work on code" -> "Own the payment service")
+                - **Engineer Appeal:** Does it mention interesting tech challenges (scale, complexity)?
 
-            JD:
-            ${jd}
-
-            Return ONLY a JSON object:
+            Return your response in valid JSON format:
             {
-                "questions": [
-                    { "question": "...", "hint": "..." }
-                ],
-                "suggestions": [
-                    "...", "..."
-                ]
+                "suggestions": ["tip 1", "tip 2", "tip 3"]
             }
+            
+            Job Description Draft:
+            ${jd}
         `;
 
         const result = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: AI_CONSTANTS.MODEL_FAST,
             contents: prompt,
         });
 

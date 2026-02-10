@@ -88,7 +88,10 @@ service cloud.firestore {
                       'embedding',
                       // Activity tracking
                       'lastActiveAt',
-                      'expiresAt'
+                      'expiresAt',
+                      'experience',
+                      'screening_questions',
+                      'company_id'
                     ])
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list
@@ -114,7 +117,10 @@ service cloud.firestore {
                       'embedding',
                       // Activity tracking
                       'lastActiveAt',
-                      'expiresAt'
+                      'expiresAt',
+                      'experience',
+                      'screening_questions',
+                      'company_id'
                     ])
                     // employer_id is immutable
                     && ( !('employer_id' in request.resource.data)

@@ -9,10 +9,10 @@ import type { JobType, WorkMode, CreateJobInput, ScreeningQuestion } from '../fe
 interface JdResponse {
   jd: string;
   suggestedSkills?: string[];
+  screeningQuestions?: ScreeningQuestion[];
 }
 
 interface AssistResponse {
-  questions?: ScreeningQuestion[];
   suggestions?: string[];
 }
 
@@ -35,7 +35,8 @@ export const PostJob: React.FC = () => {
     contactEmail: user?.email ?? '',
     salaryMin: '',
     salaryMax: '',
-    currency: 'USD'
+    currency: 'USD',
+    experience: ''
   });
 
   const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
@@ -51,31 +52,43 @@ export const PostJob: React.FC = () => {
       setGeneratingJd(true);
       setError(null);
       const token = await user?.getIdToken();
+
+      const requestBody = {
+        role: formData.title,
+        skills: formData.skills || '',
+        location: formData.location || '',
+        type: formData.type,
+        workMode: formData.work_mode,
+        experience: formData.experience
+      };
+
+      console.log('[PostJob] AI Generate Request:', requestBody);
+
       const res = await fetch('/api/ai/generate-jd', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          role: formData.title,
-          skills: formData.skills || undefined,
-          location: formData.location || undefined,
-          type: formData.type,
-          workMode: formData.work_mode
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!res.ok) {
         const errorData = (await res.json().catch(() => ({}))) as { error?: string };
+        console.error('[PostJob] AI Generate Error Response:', errorData);
         throw new Error(errorData.error ?? "Failed to generate JD");
       }
       const data = (await res.json()) as JdResponse;
+      console.log('[PostJob] Generator Response Data:', data); // Debug log
       setFormData(prev => ({
         ...prev,
         description: data.jd,
         skills: data.suggestedSkills ? data.suggestedSkills.join(', ') : prev.skills
       }));
+
+      if (data.screeningQuestions) {
+        setScreeningQuestions(data.screeningQuestions);
+      }
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : "AI Generation failed. Please try again.");
@@ -84,9 +97,9 @@ export const PostJob: React.FC = () => {
     }
   };
 
-  const handleAiGenerateAssist = async () => {
+  const handleAiReviewDraft = async () => {
     if (!formData.description) {
-      setError("Please provide a Job Description first to generate screening questions.");
+      setError("Please provide a Job Description first to review.");
       return;
     }
 
@@ -103,13 +116,13 @@ export const PostJob: React.FC = () => {
         body: JSON.stringify({ jd: formData.description })
       });
 
-      if (!res.ok) throw new Error("Failed to generate assistance data");
+      if (!res.ok) throw new Error("Failed to review draft");
       const data = (await res.json()) as AssistResponse;
-      setScreeningQuestions(data.questions ?? []);
+      // Questions are now handled by generateJD, this only returns tips
       setSuggestions(data.suggestions ?? []);
     } catch (err) {
       console.error(err);
-      setError("AI Analysis failed. Please try again.");
+      setError("AI Review failed. Please try again.");
     } finally {
       setGeneratingAssist(false);
     }
@@ -157,6 +170,7 @@ export const PostJob: React.FC = () => {
         location: formData.location,
         type: formData.type,
         work_mode: formData.work_mode,
+        experience: formData.experience,
         skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
         employer_id: user.uid,
         contactEmail: formData.contactEmail,
@@ -180,6 +194,21 @@ export const PostJob: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const prefillForm = () => {
+    setFormData(prev => ({
+      ...prev,
+      title: "Senior Full Stack Engineer",
+      skills: "React, Node.js, TypeScript, PostgreSQL, AWS",
+      location: "Remote",
+      type: "FULL_TIME",
+      work_mode: "REMOTE",
+      experience: "5+ Years",
+      salaryMin: "120000",
+      salaryMax: "180000",
+      contactEmail: user?.email ?? "test@example.com"
+    }));
   };
 
   const inputClasses = "w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:bg-black focus:text-white transition-colors placeholder:text-gray-400";
@@ -244,7 +273,7 @@ export const PostJob: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="location" className={labelClasses}>Location</label>
                 <input
@@ -273,6 +302,18 @@ export const PostJob: React.FC = () => {
                   <option value="HYBRID">HYBRID</option>
                   <option value="ONSITE">ON-SITE</option>
                 </select>
+              </div>
+              <div>
+                <label htmlFor="experience" className={labelClasses}>Experience</label>
+                <input
+                  id="experience"
+                  required
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  placeholder="e.g. 3-5 Years"
+                  className={inputClasses}
+                />
               </div>
             </div>
           </div>
@@ -318,6 +359,21 @@ export const PostJob: React.FC = () => {
                   className={inputClasses}
                 />
               </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => void handleAiReviewDraft()}
+                  disabled={generatingAssist || !formData.description}
+                  className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-white text-black px-6 py-3 hover:bg-gray-50 disabled:bg-gray-100 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                >
+                  {generatingAssist ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4 text-yellow-500" />
+                  )}
+                  Review Draft & Get Tips
+                </button>
+              </div>
             </div>
 
             {/* Suggestions (Visible if generated) */}
@@ -344,22 +400,9 @@ export const PostJob: React.FC = () => {
                 <div>
                   <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
                   <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
-                    Add questions to filter candidates effectively.
+                    Questions generated by AI based on your description. Add or remove as needed.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => void handleAiGenerateAssist()}
-                  disabled={generatingAssist || !formData.description}
-                  className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-black text-white px-6 py-3 hover:bg-gray-800 disabled:bg-gray-300 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
-                >
-                  {generatingAssist ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
-                  )}
-                  AI Suggest Questions
-                </button>
               </div>
 
               <div className="space-y-6">
@@ -478,6 +521,16 @@ export const PostJob: React.FC = () => {
               )}
             </button>
           </div>
+
+          {import.meta.env.DEV && (
+            <button
+              type="button"
+              onClick={prefillForm}
+              className="fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded shadow-lg z-50 text-xs font-mono uppercase tracking-widest hover:bg-purple-700 transition-colors"
+            >
+              [DEV] Prefill Data
+            </button>
+          )}
         </form>
       </main>
     </div>
