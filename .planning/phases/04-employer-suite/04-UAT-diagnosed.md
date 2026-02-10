@@ -1,9 +1,9 @@
 ---
 status: diagnosed
 phase: 04-employer-suite
-source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-07-SUMMARY.md
-started: 2026-02-09T00:00:00Z
-updated: 2026-02-09T01:30:00Z
+source: [04-01, 04-02, 04-03, 04-06, 04-08, 04-09]
+started: 2026-02-09T12:00:00Z
+updated: 2026-02-09T13:00:00Z
 ---
 
 ## Current Test
@@ -29,25 +29,27 @@ expected: |
   View Public Profile - changes should be visible.
 result: pass
 
-### 3. AI Job Posting Tools
+### 3. AI Job Posting Tools (New Flow Verification)
 expected: |
   Navigate to "Post a Job".
-  Enter a Job Title (e.g., "Senior React Developer").
-  Click "Generate Description" - AI should fill the JD field (now works without Skills).
-  Click "Generate Screening Questions" - AI should populate questions.
+  **Verify Flow:** Title -> Skills -> Location/Type/Mode -> "Generate Description" Button -> JD Editor.
+  Enter Title (e.g., "Senior React Developer").
+  Enter Skills, Location, Type, and Mode.
+  Click "Generate Description with AI".
+  **Verify JD is generated** and includes context from the fields above.
+  **Verify no "Missing required fields" error.**
 result: issue
-reported: "fail , as after entering Postion and clicking Auto Fill button , we get error [ERROR]: Missing required fields: role, skills, experience, after providing details the Auto Fill works But AI Suggest Questions still fails"
+reported: "400 Bad Request. Error: Missing required fields: role, skills, experience at handleAiGenerateJd (PostJob.tsx:71:15)"
 severity: major
 
-### 4. Job Creation & Listing
+### 4. Job Creation & Listing (Fix Verification)
 expected: |
   Complete the job post form and submit.
   Redirects to "Manage Jobs".
   New job appears in the list.
   Status should be "Active".
-result: issue
-reported: "fail, Error posting job: Error: Embedding service returned invalid vector at fetchEmbedding (jobService.ts:42:15) at async Object.createJob (jobService.ts:73:31) at async handleSubmit (PostJob.tsx:169:7)"
-severity: blocker
+  **Verify no "Embedding service returned invalid vector" error.**
+result: pass
 
 ### 5. ATS Kanban Board
 expected: |
@@ -56,58 +58,48 @@ expected: |
   If empty, run `npx tsx scripts/seed-applications.ts [jobId]`.
   Verify applicant cards appear.
   Drag a card to a different column - status updates immediately.
-result: skipped
-reason: "User paused testing to fix blockers"
+result: issue
+reported: "from which screen I can check this"
+severity: major
 
 ## Summary
 
 total: 5
-passed: 2
+passed: 3
 issues: 2
 pending: 0
-skipped: 1
+skipped: 0
 
 ## Gaps
 
-- truth: "AI tools (description & questions) work smoothly with minimal required fields"
+- truth: "Job posting flow is logical and AI generation works reliably"
   status: failed
-  reason: "User reported: fail , as after entering Postion and clicking Auto Fill button , we get error [ERROR]: Missing required fields: role, skills, experience, after providing details the Auto Fill works But AI Suggest Questions still fails"
+  reason: "User reported: 400 Bad Request. Error: Missing required fields: role, skills, experience"
   severity: major
   test: 3
-  root_cause: "Frontend sends 'undefined' for skills/experience which JSON.stringify removes; backend requires them. Also potential API quota exhaustion."
+  root_cause: "Backend validation is too strict. Deployed cloud function or local server middleware requires 'skills' and 'experience' to be present and non-empty, but frontend sends empty strings or undefined if user hasn't filled them yet. Need to make these fields optional in backend validation."
   artifacts:
     - path: "src/pages/PostJob.tsx"
-      issue: "Sends undefined for optional fields"
-  missing:
-    - "Ensure default empty strings for skills/experience in API payload"
-    - "Add error handling for API quota limits"
-  debug_session: ".planning/debug/ai-tools-failure.md"
-
-- truth: "Job creation succeeds and generates embeddings"
-  status: failed
-  reason: "User reported: fail, Error posting job: Error: Embedding service returned invalid vector at fetchEmbedding (jobService.ts:42:15) at async Object.createJob (jobService.ts:73:31) at async handleSubmit (PostJob.tsx:169:7)"
-  severity: blocker
-  test: 4
-  root_cause: "Embedding dimension mismatch. Frontend expects 1536 (text-embedding-004), backend may be returning 768 (older model or config ignored) or failing silently."
-  artifacts:
-    - path: "src/features/jobs/services/jobService.ts"
-      issue: "Strict validation of embedding length"
+      issue: "Frontend sends potential empty/undefined values for optional fields."
     - path: "functions/index.js"
-      issue: "Need to verify model output dimensions"
+      issue: "Backend validation logic enforces presence of optional fields."
   missing:
-    - "Verify backend model configuration for 1536 dimensions"
-    - "Relax frontend validation or ensure backend compliance"
-  debug_session: ".planning/debug/embedding-invalid-vector.md"
+    - "Relax backend validation to allow empty skills/experience"
+    - "Ensure frontend sends default empty strings instead of undefined"
+  debug_session: ".planning/debug/ai-job-posting-400-error.md"
 
-- truth: "ATS Kanban board works for created jobs"
-  status: fixed
-  reason: "Fixed in plan 04-07"
-  severity: blocker
+- truth: "ATS Kanban board is easily accessible and functional"
+  status: failed
+  reason: "User reported: from which screen I can check this"
+  severity: major
   test: 5
-  root_cause: "Cascading failure from Job Creation + Implementation bug: ApplicantCard used useDraggable inside SortableContext (requires useSortable)."
+  root_cause: "Navigation/UX issue: The 'Manage Jobs' link points to public job listing instead of employer dashboard. JobCard component lacks a 'View Applicants' button for the job owner. The route exists but is unreachable via UI."
   artifacts:
-    - path: "src/features/applications/components/ApplicantCard.tsx"
-      issue: "Used useDraggable instead of useSortable"
+    - path: "src/components/Header.tsx"
+      issue: "'Manage Jobs' link points to /jobs instead of /employer/jobs"
+    - path: "src/components/JobCard.tsx"
+      issue: "Missing 'View Applicants' button for job owner"
   missing:
-    - "Refactor ApplicantCard to use useSortable"
-  debug_session: ".planning/debug/resolved/ats-kanban-empty.md"
+    - "Update Header.tsx to point 'Manage Jobs' to employer dashboard"
+    - "Add 'View Applicants' button to JobCard when user is owner"
+  debug_session: ".planning/debug/ats-kanban-navigation-missing.md"

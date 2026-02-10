@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-employer-suite
 source: 04-01, 04-02, 04-03, 04-06, 04-10
 started: 2026-02-10T11:15:00Z
-updated: 2026-02-10T11:40:00Z
+updated: 2026-02-10T11:45:00Z
 ---
 
 ## Current Test
@@ -56,7 +56,7 @@ result: pass
 
 total: 5
 passed: 4
-issues: 1
+issues: 2
 pending: 0
 skipped: 0
 
@@ -67,17 +67,29 @@ skipped: 0
   reason: "User reported: issue with 4 - [DATABASE_ERROR] Failed to load your job postings."
   severity: blocker
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Missing Firestore composite index for querying jobs by 'employer_id' ordered by 'created_at' descending."
+  artifacts:
+    - path: "src/features/jobs/services/jobService.ts"
+      issue: "Query requires composite index"
+    - path: "firestore.indexes.json"
+      issue: "Missing index definition"
+  missing:
+    - "Add composite index to firestore.indexes.json"
+  debug_session: ".planning/debug/employer-dashboard-error.md"
 
 - truth: "Job posting form pre-fills company details"
   status: failed
   reason: "User reported: we can fetch and update the About us section rather than asking employer to fill as he is already logged in"
   severity: minor
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "PostJob form initializes with empty state and never fetches the employer's existing company profile."
+  artifacts:
+    - path: "src/pages/PostJob.tsx"
+      issue: "Missing useEffect to fetch company profile on mount"
+    - path: "src/features/jobs/types.ts"
+      issue: "Missing 'company_bio' field in JobPosting schema"
+  missing:
+    - "Update JobPosting schema to include company_bio"
+    - "Add data fetching logic to PostJob.tsx"
+    - "Add 'About Company' field to form and pre-fill it"
+  debug_session: ".planning/debug/job-posting-prefill.md"
