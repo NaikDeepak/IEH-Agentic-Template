@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 5 of 6 (Seeker Tools)
-Plan: 5 of 11 (Market Insights)
-Status: In progress - Completed 05-05-PLAN.md
-Last activity: 2026-02-11 — Implemented Adzuna market proxy and salary trends UI.
+Plan: 2 of 11 (Document Processing)
+Status: In progress - Completed 05-02-PLAN.md
+Last activity: 2026-02-11 — Implemented document processing service for DOCX and PDF.
 
-Progress: █████████████████████░░░░░ 80% (32/40 total planned tasks)
+Progress: ██████████████████████░░░░ 82% (33/40 total planned tasks)
 
 ## Performance Metrics
 
@@ -39,6 +39,8 @@ Progress: █████████████████████░░�
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-11 | 05-02 | mammoth.js for DOCX | Chosen for high-fidelity semantic text extraction suitable for LLM consumption. |
+| 2026-02-11 | 05-02 | Base64 PDF Prep | Simplified file transport to AI processing layers by converting PDFs to Base64. |
 | 2026-02-11 | 05-05 | Cloud Function JS Usage | Used JavaScript for Cloud Functions to match the existing project configuration and avoid complex TS build setups for the proxy. |
 | 2026-02-11 | 05-01 | Extension of Application Type | Reused existing Application interface but extended it with seeker-specific fields to avoid duplication. |
 | 2026-02-11 | 05-01 | Tabbed Resume Entry | Provided multiple entry points (Upload, Paste, LinkedIn) to reduce friction for seekers. |
@@ -49,7 +51,6 @@ Progress: █████████████████████░░�
 
 ### Pending Todos
 
-- Phase 5: Implement Document Processing Service for resume parsing.
 - Phase 5: Implement Seeker-side application flow and AI resume analysis.
 
 ### Blockers/Concerns
@@ -59,6 +60,6 @@ Progress: █████████████████████░░�
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Phase 5 Plan 05 (Adzuna Market Proxy)
-Resume file: .planning/phases/05-seeker-tools/05-02-PLAN.md (Assuming next plan is 02 or continuing numerical sequence)
-Session Continuity: Market insights ready. Ready to continue seeker tool implementation.
+Stopped at: Completed Phase 5 Plan 02 (Document Processing Service)
+Resume file: .planning/phases/05-seeker-tools/05-03-PLAN.md
+Session Continuity: Document processing service verified and ready for integration.
