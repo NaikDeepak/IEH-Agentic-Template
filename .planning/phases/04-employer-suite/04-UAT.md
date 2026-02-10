@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-employer-suite
 source: [04-01, 04-02, 04-03, 04-06, 04-08, 04-09]
 started: 2026-02-09T12:00:00Z
-updated: 2026-02-09T12:55:00Z
+updated: 2026-02-09T13:00:00Z
 ---
 
 ## Current Test
@@ -77,21 +77,29 @@ skipped: 0
   reason: "User reported: 400 Bad Request. Error: Missing required fields: role, skills, experience"
   severity: major
   test: 3
-  root_cause: "Backend validation error persists despite code changes. Likely caused by: 1) Local server (node index.js) not auto-restarting to pick up 'ai.controller.js' changes, or 2) Stale build artifacts in 'dist' folder if server runs from build."
+  root_cause: "Backend validation is too strict. Deployed cloud function or local server middleware requires 'skills' and 'experience' to be present and non-empty, but frontend sends empty strings or undefined if user hasn't filled them yet. Need to make these fields optional in backend validation."
   artifacts:
-    - path: "src/server/features/ai/ai.controller.js"
-      issue: "Code updated to remove 'experience' requirement, but server behavior matches old code."
+    - path: "src/pages/PostJob.tsx"
+      issue: "Frontend sends potential empty/undefined values for optional fields."
+    - path: "functions/index.js"
+      issue: "Backend validation logic enforces presence of optional fields."
   missing:
-    - "Restart local development server to apply backend changes"
-    - "Verify no stale validation logic in build artifacts"
-  debug_session: ".planning/debug/ai-generation-400-error.md"
+    - "Relax backend validation to allow empty skills/experience"
+    - "Ensure frontend sends default empty strings instead of undefined"
+  debug_session: ".planning/debug/ai-job-posting-400-error.md"
 
 - truth: "ATS Kanban board is easily accessible and functional"
   status: failed
   reason: "User reported: from which screen I can check this"
   severity: major
   test: 5
-  root_cause: "Navigation/UX issue: The entry point to the Kanban board ('View Applicants' button) is not obvious or is missing from the Manage Jobs screen."
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Navigation/UX issue: The 'Manage Jobs' link points to public job listing instead of employer dashboard. JobCard component lacks a 'View Applicants' button for the job owner. The route exists but is unreachable via UI."
+  artifacts:
+    - path: "src/components/Header.tsx"
+      issue: "'Manage Jobs' link points to /jobs instead of /employer/jobs"
+    - path: "src/components/JobCard.tsx"
+      issue: "Missing 'View Applicants' button for job owner"
+  missing:
+    - "Update Header.tsx to point 'Manage Jobs' to employer dashboard"
+    - "Add 'View Applicants' button to JobCard when user is owner"
+  debug_session: ".planning/debug/ats-kanban-navigation-missing.md"
