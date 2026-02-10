@@ -59,7 +59,7 @@ export const PostJob: React.FC = () => {
         location: formData.location || '',
         type: formData.type,
         workMode: formData.work_mode,
-        experience: formData.experience
+        experience: formData.experience || ''
       };
 
       console.log('[PostJob] AI Generate Request:', requestBody);

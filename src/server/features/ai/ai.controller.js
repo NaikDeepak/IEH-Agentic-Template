@@ -3,13 +3,23 @@ import * as aiService from './ai.service.js';
 export const generateJD = async (req, res, next) => {
     try {
         const { role, skills, location, type, workMode } = req.body;
+
+        // Log received fields for debugging
+        console.log('[ai.controller] generateJD request:', { role, skills, location, type, workMode });
+
         if (!role) {
             const error = new Error("Job Title (role) is required");
             error.statusCode = 400;
             throw error;
         }
 
-        const result = await aiService.generateJD(role, skills, location, type, workMode);
+        // Provide defaults for optional fields if they are missing or null
+        const safeSkills = skills || "";
+        const safeLocation = location || "";
+        const safeType = type || "";
+        const safeWorkMode = workMode || "";
+
+        const result = await aiService.generateJD(role, safeSkills, safeLocation, safeType, safeWorkMode);
         res.json(result);
     } catch (error) {
         next(error);

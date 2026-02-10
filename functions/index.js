@@ -330,8 +330,14 @@ const createFilter = (field, value) => ({
 
 export const generateJdHandler = async (req, res) => {
     try {
-        const { role, skills, experience } = req.body;
+        const { role, skills, experience, location, type, workMode } = req.body;
         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+
+        console.log('[functions] generateJdHandler request:', { role, skills, experience, location, type, workMode });
+
+        if (!role) {
+            return res.status(400).json({ error: "Job Title (role) is required" });
+        }
 
         if (!apiKey) {
             return res.status(500).json({ error: "Server configuration error: API Key missing" });
@@ -341,8 +347,11 @@ export const generateJdHandler = async (req, res) => {
 
         const prompt = `
             As an expert IT recruiter, generate a professional job description and a list of key skills for a ${role}.
+            Location: ${location || 'not specified'}.
+            Job Type: ${type || 'not specified'}.
+            Work Mode: ${workMode || 'not specified'}.
             Experience level: ${experience || 'not specified'}.
-            ${skills ? `Initial skills provided: ${skills}.` : ''}
+            ${skills ? `Initial skills provided: ${skills}.` : 'Please suggest 5-8 relevant modern skills for this role.'}
 
             Also generate 3-5 sharp, relevant screening questions for applicants (mix of technical and behavioral).
 
