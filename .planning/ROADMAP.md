@@ -97,17 +97,28 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-12-PLAN.md — Fix ATS Kanban Permissions (Gap Closure)
 
 ### Phase 5: Seeker Tools
-**Goal**: AI-powered preparation, analysis, and career insights
+**Goal**: Empower job seekers with AI-driven resume analysis, application tracking, and market insights.
 **Depends on**: Phase 4
 **Requirements**: SEEK-01, SEEK-02, SEEK-03, SEEK-04, SEEK-05, SEEK-06
 **Success Criteria** (what must be TRUE):
   1. Candidate receives ATS score and skill gap analysis for resumes
-  2. Candidate can practice role-specific interviews with AI feedback
-  3. Candidate can complete AI-driven skill assessments
-  4. Candidate sees real-time salary data and alumni connections
+  2. Candidate can track applications via visual Kanban board
+  3. Candidate receives daily "Top 5" curated job shortlist
+  4. Candidate sees real-time salary data and market trends
 **Research**: Likely (Complex agentic flows)
-**Research topics**: Interview agent conversational flow, real-time data sources
-**Plans**: TBD
+**Research topics**: Gemini PDF analysis, Adzuna API proxying
+**Plans**: 11 plans
+- [ ] 05-01-PLAN.md — Seeker Feature Scaffolding
+- [ ] 05-02-PLAN.md — Document Processing Service
+- [ ] 05-03-PLAN.md — Seeker Application Tracker
+- [ ] 05-04-PLAN.md — AI Resume Analysis Engine
+- [ ] 05-05-PLAN.md — Market Insights Proxy
+- [ ] 05-06-PLAN.md — Smart Job Shortlist
+- [ ] 05-07-PLAN.md — Skill Gap & Learning Loop
+- [ ] 05-08-PLAN.md — Seeker Dashboard & Navigation
+- [ ] 05-09-PLAN.md — Simulated Interview Prep
+- [ ] 05-10-PLAN.md — Verified Skill Proofs
+- [ ] 05-11-PLAN.md — Insider Connections
 
 ### Phase 6: Growth & Monetization
 **Goal**: Viral loops and revenue capture
