@@ -86,13 +86,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-01-PLAN.md — Employer Branding & Company Profile
 - [x] 04-02-PLAN.md — AI-Powered Job Posting with Screening Questions
 - [x] 04-03-PLAN.md — Basic ATS Kanban Board
-- [x] 04-04-PLAN.md — Critical API & Syntax Fixes (Gap Closure)
-- [x] 04-05-PLAN.md — ATS Pipeline Accessibility & Data (Gap Closure)
-- [x] 04-06-PLAN.md — AI Assist Routes & UX Optimization (Gap Closure)
-- [x] 04-07-PLAN.md — Final Gap Closure & Build Fixes (Gap Closure)
-- [x] 04-08-PLAN.md — Standardize Embeddings & AI Fixes (Gap Closure)
-- [x] 04-09-PLAN.md — Job Posting Flow Optimization (Gap Closure)
-- [ ] 04-10-PLAN.md — Final Gap Closure (AI Validation & Employer UX) (Gap Closure)
+- [x] 04-04-PLAN.md — Fix ESM Imports & AI Parsing (Gap Closure)
+- [x] 04-05-PLAN.md — Add Manage Jobs Nav & Seed Data (Gap Closure)
+- [x] 04-06-PLAN.md — AI Assist Backend & UX Optimization (Gap Closure)
+- [x] 04-07-PLAN.md — Final ATS DND Refactor & Build Fixes (Gap Closure)
+- [x] 04-08-PLAN.md — Standardize Embeddings & AI Payload (Gap Closure)
+- [x] 04-09-PLAN.md — Context-Aware Job Posting Flow (Gap Closure)
+- [ ] 04-10-PLAN.md — Relaxed AI Validation & Employer Dashboard (Gap Closure)
 
 ### Phase 5: Seeker Tools
 **Goal**: AI-powered preparation, analysis, and career insights
