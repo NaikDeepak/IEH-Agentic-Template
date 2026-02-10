@@ -84,7 +84,7 @@ describe('Functions: API Handlers', () => {
         it('should return search results', async () => {
             req.body = { query: 'test' };
             const embedContentMock = vi.fn().mockResolvedValueOnce({
-                embedding: { values: new Array(1536).fill(0.1) }
+                embedding: { values: new Array(768).fill(0.1) }
             });
 
             // Mock generateContent for expandQuery

@@ -17,8 +17,8 @@ const QueryAnalysisSchema = z.object({
 });
 
 /**
- * Generate embedding for a given text using gemini-embedding-001/text-embedding-004
- * @param {string} text 
+ * Generate embedding for a given text using gemini-embedding-001
+ * @param {string} text
  * @returns {Promise<number[]>}
  */
 export const generateEmbedding = async (text) => {
@@ -37,7 +37,7 @@ export const generateEmbedding = async (text) => {
 
         if (response.embedding?.values) {
             let values = EmbeddingValuesSchema.parse(response.embedding.values);
-            // Matryoshka embedding slicing - text-embedding-004 supports taking the first N dimensions
+            // Matryoshka embedding slicing - if supported by model
             if (values.length > CONSTANTS.AI.EMBEDDING_DIMENSIONS) {
                 console.warn(`[Gemini] Slicing embedding from ${values.length} to ${CONSTANTS.AI.EMBEDDING_DIMENSIONS}`);
                 values = values.slice(0, CONSTANTS.AI.EMBEDDING_DIMENSIONS);

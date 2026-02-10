@@ -38,6 +38,7 @@ Progress: ███████████████████████�
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-10 | Maintenance | Model Deprecation Response | Confirmed usage of gemini-embedding-001 (768 dims) to preempt text-embedding-004 deprecation. |
 | 2026-02-09 | 04-08 | Explicit Dimension Validation | Enforced 1536-dim check on client side to catch model mismatches early. |
 | 2026-02-09 | 04-07 | Regex-based JSON Extraction | Handles markdown-wrapped JSON from AI providers robustly. |
 | 2026-02-09 | 04-07 | Multi-route Embedding | Ensures backward compatibility while matching new service structure. |

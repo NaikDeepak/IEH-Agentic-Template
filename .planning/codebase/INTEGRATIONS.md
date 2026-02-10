@@ -9,7 +9,7 @@
   - SDK/Client: `@google/genai`
   - Auth: `API_KEY` or `GEMINI_API_KEY` env vars.
   - Models: `gemini-2.0-flash` (Generation), `models/gemini-embedding-001` (Embeddings).
-  - **Decision:** We normalized on `models/gemini-embedding-001` (768 dims) because of its stability and standard dimension support in the `@google/genai` SDK, avoiding the configuration complexity and 404 errors seen with `text-embedding-004` or `outputDimensionality` parameters.
+  - **Decision:** We normalized on `models/gemini-embedding-001` (768 dims) to avoid `text-embedding-004` deprecation (Jan 2026) and ensure stability with the `@google/genai` SDK.
 
 ## Data Storage
 
