@@ -12,7 +12,7 @@ interface EmbeddingResponse {
     embedding?: number[];
 }
 
-import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
+import { EMBEDDING_DIMENSION } from "../../../lib/ai/constants";
 
 async function fetchEmbedding(text: string): Promise<number[]> {
     const res = await fetch("/api/embedding", {

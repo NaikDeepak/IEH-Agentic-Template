@@ -5,7 +5,7 @@
  */
 
 import { initializeApp, getApps } from 'firebase-admin/app';
-import { getFirestore, Timestamp, FieldValue } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin SDK
 if (getApps().length === 0) {

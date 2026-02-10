@@ -1,17 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 
-import { CONSTANTS } from "../../server/config/constants.js";
-
-// Define a minimal type for the parts of CONSTANTS we use to satisfy strict linting
-interface AIConstants {
-    AI: {
-        EMBEDDING_DIMENSIONS: number;
-        MODEL_EMBEDDING: string;
-    }
-}
-// Cast to unknown first if CONSTANTS is not typed, then to our interface
-const Constants = CONSTANTS as unknown as AIConstants;
+import { EMBEDDING_DIMENSION, EMBEDDING_MODEL } from "./constants";
 
 // Server-only: Lazy initialization to avoid crashes on client-side imports
 let aiInstance: GoogleGenAI | null = null;
@@ -32,7 +22,8 @@ function getAI(): GoogleGenAI {
 /**
  * Generates a vector embedding for the given text using gemini-embedding-001.
  */
-export const EMBEDDING_DIMENSION = Constants.AI.EMBEDDING_DIMENSIONS;
+// Re-export for backward compatibility if needed, though direct import from constants is preferred
+export { EMBEDDING_DIMENSION } from "./constants";
 
 // Zod schema for a single embedding object
 const ContentEmbeddingSchema = z.object({
@@ -52,14 +43,14 @@ export async function generateEmbedding(text: string): Promise<number[]> {
     try {
         const client = getAI();
         const response = await client.models.embedContent({
-            model: Constants.AI.MODEL_EMBEDDING,
+            model: EMBEDDING_MODEL,
             contents: [
                 {
                     parts: [{ text }],
                 },
             ],
             config: {
-                outputDimensionality: Constants.AI.EMBEDDING_DIMENSIONS
+                outputDimensionality: EMBEDDING_DIMENSION
             }
         });
 
