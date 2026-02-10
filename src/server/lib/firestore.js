@@ -44,7 +44,7 @@ export const runVectorSearch = async (collectionName, queryVector, filters = [],
         const snapshot = await vectorQuery.get();
 
         // Map results
-        return snapshot.docs.map(doc => {
+        const results = snapshot.docs.map(doc => {
             const data = doc.data();
 
             // Calculate match score manually or use distance property if available in future SDKs
@@ -64,7 +64,8 @@ export const runVectorSearch = async (collectionName, queryVector, filters = [],
             const getVecArray = (v) => {
                 if (Array.isArray(v)) return v;
                 if (v && typeof v.toArray === 'function') return v.toArray();
-                if (v && Array.isArray(v._values)) return v._values; // Internal fallback
+                // Relying on internal properties like `_values` is risky.
+                // It's better to fail explicitly if the documented method isn't available.
                 return null;
             };
 
@@ -91,6 +92,28 @@ export const runVectorSearch = async (collectionName, queryVector, filters = [],
                 matchScore
             };
         });
+
+        // Apply post-filtering based on constraints (e.g., status=active)
+        if (filters && filters.length > 0) {
+            console.log(`[Firestore] Applying ${filters.length} post-filters to ${results.length} initial results`);
+            const filteredResults = results.filter(item => {
+                return filters.every(filter => {
+                    // Handle structured query format from createFilter
+                    if (filter.fieldFilter && filter.fieldFilter.op === 'EQUAL') {
+                        const fieldPath = filter.fieldFilter.field.fieldPath;
+                        const filterValue = filter.fieldFilter.value.stringValue;
+
+                        // Check exact match
+                        return item[fieldPath] === filterValue;
+                    }
+                    return true;
+                });
+            });
+            console.log(`[Firestore] Post-filtering complete. Returning ${filteredResults.length} results.`);
+            return filteredResults;
+        }
+
+        return results;
 
     } catch (error) {
         console.error(`[Firestore] Admin SDK Vector Search Failed:`, error);

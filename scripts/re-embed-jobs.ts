@@ -20,6 +20,8 @@ if (!apiKey) {
 }
 const ai = new GoogleGenAI({ apiKey });
 
+const EMBEDDING_DIMENSION = 768;
+
 // Helper to generate embedding using gemini-embedding-001 ensuring 768 dim via slicing
 async function generateEmbedding(text: string): Promise<number[] | null> {
     if (!text.trim()) return null;
@@ -28,7 +30,7 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
         const response = await ai.models.embedContent({
             model: "models/gemini-embedding-001",
             contents: [{ parts: [{ text }] }],
-            outputDimensionality: 768
+            outputDimensionality: EMBEDDING_DIMENSION
         });
 
         // Handle response variations
@@ -45,8 +47,8 @@ async function generateEmbedding(text: string): Promise<number[] | null> {
         }
 
         // Apply slicing if needed (e.g. if API ignores outputDimensionality and returns 3072)
-        if (values.length > 768) {
-            values = values.slice(0, 768);
+        if (values.length > EMBEDDING_DIMENSION) {
+            values = values.slice(0, EMBEDDING_DIMENSION);
         }
 
         console.log(`Generated embedding. Length: ${values.length}`);
