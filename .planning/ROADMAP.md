@@ -92,7 +92,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-07-PLAN.md — Final ATS DND Refactor & Build Fixes (Gap Closure)
 - [x] 04-08-PLAN.md — Standardize Embeddings & AI Payload (Gap Closure)
 - [x] 04-09-PLAN.md — Context-Aware Job Posting Flow (Gap Closure)
-- [ ] 04-10-PLAN.md — Relaxed AI Validation & Employer Dashboard (Gap Closure)
+- [x] 04-10-PLAN.md — Relaxed AI Validation & Employer Dashboard (Gap Closure)
 
 ### Phase 5: Seeker Tools
 **Goal**: AI-powered preparation, analysis, and career insights
@@ -129,7 +129,7 @@ Phases execute in numeric order.
 | 1. Foundation & Identity | 3/3 | Completed | 2026-01-16 |
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
 | 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
-| 4. Employer Suite | 9/10 | In Progress | - |
+| 4. Employer Suite | 10/10 | Completed | 2026-02-10 |
 | 5. Seeker Tools | 0/TBD | Not started | - |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
 
