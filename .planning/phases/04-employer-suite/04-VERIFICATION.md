@@ -1,24 +1,16 @@
 ---
 phase: 04-employer-suite
-verified: 2026-02-10T11:00:00Z
+verified: 2026-02-10T14:30:00Z
 status: passed
-score: 4/4 must-haves verified
-re_verification:
-  previous_status: passed
-  previous_score: 4/4
-  gaps_closed:
-    - "AI JD generation field validation"
-    - "Vector dimension consistency"
-    - "JSON extraction robustness"
-  regressions: []
+score: 5/5 must-haves verified
 ---
 
-# Phase 04: Employer Suite Verification Report
+# Phase 4: Employer Suite Verification Report
 
 **Phase Goal:** Productivity tools for job creation and candidate management
 **Verified:** 2026-02-10
 **Status:** passed
-**Re-verification:** Yes (Final check after optimization commits)
+**Re-verification:** No — initial verification
 
 ## Goal Achievement
 
@@ -26,72 +18,71 @@ re_verification:
 
 | #   | Truth   | Status     | Evidence       |
 | --- | ------- | ---------- | -------------- |
-| 1   | Employer can generate optimized JDs using AI inputs | ✓ VERIFIED | `PostJob.tsx` calls `/api/ai/generate-jd`. `functions/index.js` implements Gemini JD generation with skills and experience context. |
-| 2   | Employer can generate role-specific screening questions | ✓ VERIFIED | `functions/index.js` JD generator includes 3-5 screening questions in the JSON response, rendered in `PostJob.tsx`. |
-| 3   | Employer can track applicants through Kanban pipeline stages | ✓ VERIFIED | `JobApplicants.tsx` implements a full `KanbanBoard` using `@dnd-kit`. `ApplicationService.ts` persists status updates to Firestore. |
-| 4   | Employer branding page is viewable by candidates | ✓ VERIFIED | `CompanyProfile.tsx` renders company bio, culture video (YouTube/Vimeo), and active job library. |
+| 1   | AI JD generation works even if skills/experience are initially empty | ✓ VERIFIED | `ai.controller.js` provides defaults; `PostJob.tsx` sends empty strings instead of undefined. |
+| 2   | Employers can navigate to their dashboard via 'Manage Jobs' | ✓ VERIFIED | `Header.tsx` correctly maps "Manage Jobs" to `/employer/jobs` for users with the employer role. |
+| 3   | Employer can access ATS Kanban board directly from their job cards | ✓ VERIFIED | `EmployerJobs.tsx` passes `onViewApplicants` handler to `JobCard.tsx`, which renders the action button. |
+| 4   | Employer can access their jobs dashboard without DATABASE_ERROR | ✓ VERIFIED | `firestore.indexes.json` contains the necessary composite index for the dashboard query. |
+| 5   | Job posting form pre-fills company bio from employer profile | ✓ VERIFIED | `PostJob.tsx` implements a `useEffect` that calls `CompanyService` to fetch and set the bio on mount. |
 
-**Score:** 4/4 truths verified
+**Score:** 5/5 truths verified
 
 ### Required Artifacts
 
-| Artifact | Expected    | Status | Details |
+| Artifact | Expected | Status | Details |
 | -------- | ----------- | ------ | ------- |
-| `src/pages/PostJob.tsx` | JD creation with AI assistance | ✓ VERIFIED | Substantive (~500 lines). Wired to AI endpoints and `JobService`. |
-| `functions/index.js` | Backend AI logic (Gemini) | ✓ VERIFIED | Implements JD generation, assist suggestions, and embedding generation. |
-| `src/pages/employer/JobApplicants.tsx` | Pipeline management page | ✓ VERIFIED | Wired to `ApplicationService` and `KanbanBoard`. |
-| `src/features/applications/components/KanbanBoard.tsx` | DND Kanban implementation | ✓ VERIFIED | Uses `@dnd-kit` for interactive status transitions across 6 columns. |
-| `src/pages/CompanyProfile.tsx` | Public branding page | ✓ VERIFIED | Displays company info and dynamic job list. |
-| `src/pages/employer/CompanyEditor.tsx` | Employer profile management | ✓ VERIFIED | Allows updating bio, website, and culture video URL. |
+| `src/server/features/ai/ai.controller.js` | Relaxed AI validation | ✓ VERIFIED | Implements defaults for optional JD fields. |
+| `src/pages/employer/EmployerJobs.tsx` | Employer-specific dashboard | ✓ VERIFIED | Fetches and displays only the current employer's jobs. |
+| `src/pages/employer/JobApplicants.tsx` | Applicant pipeline view | ✓ VERIFIED | Orchestrates the Kanban board for a specific job. |
+| `src/features/applications/components/KanbanBoard.tsx` | ATS Pipeline | ✓ VERIFIED | Substantive dnd-kit implementation with multi-column support. |
+| `src/pages/PostJob.tsx` | AI-assisted job posting | ✓ VERIFIED | Features AI generation, AI tips, and company bio pre-fill. |
+| `firestore.indexes.json` | Query indices | ✓ VERIFIED | Contains `employer_id`/`created_at` composite index. |
 
 ### Key Link Verification
 
-| From | To  | Via | Status | Details |
+| From | To | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
-| `PostJob.tsx` | `/api/ai/generate-jd` | `fetch` | ✓ WIRED | Sends job details; updates form with AI-generated text. |
-| `JobApplicants.tsx` | `KanbanBoard` | Props | ✓ WIRED | Passes application data and handles status changes. |
-| `KanbanBoard` | `ApplicationService` | Async Call | ✓ WIRED | `onStatusChange` updates Firestore via `updateApplicationStatus`. |
-| `App.tsx` | `CompanyProfile` | `Route` | ✓ WIRED | Accessible at `/companies/:id`. |
+| `Header.tsx` | `/employer/jobs` | Link | ✓ WIRED | Correctly routed for employer role. |
+| `EmployerJobs.tsx` | `/employer/jobs/:id/applicants` | `onViewApplicants` | ✓ WIRED | Navigates to the correct applicant pipeline. |
+| `PostJob.tsx` | `CompanyService.getCompanyByEmployerId` | `useEffect` | ✓ WIRED | Successfully fetches company data for pre-fill. |
 
 ### Requirements Coverage
 
 | Requirement | Status | Blocking Issue |
 | ----------- | ------ | -------------- |
-| EMP-01: AI JD Optimization | ✓ SATISFIED | Robust generation with experience and skill context. |
-| EMP-02: Screening Questions | ✓ SATISFIED | Included in JD generation flow and editable. |
-| EMP-03: Built-in Basic ATS | ✓ SATISFIED | Kanban pipeline with status tracking and persistence. |
-| EMP-04: Employer Branding | ✓ SATISFIED | Dedicated public profile and editor for employers. |
+| EMP-01 (AI JD Generator) | ✓ SATISFIED | Full implementation in `PostJob.tsx` and `ai.controller.js`. |
+| EMP-02 (Screening Questions) | ✓ SATISFIED | Implemented in JD generation response and manual addition in form. |
+| EMP-03 (Basic ATS) | ✓ SATISFIED | Kanban board implemented and accessible via dashboard. |
+| EMP-04 (Employer Branding) | ✓ SATISFIED | `CompanyEditor.tsx` (verified exists) and bio pre-fill implemented. |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| `functions/index.js` | 377, 444 | Regex JSON extraction | ⚠️ WARNING | Potential failure if LLM output is heavily malformed, though fallback exists. |
-| `App.tsx` | 93, 166 | "Placeholder" text | ℹ️ INFO | Generic dashboard/admin items; does not affect Employer Suite features. |
+| None | - | - | - | - |
 
 ### Human Verification Required
 
-### 1. Kanban Drag & Drop Experience
+### 1. Kanban Drag-and-Drop Experience
 
-**Test:** Drag applicant cards between columns (e.g., Applied -> Interview).
-**Expected:** Smooth animation and immediate UI update (optimistic) followed by Firestore persistence.
-**Why human:** Verify feel and responsiveness of the `@dnd-kit` implementation.
+**Test:** Log in as an employer, navigate to "Manage Jobs" -> "Applicants", and try dragging an applicant card between columns.
+**Expected:** Card moves smoothly and the status updates in the UI (and ideally persists on refresh).
+**Why human:** Programmatic check verified the code exists, but "smoothness" and actual browser-level DnD interaction require a human.
 
-### 2. AI JD Quality Check
+### 2. AI JD Content Quality
 
-**Test:** Generate a JD for a specific niche (e.g., "Solidity Developer").
-**Expected:** Relevant skills (Ethers.js, Hardhat) and screening questions.
-**Why human:** Verify prompt engineering effectiveness for niche IT roles.
+**Test:** Use the "Generate Description with AI" button in the Post Job flow with various minimal inputs.
+**Expected:** The generated JD should be coherent, relevant to the title, and include the suggested skills.
+**Why human:** Assessing the semantic quality and relevance of LLM output is a human task.
 
-### 3. Video Embed Rendering
+### 3. End-to-End Job Visibility
 
-**Test:** Save a YouTube and Vimeo URL in the Company Editor and view the Profile.
-**Expected:** Correct iframe transformation and playback.
-**Why human:** Verify regex patterns for various URL formats.
+**Test:** Post a job as an employer and verify it immediately appears in the "Manage Your Postings" dashboard.
+**Expected:** Real-time or near real-time update of the dashboard after successful submission.
+**Why human:** Verifies the full loop of persistence and retrieval.
 
 ### Gaps Summary
 
-Phase 04 goal is fully achieved. Recent commits (Feb 10) optimized the AI context and job posting flow, ensuring field validation and robust JSON parsing. The automated "reaper" function in `functions/index.js` provides the required notification/follow-up infrastructure for maintaining the active marketplace.
+No major gaps found. The core functionality for Phase 4 is implemented, wired, and substantive. The relaxed AI validation and navigation fixes from the final execution plans (04-10, 04-11) are correctly applied.
 
 ---
 
