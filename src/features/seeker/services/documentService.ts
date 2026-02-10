@@ -1,0 +1,21 @@
+import mammoth from 'mammoth';
+
+/**
+ * Service to handle document processing for resumes.
+ */
+
+/**
+ * Extracts clean text from a DOCX file using mammoth.js.
+ * @param file The DOCX file as a File object or ArrayBuffer
+ * @returns Promise resolving to the extracted text
+ */
+export const parseDocx = async (file: File | ArrayBuffer): Promise<string> => {
+    try {
+        const arrayBuffer = file instanceof File ? await file.arrayBuffer() : file;
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        return result.value; // The generated raw text
+    } catch (error) {
+        console.error('Error parsing DOCX:', error);
+        throw new Error('Failed to parse DOCX file. Please ensure it is a valid document.');
+    }
+};
