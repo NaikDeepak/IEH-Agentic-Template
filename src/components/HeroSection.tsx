@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { searchJobs } from '../lib/ai/search';
-import { ArrowRight, Star, Globe, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, Globe, ArrowUpRight, Users, Zap, Target } from 'lucide-react';
 
 export const HeroSection: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -22,9 +23,9 @@ export const HeroSection: React.FC = () => {
     return (
         <section className="relative w-full border-b-2 border-black bg-white font-sans text-black">
             <div className="container mx-auto max-w-7xl px-4 md:px-8 pt-12 md:pt-24 pb-12">
-                <div className="flex flex-col lg:flex-row gap-12 lg:gap-0 border-2 border-black">
+                <div className="flex flex-col lg:flex-row gap-0 border-2 border-black">
 
-                    {/* Left Content */}
+                    {/* Left Content — Job Seekers */}
                     <div className="w-full lg:w-7/12 p-8 md:p-12 lg:p-16 flex flex-col justify-between border-b-2 lg:border-b-0 lg:border-r-2 border-black relative overflow-hidden">
 
                         {/* Decorative Grid Background */}
@@ -37,13 +38,13 @@ export const HeroSection: React.FC = () => {
                             </div>
 
                             <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
-                                India<br/>
-                                Employment<br/>
+                                India<br />
+                                Employment<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-500 to-black animate-gradient-x">Hub</span>
                             </h1>
 
                             <p className="text-lg md:text-xl font-medium text-gray-600 max-w-lg leading-relaxed border-l-4 border-black pl-6">
-                                The definitive marketplace for elite talent and premier employers. AI-powered matching. Zero friction.
+                                Find your next career move. AI-powered matching connects you to verified opportunities — zero friction, zero ghosting.
                             </p>
 
                             {/* Search Box */}
@@ -55,11 +56,13 @@ export const HeroSection: React.FC = () => {
                                         onChange={(e) => { setSearchTerm(e.target.value); }}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                         placeholder="SEARCH ROLES..."
+                                        aria-label="Search for job roles"
                                         className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-black placeholder:text-gray-400 font-mono text-sm uppercase tracking-wider"
                                     />
                                     <button
                                         onClick={handleSearch}
                                         disabled={isLoading}
+                                        aria-label="Search"
                                         className="bg-black text-white px-6 py-4 hover:bg-[#003366] transition-colors flex items-center justify-center border-l-2 border-black"
                                     >
                                         <ArrowRight className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
@@ -85,12 +88,12 @@ export const HeroSection: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Visual */}
+                    {/* Right Panel — Employers */}
                     <div className="w-full lg:w-5/12 bg-gray-100 relative min-h-[500px] lg:min-h-auto flex flex-col">
-                         {/* Top Marquee Strip */}
-                         <div className="bg-[#003366] text-white py-2 overflow-hidden border-b-2 border-black">
+                        {/* Top Marquee Strip */}
+                        <div className="bg-[#003366] text-white py-2 overflow-hidden border-b-2 border-black">
                             <div className="flex animate-marquee whitespace-nowrap">
-                                {Array.from({length: 10}).map((_, i) => (
+                                {Array.from({ length: 10 }).map((_, i) => (
                                     <span key={i} className="mx-4 text-xs font-mono uppercase tracking-widest font-bold flex items-center gap-2">
                                         <Globe className="w-3 h-3" /> Hiring Globally
                                     </span>
@@ -105,18 +108,41 @@ export const HeroSection: React.FC = () => {
                                 className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
                             />
 
-                            {/* Overlay Card */}
-                            <div className="absolute bottom-0 right-0 p-8 w-full">
-                                <div className="bg-white border-2 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-xs ml-auto">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <Star className="w-8 h-8 text-black fill-black" />
-                                        <ArrowUpRight className="w-6 h-6 text-black" />
-                                    </div>
-                                    <h3 className="font-bold text-xl uppercase leading-none mb-2">Top Recruiter</h3>
-                                    <p className="text-xs font-mono text-gray-500 leading-tight">
-                                        VERIFIED EMPLOYERS ACTIVELY HIRING ACROSS TECH, DESIGN, AND MANAGEMENT.
+                            {/* Dark Overlay for Readability */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+
+                            {/* Employer Value Overlay */}
+                            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                                <div className="mb-6">
+                                    <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none mb-3">
+                                        Hire Smarter.<br />Hire Faster.
+                                    </h2>
+                                    <p className="text-sm font-mono opacity-80 leading-relaxed max-w-sm">
+                                        AI-POWERED TALENT MATCHING. POST JOBS. FIND CANDIDATES. ZERO FRICTION.
                                     </p>
                                 </div>
+
+                                {/* Employer Stats */}
+                                <div className="flex gap-6 mb-6 border-t border-white/30 pt-4">
+                                    <div className="flex items-center gap-2">
+                                        <Zap className="w-4 h-4 text-emerald-400" />
+                                        <span className="text-xs font-mono font-bold uppercase tracking-wider">40% Faster Hiring</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Target className="w-4 h-4 text-emerald-400" />
+                                        <span className="text-xs font-mono font-bold uppercase tracking-wider">93% Placement</span>
+                                    </div>
+                                </div>
+
+                                {/* Employer CTA */}
+                                <Link
+                                    to="/post-job"
+                                    className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-emerald-400 hover:text-black transition-colors border-2 border-white hover:border-emerald-400 group/cta shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)]"
+                                >
+                                    <Users className="w-5 h-5" />
+                                    Post a Job Free
+                                    <ArrowUpRight className="w-4 h-4 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5 transition-transform" />
+                                </Link>
                             </div>
                         </div>
                     </div>

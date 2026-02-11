@@ -40,7 +40,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
             </div>
 
             <div className="relative z-10">
-               <span className="text-xs font-mono font-bold uppercase tracking-widest border-b border-current pb-0.5 group-hover:pb-1 transition-all">Explore Roles</span>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest border-b border-current pb-0.5 group-hover:pb-1 transition-all">Explore Roles</span>
             </div>
         </motion.button>
     );
@@ -55,56 +55,56 @@ export const FeaturesSection: React.FC = () => {
                 <div className="mb-16 flex flex-col md:flex-row justify-between items-end border-b-2 border-black pb-8 gap-8">
                     <div>
                         <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-4 leading-[0.85]">
-                            Trending<br/>Sectors
+                            Trending<br />Sectors
                         </h2>
                     </div>
                     <p className="text-gray-600 max-w-md text-sm font-mono uppercase tracking-wide text-right md:text-left">
-                        Curated opportunities across high-growth industries. Verified employers only.
+                        Verified opportunities from 12K+ employers across India. Specializing in IT & digital services.
                     </p>
                 </div>
 
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-0 border-2 border-black bg-black">
 
-                    {/* Creative & Design */}
+                    {/* Software Engineering */}
                     <div className="md:col-span-4">
                         <ServiceCard
-                            title="Creative & Design"
-                            image="/images/feature_creative.png"
-                            tags={['UI/UX', '3D Art', 'Motion']}
+                            title="Software Engineering"
+                            image="/images/sector_software.png"
+                            tags={['Frontend', 'Backend', 'Systems']}
                             className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white"
                         />
                     </div>
 
-                    {/* Media & Production */}
+                    {/* Cloud & DevOps */}
                     <div className="md:col-span-4">
                         <ServiceCard
-                            title="Media Production"
-                            image="/images/feature_video.png"
-                            tags={['Editing', 'Sound', 'Camera']}
+                            title="Cloud & DevOps"
+                            image="/images/sector_cloud.png"
+                            tags={['Infrastructure', 'AWS', 'Security']}
                             className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-black"
                             dark
                         />
                     </div>
 
-                    {/* Brand Identity */}
+                    {/* Data Science & AI */}
                     <div className="md:col-span-4">
                         <ServiceCard
-                            title="Brand Identity"
-                            image="/images/feature_graphic.png"
-                            tags={['Strategy', 'Visuals', 'Copy']}
+                            title="Data Science & AI"
+                            image="/images/sector_data_ai.png"
+                            tags={['MLOps', 'Big Data', 'Analytics']}
                             className="h-full border-0 bg-white"
                         />
                     </div>
 
-                    {/* Digital Marketing (Wide Card) */}
+                    {/* ITES & Business Operations (Wide Card) */}
                     <div className="md:col-span-12 border-t-2 border-black">
                         <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden group bg-gray-100 flex flex-col md:flex-row">
                             <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b-2 md:border-b-0 md:border-r-2 border-black bg-white z-10">
                                 <div>
-                                    <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">Digital<br/>Marketing</h3>
+                                    <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">ITES & Business<br />Operations</h3>
                                     <div className="flex flex-wrap gap-3">
-                                        {['SEO Specialist', 'Growth', 'PPC', 'Social Media', 'Analytics'].map((tag, i) => (
+                                        {['Customer Success', 'Tech Support', 'Global Ops', 'BPO', 'Management'].map((tag, i) => (
                                             <span key={i} className="text-xs font-mono font-bold uppercase tracking-wider px-3 py-1.5 border-2 border-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-default">
                                                 {tag}
                                             </span>
@@ -112,18 +112,32 @@ export const FeaturesSection: React.FC = () => {
                                     </div>
                                 </div>
                                 <button className="flex items-center gap-4 text-lg font-bold uppercase tracking-wide group-hover:translate-x-2 transition-transform w-fit">
-                                    View 140+ Openings <ArrowRight className="w-5 h-5" />
+                                    View 450+ Openings <ArrowRight className="w-5 h-5" />
                                 </button>
                             </div>
 
                             <div className="w-full md:w-1/2 relative overflow-hidden">
-                                <img src="/images/feature_marketing.png" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                <img src="/images/sector_ites.png" alt="ITES & Business Operations" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                             </div>
                         </div>
                     </div>
 
                 </div>
+
+                {/* Employer CTA */}
+                <div className="mt-8 flex items-center justify-between border-2 border-black p-6 bg-gray-50">
+                    <p className="text-sm font-mono font-bold uppercase tracking-wider text-gray-600">
+                        Can't find your industry? Reach talent across all sectors.
+                    </p>
+                    <a
+                        href="/post-job"
+                        className="hidden md:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4"
+                    >
+                        Post a Job <ArrowUpRight className="w-4 h-4" />
+                    </a>
+                </div>
+
             </div>
         </section>
     );
