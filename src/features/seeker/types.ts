@@ -24,9 +24,38 @@ export interface SeekerProfile {
         remote: boolean;
         minSalary?: number;
     };
-    onboarded: boolean;
+    saved_resources?: {
+        title: string;
+        url: string;
+    }[];
+    verified_skills?: string[]; // List of skills that have been verified
     created_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
+}
+
+export interface AssessmentQuestion {
+    id: string;
+    text: string;
+    options: string[];
+    correctOptionIndex?: number; // Internal use, verify on server/via AI
+}
+
+export interface Assessment {
+    id: string;
+    skill: string;
+    questions: AssessmentQuestion[];
+    generated_at: Timestamp | FieldValue;
+}
+
+export interface AssessmentResult {
+    id?: string;
+    assessmentId: string;
+    user_id: string;
+    skill: string;
+    score: number;
+    passed: boolean;
+    feedback: string;
+    completed_at: Timestamp | FieldValue;
 }
 
 export interface ResumeAnalysisResult {
@@ -86,6 +115,7 @@ export interface SkillGap {
         title: string;
         url: string;
         type: 'course' | 'article' | 'video';
+        skill_name?: string;
     }[];
     identified_at: Timestamp | FieldValue;
 }
