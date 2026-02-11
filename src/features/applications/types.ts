@@ -14,6 +14,8 @@ export interface Application {
     match_score: number;
     applied_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
+    needsFollowUp?: boolean;
+    nudgeReason?: string;
 }
 
 export interface SubmitApplicationInput {

@@ -15,31 +15,29 @@ import {
 import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import type { Application, ApplicationStatus } from '../types';
 import { KanbanColumn } from './KanbanColumn';
-import { ApplicantCard } from './ApplicantCard';
 
-interface KanbanBoardProps {
-  applications: Application[];
-  onStatusChange: (applicationId: string, newStatus: ApplicationStatus) => void;
+interface KanbanBoardProps<T extends { id?: string; status: string }> {
+  items: T[];
+  columns: { id: string; title: string }[];
+  onStatusChange: (id: string, newStatus: string) => void;
+  renderCard: (item: T) => React.ReactNode;
+  renderOverlayCard: (item: T) => React.ReactNode;
 }
 
-const COLUMNS: { id: ApplicationStatus; title: string }[] = [
-  { id: 'applied', title: 'Applied' },
-  { id: 'screening', title: 'Screening' },
-  { id: 'interview', title: 'Interview' },
-  { id: 'offer', title: 'Offer' },
-  { id: 'hired', title: 'Hired' },
-  { id: 'rejected', title: 'Rejected' },
-];
-
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatusChange }) => {
+export function KanbanBoard<T extends { id?: string; status: string }>({
+  items,
+  columns,
+  onStatusChange,
+  renderCard,
+  renderOverlayCard
+}: KanbanBoardProps<T>) {
   const [activeId, setActiveId] = React.useState<string | null>(null);
-  const [localApplications, setLocalApplications] = React.useState<Application[]>(applications);
+  const [localItems, setLocalItems] = React.useState<T[]>(items);
 
   React.useEffect(() => {
-    setLocalApplications(applications);
-  }, [applications]);
+    setLocalItems(items);
+  }, [items]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -60,21 +58,21 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatus
     const { active, over } = event;
     if (!over) return;
 
-    const activeAppId = active.id as string;
-    const overId = over.id as string;
+    const activeIdVal = active.id as string;
+    const overIdVal = over.id as string;
 
-    const activeApp = localApplications.find((app) => app.id === activeAppId);
-    if (!activeApp) return;
+    const activeItem = localItems.find((item) => item.id === activeIdVal);
+    if (!activeItem) return;
 
     // Is it dropping over a column?
-    const isOverAColumn = COLUMNS.some((col) => col.id === overId);
+    const isOverAColumn = columns.some((col) => col.id === overIdVal);
 
     if (isOverAColumn) {
-      const newStatus = overId as ApplicationStatus;
-      if (activeApp.status !== newStatus) {
-        setLocalApplications((prev) =>
-          prev.map((app) =>
-            app.id === activeAppId ? { ...app, status: newStatus } : app
+      const newStatus = overIdVal;
+      if (activeItem.status !== newStatus) {
+        setLocalItems((prev) =>
+          prev.map((item) =>
+            item.id === activeIdVal ? { ...item, status: newStatus } : item
           )
         );
       }
@@ -82,11 +80,11 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatus
     }
 
     // Is it dropping over another card?
-    const overApp = localApplications.find((app) => app.id === overId);
-    if (overApp && activeApp.status !== overApp.status) {
-      setLocalApplications((prev) =>
-        prev.map((app) =>
-          app.id === activeAppId ? { ...app, status: overApp.status } : app
+    const overItem = localItems.find((item) => item.id === overIdVal);
+    if (overItem && activeItem.status !== overItem.status) {
+      setLocalItems((prev) =>
+        prev.map((item) =>
+          item.id === activeIdVal ? { ...item, status: overItem.status } : item
         )
       );
     }
@@ -99,37 +97,37 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatus
       return;
     }
 
-    const activeAppId = active.id as string;
-    const overId = over.id as string;
+    const activeIdVal = active.id as string;
+    const overIdVal = over.id as string;
 
-    const activeApp = localApplications.find((app) => app.id === activeAppId);
-    if (!activeApp) {
+    const activeItem = localItems.find((item) => item.id === activeIdVal);
+    if (!activeItem) {
       setActiveId(null);
       return;
     }
 
-    let newStatus: ApplicationStatus = activeApp.status;
+    let newStatus: string = activeItem.status;
 
     // If dropped over a column
-    if (COLUMNS.some((col) => col.id === overId)) {
-      newStatus = overId as ApplicationStatus;
+    if (columns.some((col) => col.id === overIdVal)) {
+      newStatus = overIdVal;
     } else {
-      // If dropped over another application
-      const overApp = localApplications.find((app) => app.id === overId);
-      if (overApp) {
-        newStatus = overApp.status;
+      // If dropped over another item
+      const overItem = localItems.find((item) => item.id === overIdVal);
+      if (overItem) {
+        newStatus = overItem.status;
       }
     }
 
-    if (activeApp.status !== newStatus || activeAppId !== overId) {
-      onStatusChange(activeAppId, newStatus);
+    if (activeItem.status !== newStatus || activeIdVal !== overIdVal) {
+      onStatusChange(activeIdVal, newStatus);
     }
 
     setActiveId(null);
   };
 
-  const activeApplication = activeId
-    ? localApplications.find((app) => app.id === activeId)
+  const activeItem = activeId
+    ? localItems.find((item) => item.id === activeId)
     : null;
 
   return (
@@ -141,12 +139,13 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatus
       onDragEnd={handleDragEnd}
     >
       <div className="flex gap-6 overflow-x-auto pb-8 min-h-[600px] items-start">
-        {COLUMNS.map((column) => (
-          <KanbanColumn
+        {columns.map((column) => (
+          <KanbanColumn<T>
             key={column.id}
             id={column.id}
             title={column.title}
-            applications={localApplications.filter((app) => app.status === column.id)}
+            items={localItems.filter((item) => item.status === column.id)}
+            renderCard={renderCard}
           />
         ))}
       </div>
@@ -162,8 +161,8 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ applications, onStatus
           }),
         }}
       >
-        {activeApplication ? <ApplicantCard application={activeApplication} /> : null}
+        {activeItem ? renderOverlayCard(activeItem) : null}
       </DragOverlay>
     </DndContext>
   );
-};
+}

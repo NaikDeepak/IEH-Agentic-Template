@@ -8,6 +8,8 @@ import type { JobPosting } from '../../features/jobs/types';
 import { Header } from '../../components/Header';
 import { Loader2, ArrowLeft, Users, ExternalLink } from 'lucide-react';
 
+import { ApplicantCard } from '../../features/applications/components/ApplicantCard';
+
 export const JobApplicants: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -15,6 +17,15 @@ export const JobApplicants: React.FC = () => {
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const COLUMNS = [
+        { id: 'applied', title: 'Applied' },
+        { id: 'screening', title: 'Screening' },
+        { id: 'interview', title: 'Interview' },
+        { id: 'offer', title: 'Offer' },
+        { id: 'hired', title: 'Hired' },
+        { id: 'rejected', title: 'Rejected' },
+    ];
 
     useEffect(() => {
         const loadData = async () => {
@@ -128,9 +139,14 @@ export const JobApplicants: React.FC = () => {
                     </div>
                 </div>
 
-                <KanbanBoard
-                    applications={applications}
-                    onStatusChange={handleStatusChange}
+                <KanbanBoard<Application>
+                    items={applications}
+                    columns={COLUMNS}
+                    onStatusChange={(appId, newStatus) => {
+                        void handleStatusChange(appId, newStatus as ApplicationStatus);
+                    }}
+                    renderCard={(app) => <ApplicantCard application={app} />}
+                    renderOverlayCard={(app) => <ApplicantCard application={app} />}
                 />
             </main>
         </div>
