@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../../hooks/useAuth';
 import { analyzeSkillGap } from '../../services/skillService';
-import { SkillGap } from '../../types';
+import type { SkillGap } from '../../types';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { Loader2, BookOpen, Video, FileText, CheckCircle, Target, ExternalLink, BookmarkPlus } from 'lucide-react';
@@ -23,9 +23,9 @@ export const GapAnalysis: React.FC = () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                     
+
                     if (data.skills && Array.isArray(data.skills)) {
-                         
+
                         setCurrentSkills(data.skills);
                     }
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -131,7 +131,7 @@ export const GapAnalysis: React.FC = () => {
                 </div>
 
                 <div className="mt-4">
-                     <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500">
                         Based on your current skills: <span className="font-medium text-slate-700">{currentSkills.length > 0 ? currentSkills.join(', ') : 'None listed'}</span>
                     </p>
                 </div>

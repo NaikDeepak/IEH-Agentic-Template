@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getMarketData, MarketDataResponse } from '../../services/marketService';
+import { getMarketData, type MarketDataResponse } from '../../services/marketService';
 import { TrendingUp, AlertCircle, Loader2, Info } from 'lucide-react';
 
 interface MarketTrendsProps {

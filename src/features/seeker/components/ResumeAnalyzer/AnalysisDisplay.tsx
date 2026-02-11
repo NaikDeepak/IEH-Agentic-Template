@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResumeAnalysisResult } from '../../types';
+import type { ResumeAnalysisResult } from '../../types';
 import { CheckCircle, XCircle, AlertTriangle, Lightbulb, RefreshCw, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
 

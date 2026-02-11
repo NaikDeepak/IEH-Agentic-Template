@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { SkillGap } from "../types";
+import type { SkillGap } from "../types";
 
 const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
 const genAI = new GoogleGenAI({ apiKey: API_KEY });

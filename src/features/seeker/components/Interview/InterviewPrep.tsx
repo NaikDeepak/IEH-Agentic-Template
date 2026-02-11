@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateQuestions, evaluateAnswer, InterviewQuestion, EvaluationResult } from '../../services/interviewService';
+import { generateQuestions, evaluateAnswer, type InterviewQuestion, type EvaluationResult } from '../../services/interviewService';
 import { Loader2, Send, CheckCircle, AlertCircle, RefreshCw, ChevronRight } from 'lucide-react';
 
 export const InterviewPrep: React.FC = () => {
@@ -86,7 +86,7 @@ export const InterviewPrep: React.FC = () => {
                             id="target-role"
                             type="text"
                             value={role}
-                            onChange={(e) => setRole(e.target.value)}
+                            onChange={(e) => { setRole(e.target.value); }}
                             placeholder="e.g. Senior Frontend Developer"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required
@@ -100,7 +100,7 @@ export const InterviewPrep: React.FC = () => {
                         <textarea
                             id="resume-context"
                             value={resumeContext}
-                            onChange={(e) => setResumeContext(e.target.value)}
+                            onChange={(e) => { setResumeContext(e.target.value); }}
                             placeholder="Paste your resume summary or key experiences here to get personalized questions..."
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32"
                         />
@@ -176,8 +176,8 @@ export const InterviewPrep: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize
                         ${currentQuestion.difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                          currentQuestion.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'}`}>
+                            currentQuestion.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'}`}>
                         {currentQuestion.difficulty}
                     </span>
                     <span className="text-xs text-gray-500 capitalize">{currentQuestion.type}</span>
@@ -197,7 +197,7 @@ export const InterviewPrep: React.FC = () => {
                         <textarea
                             id="answer-input"
                             value={answer}
-                            onChange={(e) => setAnswer(e.target.value)}
+                            onChange={(e) => { setAnswer(e.target.value); }}
                             placeholder="Type your answer here..."
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-48 resize-none mb-4"
                         />
@@ -240,8 +240,8 @@ export const InterviewPrep: React.FC = () => {
                                 </h4>
                                 <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold
                                     ${evaluation.score >= 80 ? 'bg-green-100 text-green-700' :
-                                      evaluation.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                      'bg-red-100 text-red-700'}`}>
+                                        evaluation.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-red-100 text-red-700'}`}>
                                     Score: {evaluation.score}/100
                                 </div>
                             </div>

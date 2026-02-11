@@ -1,5 +1,5 @@
 import { Timestamp, FieldValue } from "firebase/firestore";
-import { Application as BaseApplication } from "../applications/types";
+import type { Application as BaseApplication } from "../applications/types";
 
 /**
  * Firestore Schema Expectations:

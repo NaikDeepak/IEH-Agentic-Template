@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShortlistService, ShortlistResult } from '../../services/shortlistService';
-import { JobPosting } from '../../../jobs/types';
+import { ShortlistService, type ShortlistResult } from '../../services/shortlistService';
+import type { JobPosting } from '../../../jobs/types';
 import { Briefcase, MapPin, Building, Clock, ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 
@@ -148,8 +148,8 @@ const ShortlistCard: React.FC<ShortlistCardProps> = ({ job }) => {
         const d = dateField as any;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         if (d && typeof d.toDate === 'function') {
-             // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-             return d.toDate() as Date;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            return d.toDate() as Date;
         }
 
         return new Date(dateField as string | number | Date);

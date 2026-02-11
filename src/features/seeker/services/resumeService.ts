@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { ResumeAnalysisResult } from "../types";
+import type { ResumeAnalysisResult } from "../types";
 import { parseDocx, preparePdf } from "./documentService";
 
 // Initialize Gemini

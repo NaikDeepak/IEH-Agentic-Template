@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ResumeInput } from './ResumeInput';
 import { AnalysisDisplay } from './AnalysisDisplay';
 import { analyzeResume } from '../../services/resumeService';
-import { ResumeAnalysisResult } from '../../types';
+import type { ResumeAnalysisResult } from '../../types';
 import { useAuth } from '../../../../hooks/useAuth';
 import { AlertCircle } from 'lucide-react';
 

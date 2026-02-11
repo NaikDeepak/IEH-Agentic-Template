@@ -1,7 +1,7 @@
 import React from 'react';
-import { KanbanBoard } from '../../../features/applications/components/KanbanBoard';
+import { KanbanBoard } from '../../../applications/components/KanbanBoard';
 import { SeekerApplicationCard } from './SeekerApplicationCard';
-import type { Application, ApplicationStatus } from '../../../features/applications/types';
+import type { Application, ApplicationStatus } from '../../../applications/types';
 
 interface SeekerApplicationBoardProps {
   applications: Application[];
@@ -21,7 +21,7 @@ export const ApplicationBoard: React.FC<SeekerApplicationBoardProps> = ({
 }) => {
   // Filter applications to only show those in our seeker-visible columns
   const visibleApplications = applications.filter((app: Application) =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+     
     SEEKER_COLUMNS.some(col => col.id === app.status)
   );
 
@@ -33,14 +33,14 @@ export const ApplicationBoard: React.FC<SeekerApplicationBoardProps> = ({
         onStatusChange={(id: string, status: string) => {
           onStatusChange(id, status as ApplicationStatus);
         }}
-         
+
         renderCard={(app: Application) => (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+           
           <SeekerApplicationCard application={app} />
         )}
-         
+
         renderOverlayCard={(app: Application) => (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+           
           <SeekerApplicationCard application={app} />
         )}
       />

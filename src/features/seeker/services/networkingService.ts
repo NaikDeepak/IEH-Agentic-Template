@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
 import { collection, query, getDocs, limit } from "firebase/firestore";
-import { Connection, OutreachTemplate, SeekerProfile } from "../types";
+import type { Connection, OutreachTemplate, SeekerProfile } from "../types";
 
 // Initialize Gemini
 // Note: In a production environment, this should be proxied through a backend/Cloud Function to protect the API key.

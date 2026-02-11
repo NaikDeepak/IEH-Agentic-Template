@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Building2, GraduationCap, Briefcase, Mail, Loader2, Send, X, Copy, Check } from 'lucide-react';
 import { useAuth } from '../../../../hooks/useAuth';
 import { findConnections, generateOutreachTemplate } from '../../services/networkingService';
-import { Connection, OutreachTemplate, SeekerProfile } from '../../types';
+import type { Connection, OutreachTemplate, SeekerProfile } from '../../types';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 
@@ -136,18 +136,17 @@ export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyN
                                     <p className="text-xs text-gray-500 truncate max-w-[200px]">{connection.headline}</p>
 
                                     <div className="flex items-center gap-1 mt-1">
-                                        <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${
-                                            connection.connectionType === 'alumni'
+                                        <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${connection.connectionType === 'alumni'
                                                 ? 'bg-purple-100 text-purple-700'
                                                 : connection.connectionType === 'ex-colleague'
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-blue-100 text-blue-700'
-                                        }`}>
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-blue-100 text-blue-700'
+                                            }`}>
                                             {connection.connectionType === 'alumni' && <GraduationCap className="w-3 h-3" />}
                                             {connection.connectionType === 'ex-colleague' && <Briefcase className="w-3 h-3" />}
                                             {connection.connectionType === 'shared-network' && <User className="w-3 h-3" />}
                                             {connection.connectionType === 'alumni' ? 'Alumni' :
-                                             connection.connectionType === 'ex-colleague' ? 'Ex-Colleague' : 'Network'}
+                                                connection.connectionType === 'ex-colleague' ? 'Ex-Colleague' : 'Network'}
                                         </span>
                                         <span className="text-xs text-gray-400">• {connection.sharedAttribute}</span>
                                     </div>
