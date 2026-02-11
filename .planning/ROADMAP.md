@@ -107,18 +107,20 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Candidate sees real-time salary data and market trends
 **Research**: Likely (Complex agentic flows)
 **Research topics**: Gemini PDF analysis, Adzuna API proxying
-**Plans**: 11 plans
-- [ ] 05-01-PLAN.md — Seeker Feature Scaffolding
-- [ ] 05-02-PLAN.md — Document Processing Service
-- [ ] 05-03-PLAN.md — Seeker Application Tracker
-- [ ] 05-04-PLAN.md — AI Resume Analysis Engine
-- [ ] 05-05-PLAN.md — Market Insights Proxy
-- [ ] 05-06-PLAN.md — Smart Job Shortlist
-- [ ] 05-07-PLAN.md — Skill Gap & Learning Loop
-- [ ] 05-08-PLAN.md — Seeker Dashboard & Navigation
-- [ ] 05-09-PLAN.md — Simulated Interview Prep
-- [ ] 05-10-PLAN.md — Verified Skill Proofs
-- [ ] 05-11-PLAN.md — Insider Connections
+**Plans**: 13 plans
+- [x] 05-01-PLAN.md — Seeker Feature Scaffolding
+- [x] 05-02-PLAN.md — Document Processing Service
+- [x] 05-03-PLAN.md — Seeker Application Tracker
+- [x] 05-04-PLAN.md — AI Resume Analysis Engine
+- [x] 05-05-PLAN.md — Market Insights Proxy
+- [x] 05-06-PLAN.md — Smart Job Shortlist
+- [x] 05-07-PLAN.md — Skill Gap & Learning Loop
+- [x] 05-08-PLAN.md — Seeker Dashboard & Navigation
+- [x] 05-09-PLAN.md — Simulated Interview Prep
+- [x] 05-10-PLAN.md — Verified Skill Proofs
+- [x] 05-11-PLAN.md — Insider Connections
+- [x] 05-12-PLAN.md — Follow-up Nudges
+- [ ] 05-13-PLAN.md — Environment Hardening & API Setup (Gap Closure)
 
 ### Phase 6: Growth & Monetization
 **Goal**: Viral loops and revenue capture
@@ -143,7 +145,7 @@ Phases execute in numeric order.
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
 | 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
 | 4. Employer Suite | 11/12 | In Progress | - |
-| 5. Seeker Tools | 12/12 | Completed | 2026-02-11 |
+| 5. Seeker Tools | 12/13 | In Progress | - |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
 
 ## Requirements
