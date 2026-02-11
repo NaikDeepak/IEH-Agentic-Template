@@ -120,7 +120,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 05-10-PLAN.md — Verified Skill Proofs
 - [x] 05-11-PLAN.md — Insider Connections
 - [x] 05-12-PLAN.md — Follow-up Nudges
-- [ ] 05-13-PLAN.md — Environment Hardening & API Setup (Gap Closure)
+- [x] 05-13-PLAN.md — Environment Hardening & API Setup (Gap Closure)
 
 ### Phase 6: Growth & Monetization
 **Goal**: Viral loops and revenue capture
@@ -145,7 +145,7 @@ Phases execute in numeric order.
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
 | 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
 | 4. Employer Suite | 11/12 | In Progress | - |
-| 5. Seeker Tools | 12/13 | In Progress | - |
+| 5. Seeker Tools | 13/13 | Completed | 2026-02-11 |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
 
 ## Requirements

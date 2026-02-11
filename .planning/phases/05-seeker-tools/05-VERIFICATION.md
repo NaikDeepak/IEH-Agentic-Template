@@ -1,8 +1,9 @@
 ---
 phase: 05-seeker-tools
-verified: 2026-02-11T16:45:00Z
+verified: 2026-02-11T18:35:00Z
 status: passed
 score: 4/4 must-haves verified
+gaps: []
 ---
 
 # Phase 05: Seeker Tools Verification Report
@@ -18,10 +19,10 @@ score: 4/4 must-haves verified
 
 | #   | Truth   | Status     | Evidence       |
 | --- | ------- | ---------- | -------------- |
-| 1   | Candidate receives ATS score and skill gap analysis | ✓ VERIFIED | `ResumeAnalyzer` + `GapAnalysis` using Gemini AI |
-| 2   | Candidate can track applications via visual Kanban board | ✓ VERIFIED | `ApplicationBoard` with DnD integration |
-| 3   | Candidate receives daily "Top 5" curated job shortlist | ✓ VERIFIED | `ShortlistService` using semantic vector matching |
-| 4   | Candidate sees real-time salary data and market trends | ✓ VERIFIED | `MarketTrends` using Adzuna API via Cloud Function |
+| 1   | Candidate receives ATS score and skill gap analysis | ✓ VERIFIED | ResumeAnalyzer + GapAnalysis using Gemini 2.0 Flash |
+| 2   | Candidate can track applications via visual Kanban board | ✓ VERIFIED | ApplicationBoard using generic KanbanBoard + TrackerService |
+| 3   | Candidate receives daily "Top 5" curated job shortlist | ✓ VERIFIED | ShortlistFeed using semantic vector matching via ShortlistService |
+| 4   | Candidate sees real-time salary data and market trends | ✓ VERIFIED | MarketTrends using Adzuna API via marketProxy Cloud Function |
 
 **Score:** 4/4 truths verified
 
@@ -29,64 +30,64 @@ score: 4/4 must-haves verified
 
 | Artifact | Expected    | Status | Details |
 | -------- | ----------- | ------ | ------- |
-| `ResumeAnalyzer.tsx` | UI for resume upload and AI analysis | ✓ VERIFIED | Full implementation with file/text/linkedin support |
-| `AnalysisDisplay.tsx` | Visualization of ATS score and gaps | ✓ VERIFIED | Circular progress and keyword gap lists |
-| `ApplicationBoard.tsx` | Seeker-specific Kanban board | ✓ VERIFIED | Uses generic `KanbanBoard` with seeker columns |
+| `ResumeAnalyzer.tsx` | UI for resume upload and AI analysis | ✓ VERIFIED | Multi-mode input (File/Text/LinkedIn instructions) |
+| `AnalysisDisplay.tsx` | Visualization of ATS score and gaps | ✓ VERIFIED | Circular progress and structured keyword/section gaps |
+| `ApplicationBoard.tsx` | Seeker-specific Kanban board | ✓ VERIFIED | Uses generic KanbanBoard with seeker-relevant columns |
 | `ShortlistFeed.tsx` | Daily recommendation display | ✓ VERIFIED | Handles cold-start and displays match reasons |
-| `MarketTrends.tsx` | Salary and trend visualization | ✓ VERIFIED | Displays average/median/range from Adzuna |
-| `resumeService.ts` | AI Logic for resume analysis | ✓ VERIFIED | Structured Gemini 2.0 Flash integration |
+| `MarketTrends.tsx` | Salary and trend visualization | ✓ VERIFIED | Real-time fetching and currency formatting |
+| `resumeService.ts` | AI Logic for resume analysis | ✓ VERIFIED | Structured Gemini integration with Firestore persistence |
 | `shortlistService.ts` | Matching logic for recommendations | ✓ VERIFIED | Cosine similarity on job/resume embeddings |
 | `marketProxy.js` | Backend proxy for Adzuna API | ✓ VERIFIED | Deployed Cloud Function with salary stats logic |
+| `GapAnalysis.tsx` | Skill gap analysis UI | ✓ VERIFIED | Integrated learning plan with resource saving |
 
 ### Key Link Verification
 
 | From | To  | Via | Status | Details |
 | ---- | --- | --- | ------ | ------- |
 | `ResumeAnalyzer` | `resumeService` | `analyzeResume()` | WIRED | Call + Response handling implemented |
-| `GapAnalysis` | `skillService` | `analyzeSkillGap()` | WIRED | Profile skills → AI Analysis |
-| `ApplicationBoard` | `ApplicationService` | `updateApplicationStatus()` | WIRED | DnD move → Firestore update |
+| `GapAnalysis` | `skillService` | `analyzeSkillGap()` | WIRED | User skills -> AI Analysis |
+| `ApplicationBoard` | `ApplicationService` | `updateApplicationStatus()` | WIRED | DnD move -> Firestore update (via App.tsx wrapper) |
 | `ShortlistFeed` | `ShortlistService` | `getDailyShortlist()` | WIRED | Cached matching with fallback to generation |
 | `MarketTrends` | `marketProxy` | `getMarketData()` | WIRED | HTTPS Callable function connection |
+| `App.tsx` | Seeker Tools | `Routes` | WIRED | All tools accessible via /seeker/* routes |
 
 ### Requirements Coverage
 
 | Requirement | Status | Blocking Issue |
 | ----------- | ------ | -------------- |
-| Candidate receiving ATS Score | ✓ SATISFIED | Implemented in Resume AI Analyzer |
-| Visual Application Tracker | ✓ SATISFIED | Implemented in Kanban Board |
-| Daily Top 5 Shortlist | ✓ SATISFIED | Implemented in Shortlist Service |
-| Real-time Salary Trends | ✓ SATISFIED | Implemented via Adzuna API |
+| SEEK-01 (ATS Score) | ✓ SATISFIED | Full AI analysis pipeline implemented |
+| SEEK-02 (Skill Gaps) | ✓ SATISFIED | Gemini-driven gap analysis with learning resources |
+| SEEK-03 (Kanban Board) | ✓ SATISFIED | Visual tracker with DnD status updates |
+| SEEK-04 (Top 5 Shortlist)| ✓ SATISFIED | Daily semantic matching service |
+| SEEK-05 (Salary Trends) | ✓ SATISFIED | Adzuna integration via Cloud Function |
+| SEEK-06 (Market Insights)| ✓ SATISFIED | Trend visualization in dashboard |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| `SeekerApplicationCard.tsx` | 61 | Hardcoded "Company Name" | ℹ️ INFO | Visual minor; app has `company_id` but not name string |
-| `shortlistService.ts` | 167 | Fetch 50 jobs for MVP | ℹ️ INFO | Scalability warning for future phases |
+| `SeekerApplicationCard.tsx` | 61 | Hardcoded "Company Name" | ℹ️ INFO | Visual minor; app has company_id but not direct name string |
+| `shortlistService.ts` | 167 | Fetch 50 jobs for MVP | ℹ️ INFO | Scalability limitation for future high-volume growth |
 
 ### Human Verification Required
 
-### 1. Resume Upload Flow
-**Test:** Upload a PDF resume in `SeekerAnalyzer`.
-**Expected:** AI should parse name, skills, and experience correctly and provide a score.
-**Why human:** Verify AI extraction accuracy and PDF parsing reliability.
+### 1. Resume AI Extraction Accuracy
+**Test:** Upload various PDF formats (standard, multi-column, LinkedIn export).
+**Expected:** AI correctly identifies sections and provides relevant missing keywords.
+**Why human:** Verify Gemini's parsing reliability across different resume layouts.
 
-### 2. Kanban Drag and Drop
-**Test:** Drag an application from "Applied" to "Interviewing".
-**Expected:** Card should stick to the new column and persist after refresh.
-**Why human:** Verify UI smoothness and persistence.
+### 2. Kanban Persistence
+**Test:** Move a card to "Interviewing" and refresh the page.
+**Expected:** The card stays in "Interviewing".
+**Why human:** Verify Firestore update is successful and local state reflects DB correctly.
 
-### 3. Market Trends Data
-**Test:** Check Market Trends for "Software Engineer" vs "Painter".
-**Expected:** Different salary ranges should appear.
-**Why human:** Verify Adzuna proxy returns valid data for various roles.
+### 3. Market Data Relevance
+**Test:** Search trends for "Software Engineer" vs "Marketing Manager".
+**Expected:** Statistically different salary ranges and samples.
+**Why human:** Verify Adzuna proxy is returning live, valid data for varied inputs.
 
 ### Gaps Summary
-All must-haves are fully implemented with substantive code. The phase also delivered extra features including:
-- **Interview Practice:** AI-driven interview simulation.
-- **Skill Proofs:** AI-generated assessments for badge verification.
-- **Follow-up Nudges:** Scheduled function to flag stale applications.
-- **Insider Connections:** Networking tool to find alumni at target companies.
+No blocking gaps found. Phase 05 is exceptionally substantive, providing a comprehensive "Command Center" for job seekers. All AI flows are implemented using Gemini 2.0 Flash with structured output.
 
 ---
 _Verified: 2026-02-11_
