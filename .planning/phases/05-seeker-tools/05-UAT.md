@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 05-seeker-tools
 source: 05-01 to 05-12 SUMMARY files
 started: 2026-02-11T00:00:00Z
@@ -115,17 +115,27 @@ skipped: 7
   reason: "User reported: fail, Failed to analyze resume. Please try again. API key is missing. Please provide a valid API key."
   severity: blocker
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "VITE_GEMINI_API_KEY missing in .env (client services expect VITE_ prefix)"
+  artifacts:
+    - path: ".env"
+      issue: "Missing VITE_GEMINI_API_KEY"
+    - path: "src/features/seeker/services/resumeService.ts"
+      issue: "Expects VITE_GEMINI_API_KEY"
+  missing:
+    - "Add VITE_GEMINI_API_KEY to .env and .env.example"
+  debug_session: ".planning/debug/resume-api-key-missing.md"
 
 - truth: "Market data shows histogram or graceful unavailable message without connection error"
   status: failed
   reason: "User reported: Unsure, Market Data Unavailable... Failed to connect to market data service."
   severity: major
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Missing Adzuna API credentials (ADZUNA_APP_ID, ADZUNA_APP_KEY) in functions/.env"
+  artifacts:
+    - path: "functions/.env"
+      issue: "Missing Adzuna credentials"
+    - path: "functions/src/marketProxy.js"
+      issue: "Fails precondition check"
+  missing:
+    - "Add ADZUNA_APP_ID and ADZUNA_APP_KEY to functions/.env"
+  debug_session: ".planning/debug/market-data-connection-failure.md"
