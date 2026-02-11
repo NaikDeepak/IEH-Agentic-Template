@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-16)
 ## Current Position
 
 Phase: 5 of 6 (Seeker Tools)
-Plan: 4 of 11 (AI Resume Analysis)
-Status: In progress - Completed 05-04-PLAN.md
-Last activity: 2026-02-11 — Implemented AI resume analysis with Gemini 2.0 Flash.
+Plan: 10 of 11 (Verified Skill Proofs)
+Status: In progress - Completed 05-10-PLAN.md
+Last activity: 2026-02-11 — Implemented verified skill proofs with Gemini-generated assessments.
 
-Progress: ████████████████████████░░ 88% (35/40 total planned tasks)
+Progress: █████████████████████████░ 90% (36/40 total planned tasks)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
+- Total plans completed: 35
 - Average duration: ~12m
-- Total execution time: ~4.5 hours
+- Total execution time: ~4.7 hours
 
 **By Phase:**
 
@@ -31,7 +31,7 @@ Progress: ███████████████████████�
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
 | 3. Semantic Matching | 6 | 6 | ~11m |
 | 4. Employer Suite | 12 | 12 | ~12m |
-| 5. Seeker Tools | 5 | 11 | ~6m |
+| 5. Seeker Tools | 6 | 11 | ~6m |
 
 ## Accumulated Context
 
@@ -39,6 +39,8 @@ Progress: ███████████████████████�
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
+| 2026-02-11 | 05-10 | Local Grading | Grading assessments client-side against AI-generated correct indices for immediate feedback. |
+| 2026-02-11 | 05-10 | On-Demand Assessments | Generating questions just-in-time to ensure variety and minimize storage. |
 | 2026-02-11 | 05-04 | Manual SchemaType | Defined local constants for Gemini SDK compatibility to avoid build errors with experimental types. |
 | 2026-02-11 | 05-04 | Gemini 2.0 Flash | Selected for high speed and cost-efficiency in real-time resume analysis. |
 | 2026-02-11 | 05-04 | Analyze-then-Persist | Persisting analysis results immediately to Firestore (`users/{uid}/resumes`) to enable downstream matching features. |
@@ -56,8 +58,8 @@ Progress: ███████████████████████�
 
 ### Pending Todos
 
-- Phase 5: Implement AI resume analysis and matching.
 - Phase 5: Implement Seeker Dashboard layout.
+- Phase 5: Integrate verified skills into matchmaking.
 
 ### Blockers/Concerns
 
@@ -66,6 +68,6 @@ Progress: ███████████████████████�
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Phase 5 Plan 03 (Seeker Tracker & Apply)
-Resume file: .planning/phases/05-seeker-tools/05-04-PLAN.md
-Session Continuity: AI Resume Analysis engine implemented and verified. Ready for matching algorithm implementation.
+Stopped at: Completed Phase 5 Plan 10 (Verified Skill Proofs)
+Resume file: .planning/phases/05-seeker-tools/05-11-PLAN.md
+Session Continuity: Implemented assessment engine and UI. Ready for matching integration.
