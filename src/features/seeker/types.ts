@@ -29,6 +29,23 @@ export interface SeekerProfile {
         url: string;
     }[];
     verified_skills?: string[]; // List of skills that have been verified
+    parsed_data?: {
+        name?: string;
+        email?: string;
+        phone?: string;
+        links?: string[];
+        experience?: {
+            company: string;
+            role: string;
+            duration: string;
+            description: string[];
+        }[];
+        education?: {
+            institution: string;
+            degree: string;
+            year: string;
+        }[];
+    };
     created_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
 }
@@ -127,4 +144,22 @@ export interface ShortlistedJob {
     score: number;
     reason: string;
     recommended_at: Timestamp | FieldValue;
+}
+
+export interface Connection {
+    id: string;
+    uid: string;
+    name: string;
+    headline?: string;
+    photoURL?: string;
+    company: string;
+    connectionType: 'alumni' | 'ex-colleague' | 'shared-network';
+    sharedAttribute: string; // e.g., "University of Toronto", "Ex-Shopify"
+    matchScore: number;
+}
+
+export interface OutreachTemplate {
+    subject: string;
+    body: string;
+    tone: 'professional' | 'casual' | 'enthusiastic';
 }
