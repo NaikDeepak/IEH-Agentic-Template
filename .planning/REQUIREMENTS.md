@@ -32,12 +32,12 @@
 
 ### Job Seeker Tools
 
-- [ ] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
-- [ ] **SEEK-02**: Real-time Skill Gap Analysis against target roles
-- [ ] **SEEK-03**: Simulated Interview Prep (Role-specific questions & feedback)
-- [ ] **SEEK-04**: Verified Skill Proofs (AI-driven assessments)
-- [ ] **SEEK-05**: Real-time Salary/Market Index
-- [ ] **SEEK-06**: Insider Connections (Identify alumni/network at target companies)
+- [x] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
+- [x] **SEEK-02**: Real-time Skill Gap Analysis against target roles
+- [x] **SEEK-03**: Simulated Interview Prep (Role-specific questions & feedback)
+- [x] **SEEK-04**: Verified Skill Proofs (AI-driven assessments)
+- [x] **SEEK-05**: Real-time Salary/Market Index
+- [x] **SEEK-06**: Insider Connections (Identify alumni/network at target companies)
 
 ### Growth & Monetization
 
@@ -79,12 +79,12 @@
 | EMP-02 | Phase 4 | Complete |
 | EMP-03 | Phase 4 | Complete |
 | EMP-04 | Phase 4 | Complete |
-| SEEK-01 | Phase 5 | Pending |
-| SEEK-02 | Phase 5 | Pending |
-| SEEK-03 | Phase 5 | Pending |
-| SEEK-04 | Phase 5 | Pending |
-| SEEK-05 | Phase 5 | Pending |
-| SEEK-06 | Phase 5 | Pending |
+| SEEK-01 | Phase 5 | Complete |
+| SEEK-02 | Phase 5 | Complete |
+| SEEK-03 | Phase 5 | Complete |
+| SEEK-04 | Phase 5 | Complete |
+| SEEK-05 | Phase 5 | Complete |
+| SEEK-06 | Phase 5 | Complete |
 | GROW-01 | Phase 6 | Pending |
 | GROW-02 | Phase 6 | Pending |
 | GROW-03 | Phase 6 | Pending |
