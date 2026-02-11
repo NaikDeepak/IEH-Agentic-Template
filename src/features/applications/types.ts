@@ -1,6 +1,6 @@
 import { Timestamp, FieldValue } from "firebase/firestore";
 
-export type ApplicationStatus = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected';
+export type ApplicationStatus = 'applied' | 'screening' | 'interview' | 'offer' | 'hired' | 'rejected' | 'withdrawn';
 
 export interface Application {
     id?: string;

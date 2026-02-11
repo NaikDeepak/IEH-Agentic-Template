@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { SkillGap } from "../types";
 
 const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
@@ -81,7 +81,7 @@ export const analyzeSkillGap = async (
                 responseMimeType: "application/json",
                 responseSchema: SKILL_GAP_SCHEMA,
             }
-        }) as any;
+        }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         const responseText = result.text() as string;
@@ -112,5 +112,22 @@ export const analyzeSkillGap = async (
     } catch (error) {
         console.error("Skill Gap Analysis Error:", error);
         throw error;
+    }
+};
+
+/**
+ * Fetches the most recent skill gap analysis for a user.
+ */
+export const getLatestSkillGap = async (userId: string): Promise<SkillGap | null> => {
+    try {
+        const gapRef = collection(db, `users/${userId}/skillGaps`);
+        const q = query(gapRef, orderBy("identified_at", "desc"), limit(1));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) return null;
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as SkillGap;
+    } catch (error) {
+        console.error("Error fetching latest skill gap:", error);
+        return null;
     }
 };

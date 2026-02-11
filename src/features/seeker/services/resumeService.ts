@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, serverTimestamp, collection } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { ResumeAnalysisResult } from "../types";
 import { parseDocx, preparePdf } from "./documentService";
 
@@ -210,5 +210,22 @@ export const analyzeResume = async (
     } catch (error: unknown) {
         console.error("Resume Analysis Error:", error instanceof Error ? error.message : String(error));
         throw error;
+    }
+};
+
+/**
+ * Fetches the most recent resume analysis for a user.
+ */
+export const getLatestResume = async (userId: string): Promise<ResumeAnalysisResult | null> => {
+    try {
+        const resumesRef = collection(db, `users/${userId}/resumes`);
+        const q = query(resumesRef, orderBy("analyzed_at", "desc"), limit(1));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) return null;
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as ResumeAnalysisResult;
+    } catch (error) {
+        console.error("Error fetching latest resume:", error);
+        return null;
     }
 };

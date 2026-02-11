@@ -15,6 +15,11 @@ export const Header: React.FC = () => {
         { label: 'Pricing', path: '#pricing' },
     ];
 
+    if (userData?.role === 'seeker') {
+        // Add Dashboard for seekers at the beginning
+        navItems.unshift({ label: 'Dashboard', path: '/seeker/dashboard' });
+    }
+
     if (userData?.role === 'employer') {
         const employerNavItems = [
             { label: 'Find Talent', path: '/employer/search' },

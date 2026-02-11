@@ -4,6 +4,14 @@ import { useAuth } from './hooks/useAuth';
 import { trackUserActivity } from './lib/activity';
 import { LandingPage } from './pages/LandingPage'
 import { Register } from './pages/Register'
+import { SeekerDashboard } from './pages/seeker/Dashboard'
+import { ResumeAnalyzer } from './features/seeker/components/ResumeAnalyzer/ResumeAnalyzer'
+import { GapAnalysis } from './features/seeker/components/SkillGap/GapAnalysis'
+import { InterviewPrep } from './features/seeker/components/Interview/InterviewPrep'
+import { SkillProofs } from './features/seeker/components/Assessments/SkillProofs'
+import { InsiderConnections } from './features/seeker/components/Networking/InsiderConnections'
+import { ApplicationBoard } from './features/seeker/components/ApplicationBoard/ApplicationBoard'
+import { TrackerService } from './features/seeker/services/trackerService'
 import { Header } from './components/Header'
 import { RoleSelection } from './components/RoleSelection'
 import { Login } from './components/Login'
@@ -18,6 +26,62 @@ import { JobApplicants } from './pages/employer/JobApplicants'
 import { EmployerJobs } from './pages/employer/EmployerJobs'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import FinancialDashboard from './pages/admin/FinancialDashboard';
+
+import { Navigate } from 'react-router-dom';
+
+function DashboardRedirect() {
+  const { userData } = useAuth();
+  if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
+  if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
+  return <Navigate to="/seeker/dashboard" replace />;
+}
+
+import { useState, useCallback } from 'react';
+import type { Application, ApplicationStatus } from './features/applications/types';
+import { ApplicationService } from './features/applications/services/applicationService';
+
+function SeekerTrackerPage() {
+  const { user } = useAuth();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadApplications = useCallback(async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      const data = await TrackerService.getSeekerApplications(user.uid);
+      setApplications(data);
+    } catch (error) {
+      console.error('Failed to load applications:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    void loadApplications();
+  }, [loadApplications]);
+
+  const handleStatusChange = async (itemId: string, newStatus: ApplicationStatus) => {
+    try {
+      await ApplicationService.updateApplicationStatus(itemId, newStatus);
+      setApplications(prev =>
+        prev.map(app => (app.id === itemId ? { ...app, status: newStatus } : app))
+      );
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
+  if (loading) return <div className="p-12 text-center font-mono font-bold uppercase">Loading Tracker...</div>;
+
+  return (
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-4xl font-black uppercase tracking-tighter mb-8">Application Tracker</h1>
+      <ApplicationBoard applications={applications} onStatusChange={handleStatusChange} />
+    </div>
+  );
+}
 
 function App() {
   const { user } = useAuth();
@@ -84,16 +148,98 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute allowedRoles={['seeker', 'employer', 'admin']}>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <SeekerDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/resume"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
               <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
-                <main className="flex-grow p-8 md:p-12">
-                  <div className="border-2 border-black p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-4xl mx-auto">
-                    <h1 className="text-5xl font-black uppercase tracking-tighter mb-4">Dashboard</h1>
-                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500 mb-8">
-                      Your command center is under construction.
-                    </p>
-                    <div className="h-2 w-24 bg-black"></div>
-                  </div>
+                <main className="flex-grow p-8">
+                  <ResumeAnalyzer />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/skills"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-8">
+                  <GapAnalysis />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/interview"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-8">
+                  <InterviewPrep />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/assessments"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-8">
+                  <SkillProofs />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/networking"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-8">
+                  <InsiderConnections />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/tracker"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-8">
+                  <SeekerTrackerPage />
                 </main>
               </div>
             </ProtectedRoute>
