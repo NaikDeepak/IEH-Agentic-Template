@@ -8,57 +8,56 @@ interface AnalysisDisplayProps {
     onReset: () => void;
 }
 
-// Determine score color
-const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 border-green-600';
-    if (score >= 60) return 'text-yellow-600 border-yellow-600';
-    return 'text-red-600 border-red-600';
-};
-
-const getScoreRingColor = (score: number) => {
-    if (score >= 80) return 'stroke-green-500';
-    if (score >= 60) return 'stroke-yellow-500';
-    return 'stroke-red-500';
+// Determine score colors for Neo-Brutalist
+const getScoreColors = (score: number) => {
+    if (score >= 80) return { bg: 'bg-emerald-400', stroke: 'stroke-black' };
+    if (score >= 60) return { bg: 'bg-yellow-400', stroke: 'stroke-black' };
+    return { bg: 'bg-red-400', stroke: 'stroke-black' };
 };
 
 // Circular Progress Component
 const CircularProgress = ({ value }: { value: number }) => {
-    const radius = 50;
+    const roundedValue = Math.round(value);
+    const radius = 60;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (value / 100) * circumference;
+    const offset = circumference - (roundedValue / 100 * circumference);
+    const colors = getScoreColors(roundedValue);
 
     return (
-        <div className="relative w-40 h-40 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-                {/* Background Ring */}
+        <div className="relative w-48 h-48 flex-shrink-0 flex items-center justify-center">
+            {/* Background Shape */}
+            <div className={`absolute inset-4 rounded-full border-4 border-black ${colors.bg} shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}></div>
+
+            <svg className="w-full h-full transform -rotate-90 relative z-10 overflow-visible">
+                {/* Track */}
                 <circle
-                    cx="80"
-                    cy="80"
+                    cx="96"
+                    cy="96"
                     r={radius}
-                    className="stroke-slate-100"
-                    strokeWidth="12"
+                    className="stroke-black/10"
+                    strokeWidth="16"
                     fill="transparent"
                 />
-                {/* Progress Ring */}
+                {/* Progress */}
                 <motion.circle
-                    cx="80"
-                    cy="80"
+                    cx="96"
+                    cy="96"
                     r={radius}
-                    className={getScoreRingColor(value)}
-                    strokeWidth="12"
+                    className={colors.stroke}
+                    strokeWidth="16"
                     fill="transparent"
                     strokeDasharray={circumference}
                     initial={{ strokeDashoffset: circumference }}
                     animate={{ strokeDashoffset: offset }}
                     transition={{ duration: 1.5, ease: "easeOut" }}
-                    strokeLinecap="round"
+                    strokeLinecap="square"
                 />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-4xl font-black ${getScoreColor(value).split(' ')[0]}`}>
-                    {value}
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                <span className="text-5xl font-black italic tracking-tighter">
+                    {roundedValue}
                 </span>
-                <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">ATS Score</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/50">Score</span>
             </div>
         </div>
     );
@@ -68,53 +67,61 @@ export const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({ result, onRese
     const { score, sections, keywords, suggestions, parsed_data } = result;
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            {/* Header */}
-            <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="flex items-center gap-8">
+        <div className="space-y-12">
+            {/* Header / Primary Stats */}
+            <div className="bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 md:p-12 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 -mr-32 -mt-32 rounded-full border-4 border-black"></div>
+
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                     <CircularProgress value={score} />
-                    <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-2">
-                            {parsed_data.name ? `Analysis for ${parsed_data.name}` : 'Resume Analysis'}
-                        </h2>
-                        <p className="text-slate-500 max-w-md">
-                            We've analyzed your resume against industry standards.
+                    <div className="flex-grow space-y-6">
+                        <div>
+                            <div className="inline-block bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest mb-3">
+                                Analytics Report
+                            </div>
+                            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter italic leading-none">
+                                {parsed_data.name ?? 'System Profile'}
+                            </h2>
+                        </div>
+                        <p className="font-bold text-gray-500 max-w-2xl leading-relaxed uppercase text-sm tracking-tight">
+                            Targeting high ATS compatibility.
                             {score >= 80
-                                ? " Excellent work! You're ready to apply."
-                                : " Review the suggestions below to improve your chances."}
+                                ? " Mission successful. Candidate is optimized for deployment."
+                                : " Re-calibration recommended. Review identified gaps below."}
                         </p>
+                        <button
+                            onClick={onReset}
+                            className="flex items-center gap-3 px-8 py-4 bg-black text-white border-4 border-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all font-black uppercase tracking-tight text-sm italic"
+                        >
+                            <RefreshCw size={20} strokeWidth={3} />
+                            Reset Analysis
+                        </button>
                     </div>
                 </div>
-                <button
-                    onClick={onReset}
-                    className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
-                >
-                    <RefreshCw size={18} />
-                    Analyze Another
-                </button>
             </div>
 
-
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* 1. Section Completeness */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="text-blue-600" size={20} />
-                        Section Check
-                    </h3>
-                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                {/* 1. Section Check */}
+                <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <div className="bg-black text-white p-4 flex items-center justify-between">
+                        <h3 className="text-lg font-black uppercase italic tracking-tight flex items-center gap-3">
+                            <FileText size={20} />
+                            Structural Integrity
+                        </h3>
+                    </div>
+                    <div className="p-8 space-y-4">
                         {Object.entries(sections).map(([key, present]) => (
-                            <div key={key} className="flex items-center justify-between group">
-                                <span className="text-slate-600 font-medium capitalize group-hover:text-slate-900 transition-colors">
+                            <div key={key} className="flex items-center justify-between p-4 border-2 border-black bg-gray-50 group hover:translate-x-2 transition-transform">
+                                <span className="font-black uppercase text-xs tracking-widest truncate mr-4">
                                     {key}
-                                </span>
+                                </span >
                                 {present ? (
-                                    <span className="flex items-center gap-1.5 text-green-600 text-sm font-bold bg-green-50 px-2 py-1 rounded-md border border-green-100">
-                                        <CheckCircle size={14} /> Found
+                                    <span className="flex items-center gap-2 bg-emerald-400 text-black px-3 py-1 border-2 border-black text-[10px] font-black uppercase">
+                                        <CheckCircle size={12} strokeWidth={3} /> Verified
                                     </span>
                                 ) : (
-                                    <span className="flex items-center gap-1.5 text-red-600 text-sm font-bold bg-red-50 px-2 py-1 rounded-md border border-red-100">
-                                        <XCircle size={14} /> Missing
+                                    <span className="flex items-center gap-2 bg-red-400 text-black px-3 py-1 border-2 border-black text-[10px] font-black uppercase italic">
+                                        <XCircle size={12} strokeWidth={3} /> Missing
                                     </span>
                                 )}
                             </div>
@@ -122,67 +129,78 @@ export const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({ result, onRese
                     </div>
                 </div>
 
-                {/* 2. Improvements / Suggestions */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Lightbulb className="text-amber-500" size={20} />
-                        Top Improvements
-                    </h3>
-                    <div className="bg-amber-50/50 rounded-xl p-6 border border-amber-100 space-y-3 h-full">
+                {/* 2. Top Improvements */}
+                <div className="bg-yellow-400 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <div className="bg-black text-white p-4">
+                        <h3 className="text-lg font-black uppercase italic tracking-tight flex items-center gap-3">
+                            <Lightbulb size={20} />
+                            Optimization Log
+                        </h3>
+                    </div>
+                    <div className="p-8 space-y-6">
                         {suggestions.length > 0 ? (
                             suggestions.map((suggestion, idx) => (
-                                <div key={idx} className="flex gap-3 items-start">
-                                    <div className="mt-1 min-w-[20px] h-5 flex items-center justify-center bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                                <div key={idx} className="flex gap-4 items-start bg-white p-5 border-2 border-black">
+                                    <div className="min-w-[32px] h-8 flex items-center justify-center bg-black text-white font-black italic">
                                         {idx + 1}
                                     </div>
-                                    <p className="text-slate-700 text-sm leading-relaxed">{suggestion}</p>
+                                    <p className="font-bold text-xs uppercase leading-tight tracking-tight">{suggestion}</p>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-slate-500 italic">No specific suggestions found. Good job!</p>
+                            <div className="text-center py-12">
+                                <p className="font-black uppercase text-gray-400 italic">No optimizations required.</p>
+                            </div>
                         )}
                     </div>
                 </div>
 
-                {/* 3. Keywords Analysis */}
-                <div className="md:col-span-2 space-y-4">
-                    <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <AlertTriangle className="text-purple-600" size={20} />
-                        Keyword Gap Analysis
-                    </h3>
-                    <div className="grid md:grid-cols-2 gap-6">
+                {/* 3. Keyword Analysis */}
+                <div className="md:col-span-2 space-y-8">
+                    <div className="flex items-center gap-4">
+                        <div className="h-2 w-12 bg-indigo-600"></div>
+                        <h3 className="text-2xl font-black uppercase tracking-tighter italic">Semantic Analysis</h3>
+                        <div className="flex-grow h-2 bg-gray-100"></div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8">
                         {/* Found Keywords */}
-                        <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
-                            <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Detected Keywords</h4>
-                            <div className="flex flex-wrap gap-2">
+                        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-emerald-400 border border-black"></div>
+                                Detected Keywords
+                            </h4>
+                            <div className="flex flex-wrap gap-3">
                                 {keywords.found.length > 0 ? (
                                     keywords.found.map((kw, idx) => (
-                                        <span key={idx} className="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 text-sm rounded-lg font-medium shadow-sm">
+                                        <span key={idx} className="px-3 py-2 bg-white border-2 border-black font-black uppercase text-[10px] tracking-widest shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-default">
                                             {kw}
                                         </span>
                                     ))
                                 ) : (
-                                    <span className="text-slate-400 text-sm italic">No strong keywords detected</span>
+                                    <span className="font-bold uppercase text-gray-300 italic text-sm">Scan yielded no core keywords</span>
                                 )}
                             </div>
                         </div>
 
                         {/* Missing Keywords */}
-                        <div className="bg-red-50/30 rounded-xl p-6 border border-red-100">
-                            <h4 className="text-sm font-bold text-red-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                                Missing Critical Keywords
+                        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 mb-6 flex items-center gap-2">
+                                <AlertTriangle size={14} strokeWidth={3} />
+                                Targeted Semantic Voids
                             </h4>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-3">
                                 {keywords.missing.length > 0 ? (
                                     keywords.missing.map((kw, idx) => (
-                                        <span key={idx} className="px-3 py-1.5 bg-white border border-red-100 text-red-700 text-sm rounded-lg font-medium shadow-sm opacity-75 hover:opacity-100 transition-opacity">
+                                        <span key={idx} className="px-3 py-2 bg-red-50 border-2 border-black text-red-600 font-black uppercase text-[10px] tracking-widest shadow-[3px_3px_0px_0px_rgba(239,68,68,0.2)]">
                                             + {kw}
                                         </span>
                                     ))
                                 ) : (
-                                    <span className="text-green-600 text-sm font-medium flex items-center gap-2">
-                                        <CheckCircle size={16} /> All key areas covered!
-                                    </span>
+                                    <div className="flex items-center gap-3 bg-emerald-50 p-4 border-2 border-emerald-400 w-full">
+                                        <CheckCircle className="text-emerald-500" size={20} strokeWidth={3} />
+                                        <span className="font-black uppercase text-xs tracking-widest text-emerald-700">All target keywords present.</span>
+                                    </div>
                                 )}
                             </div>
                         </div>

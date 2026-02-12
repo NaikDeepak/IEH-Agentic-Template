@@ -35,24 +35,36 @@ export const ResumeAnalyzer: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-black text-slate-900 mb-2">Resume AI Analyzer</h2>
-                <p className="text-slate-600">Get instant feedback on your resume and match with top jobs.</p>
+        <div className="max-w-4xl mx-auto space-y-12">
+            <div className="text-left mb-12 relative">
+                <div className="h-2 w-24 bg-black mb-6"></div>
+                <h2 className="text-6xl font-black uppercase tracking-tighter mb-4 italic leading-none">
+                    Resume <br />Intelligence
+                </h2>
+                <div className="flex items-center gap-3">
+                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
+                        Scan. Optimize. Conquer.
+                    </p>
+                    <div className="flex-grow h-px bg-gray-200"></div>
+                </div>
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-center gap-2 border border-red-200">
-                    <AlertCircle size={20} />
-                    {error}
+                <div className="bg-red-400 text-black p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center gap-4">
+                    <div className="bg-black p-2">
+                        <AlertCircle size={24} className="text-white" />
+                    </div>
+                    <div className="font-bold uppercase text-sm tracking-tight">{error}</div>
                 </div>
             )}
 
-            {!result ? (
-                <ResumeInput onSubmit={handleAnalyze} isLoading={isAnalyzing} />
-            ) : (
-                <AnalysisDisplay result={result} onReset={handleReset} />
-            )}
+            <div className="relative">
+                {!result ? (
+                    <ResumeInput onSubmit={handleAnalyze} isLoading={isAnalyzing} />
+                ) : (
+                    <AnalysisDisplay result={result} onReset={handleReset} />
+                )}
+            </div>
         </div>
     );
 };

@@ -18,9 +18,9 @@ export const analyzeResumeProxy = async (req, res) => {
             const ai = getAI();
             const result = await ai.models.generateContent({
                 model: "gemini-2.0-flash",
+                systemInstruction: systemPrompt,
                 contents: [{ role: "user", parts: promptParts }],
                 config: {
-                    systemInstruction: systemPrompt,
                     responseMimeType: "application/json",
                     responseSchema: RESUME_SCHEMA,
                 }

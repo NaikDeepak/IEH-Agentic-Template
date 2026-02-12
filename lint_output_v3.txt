@@ -1,0 +1,58 @@
+
+> ieh-webapp@0.0.0 lint
+> eslint .
+
+
+/Users/deepaknaik/Downloads/1. AI Live/IEH/src/features/seeker/services/resumeService.ts
+   83:26   warning  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+   84:31   warning  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+   85:25   warning  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+   86:35   warning  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+  128:26   error    Passing a boolean to Boolean() does not change the type or value of the boolean                     @typescript-eslint/no-unnecessary-type-conversion
+  128:34   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  128:34   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  128:55   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  129:26   error    Passing a boolean to Boolean() does not change the type or value of the boolean                     @typescript-eslint/no-unnecessary-type-conversion
+  129:34   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  129:34   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  129:55   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  130:29   error    Passing a boolean to Boolean() does not change the type or value of the boolean                     @typescript-eslint/no-unnecessary-type-conversion
+  130:37   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  130:58   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  131:28   error    Passing a boolean to Boolean() does not change the type or value of the boolean                     @typescript-eslint/no-unnecessary-type-conversion
+  131:36   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  131:57   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  132:25   error    Passing a boolean to Boolean() does not change the type or value of the boolean                     @typescript-eslint/no-unnecessary-type-conversion
+  132:33   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  132:33   error    Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined  @typescript-eslint/no-unnecessary-condition
+  132:54   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  135:59   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  136:61   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  145:33   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  145:49   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  146:30   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  146:43   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  146:57   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  147:34   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  147:51   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  148:51   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  149:43   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  150:40   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  151:44   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  154:37   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  154:57   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  154:76   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  155:32   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  155:47   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  156:30   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  156:43   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  156:57   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  156:76   error    Unnecessary optional chain on a non-nullish value                                                   @typescript-eslint/no-unnecessary-condition
+  169:60   error    Unnecessary conditional, the types have no overlap                                                  @typescript-eslint/no-unnecessary-condition
+  211:82   error    This assertion is unnecessary since it does not change the type of the expression                   @typescript-eslint/no-unnecessary-type-assertion
+  211:99   warning  Unexpected any. Specify a different type                                                            @typescript-eslint/no-explicit-any
+  211:104  error    Unsafe member access .toDate on an `any` value                                                      @typescript-eslint/no-unsafe-member-access
+
+✖ 48 problems (43 errors, 5 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

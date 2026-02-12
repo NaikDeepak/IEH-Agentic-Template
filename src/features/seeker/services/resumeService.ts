@@ -1,5 +1,5 @@
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs, orderBy } from "firebase/firestore";
 import type { ResumeAnalysisResult } from "../types";
 import { callAIProxy } from "../../../lib/ai/proxy";
 import { parseDocx, preparePdf } from "./documentService";
@@ -49,14 +49,14 @@ export const analyzeResume = async (
         You are an expert ATS (Applicant Tracking System) and Resume Coach.
         Analyze the provided resume and return a structured JSON response.
 
-        Evaluate:
-        1. ATS Score (0-100): Based on formatting, keyword density, measurable results, and clarity.
-        2. Section Completeness: Check for Contact, Summary, Experience, Education, Skills.
-        3. Keywords: Identify strong industry keywords present and critical missing ones (assume general tech/industry standards based on the content).
+        EVALUATION CRITERIA:
+        1. ATS Score (0-100): An integer score based on formatting, keyword density, measurable results, and clarity.
+        2. Section Completeness: Check for the presence of Contact, Summary, Experience, Education, and Skills.
+        3. Keywords: Identify strong industry keywords present and critical missing ones.
         4. Suggestions: 3-5 actionable tips to improve the resume.
-        5. Parsed Data: Extract structured data (Name, Contact, Experience, Education).
+        5. Parsed Data: Extract structured data including Name, Contact Info, Experience (Company, Role, Duration, Description), and Education.
 
-        Be strict but constructive.
+        Be strict but constructive. Return ONLY a valid JSON object.
         `;
 
         // 3. Generate Content via Proxy
@@ -65,24 +65,112 @@ export const analyzeResume = async (
             systemPrompt
         });
 
-        // 4. Construct Result Object
+        // Debug: Log the raw data received from the AI (useful for debugging schema mismatches)
+        console.warn('[resumeService] AI analysis raw data:', JSON.stringify(analysisData, null, 2));
+
+        // 4. Construct Result Object with Robust Defensive Mapping & Alias Support
+        // The AI might return fields with slightly different names
+        interface RawParsedData {
+            name?: string;
+            full_name?: string;
+            email?: string;
+            phone?: string;
+            contact_number?: string;
+            links?: string[];
+            social_links?: string[];
+            summary?: string;
+            skills?: string[];
+            experience?: any[];
+            work_experience?: any[];
+            education?: any[];
+            academic_background?: any[];
+        }
+
+        interface RawExperience {
+            company?: string;
+            organization?: string;
+            role?: string;
+            title?: string;
+            job_title?: string;
+            duration?: string;
+            dates?: string;
+            description?: string | string[];
+            responsibilities?: string | string[];
+        }
+
+        interface RawEducation {
+            institution?: string;
+            university?: string;
+            school?: string;
+            degree?: string;
+            qualification?: string;
+            year?: string;
+            dates?: string;
+            start_date?: string;
+            end_date?: string;
+        }
+
+        const rawData = analysisData as unknown as (RawParsedData & { parsed_data?: RawParsedData });
+        const rawParsed = rawData.parsed_data ?? rawData;
+        const rawExperience = (rawParsed.experience ?? rawData.work_experience ?? rawParsed.work_experience ?? rawData.experience ?? []) as RawExperience[];
+        const rawEducation = (rawParsed.education ?? rawData.education ?? rawParsed.academic_background ?? []) as RawEducation[];
+
         const analysisResult: ResumeAnalysisResult = {
             user_id,
-            raw_text: rawText, // Store raw text if available/extracted
-            score: analysisData.score,
-            sections: analysisData.sections,
-            keywords: analysisData.keywords,
-            suggestions: analysisData.suggestions,
-            parsed_data: analysisData.parsed_data,
+            raw_text: rawText,
+            // Normalize score: AI might return 0.85 or 85. We want 0-100.
+            score: (() => {
+                const s = typeof analysisData.score === 'number' ? analysisData.score : (Number(analysisData.score) || 0);
+                if (s > 0 && s <= 1) return Math.round(s * 100);
+                return Math.round(s);
+            })(),
+            sections: {
+                contact: analysisData.sections.contact || !!rawParsed.email || !!rawData.email,
+                summary: analysisData.sections.summary || !!rawData.summary || !!rawParsed.summary,
+                experience: analysisData.sections.experience || rawExperience.length > 0,
+                education: analysisData.sections.education || rawEducation.length > 0,
+                skills: analysisData.sections.skills || !!rawData.skills || !!rawParsed.skills,
+            },
+            keywords: {
+                found: Array.isArray(analysisData.keywords.found) ? analysisData.keywords.found : [],
+                missing: Array.isArray(analysisData.keywords.missing) ? analysisData.keywords.missing : [],
+            },
+            suggestions: Array.isArray(analysisData.suggestions) ? analysisData.suggestions : [],
+            parsed_data: {
+                name: rawParsed.name ?? rawParsed.full_name ?? "",
+                email: rawParsed.email ?? "",
+                phone: rawParsed.phone ?? rawParsed.contact_number ?? "",
+                links: Array.isArray(rawParsed.links) ? rawParsed.links : (Array.isArray(rawParsed.social_links) ? rawParsed.social_links : []),
+                experience: rawExperience.map((exp) => ({
+                    company: exp.company ?? exp.organization ?? "",
+                    role: exp.role ?? exp.title ?? exp.job_title ?? "",
+                    duration: exp.duration ?? exp.dates ?? "",
+                    description: Array.isArray(exp.description) ? exp.description :
+                        (Array.isArray(exp.responsibilities) ? exp.responsibilities :
+                            (typeof exp.description === 'string' ? [exp.description] :
+                                (typeof exp.responsibilities === 'string' ? [exp.responsibilities] : [])))
+                })),
+                education: rawEducation.map((edu) => ({
+                    institution: edu.institution ?? edu.university ?? edu.school ?? "",
+                    degree: edu.degree ?? edu.qualification ?? "",
+                    year: edu.year ?? edu.dates ?? edu.start_date ?? edu.end_date ?? ""
+                })),
+            },
             analyzed_at: serverTimestamp(),
-            // Add metadata
-            filename: content instanceof File ? content.name : undefined
+            filename: content instanceof File ? content.name : (typeof content === 'string' ? "Text Input" : "Unknown")
         };
 
         // 5. Persist to Firestore
         const resumeRef = doc(collection(db, `users/${user_id}/resumes`));
         const finalResult = { ...analysisResult, id: resumeRef.id };
-        await setDoc(resumeRef, finalResult);
+
+        // Remove any unintentional undefineds manually to preserve serverTimestamp
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        const sanitizedResult = Object.fromEntries(
+            Object.entries(finalResult).filter(([_, v]) => v !== undefined)
+        );
+
+        await setDoc(resumeRef, sanitizedResult);
 
         // 6. Sync to Seeker Profile
         try {
@@ -107,14 +195,31 @@ export const analyzeResume = async (
 export const getLatestResume = async (userId: string): Promise<ResumeAnalysisResult | null> => {
     try {
         const resumesRef = collection(db, `users/${userId}/resumes`);
-        const q = query(resumesRef, limit(1));
-        const snapshot = await getDocs(q);
+        const q = query(resumesRef, orderBy('analyzed_at', 'desc'), limit(10));
+        let snapshot = await getDocs(q);
+
+        // Fallback: If ordered query returns nothing, try unordered (might be missing analyzed_at)
+        if (snapshot.empty) {
+            snapshot = await getDocs(query(resumesRef, limit(10)));
+        }
 
         if (snapshot.empty) return null;
-        const firstDoc = snapshot.docs[0];
-        if (!firstDoc) return null;
-        const data = firstDoc.data();
-        return { id: firstDoc.id, ...data } as ResumeAnalysisResult;
+
+        // Find the first valid doc (skip those with broken [object Object] timestamps from previous bug)
+        const validDoc = snapshot.docs.find(doc => {
+            const d = doc.data();
+            // A valid Firestore timestamp object has a toDate method
+            return d.analyzed_at && typeof d.analyzed_at === 'object' && typeof (d.analyzed_at as { toDate: () => unknown }).toDate === 'function';
+        }) ?? snapshot.docs[0]; // Fallback to first if none found valid
+
+        const data = validDoc.data();
+
+        // On-the-fly normalization for existing data
+        let score = typeof data.score === 'number' ? data.score : (Number(data.score) || 0);
+        if (score > 0 && score <= 1) score = Math.round(score * 100);
+        else score = Math.round(score);
+
+        return { id: validDoc.id, ...data, score } as ResumeAnalysisResult;
     } catch (error) {
         console.error("Error fetching latest resume:", error);
         return null;

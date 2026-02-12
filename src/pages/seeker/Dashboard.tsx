@@ -268,7 +268,7 @@ export const SeekerDashboard: React.FC = () => {
                                 {resume ? (
                                     <div className="flex items-center gap-6">
                                         <div className="w-20 h-20 rounded-full border-4 border-black flex items-center justify-center bg-yellow-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                            <span className="text-2xl font-black">{resume.score}</span>
+                                            <span className="text-2xl font-black">{Math.round(resume.score)}</span>
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold uppercase text-gray-500 mb-1">ATS Compatibility</p>

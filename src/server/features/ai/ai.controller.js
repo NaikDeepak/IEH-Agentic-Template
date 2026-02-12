@@ -64,3 +64,94 @@ export const getEmbedding = async (req, res, next) => {
         next(error);
     }
 };
+
+export const analyzeResume = async (req, res, next) => {
+    try {
+        const { promptParts, systemPrompt } = req.body;
+        if (!promptParts || !systemPrompt) {
+            const error = new Error("Prompt parts and system prompt are required");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const result = await aiService.analyzeResume(promptParts, systemPrompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const generateInterviewQuestions = async (req, res, next) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            const error = new Error("Prompt is required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.generateInterviewQuestions(prompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const evaluateInterviewAnswer = async (req, res, next) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            const error = new Error("Prompt is required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.evaluateInterviewAnswer(prompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const generateAssessment = async (req, res, next) => {
+    try {
+        const { skill, systemPrompt } = req.body;
+        if (!skill || !systemPrompt) {
+            const error = new Error("Skill and systemPrompt are required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.generateAssessment(skill, systemPrompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const generateOutreach = async (req, res, next) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            const error = new Error("Prompt is required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.generateOutreach(prompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const analyzeSkillGap = async (req, res, next) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            const error = new Error("Prompt is required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.analyzeSkillGap(prompt);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};

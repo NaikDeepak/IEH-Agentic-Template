@@ -18,9 +18,9 @@ export const generateAssessmentProxy = async (req, res) => {
             const ai = getAI();
             const result = await ai.models.generateContent({
                 model: "gemini-2.0-flash",
+                systemInstruction: systemPrompt,
                 contents: [{ role: "user", parts: [{ text: `Generate assessment for ${skill}` }] }],
                 config: {
-                    systemInstruction: systemPrompt,
                     responseMimeType: "application/json",
                     responseSchema: ASSESSMENT_SCHEMA,
                 }

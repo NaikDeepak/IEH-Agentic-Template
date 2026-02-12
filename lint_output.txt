@@ -1,0 +1,120 @@
+
+> ieh-webapp@0.0.0 lint
+> eslint .
+
+
+/Users/deepaknaik/Downloads/1. AI Live/IEH/src/features/seeker/services/resumeService.ts
+   69:9    warning  Unexpected console statement. Only these console methods are allowed: warn, error                          no-console
+   73:27   error    Unnecessary conditional, value is always truthy                                                            @typescript-eslint/no-unnecessary-condition
+   73:72   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   73:77   error    Unsafe member access .personal_information on an `any` value                                               @typescript-eslint/no-unsafe-member-access
+   74:15   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+   74:52   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   74:72   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   74:77   error    Unsafe member access .work_experience on an `any` value                                                    @typescript-eslint/no-unsafe-member-access
+   74:93   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   74:110  warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   74:115  error    Unsafe member access .work_experience on an `any` value                                                    @typescript-eslint/no-unsafe-member-access
+   74:131  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   74:151  warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   74:156  error    Unsafe member access .experience on an `any` value                                                         @typescript-eslint/no-unsafe-member-access
+   74:167  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   75:15   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+   75:50   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   75:70   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   75:75   error    Unsafe member access .education on an `any` value                                                          @typescript-eslint/no-unsafe-member-access
+   75:85   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   75:102  warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   75:107  error    Unsafe member access .academic_background on an `any` value                                                @typescript-eslint/no-unsafe-member-access
+   75:127  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   87:50   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   87:79   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   87:99   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   87:104  error    Unsafe member access .personal_information on an `any` value                                               @typescript-eslint/no-unsafe-member-access
+   88:50   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   88:80   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   88:85   error    Unsafe member access .summary on an `any` value                                                            @typescript-eslint/no-unsafe-member-access
+   88:93   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   89:29   error    Using !! on a boolean does not change the type or value of the boolean                                     @typescript-eslint/no-unnecessary-type-conversion
+   89:53   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   89:83   error    Unsafe member access .length on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+   90:28   error    Using !! on a boolean does not change the type or value of the boolean                                     @typescript-eslint/no-unnecessary-type-conversion
+   90:52   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   90:80   error    Unsafe member access .length on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+   91:49   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   91:78   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   91:83   error    Unsafe member access .skills on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+   91:90   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   94:59   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   95:61   error    Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
+   99:17   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+   99:38   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+   99:55   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+   99:60   error    Unsafe member access .full_name on an `any` value                                                          @typescript-eslint/no-unsafe-member-access
+   99:70   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  100:40   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  101:17   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  101:40   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  101:57   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  101:62   error    Unsafe member access .contact_number on an `any` value                                                     @typescript-eslint/no-unsafe-member-access
+  101:77   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  102:17   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  102:104  warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  102:109  error    Unsafe member access .social_links on an `any` value                                                       @typescript-eslint/no-unsafe-member-access
+  102:139  warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  102:144  error    Unsafe member access .social_links on an `any` value                                                       @typescript-eslint/no-unsafe-member-access
+  103:91   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  104:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  104:35   error    Unsafe member access .company on an `any` value                                                            @typescript-eslint/no-unsafe-member-access
+  104:43   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  104:51   error    Unsafe member access .organization on an `any` value                                                       @typescript-eslint/no-unsafe-member-access
+  104:64   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  105:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  105:32   error    Unsafe member access .role on an `any` value                                                               @typescript-eslint/no-unsafe-member-access
+  105:37   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  105:45   error    Unsafe member access .title on an `any` value                                                              @typescript-eslint/no-unsafe-member-access
+  105:51   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  105:59   error    Unsafe member access .job_title on an `any` value                                                          @typescript-eslint/no-unsafe-member-access
+  105:69   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  106:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  106:36   error    Unsafe member access .duration on an `any` value                                                           @typescript-eslint/no-unsafe-member-access
+  106:45   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  106:53   error    Unsafe member access .dates on an `any` value                                                              @typescript-eslint/no-unsafe-member-access
+  106:59   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  107:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  107:53   error    Unsafe member access .description on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  107:72   error    Unsafe member access .description on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  108:45   error    Unsafe member access .responsibilities on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  108:69   error    Unsafe member access .responsibilities on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  109:42   error    Unsafe member access .description on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  109:74   error    Unsafe member access .description on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  110:46   error    Unsafe member access .responsibilities on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  110:83   error    Unsafe member access .responsibilities on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  112:88   warning  Unexpected any. Specify a different type                                                                   @typescript-eslint/no-explicit-any
+  113:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  113:39   error    Unsafe member access .institution on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  113:51   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  113:59   error    Unsafe member access .university on an `any` value                                                         @typescript-eslint/no-unsafe-member-access
+  113:70   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  113:78   error    Unsafe member access .school on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+  113:85   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  114:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  114:34   error    Unsafe member access .degree on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+  114:41   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  114:49   error    Unsafe member access .qualification on an `any` value                                                      @typescript-eslint/no-unsafe-member-access
+  114:63   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  115:21   error    Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  115:32   error    Unsafe member access .year on an `any` value                                                               @typescript-eslint/no-unsafe-member-access
+  115:37   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  115:45   error    Unsafe member access .dates on an `any` value                                                              @typescript-eslint/no-unsafe-member-access
+  115:51   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  115:59   error    Unsafe member access .start_date on an `any` value                                                         @typescript-eslint/no-unsafe-member-access
+  115:70   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  115:78   error    Unsafe member access .end_date on an `any` value                                                           @typescript-eslint/no-unsafe-member-access
+  115:87   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+  128:60   error    Unnecessary conditional, the types have no overlap                                                         @typescript-eslint/no-unnecessary-condition
+  170:95   error    Unsafe member access .toDate on an `any` value                                                             @typescript-eslint/no-unsafe-member-access
+  171:12   error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+✖ 111 problems (95 errors, 16 warnings)
+
