@@ -14,6 +14,7 @@ import nodemailer from "nodemailer";
 import { marketProxy } from "./src/marketProxy.js";
 import { followUpNudges } from "./src/followUpNudges.js";
 import * as aiProxy from "./src/ai/proxy.js";
+import * as userHandlers from "./src/user/handlers.js";
 import rateLimit from "express-rate-limit";
 
 dotenv.config({ path: ".env.production" });
@@ -80,11 +81,17 @@ const authMiddleware = async (req, res, next) => {
             req.user = { ...decodedToken };
 
             try {
-                const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    req.user.role = userData.role;
-                    req.user.employerRole = userData.employerRole;
+                // Prefer role from Custom Claims (Token) for performance and security
+                if (decodedToken.role) {
+                    req.user.role = decodedToken.role;
+                } else {
+                    // Fallback to Firestore during transition or for legacy users
+                    const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        req.user.role = userData.role;
+                        req.user.employerRole = userData.employerRole;
+                    }
                 }
             } catch (dbError) {
                 console.warn(`Failed to fetch user profile for ${decodedToken.uid}:`, dbError.message);
@@ -471,6 +478,9 @@ app.post("/api/ai/interview-questions", requireAuth, aiLimiter, aiProxy.generate
 app.post("/api/ai/evaluate-answer", requireAuth, aiLimiter, aiProxy.evaluateAnswerProxy);
 app.post("/api/ai/assessment", requireAuth, aiLimiter, aiProxy.generateAssessmentProxy);
 app.post("/api/ai/outreach", requireAuth, aiLimiter, aiProxy.generateOutreachProxy);
+
+// User & Onboarding Routes
+app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
 
 
 // Expose the Express API as a single Cloud Function

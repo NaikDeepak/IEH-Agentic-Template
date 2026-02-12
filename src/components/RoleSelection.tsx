@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { db } from '../lib/firebase';
-import { doc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { UserCheck, Building2, Loader2, ArrowRight } from 'lucide-react';
 
 export const RoleSelection: React.FC = () => {
@@ -16,41 +14,32 @@ export const RoleSelection: React.FC = () => {
         setSelectedRole(role);
 
         try {
-            const userDocRef = doc(db, 'users', user.uid);
-
-            await runTransaction(db, async (transaction) => {
-                const userDoc = await transaction.get(userDocRef);
-
-                if (!userDoc.exists()) {
-                    transaction.set(userDocRef, {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL,
-                        role,
-                        ...(role === 'employer' ? { employerRole: 'owner' } : {}),
-                        created_at: serverTimestamp(),
-                        updated_at: serverTimestamp(),
-                        last_login: serverTimestamp()
-                    });
-                    return;
-                }
-
-                const data = userDoc.data() as { role?: string | null };
-                if (!data.role) {
-                    transaction.update(userDocRef, {
-                        role,
-                        ...(role === 'employer' ? { employerRole: 'owner' } : {}),
-                        updated_at: serverTimestamp()
-                    });
-                }
+            // 1. Call Onboarding API (Sets Custom Claims + Firestore Role)
+            const token = await user.getIdToken();
+            const response = await fetch('/api/user/onboard', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ role })
             });
 
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({})) as { error?: string };
+                throw new Error(errorData.error ?? `Onboarding failed with status ${response.status}`);
+            }
+
+            // 2. Force ID Token Refresh to get new Custom Claims
+            await user.getIdToken(true);
+
+            // 3. Sync React State
             await refreshUserData();
         } catch (error) {
-            console.error("Error setting role:", error);
+            console.error("Onboarding error:", error);
             setIsUpdating(false);
             setSelectedRole(null);
+            // Optional: Show error to user via toast/UI
         }
     };
 
