@@ -3,6 +3,7 @@ import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs, orderB
 import type { ResumeAnalysisResult } from "../types";
 import { callAIProxy } from "../../../lib/ai/proxy";
 import { parseDocx, preparePdf } from "./documentService";
+import { ProfileService } from "./profileService";
 
 interface ResumeAnalysisResponse {
     score: number;
@@ -168,13 +169,7 @@ export const analyzeResume = async (
         await setDoc(resumeRef, finalResult);
 
         // 6. Sync to Seeker Profile
-        try {
-            const { ProfileService } = await import("./profileService");
-            await ProfileService.syncFromResume(user_id, finalResult);
-        } catch (syncError) {
-            console.error("Failed to sync profile from resume:", syncError);
-            // Don't fail the whole analysis if sync fails
-        }
+        await ProfileService.syncFromResume(user_id, finalResult);
 
         return finalResult;
 
