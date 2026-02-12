@@ -11,6 +11,7 @@ import { InterviewPrep } from './features/seeker/components/Interview/InterviewP
 import { SkillProofs } from './features/seeker/components/Assessments/SkillProofs'
 import { InsiderConnections } from './features/seeker/components/Networking/InsiderConnections'
 import { ApplicationBoard } from './features/seeker/components/ApplicationBoard/ApplicationBoard'
+import { ProfileEditor } from './features/seeker/components/Profile/ProfileEditor'
 import { TrackerService } from './features/seeker/services/trackerService'
 import { Header } from './components/Header'
 import { RoleSelection } from './components/RoleSelection'
@@ -24,6 +25,7 @@ import { CompanyEditor } from './pages/employer/CompanyEditor'
 import { CompanyProfile } from './pages/CompanyProfile'
 import { JobApplicants } from './pages/employer/JobApplicants'
 import { EmployerJobs } from './pages/employer/EmployerJobs'
+import { JobDetailPage } from './pages/JobDetailPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import FinancialDashboard from './pages/admin/FinancialDashboard';
 
@@ -112,6 +114,11 @@ function App() {
         <Route
           path="/jobs"
           element={<JobsPage />}
+        />
+
+        <Route
+          path="/jobs/:id"
+          element={<JobDetailPage />}
         />
 
         <Route
@@ -240,6 +247,20 @@ function App() {
                 <Header />
                 <main className="flex-grow p-8">
                   <SeekerTrackerPage />
+                </main>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seeker/profile"
+          element={
+            <ProtectedRoute allowedRoles={['seeker']}>
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow">
+                  <ProfileEditor />
                 </main>
               </div>
             </ProtectedRoute>

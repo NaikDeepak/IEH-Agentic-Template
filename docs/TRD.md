@@ -71,7 +71,14 @@
 
 ## 5. Security & Compliance
 -   **RBAC:** Strict access control via Firebase Security Rules / RLS.
+-   **AI Security:** All AI calls are proxied through server-side Cloud Functions. **Client-side API keys are strictly forbidden.**
 -   **Data Privacy:** User data isolated; explicit consent for AI processing.
+
+## 7. Secure AI Proxy Architecture
+-   **Endpoint Root:** `/api/ai/*`
+-   **Authentication:** Firebase ID Token (JWT) in `Authorization` header.
+-   **Rate Limiting:** 100 requests / 15 minutes per user.
+-   **Implementation:** See `architecture.md` for full breakdown.
 
 ## 6. Implementation Strategy
 1.  **Phase 1:** Skeleton App + Auth + Landing Page.

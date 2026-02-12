@@ -7,13 +7,15 @@ import {
     limit,
     serverTimestamp,
     Timestamp,
+    doc,
+    getDoc,
     addDoc
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { JobService } from "../../jobs/services/jobService";
 import type { JobPosting } from "../../jobs/types";
-import type { ResumeAnalysisResult, ShortlistedJob } from "../types";
+import type { ResumeAnalysisResult, ShortlistedJob, SeekerProfile } from "../types";
 
 const SHORTLIST_COLLECTION = "shortlist";
 const RESUMES_SUBCOLLECTION = "resumes";
@@ -22,6 +24,7 @@ export interface ShortlistResult {
     jobs: (JobPosting & { matchScore: number; matchReason: string })[];
     isColdStart: boolean;
     lastUpdated: Date | null;
+    error?: string;
 }
 
 interface EmbeddingResponse {
@@ -57,9 +60,13 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
     let magnitudeA = 0;
     let magnitudeB = 0;
     for (let i = 0; i < vecA.length; i++) {
-        dotProduct += vecA[i] * vecB[i];
-        magnitudeA += vecA[i] * vecA[i];
-        magnitudeB += vecB[i] * vecB[i];
+        const a = vecA[i];
+        const b = vecB[i];
+        if (a !== undefined && b !== undefined) {
+            dotProduct += a * b;
+            magnitudeA += a * a;
+            magnitudeB += b * b;
+        }
     }
     magnitudeA = Math.sqrt(magnitudeA);
     magnitudeB = Math.sqrt(magnitudeB);
@@ -86,37 +93,52 @@ export const ShortlistService = {
                 shortlistRef,
                 where("recommended_at", ">=", Timestamp.fromDate(oneDayAgo)),
                 orderBy("recommended_at", "desc"),
-                limit(5)
+                limit(20) // Fetch more to allow for deduplication
             );
 
             const snapshot = await getDocs(q);
 
             if (!snapshot.empty) {
-                // We have recent recommendations. Hydrate them with Job details.
-                const shortlistedJobs = snapshot.docs.map(doc => doc.data() as ShortlistedJob);
+                // We have recent recommendations.
+                const allShortlisted = snapshot.docs.map(doc => doc.data() as ShortlistedJob);
 
-                // Fetch job details (this could be optimized with a batched fetch or storing job snapshot)
-                // For MVP, fetching individually or assuming we have them is okay.
-                // Let's fetch them to ensure they are still active/exist.
+                // Deduplicate by job_id (taking the most recent one due to orderBy desc)
+                const uniqueJobIds = new Set<string>();
+                const shortlistedJobs: ShortlistedJob[] = [];
+
+                for (const sj of allShortlisted) {
+                    if (!uniqueJobIds.has(sj.job_id)) {
+                        uniqueJobIds.add(sj.job_id);
+                        shortlistedJobs.push(sj);
+                        if (shortlistedJobs.length >= 5) break; // Keep only top 5 unique
+                    }
+                }
+
+                // Hydrate them with Job details.
                 const hydratedJobs = [];
                 for (const sj of shortlistedJobs) {
-                    const job = await JobService.getJobById(sj.job_id);
-                    if (job?.status === 'active') {
-                        hydratedJobs.push({
-                            ...job,
-                            matchScore: sj.score,
-                            matchReason: sj.reason
-                        });
+                    try {
+                        const job = await JobService.getJobById(sj.job_id);
+                        if (job?.status === 'active') {
+                            hydratedJobs.push({
+                                ...job,
+                                matchScore: sj.score,
+                                matchReason: sj.reason
+                            });
+                        }
+                    } catch (jobError) {
+                        console.warn(`Could not hydrate shortlisted job ${sj.job_id}:`, jobError);
                     }
                 }
 
                 // If we have at least 1 valid job, return it. If jobs expired, we might need to regenerate.
                 if (hydratedJobs.length > 0) {
+                    const firstShortlisted = shortlistedJobs[0];
                     return {
                         jobs: hydratedJobs,
                         isColdStart: false,
-                        lastUpdated: shortlistedJobs[0].recommended_at instanceof Timestamp
-                            ? shortlistedJobs[0].recommended_at.toDate()
+                        lastUpdated: (firstShortlisted && firstShortlisted.recommended_at instanceof Timestamp)
+                            ? firstShortlisted.recommended_at.toDate()
                             : new Date()
                     };
                 }
@@ -128,7 +150,12 @@ export const ShortlistService = {
         } catch (error) {
             console.error("Error fetching daily shortlist:", error);
             // Fallback to cold start on error to be safe
-            return { jobs: [], isColdStart: true, lastUpdated: null };
+            return {
+                jobs: [],
+                isColdStart: true,
+                lastUpdated: null,
+                error: error instanceof Error ? error.message : "Unknown error"
+            };
         }
     },
 
@@ -136,35 +163,55 @@ export const ShortlistService = {
      * Generates a new shortlist by matching user profile/resume against active jobs.
      */
     async generateShortlist(userId: string): Promise<ShortlistResult> {
-        // 1. Get User's Latest Resume
-        const resumesRef = collection(db, `users/${userId}/${RESUMES_SUBCOLLECTION}`);
-        const resumeQuery = query(resumesRef, orderBy("analyzed_at", "desc"), limit(1));
-        const resumeSnap = await getDocs(resumeQuery);
+        // 1. Get User's Latest Context (Profile or Resume)
+        const profileRef = doc(db, "seeker_profiles", userId);
+        const profileSnap = await getDoc(profileRef);
+        const profileData = profileSnap.exists() ? profileSnap.data() as SeekerProfile : null;
 
-        if (resumeSnap.empty) {
-            return { jobs: [], isColdStart: true, lastUpdated: null };
+        let summary = "";
+        let resumeData: ResumeAnalysisResult | null = null;
+
+        if (profileData && profileData.preferences.roles.length > 0) {
+            // Priority 1: Use Profile Data
+            const skills = profileData.skills.join(", ");
+            const roles = profileData.preferences.roles.join(", ");
+            const bio = profileData.bio ?? "";
+            summary = `
+                Profile for matching:
+                Target Roles: ${roles}
+                Key Skills: ${skills}
+                Background: ${bio}
+            `.trim();
+        } else {
+            // Priority 2: Fallback to Latest Resume
+            const resumesRef = collection(db, `users/${userId}/${RESUMES_SUBCOLLECTION}`);
+            const resumeQuery = query(resumesRef, orderBy("analyzed_at", "desc"), limit(1));
+            const resumeSnap = await getDocs(resumeQuery);
+
+            if (resumeSnap.empty) {
+                return { jobs: [], isColdStart: true, lastUpdated: null };
+            }
+
+            const firstResumeDoc = resumeSnap.docs[0];
+            if (!firstResumeDoc) {
+                return { jobs: [], isColdStart: true, lastUpdated: null };
+            }
+
+            resumeData = firstResumeDoc.data() as ResumeAnalysisResult;
+            const skills = resumeData.keywords.found.join(", ");
+            const roles = resumeData.parsed_data.experience?.map(e => e.role).join(" ") ?? "";
+            summary = `
+                Resume Summary for matching:
+                Skills: ${skills}
+                Experience Roles: ${roles}
+                Suggestions: ${resumeData.suggestions.join(" ")}
+            `.trim();
         }
-
-        const resumeData = resumeSnap.docs[0].data() as ResumeAnalysisResult;
-
-        // 2. Create a semantic query from the resume
-        // We want to capture the user's essence: Title/Role, Skills, Experience
-        const skills = resumeData.keywords.found.join(", ");
-        // Use parsed data if available, otherwise fallback
-        const roles = resumeData.parsed_data.experience?.map(e => e.role).join(" ") ?? "";
-        const summary = `
-            Resume Summary for matching:
-            Skills: ${skills}
-            Experience Roles: ${roles}
-            Suggestions: ${resumeData.suggestions.join(" ")}
-        `.trim();
 
         // 3. Generate User Embedding
         const userEmbedding = await fetchEmbedding(summary);
 
         // 4. Fetch Active Jobs (Candidate Pool)
-        // Optimization: In a real app, use vector search (Vector Store) or limit candidates.
-        // For MVP, fetch recent active jobs (e.g., last 50).
         const jobsRef = collection(db, "jobs");
         const jobsQuery = query(
             jobsRef,
@@ -181,18 +228,19 @@ export const ShortlistService = {
             .map(job => {
                 const embedding = job.embedding ?? [];
                 const score = cosineSimilarity(userEmbedding, embedding);
+                const matchContext = profileData ?? resumeData;
+                if (!matchContext) throw new Error("No user context for matching");
+
                 return {
                     ...job,
                     matchScore: score,
-                    matchReason: this.generateMatchReason(score, job, resumeData)
+                    matchReason: this.generateMatchReason(score, job, matchContext)
                 };
             })
             .sort((a, b) => b.matchScore - a.matchScore)
             .slice(0, 5); // Top 5
 
-        // 6. Save to Firestore (Shortlist)
-        // Delete old shortlist? Or just append. We filtered by date in getDailyShortlist.
-        // Let's add new entries.
+        // ... rest of the function for saving to Firestore remains similar but updated for context
         const batchPromises = scoredJobs.map(job => {
             return addDoc(collection(db, `users/${userId}/${SHORTLIST_COLLECTION}`), {
                 user_id: userId,
@@ -212,20 +260,26 @@ export const ShortlistService = {
         };
     },
 
-    generateMatchReason(score: number, job: JobPosting, resume: ResumeAnalysisResult): string {
+    generateMatchReason(score: number, job: JobPosting, context: SeekerProfile | ResumeAnalysisResult): string {
         // Simple heuristic for "Why this matches"
-        if (score > 0.85) return "Excellent match based on your skills and experience.";
-        if (score > 0.75) return "Strong match for your skill profile.";
+        if (score > 0.85) return "Excellent match based on your skills and professional goals.";
+        if (score > 0.75) return "Strong match for your defined preferences.";
 
-        // Try to find overlapping skills
-        const jobSkills = job.skills.map(s => s.toLowerCase());
-        const userSkills = resume.keywords.found.map(s => s.toLowerCase());
+        const jobSkills = job.skills.map((s: string) => s.toLowerCase());
+
+        let userSkills: string[] = [];
+        if ('skills' in context) {
+            userSkills = context.skills.map((s: string) => s.toLowerCase());
+        } else if ('keywords' in context) {
+            userSkills = context.keywords.found.map((s: string) => s.toLowerCase());
+        }
+
         const overlap = jobSkills.filter(s => userSkills.includes(s));
 
         if (overlap.length > 0) {
             return `Matches your skills in ${overlap.slice(0, 3).join(", ")}.`;
         }
 
-        return "Based on your general profile.";
+        return "Aligned with your target role and industry focus.";
     }
 };

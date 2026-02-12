@@ -1,45 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
 import { doc, updateDoc, arrayUnion, addDoc, collection, serverTimestamp } from "firebase/firestore";
-import type { Assessment, AssessmentQuestion, AssessmentResult } from "../types";
-
-// Initialize Gemini
-// Note: In a production environment, this should be proxied through a backend/Cloud Function to protect the API key.
-const API_KEY = (import.meta.env['VITE_GEMINI_API_KEY'] as string) || "";
-const genAI = new GoogleGenAI({ apiKey: API_KEY });
-
-// Schema types as string constants since they are not exported by the SDK
-const SchemaType = {
-    STRING: "STRING",
-    NUMBER: "NUMBER",
-    INTEGER: "INTEGER",
-    BOOLEAN: "BOOLEAN",
-    ARRAY: "ARRAY",
-    OBJECT: "OBJECT"
-};
-
-const ASSESSMENT_SCHEMA = {
-    type: SchemaType.OBJECT,
-    properties: {
-        questions: {
-            type: SchemaType.ARRAY,
-            items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                    id: { type: SchemaType.STRING },
-                    text: { type: SchemaType.STRING },
-                    options: {
-                        type: SchemaType.ARRAY,
-                        items: { type: SchemaType.STRING }
-                    },
-                    correctOptionIndex: { type: SchemaType.INTEGER }
-                },
-                required: ["id", "text", "options", "correctOptionIndex"]
-            }
-        }
-    },
-    required: ["questions"]
-};
+import type { Assessment, AssessmentResult } from "../types";
+import { callAIProxy } from "../../../lib/ai/proxy";
 
 export const generateAssessment = async (skill: string): Promise<Assessment> => {
     try {
@@ -56,22 +18,11 @@ export const generateAssessment = async (skill: string): Promise<Assessment> => 
         The questions should be challenging enough to verify intermediate competence.
         `;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result: any = await genAI.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: [{ role: "user", parts: [{ text: `Generate assessment for ${skill}` }] }],
-            config: {
-                systemInstruction: systemPrompt,
-                responseMimeType: "application/json",
-                responseSchema: ASSESSMENT_SCHEMA,
-            }
+        // Generate Content via Proxy
+        const data = await callAIProxy<{ questions: Assessment['questions'] }>('/api/ai/assessment', {
+            systemPrompt,
+            skill
         });
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        const responseText = result.text() as string;
-        if (!responseText) throw new Error("No response from AI");
-
-        const data = JSON.parse(responseText) as { questions: AssessmentQuestion[] };
 
         return {
             id: crypto.randomUUID(),

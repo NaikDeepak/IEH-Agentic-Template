@@ -7,9 +7,13 @@ import { FollowUpNudge } from './FollowUpNudge';
 
 interface SeekerApplicationCardProps {
     application: Application;
+    isReadOnly?: boolean;
 }
 
-export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({ application }) => {
+export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
+    application,
+    isReadOnly = false
+}) => {
     const {
         attributes,
         listeners,
@@ -19,6 +23,7 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({ ap
         isDragging
     } = useSortable({
         id: application.id ?? '',
+        disabled: isReadOnly
     });
 
     const style = {
@@ -39,14 +44,31 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({ ap
         return d instanceof Date && !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Unknown';
     };
 
+    const handleCardClick = (_e: React.MouseEvent) => {
+        // Prevent drag-and-drop from triggering navigation if we add drag handle later
+        // For now, it's fine as the whole card is draggable via listeners
+        if (application.job_id) {
+            window.location.href = `/jobs/${application.job_id}`;
+        }
+    };
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...listeners}
             {...attributes}
+            onClick={handleCardClick}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick(e as unknown as React.MouseEvent);
+                }
+            }}
+            role="button"
+            tabIndex={0}
             className={`
-                bg-white border-2 border-black p-4 mb-4 cursor-grab active:cursor-grabbing
+                bg-white border-2 border-black p-4 mb-4 ${isReadOnly ? 'cursor-default' : 'cursor-pointer'}
                 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all
                 ${isDragging ? 'opacity-50 shadow-none z-50' : 'opacity-100'}
             `}

@@ -21,8 +21,9 @@ interface KanbanBoardProps<T extends { id?: string; status: string }> {
   items: T[];
   columns: { id: string; title: string }[];
   onStatusChange: (id: string, newStatus: string) => void;
-  renderCard: (item: T) => React.ReactNode;
-  renderOverlayCard: (item: T) => React.ReactNode;
+  renderCard: (item: T, isReadOnly?: boolean) => React.ReactNode;
+  renderOverlayCard: (item: T, isReadOnly?: boolean) => React.ReactNode;
+  isReadOnly?: boolean;
 }
 
 export function KanbanBoard<T extends { id?: string; status: string }>({
@@ -30,7 +31,8 @@ export function KanbanBoard<T extends { id?: string; status: string }>({
   columns,
   onStatusChange,
   renderCard,
-  renderOverlayCard
+  renderOverlayCard,
+  isReadOnly = false
 }: KanbanBoardProps<T>) {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [localItems, setLocalItems] = React.useState<T[]>(items);
@@ -132,11 +134,11 @@ export function KanbanBoard<T extends { id?: string; status: string }>({
 
   return (
     <DndContext
-      sensors={sensors}
+      sensors={isReadOnly ? [] : sensors}
       collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
+      onDragStart={!isReadOnly ? handleDragStart : undefined}
+      onDragOver={!isReadOnly ? handleDragOver : undefined}
+      onDragEnd={!isReadOnly ? handleDragEnd : undefined}
     >
       <div className="flex gap-6 overflow-x-auto pb-8 min-h-[600px] items-start">
         {columns.map((column) => (
@@ -145,24 +147,26 @@ export function KanbanBoard<T extends { id?: string; status: string }>({
             id={column.id}
             title={column.title}
             items={localItems.filter((item) => item.status === column.id)}
-            renderCard={renderCard}
+            renderCard={(item) => renderCard(item, isReadOnly)}
           />
         ))}
       </div>
 
-      <DragOverlay
-        dropAnimation={{
-          sideEffects: defaultDropAnimationSideEffects({
-            styles: {
-              active: {
-                opacity: '0.5',
+      {!isReadOnly && (
+        <DragOverlay
+          dropAnimation={{
+            sideEffects: defaultDropAnimationSideEffects({
+              styles: {
+                active: {
+                  opacity: '0.5',
+                },
               },
-            },
-          }),
-        }}
-      >
-        {activeItem ? renderOverlayCard(activeItem) : null}
-      </DragOverlay>
+            }),
+          }}
+        >
+          {activeItem ? renderOverlayCard(activeItem, isReadOnly) : null}
+        </DragOverlay>
+      )}
     </DndContext>
   );
 }

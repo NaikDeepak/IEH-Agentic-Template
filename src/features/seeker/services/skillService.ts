@@ -1,53 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, serverTimestamp, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs } from "firebase/firestore";
 import type { SkillGap } from "../types";
-
-const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
-const genAI = new GoogleGenAI({ apiKey: API_KEY });
-
-// Schema types
-const SchemaType = {
-    STRING: "STRING",
-    NUMBER: "NUMBER",
-    INTEGER: "INTEGER",
-    BOOLEAN: "BOOLEAN",
-    ARRAY: "ARRAY",
-    OBJECT: "OBJECT"
-};
-
-const SKILL_GAP_SCHEMA = {
-    type: SchemaType.OBJECT,
-    properties: {
-        target_role: { type: SchemaType.STRING },
-        missing_skills: {
-            type: SchemaType.ARRAY,
-            items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                    name: { type: SchemaType.STRING },
-                    importance: { type: SchemaType.STRING, enum: ["high", "medium", "low"] },
-                    description: { type: SchemaType.STRING }
-                },
-                required: ["name", "importance", "description"]
-            }
-        },
-        resources: {
-            type: SchemaType.ARRAY,
-            items: {
-                type: SchemaType.OBJECT,
-                properties: {
-                    title: { type: SchemaType.STRING },
-                    url: { type: SchemaType.STRING },
-                    type: { type: SchemaType.STRING, enum: ["course", "article", "video"] },
-                    skill_name: { type: SchemaType.STRING, description: "The skill this resource helps with" }
-                },
-                required: ["title", "url", "type"]
-            }
-        }
-    },
-    required: ["target_role", "missing_skills", "resources"]
-};
+import { callAIProxy } from "../../../lib/ai/proxy";
 
 export const analyzeSkillGap = async (
     userId: string,
@@ -73,29 +27,13 @@ export const analyzeSkillGap = async (
         Return the result as JSON.
         `;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const result = await genAI.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: SKILL_GAP_SCHEMA,
-            }
-        }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        const responseText = result.text() as string;
-        if (!responseText) throw new Error("No response from AI");
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const data = JSON.parse(responseText);
+        // Generate Content via Proxy
+        const data = await callAIProxy<{ missing_skills: SkillGap['missing_skills']; resources: SkillGap['resources'] }>('/api/ai/skill-gap', { prompt });
 
         const skillGap: SkillGap = {
             user_id: userId,
             target_role: targetRole,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             missing_skills: data.missing_skills,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
             resources: data.resources,
             identified_at: serverTimestamp()
         };
@@ -121,11 +59,13 @@ export const analyzeSkillGap = async (
 export const getLatestSkillGap = async (userId: string): Promise<SkillGap | null> => {
     try {
         const gapRef = collection(db, `users/${userId}/skillGaps`);
-        const q = query(gapRef, orderBy("identified_at", "desc"), limit(1));
+        const q = query(gapRef, limit(1));
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) return null;
-        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as SkillGap;
+        const firstDoc = snapshot.docs[0];
+        if (!firstDoc) return null;
+        return { id: firstDoc.id, ...firstDoc.data() } as SkillGap;
     } catch (error) {
         console.error("Error fetching latest skill gap:", error);
         return null;

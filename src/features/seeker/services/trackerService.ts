@@ -3,7 +3,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import type { Application } from "../../applications/types";
@@ -18,8 +17,7 @@ export const TrackerService = {
     try {
       const q = query(
         collection(db, APPLICATIONS_COLLECTION),
-        where("candidate_id", "==", seekerId),
-        orderBy("applied_at", "desc")
+        where("candidate_id", "==", seekerId)
       );
       const snap = await getDocs(q);
       return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Application));

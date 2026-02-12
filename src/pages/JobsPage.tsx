@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { JobService } from '../features/jobs/services/jobService';
 import type { JobPosting } from '../features/jobs/types';
 import type { Job } from '../types';
@@ -11,6 +12,7 @@ import { searchJobs } from '../lib/ai/search';
 type JobWithMatch = Job & { matchScore?: number };
 
 export const JobsPage: React.FC = () => {
+    const navigate = useNavigate();
     // browseJobs holds the default list (Active First) to restore after search
     const [browseJobs, setBrowseJobs] = useState<Job[]>([]);
     // displayedJobs is what's currently shown on screen
@@ -108,7 +110,7 @@ export const JobsPage: React.FC = () => {
             description: posting.description,
             // Map JobStatus to ActivityStatus explicitly
             status: posting.status === 'active' ? 'active' :
-                    posting.status === 'passive' ? 'passive' : 'closed',
+                posting.status === 'passive' ? 'passive' : 'closed',
             // Fallback to created_at if activity timestamps are missing
             lastActiveAt: posting.lastActiveAt ?? posting.created_at,
             expiresAt: posting.expiresAt ?? posting.created_at,
@@ -133,7 +135,7 @@ export const JobsPage: React.FC = () => {
                             Open Positions
                         </h1>
                         <p className="text-xl md:text-2xl font-light text-gray-500 max-w-2xl leading-relaxed tracking-tight">
-                            Find your next role in our curated list of opportunities. <br/>
+                            Find your next role in our curated list of opportunities. <br />
                             <span className="text-black font-medium">Powered by semantic search.</span>
                         </p>
                     </div>
@@ -209,6 +211,7 @@ export const JobsPage: React.FC = () => {
                                     key={job.id}
                                     job={job}
                                     matchScore={job.matchScore}
+                                    onClick={() => navigate(`/jobs/${job.id}`)}
                                 />
                             ))}
                         </div>

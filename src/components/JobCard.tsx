@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { StatusBadge } from './StatusBadge';
 import type { Job } from '../types';
@@ -13,7 +14,16 @@ interface JobCardProps {
 }
 
 export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants }) => {
-  const { title, location, type, salaryRange, status, expiresAt, createdAt } = job;
+  const { id, title, location, type, salaryRange, status, expiresAt, createdAt } = job;
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (id) {
+      void navigate(`/jobs/${id}`);
+    }
+  };
 
   const formatSalary = (range: NonNullable<Job['salaryRange']>) => {
     return `${range.currency} ${range.min.toLocaleString()} - ${range.max.toLocaleString()}`;
@@ -49,13 +59,13 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
   return (
     <div
       className={`group relative bg-white border-2 border-black p-6 flex flex-col gap-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer ${className}`}
-      onClick={onClick}
+      onClick={handleCardClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          onClick?.();
+          handleCardClick();
         }
       }}
     >
@@ -70,7 +80,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
               className="!p-0 !bg-transparent !border-0"
             />
             <span className="text-[10px] font-mono uppercase tracking-widest text-gray-500">
-               {status === 'active' ? 'Active Hiring' : 'Closed'}
+              {status === 'active' ? 'Active Hiring' : 'Closed'}
             </span>
           </div>
           <h3 className="font-bold text-xl leading-tight text-black group-hover:text-[#003366] transition-colors line-clamp-2">
@@ -111,7 +121,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
       {/* Footer / Action */}
       <div className="mt-auto pt-4 flex items-center justify-between border-t-2 border-black">
         <div className="flex items-center gap-1.5 text-[10px] font-mono font-medium text-gray-400 uppercase tracking-wider">
-           <span>Posted {getRelativeTime(createdAt)}</span>
+          <span>Posted {getRelativeTime(createdAt)}</span>
         </div>
 
         <div className="flex items-center gap-4">

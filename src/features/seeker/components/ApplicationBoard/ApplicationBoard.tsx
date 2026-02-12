@@ -21,7 +21,7 @@ export const ApplicationBoard: React.FC<SeekerApplicationBoardProps> = ({
 }) => {
   // Filter applications to only show those in our seeker-visible columns
   const visibleApplications = applications.filter((app: Application) =>
-     
+
     SEEKER_COLUMNS.some(col => col.id === app.status)
   );
 
@@ -30,18 +30,19 @@ export const ApplicationBoard: React.FC<SeekerApplicationBoardProps> = ({
       <KanbanBoard<Application>
         items={visibleApplications}
         columns={SEEKER_COLUMNS}
+        isReadOnly={true}
         onStatusChange={(id: string, status: string) => {
           onStatusChange(id, status as ApplicationStatus);
         }}
 
-        renderCard={(app: Application) => (
-           
-          <SeekerApplicationCard application={app} />
+        renderCard={(app: Application, isReadOnly?: boolean) => (
+
+          <SeekerApplicationCard application={app} isReadOnly={isReadOnly} />
         )}
 
-        renderOverlayCard={(app: Application) => (
-           
-          <SeekerApplicationCard application={app} />
+        renderOverlayCard={(app: Application, isReadOnly?: boolean) => (
+
+          <SeekerApplicationCard application={app} isReadOnly={isReadOnly} />
         )}
       />
     </div>

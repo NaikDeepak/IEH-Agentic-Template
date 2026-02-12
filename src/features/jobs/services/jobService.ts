@@ -219,8 +219,9 @@ export const JobService = {
 
             return { id: snap.id, ...snap.data() } as JobPosting;
         } catch (error) {
-            console.error("Error fetching job:", error);
-            throw error;
+            console.error(`Error fetching job ${jobId}:`, error);
+            // Return null instead of throwing to prevent cascading UI failures
+            return null;
         }
     },
 

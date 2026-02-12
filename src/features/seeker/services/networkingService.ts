@@ -1,31 +1,10 @@
-import { GoogleGenAI } from "@google/genai";
 import { db } from "../../../lib/firebase";
 import { collection, query, getDocs, limit } from "firebase/firestore";
 import type { Connection, OutreachTemplate, SeekerProfile } from "../types";
-
-// Initialize Gemini
-// Note: In a production environment, this should be proxied through a backend/Cloud Function to protect the API key.
-const API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string) || "";
-const genAI = new GoogleGenAI({ apiKey: API_KEY });
-
-const SchemaType = {
-    STRING: "STRING",
-    NUMBER: "NUMBER",
-    INTEGER: "INTEGER",
-    BOOLEAN: "BOOLEAN",
-    ARRAY: "ARRAY",
-    OBJECT: "OBJECT"
-};
+import { callAIProxy } from "../../../lib/ai/proxy";
 
 /**
  * Finds potential connections at a target company who share background with the user.
- *
- * Note: Real implementation would require a dedicated search service (Algolia/Elastic)
- * or denormalized arrays of "schools" and "companies" on user documents for Firestore querying.
- *
- * For this MVP, we will:
- * 1. Fetch a sample of users (simulating a search for people at targetCompany)
- * 2. Filter them in memory for shared background
  */
 export const findConnections = async (
     userProfile: SeekerProfile,
@@ -37,9 +16,6 @@ export const findConnections = async (
         const userCompanies = userProfile.parsed_data?.experience?.map(e => e.company.toLowerCase()) ?? [];
 
         // 2. Query potential connections
-        // In a real app, we'd query: users where current_company == targetCompany OR past_companies contains targetCompany
-        // Since we don't have that index structure yet, we'll fetch a broad sample of users.
-        // Optimization: In real world, use a collection group query or specific index.
         const usersRef = collection(db, "users");
         const q = query(
             usersRef,
@@ -56,12 +32,9 @@ export const findConnections = async (
             if (userData.uid === userProfile.uid) return;
 
             // Check if this person is relevant to the target company
-            // (Assuming we can determine their current/past company from parsed_data)
             const theirExperience = userData.parsed_data?.experience ?? [];
             const hasWorkedAtTarget = theirExperience.some(e => e.company.toLowerCase().includes(targetCompany.toLowerCase()));
 
-            // If they haven't worked at the target company, they aren't an "insider" there.
-            // (Unless they are currently there - we check 'experience' for that too usually)
             if (!hasWorkedAtTarget) return;
 
             // 3. Check for shared background
@@ -83,7 +56,6 @@ export const findConnections = async (
             // Check Ex-Colleague (Past Company)
             if (!matchType) {
                 for (const exp of theirExperience) {
-                    // Don't match on the target company itself as "shared past company" (unless user also worked there)
                     if (exp.company.toLowerCase().includes(targetCompany.toLowerCase())) continue;
 
                     if (userCompanies.some(c => c.includes(exp.company.toLowerCase()) || exp.company.toLowerCase().includes(c))) {
@@ -95,13 +67,10 @@ export const findConnections = async (
                 }
             }
 
-            // Fallback: Shared Network (e.g. same skills or location - simple heuristic)
+            // Fallback: Shared Network
             if (!matchType) {
-                // If no strong connection, maybe just "Working at Target Company" is enough if we want to show them?
-                // The requirement says "shared backgrounds".
-                // But let's be generous: if they are at the target company, they are a 'connection' of type 'network'
                 matchType = 'shared-network';
-                sharedAttribute = "Professional Network"; // Generic
+                sharedAttribute = "Professional Network";
                 score = 60;
             }
 
@@ -123,7 +92,6 @@ export const findConnections = async (
 
     } catch (error) {
         console.error("Error finding connections:", error);
-        // Return empty array instead of crashing
         return [];
     }
 };
@@ -157,27 +125,7 @@ export const generateOutreachTemplate = async (
             Return JSON with "subject" and "body".
         `;
 
-        const result = (await genAI.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: SchemaType.OBJECT,
-                    properties: {
-                        subject: { type: SchemaType.STRING },
-                        body: { type: SchemaType.STRING },
-                        tone: { type: SchemaType.STRING }
-                    },
-                    required: ["subject", "body"]
-                }
-            }
-        })) as { text: () => string };
-
-        const responseText = result.text();
-        if (!responseText) throw new Error("No response from AI");
-
-        return JSON.parse(responseText) as OutreachTemplate;
+        return await callAIProxy('/api/ai/outreach', { prompt });
 
     } catch (error) {
         console.error("Error generating outreach template:", error);

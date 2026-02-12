@@ -22,6 +22,8 @@ export interface SubmitApplicationInput {
     job_id: string;
     employer_id: string;
     candidate_id: string;
+    candidate_name: string;
+    candidate_role: string;
     answers: Record<string, string>;
     match_score: number;
 }
