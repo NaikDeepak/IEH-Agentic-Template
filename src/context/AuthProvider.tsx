@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 try {
                     // Force refresh to get latest custom claims
                     const tokenResult = await user.getIdTokenResult();
-                    const claimRole = tokenResult.claims.role as 'seeker' | 'employer' | 'admin' | null;
+                    const claimRole = tokenResult.claims['role'] as 'seeker' | 'employer' | 'admin' | null;
 
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userDocRef);
