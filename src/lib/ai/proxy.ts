@@ -6,9 +6,18 @@ import { auth } from "../firebase";
  */
 export const callAIProxy = async <T = unknown>(endpoint: string, body: unknown): Promise<T> => {
     const user = auth.currentUser;
-    if (!user) throw new Error("Authentication required for AI features.");
+    if (!user) {
+        console.error("[AI Proxy] Authentication required but user is not signed in");
+        throw new Error("Authentication required for AI features.");
+    }
 
-    const token = await user.getIdToken();
+    // Force token refresh to ensure we always have a valid token
+    const token = await user.getIdToken(true);
+
+    console.warn("[AI Proxy] Making request to:", endpoint);
+    console.warn("[AI Proxy] User ID:", user.uid);
+    console.warn("[AI Proxy] Token length:", token.length);
+
     const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -19,8 +28,17 @@ export const callAIProxy = async <T = unknown>(endpoint: string, body: unknown):
     });
 
     if (!response.ok) {
+        console.error("[AI Proxy] Request failed:", {
+            status: response.status,
+            statusText: response.statusText,
+            url: endpoint
+        });
+
         const errorData = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(errorData.error ?? `AI Request failed with status ${response.status}`);
+        const errorMessage = errorData.error ?? `AI Request failed with status ${response.status}`;
+
+        console.error("[AI Proxy] Error details:", errorData);
+        throw new Error(errorMessage);
     }
 
     return response.json() as Promise<T>;

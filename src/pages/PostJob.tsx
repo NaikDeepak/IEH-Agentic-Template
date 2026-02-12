@@ -6,6 +6,8 @@ import { Header } from '../components/Header';
 import { Loader2, ArrowLeft, Sparkles, Plus, Trash2, Info, Lightbulb, Building2 } from 'lucide-react';
 import type { JobType, WorkMode, CreateJobInput, ScreeningQuestion } from '../features/jobs/types';
 import { CompanyService } from '../features/companies/services/companyService';
+import { callAIProxy } from '../lib/ai/proxy';
+
 
 interface JdResponse {
   jd: string;
@@ -43,14 +45,26 @@ export const PostJob: React.FC = () => {
 
   const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestion[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [companyContext, setCompanyContext] = useState<{
+    name?: string;
+    tagline?: string;
+    mission?: string;
+    techStack?: string[];
+  }>({});
 
   React.useEffect(() => {
     const fetchCompanyData = async () => {
       if (!user) return;
       try {
         const company = await CompanyService.getCompanyByEmployerId(user.uid);
-        if (company?.bio) {
+        if (company) {
           setFormData(prev => ({ ...prev, company_bio: company.bio }));
+          setCompanyContext({
+            name: company.name,
+            tagline: company.tagline,
+            mission: company.bio,
+            techStack: company.tech_stack
+          });
         }
       } catch (err) {
         console.error("Error fetching company data:", err);
@@ -68,7 +82,6 @@ export const PostJob: React.FC = () => {
     try {
       setGeneratingJd(true);
       setError(null);
-      const token = await user?.getIdToken();
 
       const requestBody = {
         role: formData.title,
@@ -76,22 +89,12 @@ export const PostJob: React.FC = () => {
         location: formData.location || '',
         type: formData.type,
         workMode: formData.work_mode,
-        experience: formData.experience || ''
+        experience: formData.experience || '',
+        companyContext: companyContext
       };
-      const res = await fetch('/api/ai/generate-jd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(requestBody)
-      });
 
-      if (!res.ok) {
-        const errorData = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(errorData.error ?? "Failed to generate JD");
-      }
-      const data = (await res.json()) as JdResponse;
+      const data = await callAIProxy<JdResponse>('/api/ai/generate-jd', requestBody);
+
       setFormData(prev => ({
         ...prev,
         description: data.jd,
@@ -118,18 +121,8 @@ export const PostJob: React.FC = () => {
     try {
       setGeneratingAssist(true);
       setError(null);
-      const token = await user?.getIdToken();
-      const res = await fetch('/api/ai/generate-job-assist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ jd: formData.description })
-      });
+      const data = await callAIProxy<AssistResponse>('/api/ai/generate-job-assist', { jd: formData.description });
 
-      if (!res.ok) throw new Error("Failed to review draft");
-      const data = (await res.json()) as AssistResponse;
       // Questions are now handled by generateJD, this only returns tips
       setSuggestions(data.suggestions ?? []);
     } catch (err) {
@@ -346,8 +339,13 @@ export const PostJob: React.FC = () => {
               )}
               Generate Description with AI
             </button>
-            <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest text-center">
-              Uses Title, Skills, and Location to create a tailored description.
+            <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest text-center flex items-center gap-2">
+              {companyContext.name && (
+                <span className="flex items-center gap-1 text-green-600 font-bold border-r-2 border-gray-200 pr-2">
+                  <Building2 className="w-3 h-3" /> {companyContext.name} Branding Applied
+                </span>
+              )}
+              Uses Title, Skills, Location, and Company Profile to create a tailored description.
             </p>
           </div>
 

@@ -14,6 +14,8 @@ import {
 import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { JobService } from "../../jobs/services/jobService";
+import { callAIProxy } from "../../../lib/ai/proxy";
+
 import type { JobPosting } from "../../jobs/types";
 import type { ResumeAnalysisResult, ShortlistedJob, SeekerProfile } from "../types";
 
@@ -32,17 +34,7 @@ interface EmbeddingResponse {
 }
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const res = await fetch("/api/ai/embedding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-    });
-
-    if (!res.ok) {
-        throw new Error(`Embedding service failed: ${res.status.toString()}`);
-    }
-
-    const data = (await res.json()) as EmbeddingResponse;
+    const data = await callAIProxy<EmbeddingResponse>("/api/ai/embedding", { text });
     const embedding = data.embedding;
 
     if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number") {
@@ -52,6 +44,7 @@ async function fetchEmbedding(text: string): Promise<number[]> {
 
     return embedding;
 }
+
 
 // Helper: Cosine Similarity
 function cosineSimilarity(vecA: number[], vecB: number[]): number {

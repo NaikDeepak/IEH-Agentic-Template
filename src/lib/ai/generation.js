@@ -181,40 +181,57 @@ const getClient = (apiKey) => {
 /**
  * Generate a Job Description
  * @param {object} params 
- * @param {string} params.role
- * @param {string} params.skills
- * @param {string} params.experience
- * @param {string} params.location
- * @param {string} params.type
- * @param {string} params.workMode
+ * @param {object} params.job - basic job details (role, skills, experience, location, type, workMode)
+ * @param {object} params.companyContext - company context for branding (name, tagline, bio, techStack)
  * @param {string} apiKey
  * @returns {Promise<object>} { jd: string, suggestedSkills: string[], screeningQuestions: object[] }
  */
-export const generateJD = async ({ role, skills, experience, location, type, workMode }, apiKey) => {
+export const generateJD = async ({ job, companyContext }, apiKey) => {
     const ai = getClient(apiKey);
+    const { role, skills, experience, location, type, workMode } = job;
+    const { name: companyName, tagline, mission, techStack } = companyContext || {};
+
     const prompt = `
-        As an expert IT recruiter, generate a professional job description and a list of key skills for a ${role}.
+        As an expert IT recruiter, generate a professional, high-conversion job description and key skills for a ${role}.
+        
+        CRITICAL RULES:
+        1. NO PLACEHOLDERS: NEVER use text like "[Company Name]", "[Insert mission]", or "[About Us]".
+        2. USE DATA PROVIDED: If COMPANY CONTEXT is provided, use it EXCLUSIVELY to talk about the company.
+        3. IF NO DATA: If a specific company field is missing, infer a professional description based on the ROLE and INDUSTRY, but NEVER leave a bracketed placeholder.
+
+        ${companyName ? `COMPANY CONTEXT:
+        - Name: ${companyName}
+        - Tagline: ${tagline || 'Not provided'}
+        - About/Mission: ${mission || 'Not provided'}
+        - Tech Stack: ${Array.isArray(techStack) ? techStack.join(', ') : techStack || 'Not provided'}
+        
+        Instructions: Strictly use the Name, Tagline, and Mission above to write the "About ${companyName}" section. Do NOT ask the user to fill it in.
+        ` : ''}
+
+        JOB DETAILS:
+        Position: ${role}
         Location: ${location || 'not specified'}.
         Job Type: ${type || 'not specified'}.
         Work Mode: ${workMode || 'not specified'}.
         Experience level: ${experience || 'not specified'}.
-        ${skills ? `Initial skills provided: ${skills}.` : 'Please suggest 5-8 relevant modern skills for this role.'}
+        ${skills ? `Required core skills: ${skills}.` : 'Suggest 5-8 relevant modern skills for this role.'}
 
-        Also generate 3-5 sharp, relevant screening questions for applicants (mix of technical and behavioral).
-
-        Return your response in valid JSON format:
-        {
-            "jd": "full job description text here (markdown supported)...",
-            "suggestedSkills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
-            "screeningQuestions": [{"question": "string", "hint": "string"}]
-        }
+        STRUCTURE:
+        Generate a JSON response with these keys:
+        - "jd": Markdown text. Sections: "About ${companyName || 'Us'}", "The Role", "Responsibilities", "Requirements".
+        - "suggestedSkills": String array of technical skills.
+        - "screeningQuestions": Array of {question, hint} objects.
     `;
 
     try {
         const response = await ai.models.generateContent({
             model: DEFAULT_MODELS.FAST,
+            systemInstruction: "You are a senior technical recruiter. You always provide complete, ready-to-publish job descriptions. You NEVER use bracketed placeholders or ask the user to insert their own content. You weave provided company details into a compelling narrative.",
             contents: prompt,
-            config: { responseMimeType: "application/json" } // Force JSON to be safe
+            config: {
+                responseMimeType: "application/json",
+                temperature: 0.6
+            }
         });
 
         const text = typeof response.text === 'function' ? response.text() : response.candidates?.[0]?.content?.parts?.[0]?.text;

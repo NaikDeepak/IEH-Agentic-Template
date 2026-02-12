@@ -11,8 +11,8 @@ import {
     analyzeSkillGap as genSkillGap
 } from '../../../lib/ai/generation.js';
 
-export const generateJD = async (role, skills, experience, location, type, workMode) => {
-    return await genJD({ role, skills, experience, location, type, workMode }, config.apiKey);
+export const generateJD = async (job, companyContext) => {
+    return await genJD({ job, companyContext }, config.apiKey);
 };
 
 export const generateJobAssist = async (jd) => {

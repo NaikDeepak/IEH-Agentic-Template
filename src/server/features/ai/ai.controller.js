@@ -2,10 +2,10 @@ import * as aiService from './ai.service.js';
 
 export const generateJD = async (req, res, next) => {
     try {
-        const { role, skills, experience, location, type, workMode } = req.body;
+        const { role, skills, experience, location, type, workMode, companyContext } = req.body;
 
         // Log received fields for debugging
-        console.log('[ai.controller] generateJD request:', { role, skills, experience, location, type, workMode });
+        console.log('[ai.controller] generateJD request:', { role, skills, experience, location, type, workMode, hasCompanyContext: !!companyContext });
 
         if (!role) {
             const error = new Error("Job Title (role) is required");
@@ -13,14 +13,16 @@ export const generateJD = async (req, res, next) => {
             throw error;
         }
 
-        // Provide defaults for optional fields if they are missing or null
-        const safeSkills = skills || "";
-        const safeExperience = experience || "";
-        const safeLocation = location || "";
-        const safeType = type || "";
-        const safeWorkMode = workMode || "";
+        const job = {
+            role,
+            skills: skills || "",
+            experience: experience || "",
+            location: location || "",
+            type: type || "",
+            workMode: workMode || ""
+        };
 
-        const result = await aiService.generateJD(role, safeSkills, safeExperience, safeLocation, safeType, safeWorkMode);
+        const result = await aiService.generateJD(job, companyContext);
         res.json(result);
     } catch (error) {
         next(error);

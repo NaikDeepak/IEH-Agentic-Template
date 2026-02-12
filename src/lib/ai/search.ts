@@ -1,5 +1,8 @@
-import { getAuth } from 'firebase/auth';
+import { getAuth } from "firebase/auth";
 import { z } from "zod";
+import { callAIProxy } from './proxy';
+
+
 
 export interface CandidateSearchResult {
     id: string;
@@ -101,24 +104,8 @@ export async function searchJobs(searchQuery: string, locationFilter = '', limit
  */
 export async function searchCandidates(searchQuery: string, limitCount = 10): Promise<CandidateSearchResult[]> {
     try {
-        const token = await getAuthToken();
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
+        const rawData = await callAIProxy('/api/candidates/search', { query: searchQuery, limit: limitCount });
 
-        const response = await fetch('/api/candidates/search', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ query: searchQuery, limit: limitCount })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Search failed: ${response.status} ${errorText}`);
-        }
-
-        const rawData = (await response.json()) as unknown;
 
         // Validate with Zod
         const data = CandidateSearchResponseSchema.parse(rawData);
@@ -130,3 +117,4 @@ export async function searchCandidates(searchQuery: string, limitCount = 10): Pr
         throw error;
     }
 }
+

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { UserCheck, Building2, Loader2, ArrowRight } from 'lucide-react';
+import { callAIProxy } from '../lib/ai/proxy';
+
 
 export const RoleSelection: React.FC = () => {
     const { userData, user, refreshUserData } = useAuth();
@@ -15,23 +17,11 @@ export const RoleSelection: React.FC = () => {
 
         try {
             // 1. Call Onboarding API (Sets Custom Claims + Firestore Role)
-            const token = await user.getIdToken();
-            const response = await fetch('/api/user/onboard', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ role })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({})) as { error?: string };
-                throw new Error(errorData.error ?? `Onboarding failed with status ${response.status}`);
-            }
+            await callAIProxy('/api/user/onboard', { role });
 
             // 2. Force ID Token Refresh to get new Custom Claims
             await user.getIdToken(true);
+
 
             // 3. Sync React State
             await refreshUserData();

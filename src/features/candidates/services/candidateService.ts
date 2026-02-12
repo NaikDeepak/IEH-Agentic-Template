@@ -13,19 +13,11 @@ interface EmbeddingResponse {
 }
 
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/constants";
+import { callAIProxy } from "../../../lib/ai/proxy";
+
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const res = await fetch("/api/embedding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-    });
-
-    if (!res.ok) {
-        throw new Error(`Embedding service failed: ${res.status.toString()}`);
-    }
-
-    const data = (await res.json()) as EmbeddingResponse;
+    const data = await callAIProxy<EmbeddingResponse>("/api/embedding", { text });
     const embedding = data.embedding ?? [];
 
     if (embedding.length !== EMBEDDING_DIMENSION) {
@@ -33,6 +25,7 @@ async function fetchEmbedding(text: string): Promise<number[]> {
     }
     return embedding;
 }
+
 
 const USERS_COLLECTION = "users";
 
