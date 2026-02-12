@@ -1,18 +1,26 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { HeroSection } from '../HeroSection';
 
 describe('HeroSection', () => {
     it('renders main headline and CTAs', () => {
-        render(<HeroSection />);
+        render(
+            <MemoryRouter>
+                <HeroSection />
+            </MemoryRouter>
+        );
 
-        // Check for AI Search Badge
-        expect(screen.getByText(/Trusted by Recruiters/i)).toBeInTheDocument();
+        // Check for main heading parts
+        expect(screen.getByText(/India/i)).toBeInTheDocument();
+        expect(screen.getByText(/Employment/i)).toBeInTheDocument();
+        expect(screen.getByText(/Hub/i)).toBeInTheDocument();
 
-        // Check for Search Input
-        expect(screen.getByPlaceholderText(/Search 'Java Developer'/i)).toBeInTheDocument();
+        // Check for sub-headline
+        expect(screen.getByText(/Find your next career move/i)).toBeInTheDocument();
 
-        // Check for Search Button
-        expect(screen.getByRole('button', { name: /Search/i })).toBeInTheDocument();
+        // Check for CTAs
+        expect(screen.getByPlaceholderText(/SEARCH ROLES\.\.\./i)).toBeInTheDocument();
+        expect(screen.getByText(/Post a Job Free/i)).toBeInTheDocument();
     });
 });

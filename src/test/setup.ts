@@ -103,10 +103,10 @@ vi.mock('google-auth-library', () => ({
 vi.mock('@sentry/node', () => ({
     init: vi.fn(),
     captureException: (error: unknown) => { globalThis.__MOCKS__.sentryCaptureException(error); },
-    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({})),
+    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({ setAttribute: vi.fn() })),
 }));
 vi.mock('@sentry/react', () => ({
     init: vi.fn(),
     captureException: (error: unknown) => { globalThis.__MOCKS__.sentryCaptureException(error); },
-    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({})),
+    startSpan: vi.fn((_: unknown, callback: (span: Record<string, unknown>) => unknown) => callback({ setAttribute: vi.fn() })),
 }));

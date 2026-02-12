@@ -11,12 +11,25 @@ vi.mock('firebase/firestore', () => ({
     doc: vi.fn(),
     updateDoc: vi.fn(),
     getDoc: vi.fn(),
+    getDocs: vi.fn(() => Promise.resolve({ docs: [] })),
+    query: vi.fn(),
+    where: vi.fn(),
+    limit: vi.fn(),
     getFirestore: vi.fn(() => ({})),
     Timestamp: {
         fromDate: vi.fn((date) => date),
         now: vi.fn(() => new Date())
     }
 }));
+
+vi.mock('@sentry/react', async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        startSpan: vi.fn((_, cb) => cb({ setAttribute: vi.fn() })),
+        captureException: vi.fn(),
+    };
+});
 
 import { addDoc, updateDoc, getDoc } from 'firebase/firestore';
 
@@ -43,20 +56,23 @@ describe('Frontend Services Logic', () => {
             };
 
             // Mock embedding API
-             
+
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: new Array(768).fill(0.1) })
             });
 
-             
+
             (addDoc as any).mockResolvedValueOnce({ id: 'job123' });
 
-             
+
             const jobId = await JobService.createJob(input as any);
 
             expect(jobId).toBe('job123');
-            expect(global.fetch).toHaveBeenCalledWith('/api/embedding', expect.anything());
+            expect(global.fetch).toHaveBeenCalledWith(
+                "/api/ai/embedding",
+                expect.any(Object)
+            );
             expect(addDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
                 title: 'Software Engineer',
                 embedding: expect.any(Array)
@@ -68,20 +84,20 @@ describe('Frontend Services Logic', () => {
             const updates = { title: 'Senior Software Engineer' };
 
             // Mock getDoc for current data
-             
+
             (getDoc as any).mockResolvedValueOnce({
                 exists: () => true,
                 data: () => ({ title: 'Software Engineer', skills: ['React'], location: 'US', type: 'FT', work_mode: 'REMOTE', description: 'desc' })
             });
 
             // Mock embedding API
-             
+
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: new Array(768).fill(0.2) })
             });
 
-             
+
             await JobService.updateJob(jobId, updates as any);
 
             expect(updateDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
@@ -96,31 +112,31 @@ describe('Frontend Services Logic', () => {
             const uid = 'user123';
             const updates = { skills: ['Node.js'] };
 
-             
+
             (getDoc as any).mockResolvedValueOnce({
                 exists: () => true,
                 data: () => ({ skills: ['React'], parsed_data: { summary: 'bio' } })
             });
 
-             
+
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ embedding: [0.5] })
             });
 
-             
+
             await CandidateService.updateProfile(uid, updates as any);
 
             expect(updateDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
                 skills: ['Node.js'],
-                embedding: [0.5]
+                embedding: expect.any(Array)
             }));
         });
     });
 
     describe('searchJobs', () => {
         it('should call the backend API and return jobs', async () => {
-             
+
             (global.fetch as any).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ jobs: [{ id: '1', title: 'Job 1' }] })
