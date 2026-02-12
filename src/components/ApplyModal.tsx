@@ -26,6 +26,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
             const loadData = async () => {
                 setCheckingStatus(true);
                 try {
+                    if (!job.id) return;
                     const [applied, profile] = await Promise.all([
                         ApplicationService.hasApplied(job.id, user.uid),
                         ProfileService.getProfile(user.uid)

@@ -45,6 +45,7 @@ export const Testimonials: React.FC = () => {
     }, []);
 
     const current = testimonials[currentIndex];
+    if (!current) return null;
     const personaLabel = current.persona === 'employer' ? 'Employer' : 'Job Seeker';
 
     return (
@@ -94,8 +95,8 @@ export const Testimonials: React.FC = () => {
                         {/* Persona Badge */}
                         <div className="flex items-center gap-4 mb-6">
                             <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1 border-2 ${current.persona === 'employer'
-                                    ? 'border-[#003366] text-[#003366] bg-blue-50'
-                                    : 'border-emerald-600 text-emerald-700 bg-emerald-50'
+                                ? 'border-[#003366] text-[#003366] bg-blue-50'
+                                : 'border-emerald-600 text-emerald-700 bg-emerald-50'
                                 }`}>
                                 {personaLabel}
                             </span>

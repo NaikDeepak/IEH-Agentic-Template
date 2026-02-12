@@ -26,8 +26,8 @@ export const SkillProofs: React.FC = () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    setSkills((data.skills as string[] | undefined) ?? []);
-                    setVerifiedSkills((data.verified_skills as string[] | undefined) ?? []);
+                    setSkills((data['skills'] as string[] | undefined) ?? []);
+                    setVerifiedSkills((data['verified_skills'] as string[] | undefined) ?? []);
                 }
             } catch (err) {
                 console.error("Error fetching user data:", err);
@@ -175,11 +175,10 @@ export const SkillProofs: React.FC = () => {
                                 {q.options.map((option, optIdx) => (
                                     <label
                                         key={optIdx}
-                                        className={`flex items-start p-3 rounded-lg border cursor-pointer transition-all ${
-                                            answers[q.id] === optIdx
+                                        className={`flex items-start p-3 rounded-lg border cursor-pointer transition-all ${answers[q.id] === optIdx
                                                 ? 'border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600'
                                                 : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
-                                        }`}
+                                            }`}
                                     >
                                         <input
                                             type="radio"
@@ -225,7 +224,7 @@ export const SkillProofs: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto p-6">
-             <div className="text-center mb-10">
+            <div className="text-center mb-10">
                 <h2 className="text-3xl font-black text-slate-900 mb-3 flex items-center justify-center gap-3">
                     <BrainCircuit size={32} className="text-indigo-600" />
                     Verified Skill Proofs

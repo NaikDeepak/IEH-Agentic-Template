@@ -1,5 +1,5 @@
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs, orderBy } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, query, limit, getDocs, orderBy, Timestamp } from "firebase/firestore";
 import type { ResumeAnalysisResult } from "../types";
 import { callAIProxy } from "../../../lib/ai/proxy";
 import { parseDocx, preparePdf } from "./documentService";
@@ -70,22 +70,6 @@ export const analyzeResume = async (
 
         // 4. Construct Result Object with Robust Defensive Mapping & Alias Support
         // The AI might return fields with slightly different names
-        interface RawParsedData {
-            name?: string;
-            full_name?: string;
-            email?: string;
-            phone?: string;
-            contact_number?: string;
-            links?: string[];
-            social_links?: string[];
-            summary?: string;
-            skills?: string[];
-            experience?: any[];
-            work_experience?: any[];
-            education?: any[];
-            academic_background?: any[];
-        }
-
         interface RawExperience {
             company?: string;
             organization?: string;
@@ -110,10 +94,27 @@ export const analyzeResume = async (
             end_date?: string;
         }
 
+        interface RawParsedData {
+            name?: string;
+            full_name?: string;
+            email?: string;
+            phone?: string;
+            contact_number?: string;
+            links?: string[];
+            social_links?: string[];
+            summary?: string;
+            skills?: string[];
+            experience?: RawExperience[];
+            work_experience?: RawExperience[];
+            education?: RawEducation[];
+            academic_background?: RawEducation[];
+        }
+
+
         const rawData = analysisData as unknown as (RawParsedData & { parsed_data?: RawParsedData });
         const rawParsed = rawData.parsed_data ?? rawData;
-        const rawExperience = (rawParsed.experience ?? rawData.work_experience ?? rawParsed.work_experience ?? rawData.experience ?? []) as RawExperience[];
-        const rawEducation = (rawParsed.education ?? rawData.education ?? rawParsed.academic_background ?? []) as RawEducation[];
+        const rawExperience = (rawParsed.experience ?? rawData.work_experience ?? rawParsed.work_experience ?? rawData.experience ?? []);
+        const rawEducation = (rawParsed.education ?? rawData.education ?? rawParsed.academic_background ?? []);
 
         const analysisResult: ResumeAnalysisResult = {
             user_id,
@@ -164,13 +165,7 @@ export const analyzeResume = async (
         const resumeRef = doc(collection(db, `users/${user_id}/resumes`));
         const finalResult = { ...analysisResult, id: resumeRef.id };
 
-        // Remove any unintentional undefineds manually to preserve serverTimestamp
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        const sanitizedResult = Object.fromEntries(
-            Object.entries(finalResult).filter(([_, v]) => v !== undefined)
-        );
-
-        await setDoc(resumeRef, sanitizedResult);
+        await setDoc(resumeRef, finalResult);
 
         // 6. Sync to Seeker Profile
         try {
@@ -209,13 +204,17 @@ export const getLatestResume = async (userId: string): Promise<ResumeAnalysisRes
         const validDoc = snapshot.docs.find(doc => {
             const d = doc.data();
             // A valid Firestore timestamp object has a toDate method
-            return d.analyzed_at && typeof d.analyzed_at === 'object' && typeof (d.analyzed_at as { toDate: () => unknown }).toDate === 'function';
-        }) ?? snapshot.docs[0]; // Fallback to first if none found valid
+            const analyzedAt = d['analyzed_at'] as Timestamp | undefined;
+            return analyzedAt && typeof analyzedAt === 'object' && typeof (analyzedAt as { toDate: () => unknown }).toDate === 'function';
+        });
+
+        if (!validDoc) return null;
 
         const data = validDoc.data();
 
         // On-the-fly normalization for existing data
-        let score = typeof data.score === 'number' ? data.score : (Number(data.score) || 0);
+        const rawScore = data['score'] as number | string | undefined;
+        let score = typeof rawScore === 'number' ? rawScore : (Number(rawScore) || 0);
         if (score > 0 && score <= 1) score = Math.round(score * 100);
         else score = Math.round(score);
 

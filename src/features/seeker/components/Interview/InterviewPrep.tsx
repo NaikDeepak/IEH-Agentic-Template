@@ -43,6 +43,7 @@ export const InterviewPrep: React.FC = () => {
         setError(null);
         try {
             const currentQuestion = questions[currentQuestionIndex];
+            if (!currentQuestion) throw new Error('No question selected');
             const result = await evaluateAnswer(currentQuestion.question, answer, role);
             setEvaluation(result);
         } catch (err) {

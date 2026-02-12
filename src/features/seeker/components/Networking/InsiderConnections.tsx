@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 
 interface InsiderConnectionsProps {
-    companyName: string;
+    companyName?: string;
 }
 
 export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyName }) => {
@@ -35,6 +35,7 @@ export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyN
                 }
 
                 const userProfile = userDoc.data() as SeekerProfile;
+                if (!companyName) return;
                 const foundConnections = await findConnections(userProfile, companyName);
                 setConnections(foundConnections);
             } catch (err) {
@@ -99,7 +100,7 @@ export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyN
         return (
             <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-100">
                 <User className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                <p className="text-gray-600 text-sm">No insider connections found at {companyName}.</p>
+                <p className="text-gray-600 text-sm">No insider connections found{companyName ? ` at ${companyName}` : ''}.</p>
                 <p className="text-gray-400 text-xs mt-1">Try connecting with recruiters directly on LinkedIn.</p>
             </div>
         );
@@ -109,7 +110,7 @@ export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyN
         <div className="space-y-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-blue-600" />
-                Insider Connections at {companyName}
+                Insider Connections {companyName ? `at ${companyName}` : 'in your Network'}
             </h3>
 
             <div className="grid gap-3">
@@ -137,10 +138,10 @@ export const InsiderConnections: React.FC<InsiderConnectionsProps> = ({ companyN
 
                                     <div className="flex items-center gap-1 mt-1">
                                         <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${connection.connectionType === 'alumni'
-                                                ? 'bg-purple-100 text-purple-700'
-                                                : connection.connectionType === 'ex-colleague'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-blue-100 text-blue-700'
+                                            ? 'bg-purple-100 text-purple-700'
+                                            : connection.connectionType === 'ex-colleague'
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-blue-100 text-blue-700'
                                             }`}>
                                             {connection.connectionType === 'alumni' && <GraduationCap className="w-3 h-3" />}
                                             {connection.connectionType === 'ex-colleague' && <Briefcase className="w-3 h-3" />}
