@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as Sentry from "@sentry/react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { ApplicationService } from '../../features/applications/services/applicationService';
 import { KanbanBoard } from '../../features/applications/components/KanbanBoard';
@@ -63,7 +64,14 @@ export const JobApplicants: React.FC = () => {
 
             await ApplicationService.updateApplicationStatus(appId, newStatus);
         } catch (err) {
-            console.error("Failed to update status:", err);
+            console.error("[JobApplicants] Failed to update status:", err);
+            Sentry.captureException(err, {
+                extra: { appId, newStatus, jobId: id }
+            });
+
+            // Show user feedback
+            alert("Failed to save pipeline changes. Please check your connection and try again.");
+
             // Revert on error
             if (id) {
                 const refreshed = await ApplicationService.getApplicationsForJob(id);

@@ -102,7 +102,7 @@ export function KanbanBoard<T extends { id?: string; status: string }>({
     const activeIdVal = active.id as string;
     const overIdVal = over.id as string;
 
-    const activeItem = localItems.find((item) => item.id === activeIdVal);
+    const activeItem = items.find((item) => item.id === activeIdVal);
     if (!activeItem) {
       setActiveId(null);
       return;

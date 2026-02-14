@@ -39,11 +39,16 @@ export const ApplicationService = {
   },
 
   async updateApplicationStatus(appId: string, newStatus: ApplicationStatus): Promise<void> {
-    const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
-    await updateDoc(docRef, {
-      status: newStatus,
-      updated_at: serverTimestamp(),
-    });
+    try {
+      const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
+      await updateDoc(docRef, {
+        status: newStatus,
+        updated_at: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error(`[ApplicationService] Firestore update FAILED for appId=${appId}:`, error);
+      throw error;
+    }
   },
 
   async submitApplication(data: SubmitApplicationInput): Promise<string> {
@@ -56,7 +61,7 @@ export const ApplicationService = {
 
     // Check for referral rewards
     if (data.candidate_id) {
-        void ReferralService.checkAndRewardReferrer(data.candidate_id);
+      void ReferralService.checkAndRewardReferrer(data.candidate_id);
     }
 
     return docRef.id;
