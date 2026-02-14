@@ -15,6 +15,7 @@ import {
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
 import { updateProfile } from 'firebase/auth';
+import { ReferralService } from '../features/growth/services/referralService';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -43,13 +44,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         await updateDoc(userDocRef, {
                             last_login: serverTimestamp()
                         });
+                        
+                        // Ensure user has a referral code
+                        if (!data.referralCode) {
+                            await ReferralService.ensureReferralCode(user.uid);
+                            // Refresh data to get the new code
+                            const updatedSnap = await getDoc(userDocRef);
+                            setUserData(updatedSnap.data() as UserData);
+                        }
                     } else {
+                        // Check for referral code in session storage (passed from loginWithGoogle)
+                        const pendingReferralCode = sessionStorage.getItem('pendingReferralCode');
+                        let referredBy = null;
+
+                        if (pendingReferralCode) {
+                            referredBy = await ReferralService.getUserByReferralCode(pendingReferralCode);
+                            sessionStorage.removeItem('pendingReferralCode');
+                        }
+
                         const newUserData: UserData = {
                             uid: user.uid,
                             email: user.email,
                             displayName: user.displayName,
                             photoURL: user.photoURL,
                             role: claimRole ?? null,
+                            browniePoints: 0, // Initialize with 0 points
+                            referredBy: referredBy ?? undefined
                         };
                         setUserData(newUserData);
 
@@ -62,6 +82,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             },
                             { merge: true }
                         );
+
+                        // Generate referral code for new user
+                        await ReferralService.ensureReferralCode(user.uid);
+                        const updatedSnap = await getDoc(userDocRef);
+                        setUserData(updatedSnap.data() as UserData);
                     }
                 } catch (err: unknown) {
                     const error = err as { code?: string; message?: string };
@@ -80,9 +105,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, []);
 
-    const loginWithGoogle = useCallback(async () => {
+    const loginWithGoogle = useCallback(async (referralCode?: string) => {
         setError(null);
         try {
+            if (referralCode) {
+                sessionStorage.setItem('pendingReferralCode', referralCode);
+            }
             await signInWithPopup(auth, googleProvider);
         } catch (err: unknown) {
             const error = err as { message?: string };
@@ -104,11 +132,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-    const signupWithEmail = useCallback(async (email: string, password: string, displayName: string) => {
+    const signupWithEmail = useCallback(async (email: string, password: string, displayName: string, referralCode?: string) => {
         setError(null);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName });
+
+            // If a referral code was provided, link it
+            if (referralCode) {
+                const referrerUid = await ReferralService.getUserByReferralCode(referralCode);
+                if (referrerUid) {
+                    await updateDoc(doc(db, 'users', userCredential.user.uid), {
+                        referredBy: referrerUid
+                    });
+                }
+            }
         } catch (err: unknown) {
             const error = err as { message?: string };
             console.error("Email Signup Error:", error);

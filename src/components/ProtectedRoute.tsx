@@ -25,9 +25,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     }
 
     if (allowedRoles && userData?.role && !allowedRoles.includes(userData.role)) {
-        // Logged in but doesn't have the required role
+        // Logged in but has the WRONG role
         return <Navigate to="/" replace />;
     }
+
+    // Role selection is now global and will block interaction if missing,
+    // so we don't need to redirect here if role is simply null.
 
     return <>{children}</>;
 };

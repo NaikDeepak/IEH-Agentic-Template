@@ -8,6 +8,11 @@ export interface UserData {
     photoURL: string | null;
     role: 'seeker' | 'employer' | 'admin' | null;
     employerRole?: 'owner' | 'recruiter' | 'hiring_manager';
+    referralCode?: string;
+    referredBy?: string;
+    browniePoints?: number;
+    phoneVerified?: boolean;
+    linkedinVerified?: boolean;
 }
 
 export interface AuthContextType {
@@ -15,9 +20,9 @@ export interface AuthContextType {
     userData: UserData | null;
     loading: boolean;
     error: string | null;
-    loginWithGoogle: () => Promise<void>;
+    loginWithGoogle: (referralCode?: string) => Promise<void>;
     loginWithEmail: (email: string, password: string) => Promise<void>;
-    signupWithEmail: (email: string, password: string, displayName: string) => Promise<void>;
+    signupWithEmail: (email: string, password: string, displayName: string, referralCode?: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshUserData: () => Promise<void>;
     clearError: () => void;

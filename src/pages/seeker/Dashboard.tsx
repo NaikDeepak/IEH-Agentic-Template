@@ -9,7 +9,8 @@ import {
     Video,
     ShieldCheck,
     ChevronRight,
-    Loader2
+    Loader2,
+    Gift
 } from 'lucide-react';
 
 import { getLatestResume } from '../../features/seeker/services/resumeService';
@@ -295,6 +296,13 @@ export const SeekerDashboard: React.FC = () => {
                             {/* 5. Tool Navigator */}
                             <section className="space-y-4">
                                 <h2 className="text-xl font-black uppercase tracking-tight mb-4">Quick Tools</h2>
+
+                                <ToolLink
+                                    icon={<Gift className="w-5 h-5" />}
+                                    title="Referral Hub"
+                                    description="Earn Brownie Points"
+                                    onClick={() => navigate('/seeker/referral')}
+                                />
 
                                 <ToolLink
                                     icon={<Video className="w-5 h-5" />}

@@ -12,6 +12,7 @@ import {
 import { db } from "../../../lib/firebase";
 import type { Application, ApplicationStatus, SubmitApplicationInput } from "../types";
 import { limit } from "firebase/firestore";
+import { ReferralService } from "../../growth/services/referralService";
 
 const APPLICATIONS_COLLECTION = "applications";
 
@@ -52,6 +53,12 @@ export const ApplicationService = {
       applied_at: serverTimestamp(),
       updated_at: serverTimestamp(),
     });
+
+    // Check for referral rewards
+    if (data.candidate_id) {
+        void ReferralService.checkAndRewardReferrer(data.candidate_id);
+    }
+
     return docRef.id;
   },
 };

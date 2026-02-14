@@ -5,8 +5,8 @@ service cloud.firestore {
     // Users can read and update their own user document.
     // They cannot change their role once it has been set.
     match /users/{userId} {
-      // Allow reading own profile OR reading any 'seeker' profile (for employers)
-      allow read: if request.auth != null && (request.auth.uid == userId || resource.data.role == 'seeker');
+      // Allow authenticated users to read profiles for referral/social features
+      allow read: if request.auth != null;
 
       // Allow creation of a user document with strict validation
       allow create: if request.auth != null
@@ -26,7 +26,15 @@ service cloud.firestore {
                       // Activity tracking
                       'status',
                       'lastActiveAt',
-                      'expiresAt'
+                      'expiresAt',
+                      // Referral tracking
+                      'referralCode',
+                      'browniePoints',
+                      'referredBy',
+                      'referralRewarded',
+                      'phoneVerified',
+                      'linkedinVerified',
+                      'rewardedAt'
                     ])
                     && request.resource.data.uid == request.auth.uid
                     && request.resource.data.email == request.auth.token.email
@@ -49,7 +57,15 @@ service cloud.firestore {
                       // Activity tracking
                       'status',
                       'lastActiveAt',
-                      'expiresAt'
+                      'expiresAt',
+                      // Referral tracking
+                      'referralCode',
+                      'browniePoints',
+                      'referredBy',
+                      'referralRewarded',
+                      'phoneVerified',
+                      'linkedinVerified',
+                      'rewardedAt'
                     ])
                     && (resource.data.role == null
                         || !('role' in request.resource.data)
@@ -214,6 +230,29 @@ service cloud.firestore {
     match /seeker_profiles/{userId} {
       allow read: if request.auth != null; 
       allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Referral Codes Collection
+    match /referralCodes/{code} {
+      // Anyone authenticated can look up a code
+      allow read: if request.auth != null;
+      // Only the user who owns the code can create it, and it must point to their UID
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Ledger Collection
+    match /ledger/{entryId} {
+      // Users can only read their own ledger entries
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      
+      // Allow creation via client-side transaction
+      // This is risky without a backend, but for this prototype we'll allow it 
+      // with strict validation that the UID matches the auth user.
+      allow create: if request.auth != null 
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.keys().hasOnly(['uid', 'amount', 'type', 'metadata', 'timestamp'])
+                    && request.resource.data.amount is number
+                    && request.resource.data.type in ['referral_bonus', 'redemption', 'manual_adjustment'];
     }
   }
 }

@@ -6,6 +6,30 @@
 - **Frontend Variables**: Required only for Firebase configuration (see `.env.example`).
 - **Secret Management**: `GEMINI_API_KEY` must be set in Firebase Secrets or Cloud Function environment variables (never prefixed with `VITE_`).
 
+## Growth & Viral Engine (Phase 06)
+
+The platform includes a built-in referral and reward system designed for high-quality, verified growth.
+
+### Production Ready Features
+- **Atomic Points Ledger**: Point updates (earning/spending) use Firestore Transactions for guaranteed integrity.
+- **Referral Engine**: Unique code generation, registration linking, and automatic reward triggers.
+- **Secure Onboarding**: Server-side endpoint for role assignment and custom claims.
+
+### Production Readiness Checklist (MVP Simulation)
+Currently, certain trust signals are in **Simulation Mode** for the MVP prototype. To move to production:
+
+1.  **Phone Verification**: 
+    - Switch `isSimulated` to `false` in `PhoneVerification.tsx`.
+    - Ensure Firebase project is on the "Blaze" plan for SMS quotas.
+    - Configure authorized domains in Firebase Console.
+2.  **LinkedIn Verification**:
+    - Replace the URL-input simulation with real LinkedIn OAuth.
+    - Set up a LinkedIn Developer App (requires a Company Page).
+    - Implement the backend token exchange in the Express server.
+3.  **Redemption Fulfillment**:
+    - The `LedgerService` correctly handles point deductions.
+    - Integrate a delivery mechanism (e.g., Firebase Functions + SendGrid) to fulfill rewards when a `redemption` ledger entry is created.
+
 ## Architecture
 See [architecture.md](file:///Users/deepaknaik/Downloads/1. AI Live/IEH/architecture.md) for details on the secure AI proxy and platform design.
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn, User, LogOut, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 interface LoginProps {
     variant?: 'card' | 'navbar';
@@ -9,6 +9,8 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     const { loginWithGoogle, loginWithEmail, user, loading, logout, error, clearError } = useAuth();
+    const [searchParams] = useSearchParams();
+    const referralCode = searchParams.get('ref') ?? undefined;
     const [isEmailLoading, setIsEmailLoading] = useState(false);
     const [formData, setFormData] = useState({
         email: '',
@@ -72,9 +74,9 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     // Default Card Variant
     return (
         <div className="flex flex-col items-center justify-center min-h-[40vh] bg-white p-8 md:p-12 border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md w-full mx-auto relative">
-             {/* Decorative Corner */}
-             <div className="absolute top-0 right-0 w-8 h-8 bg-black"></div>
-             <div className="absolute top-0 right-0 w-8 h-8 bg-white border-2 border-black translate-x-2 -translate-y-2"></div>
+            {/* Decorative Corner */}
+            <div className="absolute top-0 right-0 w-8 h-8 bg-black"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 bg-white border-2 border-black translate-x-2 -translate-y-2"></div>
 
             <div className="space-y-8 w-full">
                 <div className="space-y-4 text-center">
@@ -151,7 +153,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                         </div>
 
                         <button
-                            onClick={loginWithGoogle}
+                            onClick={() => loginWithGoogle(referralCode)}
                             className="w-full flex items-center justify-center gap-3 py-3 px-6 text-xs font-bold font-mono uppercase tracking-wider text-black bg-white border-2 border-black hover:bg-gray-50 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] transition-all"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
