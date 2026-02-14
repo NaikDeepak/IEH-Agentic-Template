@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: completed
 phase: 05-seeker-tools
-source: 05-01 to 05-12 SUMMARY files
-started: 2026-02-11T00:00:00Z
-updated: 2026-02-11T00:00:00Z
+source: conversational-uat
+started: 2026-02-14T10:00:00Z
+updated: 2026-02-14T11:00:00Z
 ---
 
 ## Current Test
@@ -25,26 +25,24 @@ expected: |
   1. On Dashboard or Profile, upload a Resume (PDF/DOCX).
   2. Wait for analysis.
   3. Verify an ATS Score (0-100) and detailed feedback (Strengths/Weaknesses) appear.
-result: issue
-reported: "fail, Failed to analyze resume. Please try again. API key is missing. Please provide a valid API key."
-severity: blocker
+result: pass
+notes: "Verified functional after VITE_GEMINI_API_KEY was correctly configured."
 
 ### 3. Market Salary Insights
 expected: |
   1. View the Market Trends widget or page.
   2. Verify it shows salary data (histogram/stats) OR a graceful "Data Unavailable" message.
   3. No crashes or raw errors.
-result: issue
-reported: "Unsure, Market Data Unavailable\nFailed to connect to market data service. Please try again later.\n\nTip: Try searching for a more general job title (e.g., \"Software Engineer\" instead of \"Junior React Native Developer\") to get better market insights"
-severity: major
+result: pass
+notes: "Verified functional after Adzuna API credentials were provided in functions/.env."
 
 ### 4. Smart Job Shortlist
 expected: |
   1. Check the "Daily Top 5" or "Recommended Jobs" section.
   2. Verify jobs are listed with a "Why this matches" explanation.
   3. If new user, verify "Cold Start" prompt to upload resume.
-result: skipped
-reason: "User skipped (implied by 'Continue' context amidst blockers)"
+result: pass
+notes: "Semantic matching and AI reasoning verified."
 
 ### 5. Apply & Application Tracking
 expected: |
@@ -53,16 +51,16 @@ expected: |
   3. Verify success message.
   4. Go to Application Tracker (Kanban).
   5. Verify the job appears in the "Applied" column.
-result: skipped
-reason: "User requested continue/skip"
+result: pass
+notes: "End-to-end application flow to Firestore verified."
 
 ### 6. Skill Gap Analysis
 expected: |
   1. Go to Skill Gap / Learning section.
   2. Select/Input a target role.
   3. Verify system lists "Missing Skills" and "Learning Resources".
-result: skipped
-reason: "User requested continue (likely blocked by API key)"
+result: pass
+notes: "Gemini-driven gap analysis verified."
 
 ### 7. Simulated Interview
 expected: |
@@ -71,8 +69,8 @@ expected: |
   3. Verify questions are generated.
   4. Input an answer, click Submit.
   5. Verify AI provides feedback/grading on the answer.
-result: skipped
-reason: "User requested continue (likely blocked by API key)"
+result: pass
+notes: "AI mock interview flow verified."
 
 ### 8. Verified Skill Proofs
 expected: |
@@ -81,7 +79,7 @@ expected: |
   3. Complete the quiz/assessment.
   4. Verify result (Pass/Fail) is displayed.
 result: skipped
-reason: "User requested continue (likely blocked by API key)"
+reason: "Hidden/Removed: Out of scope for Phase 1 per user request."
 
 ### 9. Insider Connections
 expected: |
@@ -90,52 +88,25 @@ expected: |
   3. Click to generate an outreach message.
   4. Verify an AI-drafted message appears in the modal.
 result: skipped
-reason: "User requested continue (likely blocked by API key)"
+reason: "Hidden/Removed: Out of scope for Phase 1 per user request."
 
 ### 10. Follow-up Nudges
 expected: |
   1. Check Application Tracker.
   2. Verify if "Nudge" UI elements exist (badges/alerts) for old applications.
-  3. (Note: Might not be visible if all apps are new, but verify the UI component logic doesn't crash).
 result: skipped
-reason: "User requested continue"
+reason: "Not functional: UI indicators removed per user request to avoid confusion."
 
 ## Summary
 
 total: 10
-passed: 1
-issues: 2
+passed: 7
+issues: 0
 pending: 0
-skipped: 7
+skipped: 3
 
 ## Gaps
 
-- truth: "ATS Score and detailed feedback appear after upload"
-  status: failed
-  reason: "User reported: fail, Failed to analyze resume. Please try again. API key is missing. Please provide a valid API key."
-  severity: blocker
-  test: 2
-  root_cause: "VITE_GEMINI_API_KEY missing in .env (client services expect VITE_ prefix)"
-  artifacts:
-    - path: ".env"
-      issue: "Missing VITE_GEMINI_API_KEY"
-    - path: "src/features/seeker/services/resumeService.ts"
-      issue: "Expects VITE_GEMINI_API_KEY"
-  missing:
-    - "Add VITE_GEMINI_API_KEY to .env and .env.example"
-  debug_session: ".planning/debug/resume-api-key-missing.md"
-
-- truth: "Market data shows histogram or graceful unavailable message without connection error"
-  status: failed
-  reason: "User reported: Unsure, Market Data Unavailable... Failed to connect to market data service."
-  severity: major
-  test: 3
-  root_cause: "Missing Adzuna API credentials (ADZUNA_APP_ID, ADZUNA_APP_KEY) in functions/.env"
-  artifacts:
-    - path: "functions/.env"
-      issue: "Missing Adzuna credentials"
-    - path: "functions/src/marketProxy.js"
-      issue: "Fails precondition check"
-  missing:
-    - "Add ADZUNA_APP_ID and ADZUNA_APP_KEY to functions/.env"
-  debug_session: ".planning/debug/market-data-connection-failure.md"
+- No blocking gaps remain for Phase 05 core requirements.
+- Gaps identified previously (API keys) have been resolved.
+- Advanced features (Skill Proofs, Insider Connections, Nudges) deferred to future phases.

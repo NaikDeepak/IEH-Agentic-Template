@@ -9,8 +9,7 @@ import {
     Video,
     ShieldCheck,
     ChevronRight,
-    Loader2,
-    AlertCircle
+    Loader2
 } from 'lucide-react';
 
 import { getLatestResume } from '../../features/seeker/services/resumeService';
@@ -328,19 +327,6 @@ export const SeekerDashboard: React.FC = () => {
                                 />
                             </section>
 
-                            {/* 6. Upcoming Events / Nudges */}
-                            <section className="bg-yellow-400 border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                                <h2 className="text-lg font-black uppercase tracking-tight mb-4 flex items-center gap-2">
-                                    <AlertCircle className="w-5 h-5" />
-                                    Daily Nudge
-                                </h2>
-                                <p className="text-sm font-bold leading-tight">
-                                    You have 2 applications that haven't been followed up on in over a week.
-                                </p>
-                                <button className="mt-4 text-xs font-black uppercase underline">
-                                    Send Follow-ups
-                                </button>
-                            </section>
                         </div>
                     </div>
                 </div>

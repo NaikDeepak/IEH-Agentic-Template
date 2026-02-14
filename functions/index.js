@@ -12,7 +12,6 @@ import { GoogleAuth } from "google-auth-library";
 import nodemailer from "nodemailer";
 
 import { marketProxy } from "./src/marketProxy.js";
-import { followUpNudges } from "./src/followUpNudges.js";
 import * as aiProxy from "./src/ai/proxy.js";
 import * as userHandlers from "./src/user/handlers.js";
 import rateLimit from "express-rate-limit";
@@ -485,7 +484,7 @@ app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
 
 // Expose the Express API as a single Cloud Function
 export const api = onRequest(app);
-export { marketProxy, followUpNudges };
+export { marketProxy };
 
 // --- Scheduled Functions ---
 
