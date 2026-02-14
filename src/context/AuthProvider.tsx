@@ -28,11 +28,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (user) {
                 try {
+                    // Force refresh to get latest custom claims
+                    const tokenResult = await user.getIdTokenResult();
+                    const claimRole = tokenResult.claims['role'] as 'seeker' | 'employer' | 'admin' | null;
+
                     const userDocRef = doc(db, 'users', user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
-                        setUserData(userDoc.data() as UserData);
+                        const data = userDoc.data() as UserData;
+                        const effectiveRole = claimRole ?? data.role ?? null;
+
+                        setUserData({ ...data, role: effectiveRole });
                         await updateDoc(userDocRef, {
                             last_login: serverTimestamp()
                         });
@@ -42,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             email: user.email,
                             displayName: user.displayName,
                             photoURL: user.photoURL,
-                            role: null,
+                            role: claimRole ?? null,
                         };
                         setUserData(newUserData);
 
@@ -58,8 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                 } catch (err: unknown) {
                     const error = err as { code?: string; message?: string };
-                    console.error("Firestore Error:", error);
-                    setError(error.message ?? "An error occurred while fetching user data.");
+                    console.error("Auth Transition Error:", error);
+                    setError(error.message ?? "An error occurred during authentication.");
                 }
             } else {
                 setUserData(null);

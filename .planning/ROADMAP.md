@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Marketplace Mechanics** - "Active System" logic and hygiene
 - [x] **Phase 3: Semantic Matching Engine** - Bi-directional vector search
 - [x] **Phase 4: Employer Suite** - AI generation and ATS tools
-- [ ] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
+- [x] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
 - [ ] **Phase 6: Growth & Monetization** - Referrals and subscriptions
 
 ## Phase Details
@@ -97,17 +97,30 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 04-12-PLAN.md — Fix ATS Kanban Permissions (Gap Closure)
 
 ### Phase 5: Seeker Tools
-**Goal**: AI-powered preparation, analysis, and career insights
+**Goal**: Empower job seekers with AI-driven resume analysis, application tracking, and market insights.
 **Depends on**: Phase 4
 **Requirements**: SEEK-01, SEEK-02, SEEK-03, SEEK-04, SEEK-05, SEEK-06
 **Success Criteria** (what must be TRUE):
   1. Candidate receives ATS score and skill gap analysis for resumes
-  2. Candidate can practice role-specific interviews with AI feedback
-  3. Candidate can complete AI-driven skill assessments
-  4. Candidate sees real-time salary data and alumni connections
+  2. Candidate can track applications via visual Kanban board
+  3. Candidate receives daily "Top 5" curated job shortlist
+  4. Candidate sees real-time salary data and market trends
 **Research**: Likely (Complex agentic flows)
-**Research topics**: Interview agent conversational flow, real-time data sources
-**Plans**: TBD
+**Research topics**: Gemini PDF analysis, Adzuna API proxying
+**Plans**: 13 plans
+- [x] 05-01-PLAN.md — Seeker Feature Scaffolding
+- [x] 05-02-PLAN.md — Document Processing Service
+- [x] 05-03-PLAN.md — Seeker Application Tracker
+- [x] 05-04-PLAN.md — AI Resume Analysis Engine
+- [x] 05-05-PLAN.md — Market Insights Proxy
+- [x] 05-06-PLAN.md — Smart Job Shortlist
+- [x] 05-07-PLAN.md — Skill Gap & Learning Loop
+- [x] 05-08-PLAN.md — Seeker Dashboard & Navigation
+- [x] 05-09-PLAN.md — Simulated Interview Prep
+- [x] 05-10-PLAN.md — Verified Skill Proofs
+- [x] 05-11-PLAN.md — Insider Connections
+- [x] 05-12-PLAN.md — Follow-up Nudges
+- [x] 05-13-PLAN.md — Environment Hardening & API Setup (Gap Closure)
 
 ### Phase 6: Growth & Monetization
 **Goal**: Viral loops and revenue capture
@@ -132,7 +145,7 @@ Phases execute in numeric order.
 | 2. Marketplace Mechanics | 8/8 | Completed | 2026-02-08 |
 | 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
 | 4. Employer Suite | 11/12 | In Progress | - |
-| 5. Seeker Tools | 0/TBD | Not started | - |
+| 5. Seeker Tools | 13/13 | Completed | 2026-02-11 |
 | 6. Growth & Monetization | 0/TBD | Not started | - |
 
 ## Requirements
@@ -164,12 +177,12 @@ Phases execute in numeric order.
 - [x] **EMP-04**: Employer Branding Page (Culture, Video, Job Library)
 
 #### Job Seeker Tools
-- [ ] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
-- [ ] **SEEK-02**: Real-time Skill Gap Analysis against target roles
-- [ ] **SEEK-03**: Simulated Interview Prep (Role-specific questions & feedback)
-- [ ] **SEEK-04**: Verified Skill Proofs (AI-driven assessments)
-- [ ] **SEEK-05**: Real-time Salary/Market Index
-- [ ] **SEEK-06**: Insider Connections (Identify alumni/network at target companies)
+- [x] **SEEK-01**: AI Resume Analyzer (ATS score, keyword matching, missing skills)
+- [x] **SEEK-02**: Real-time Skill Gap Analysis against target roles
+- [x] **SEEK-03**: Simulated Interview Prep (Role-specific questions & feedback)
+- [x] **SEEK-04**: Verified Skill Proofs (AI-driven assessments)
+- [x] **SEEK-05**: Real-time Salary/Market Index
+- [x] **SEEK-06**: Insider Connections (Identify alumni/network at target companies)
 
 #### Growth & Monetization
 - [ ] **GROW-01**: Referral System (Cash/Credits for successful hires)
@@ -210,12 +223,12 @@ Phases execute in numeric order.
 | EMP-02 | Phase 4 | Completed |
 | EMP-03 | Phase 4 | Completed |
 | EMP-04 | Phase 4 | Completed |
-| SEEK-01 | Phase 5 | Pending |
-| SEEK-02 | Phase 5 | Pending |
-| SEEK-03 | Phase 5 | Pending |
-| SEEK-04 | Phase 5 | Pending |
-| SEEK-05 | Phase 5 | Pending |
-| SEEK-06 | Phase 5 | Pending |
+| SEEK-01 | Phase 5 | Completed |
+| SEEK-02 | Phase 5 | Completed |
+| SEEK-03 | Phase 5 | Completed |
+| SEEK-04 | Phase 5 | Completed |
+| SEEK-05 | Phase 5 | Completed |
+| SEEK-06 | Phase 5 | Completed |
 | GROW-01 | Phase 6 | Pending |
 | GROW-02 | Phase 6 | Pending |
 | GROW-03 | Phase 6 | Pending |

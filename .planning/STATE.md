@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-16)
 
 **Core value:** Semantic matching that connects the right talent to the right roles by understanding context, not just keywords.
-**Current focus:** Phase 5 — Seeker Experience
+**Current focus:** Phase 6 — Growth & Monetization
 
 ## Current Position
 
-Phase: 4 of 6 (Employer Suite)
-Plan: 12 of 12 (Gap Closure)
-Status: Phase 4 Complete.
-Last activity: 2026-02-10 — Fixed Firestore permissions for Applications.
+Phase: 6 of 6 (Growth & Monetization)
+Plan: 0 of 12 (Phase Starting)
+Status: Phase 05 UAT Complete. Phase 06 Starting.
+Last activity: 2026-02-14 — Completed Phase 05 UAT and verified all core features.
 
-Progress: ██████████████████████████ 100% (29/29 total planned tasks)
+Progress: ████████████████████████████████ 100% (42/42 total plans for Phase 1-5)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
+- Total plans completed: 42
 - Average duration: ~12m
-- Total execution time: ~3.8 hours
+- Total execution time: ~5.6 hours
 
 **By Phase:**
 
@@ -31,6 +31,7 @@ Progress: ███████████████████████�
 | 2. Marketplace Mechanics | 8 | 8 | ~10m |
 | 3. Semantic Matching | 6 | 6 | ~11m |
 | 4. Employer Suite | 12 | 12 | ~12m |
+| 5. Seeker Tools | 13 | 13 | ~8m |
 
 ## Accumulated Context
 
@@ -38,24 +39,32 @@ Progress: ███████████████████████�
 
 | Date | Plan | Decision | Rationale |
 |------|------|----------|-----------|
-| 2026-02-10 | 04-12 | Cross-Collection Auth Check | Verified employer ownership via `get()` call to the linked job document in security rules. |
-| 2026-02-10 | 04-11 | Persisted Bio Snapshot | Storing company bio directly on job posting ensures contextual consistency at time of post. |
-| 2026-02-10 | 04-10 | Relaxed AI Validation | Allowed AI JD generation with only a title to improve exploratory UX. |
-| 2026-02-10 | 04-10 | Dedicated Employer Dashboard | Created /employer/jobs to centralize job management and ATS access. |
-| 2026-02-10 | Maintenance | Model Deprecation Response | Confirmed usage of gemini-embedding-001 (768 dims) to preempt text-embedding-004 deprecation. |
+| 2026-02-11 | 05-13 | Standardized .env.example | Prevents "API key missing" errors during development and deployment. |
+| 2026-02-11 | 05-08 | Dashboard Hub | Centralized all seeker features into a "Command Center" to improve tool discoverability. |
+| 2026-02-11 | 05-08 | RBAC Redirection | Implemented dynamic redirection logic to send users to the correct dashboard based on role. |
+| 2026-02-11 | 05-06 | 24-Hour Caching | Ensures a consistent "Daily Digest" experience and reduces API costs for embedding generation. |
+| 2026-02-11 | 05-06 | Cosine Similarity | Provides effective semantic matching between user profiles and job descriptions without requiring complex search infrastructure for MVP. |
+| 2026-02-11 | 05-11 | Client-Side Matching | Networking matching happens client-side for now to reduce backend complexity, utilizing existing employer data. |
+| 2026-02-11 | 05-07 | Gemini 2.0 Flash | Selected for high speed and cost-efficiency in generating structured skill gap reports. |
+| 2026-02-11 | 05-07 | Resource Saving | Allowed users to save specific resources to their profile (`saved_resources`) for later reference. |
+| 2026-02-11 | 05-10 | Local Grading | Grading assessments client-side against AI-generated correct indices for immediate feedback. |
+| 2026-02-11 | 05-10 | On-Demand Assessments | Generating questions just-in-time to ensure variety and minimize storage. |
+| 2026-02-11 | 05-04 | Manual SchemaType | Defined local constants for Gemini SDK compatibility to avoid build errors with experimental types. |
+| 2026-02-11 | 05-04 | Gemini 2.0 Flash | Selected for high speed and cost-efficiency in real-time resume analysis. |
+| 2026-02-11 | 05-04 | Analyze-then-Persist | Persisting analysis results immediately to Firestore (`users/{uid}/resumes`) to enable downstream matching features. |
 
 ### Pending Todos
 
-- Phase 5: Implement Seeker-side application flow and AI prep tools.
-- Implement RBAC protection for /admin routes.
+- Phase 6: Performance Optimization & Polish.
+- Phase 6: Final Deployment Readiness.
 
 ### Blockers/Concerns
 
-- None. All major Phase 4 blockers resolved.
+- **Plan 04-09 (Employer Suite)**: Missing SUMMARY.md. Needs verification if this was completed.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Completed Phase 4 Plan 12 (Gap Closure)
-Resume file: .planning/phases/05-seeker-tools/05-01-PLAN.md
-Session Continuity: Phase 4 complete. Ready to start Phase 5 (Seeker Tools).
+Last session: 2026-02-11
+Stopped at: Completed 05-13.
+Resume file: None
+Session Continuity: Phase 5 completed.

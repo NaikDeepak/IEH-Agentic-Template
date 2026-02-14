@@ -1,69 +1,124 @@
 import React from 'react';
-import { ShieldCheck, Zap, Check } from 'lucide-react';
+import { ShieldCheck, Zap, Brain, Clock, Users, FileText, Target, Sparkles } from 'lucide-react';
+
+interface BenefitProps {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+}
+
+const Benefit: React.FC<BenefitProps> = ({ icon, title, description }) => (
+    <div className="group border border-white/20 p-6 hover:bg-white hover:text-black transition-colors duration-300">
+        <div className="flex items-start justify-between mb-4">
+            <h3 className="text-xl font-bold uppercase tracking-tight">{title}</h3>
+            {icon}
+        </div>
+        <p className="text-sm font-mono opacity-70 leading-relaxed uppercase">{description}</p>
+    </div>
+);
 
 export const WhyChooseUs: React.FC = () => {
+
+    const seekerBenefits: BenefitProps[] = [
+        {
+            icon: <Zap className="w-6 h-6" />,
+            title: 'Direct Access',
+            description: 'Skip the middleman. Connect directly with hiring managers who control the budget.',
+        },
+        {
+            icon: <ShieldCheck className="w-6 h-6" />,
+            title: 'Verified Jobs',
+            description: 'Every employer is vetted. Every job is real. Zero tolerance for scams or stale listings.',
+        },
+        {
+            icon: <Brain className="w-6 h-6" />,
+            title: 'AI-Powered Tools',
+            description: 'Resume AI, Interview Prep, Skill Gap Analysis — everything to accelerate your career.',
+        },
+    ];
+
+    const employerBenefits: BenefitProps[] = [
+        {
+            icon: <Target className="w-6 h-6" />,
+            title: 'AI Talent Search',
+            description: 'Semantic matching finds candidates by real fit — not outdated keyword filters.',
+        },
+        {
+            icon: <Clock className="w-6 h-6" />,
+            title: '14-Day Avg. Hire',
+            description: 'From posting to offer in two weeks. No more months-long hiring pipelines.',
+        },
+        {
+            icon: <Users className="w-6 h-6" />,
+            title: 'Top 1% Talent Pool',
+            description: '50K+ verified, active professionals across India. Quality over quantity.',
+        },
+    ];
+
     return (
         <section className="py-24 px-4 md:px-8 bg-black text-white font-sans">
             <div className="container mx-auto max-w-7xl">
-                <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
+                <div className="flex flex-col gap-16">
 
-                    {/* Left Content */}
-                    <div className="w-full lg:w-1/2">
-                        <div className="mb-12 border-l-4 border-white pl-8">
-                            <span className="text-sm font-mono font-bold text-gray-400 uppercase tracking-widest mb-2 block">Our Mission</span>
-                            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
-                                Built for <br/> Ambition.
-                            </h2>
-                            <p className="text-xl text-gray-400 font-light leading-relaxed max-w-lg">
-                                We've dismantled the traditional hiring chaos. No ghosting. No black boxes. Just verified opportunities and direct connections.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-8">
-                            <div className="group border border-white/20 p-6 hover:bg-white hover:text-black transition-colors duration-300">
-                                <div className="flex items-start justify-between mb-4">
-                                    <h3 className="text-xl font-bold uppercase tracking-tight">Direct Access</h3>
-                                    <Zap className="w-6 h-6" />
-                                </div>
-                                <p className="text-sm font-mono opacity-70 leading-relaxed uppercase">
-                                    Skip the middleman. Connect directly with hiring managers who control the budget.
-                                </p>
-                            </div>
-
-                            <div className="group border border-white/20 p-6 hover:bg-white hover:text-black transition-colors duration-300">
-                                <div className="flex items-start justify-between mb-4">
-                                    <h3 className="text-xl font-bold uppercase tracking-tight">Verified & Secure</h3>
-                                    <ShieldCheck className="w-6 h-6" />
-                                </div>
-                                <p className="text-sm font-mono opacity-70 leading-relaxed uppercase">
-                                    Every employer is vetted. Every job is real. Zero tolerance for scams or stale listings.
-                                </p>
-                            </div>
-                        </div>
+                    {/* Header */}
+                    <div className="border-l-4 border-white pl-8">
+                        <span className="text-sm font-mono font-bold text-gray-400 uppercase tracking-widest mb-2 block">Our Mission</span>
+                        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
+                            Built for <br /> Ambition.
+                        </h2>
+                        <p className="text-xl text-gray-400 font-light leading-relaxed max-w-lg">
+                            We've dismantled the traditional hiring chaos. No ghosting. No black boxes. Just verified opportunities and direct connections.
+                        </p>
                     </div>
 
-                    {/* Right Visual / Stats */}
-                    <div className="w-full lg:w-1/2 relative">
-                        <div className="relative z-10 border-2 border-white bg-gray-900 p-2">
-                             <img
-                                src="/images/about_collaboration.png"
-                                alt="Collaboration"
-                                className="w-full h-auto object-cover grayscale contrast-125 border border-white/20"
-                            />
+                    {/* Dual-Column Benefits */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-2 border-white">
+
+                        {/* Seekers Column */}
+                        <div className="border-b-2 lg:border-b-0 lg:border-r-2 border-white">
+                            <div className="p-6 border-b border-white/20 flex items-center gap-3">
+                                <FileText className="w-5 h-5 text-emerald-400" />
+                                <h3 className="font-bold uppercase tracking-widest text-sm">For Job Seekers</h3>
+                            </div>
+                            <div className="flex flex-col">
+                                {seekerBenefits.map((benefit, i) => (
+                                    <div key={benefit.title} className={i < seekerBenefits.length - 1 ? 'border-b border-white/10' : ''}>
+                                        <Benefit {...benefit} />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
-                        {/* Floating Stats Box */}
-                        <div className="absolute -bottom-12 -left-4 md:-left-12 bg-white text-black p-8 border-2 border-black shadow-[12px_12px_0px_0px_rgba(255,255,255,0.2)] max-w-sm z-20">
-                            <h4 className="text-4xl font-black mb-2">93%</h4>
-                            <p className="font-bold uppercase tracking-tight mb-4">Placement Rate</p>
-                            <ul className="space-y-2">
-                                {['Avg. 14 Days to Hire', 'Top 1% Talent Pool', 'Global Reach'].map((item, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-xs font-mono uppercase font-bold text-gray-600">
-                                        <Check className="w-3 h-3 text-black" /> {item}
-                                    </li>
+                        {/* Employers Column */}
+                        <div>
+                            <div className="p-6 border-b border-white/20 flex items-center gap-3">
+                                <Sparkles className="w-5 h-5 text-emerald-400" />
+                                <h3 className="font-bold uppercase tracking-widest text-sm">For Employers</h3>
+                            </div>
+                            <div className="flex flex-col">
+                                {employerBenefits.map((benefit, i) => (
+                                    <div key={benefit.title} className={i < employerBenefits.length - 1 ? 'border-b border-white/10' : ''}>
+                                        <Benefit {...benefit} />
+                                    </div>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
+
+                    </div>
+
+                    {/* Stats Bar */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-2 border-white">
+                        {[
+                            { stat: '93%', label: 'Placement Rate' },
+                            { stat: '14d', label: 'Avg. Time to Hire' },
+                            { stat: '85%', label: 'Interview in 7 Days' },
+                            { stat: '50K+', label: 'Active Professionals' },
+                        ].map((item, i) => (
+                            <div key={item.label} className={`p-8 text-center ${i < 3 ? 'border-b md:border-b-0 md:border-r border-white/20' : ''}`}>
+                                <p className="text-4xl font-black tabular-nums tracking-tighter">{item.stat}</p>
+                                <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-400 mt-2">{item.label}</p>
+                            </div>
+                        ))}
                     </div>
 
                 </div>

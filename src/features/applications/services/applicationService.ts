@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import type { Application, ApplicationStatus, SubmitApplicationInput } from "../types";
+import { limit } from "firebase/firestore";
 
 const APPLICATIONS_COLLECTION = "applications";
 
@@ -23,6 +24,17 @@ export const ApplicationService = {
     );
     const snap = await getDocs(q);
     return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Application));
+  },
+
+  async hasApplied(jobId: string, candidateId: string): Promise<boolean> {
+    const q = query(
+      collection(db, APPLICATIONS_COLLECTION),
+      where("job_id", "==", jobId),
+      where("candidate_id", "==", candidateId),
+      limit(1)
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
   },
 
   async updateApplicationStatus(appId: string, newStatus: ApplicationStatus): Promise<void> {

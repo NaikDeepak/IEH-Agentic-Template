@@ -35,11 +35,11 @@ describe('Register Component', () => {
     it('rendering of registration form elements', () => {
         renderRegister();
 
-        expect(screen.getByRole('heading', { level: 2, name: /create account/i })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 2, name: /Join The Hub/i })).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/john doe/i)).toBeInTheDocument(); // Name
-        expect(screen.getByPlaceholderText(/john@example.com/i)).toBeInTheDocument(); // Email
+        expect(screen.getByPlaceholderText(/USER@EXAMPLE.COM/i)).toBeInTheDocument(); // Email
         expect(screen.getAllByPlaceholderText(/••••••••/i)).toHaveLength(2); // Password and Confirm
-        expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Create Account/i })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
     });
 
@@ -47,7 +47,7 @@ describe('Register Component', () => {
         renderRegister();
 
         const nameInput = screen.getByPlaceholderText(/john doe/i);
-        const emailInput = screen.getByPlaceholderText(/john@example.com/i);
+        const emailInput = screen.getByPlaceholderText(/USER@EXAMPLE.COM/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
         const [passwordInput, confirmInput] = passwordInputs;
 
@@ -67,7 +67,7 @@ describe('Register Component', () => {
 
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
         const [passwordInput, confirmInput] = passwordInputs;
-        const submitButton = screen.getByRole('button', { name: /sign up/i });
+        const submitButton = screen.getByRole('button', { name: /Create Account/i });
 
         if (passwordInput) fireEvent.change(passwordInput, { target: { value: 'password123' } });
         if (confirmInput) fireEvent.change(confirmInput, { target: { value: 'password456' } });
@@ -85,10 +85,10 @@ describe('Register Component', () => {
         renderRegister();
 
         const nameInput = screen.getByPlaceholderText(/john doe/i);
-        const emailInput = screen.getByPlaceholderText(/john@example.com/i);
+        const emailInput = screen.getByPlaceholderText(/USER@EXAMPLE.COM/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
         const [passwordInput, confirmInput] = passwordInputs;
-        const submitButton = screen.getByRole('button', { name: /sign up/i });
+        const submitButton = screen.getByRole('button', { name: /Create Account/i });
 
         fireEvent.change(nameInput, { target: { value: 'Jane Doe' } });
         fireEvent.change(emailInput, { target: { value: 'jane@example.com' } });
@@ -110,6 +110,6 @@ describe('Register Component', () => {
 
         renderRegister();
 
-        expect(screen.getByText('Email already in use')).toBeInTheDocument();
+        expect(screen.getByText('Error: Email already in use')).toBeInTheDocument();
     });
 });

@@ -4,28 +4,32 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { Application, ApplicationStatus } from '../types';
-import { ApplicantCard } from './ApplicantCard';
 
-interface KanbanColumnProps {
-  id: ApplicationStatus;
+interface KanbanColumnProps<T extends { id?: string }> {
+  id: string;
   title: string;
-  applications: Application[];
+  items: T[];
+  renderCard: (item: T) => React.ReactNode;
 }
 
-export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applications }) => {
+export function KanbanColumn<T extends { id?: string }>({
+  id,
+  title,
+  items,
+  renderCard
+}: KanbanColumnProps<T>) {
   const { setNodeRef } = useDroppable({
     id: id,
   });
 
-  const validApps = applications.filter((app): app is Application & { id: string } => !!app.id);
+  const validItems = items.filter((item): item is T & { id: string } => !!item.id);
 
   return (
     <div className="flex flex-col w-72 flex-shrink-0">
       <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2 px-2">
         <h3 className="font-black uppercase tracking-tighter text-lg">{title}</h3>
         <span className="bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold">
-          {applications.length}
+          {items.length}
         </span>
       </div>
 
@@ -34,20 +38,22 @@ export const KanbanColumn: React.FC<KanbanColumnProps> = ({ id, title, applicati
         className="flex-grow min-h-[500px] bg-gray-50 border-2 border-dashed border-gray-200 p-3 flex flex-col gap-3 transition-colors hover:border-black"
       >
         <SortableContext
-          items={validApps.map(app => app.id)}
+          items={validItems.map(item => item.id)}
           strategy={verticalListSortingStrategy}
         >
-          {validApps.map((application) => (
-            <ApplicantCard key={application.id} application={application} />
+          {validItems.map((item) => (
+            <React.Fragment key={item.id}>
+              {renderCard(item)}
+            </React.Fragment>
           ))}
         </SortableContext>
 
-        {applications.length === 0 && (
+        {items.length === 0 && (
           <div className="flex-grow flex items-center justify-center py-12 opacity-20">
-            <p className="font-mono text-[10px] uppercase font-bold text-center">No Applicants</p>
+            <p className="font-mono text-[10px] uppercase font-bold text-center">Empty</p>
           </div>
         )}
       </div>
     </div>
   );
-};
+}

@@ -17,6 +17,8 @@ import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { trackJobActivity } from "../../../lib/activity";
 import type { CreateJobInput, JobPosting } from "../types";
 import { CompanyService } from "../../companies/services/companyService";
+import { callAIProxy } from "../../../lib/ai/proxy";
+
 
 const JOBS_COLLECTION = "jobs";
 
@@ -25,17 +27,7 @@ interface EmbeddingResponse {
 }
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const res = await fetch("/api/ai/embedding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-    });
-
-    if (!res.ok) {
-        throw new Error(`Embedding service failed: ${res.status.toString()}`);
-    }
-
-    const data = (await res.json()) as EmbeddingResponse;
+    const data = await callAIProxy<EmbeddingResponse>("/api/ai/embedding", { text });
     const embedding = data.embedding;
 
     if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
@@ -45,6 +37,7 @@ async function fetchEmbedding(text: string): Promise<number[]> {
 
     return embedding;
 }
+
 
 export const JobService = {
     /**
@@ -219,8 +212,9 @@ export const JobService = {
 
             return { id: snap.id, ...snap.data() } as JobPosting;
         } catch (error) {
-            console.error("Error fetching job:", error);
-            throw error;
+            console.error(`Error fetching job ${jobId}:`, error);
+            // Return null instead of throwing to prevent cascading UI failures
+            return null;
         }
     },
 

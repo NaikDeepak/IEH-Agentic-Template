@@ -3,9 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { embeddingHandler } from '../functions/index.js';
 
 // Mock Sentry
-const { mockCaptureException, mockEmbedContent } = vi.hoisted(() => {
+const { mockEmbedContent } = vi.hoisted(() => {
     return {
-        mockCaptureException: vi.fn(),
         mockEmbedContent: vi.fn()
     };
 });
@@ -57,10 +56,14 @@ vi.mock('@google/genai', () => {
     };
 });
 
-vi.mock('@sentry/node', () => ({
-    init: vi.fn(),
-    captureException: mockCaptureException,
-}));
+vi.mock('@sentry/node', async (importOriginal) => {
+    const actual = await importOriginal<any>();
+    return {
+        ...actual,
+        startSpan: vi.fn((_, cb) => cb({ setAttribute: vi.fn() })),
+        captureException: vi.fn(),
+    };
+});
 
 describe('API Endpoint: /api/embedding', () => {
 

@@ -62,19 +62,32 @@ service cloud.firestore {
                     // Validate expiresAt if present (max 4 days + 1 hour buffer)
                     && ( !('expiresAt' in request.resource.data)
                          || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
+
+      // Subcollections
+      match /resumes/{resumeId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /skillGaps/{gapId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /assessments/{assessmentId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /shortlist/{shortlistId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Jobs Collection
     match /jobs/{jobId} {
-      // Allow public read access to ACTIVE jobs.
-      // Employers can read their own non-active jobs.
-      allow read: if resource.data.status in ['active', 'passive'] 
-                  || (request.auth != null && resource.data.employer_id == request.auth.uid);
+      // Require authentication to read jobs (protects against scraping)
+      allow read: if request.auth != null;
 
       allow create: if request.auth != null
-                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
+                    && request.auth.token.role == 'employer'
                     && request.resource.data.employer_id == request.auth.uid
+                    && request.resource.data.title is string && request.resource.data.title.size() > 5
+                    && request.resource.data.description is string && request.resource.data.description.size() > 20
                     && request.resource.data.keys().hasOnly([
                       'employer_id',
                       'title',
@@ -84,7 +97,6 @@ service cloud.firestore {
                       'type',
                       'work_mode',
                       'salary_range',
-                      'contactEmail',
                       'contactEmail',
                       'status',
                       'created_at',
@@ -108,6 +120,7 @@ service cloud.firestore {
 
       // Only the job owner (employer) can update the job
       allow update: if request.auth != null
+                    && request.auth.token.role == 'employer'
                     && resource.data.employer_id == request.auth.uid
                     // restrict what can change
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly([
@@ -150,11 +163,12 @@ service cloud.firestore {
     // Applications Collection
     match /applications/{appId} {
       allow create: if request.auth != null
-                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'seeker'
+                    && request.auth.token.role == 'seeker'
                     // prevent arbitrary field injection
                     && request.resource.data.keys().hasOnly([
                       'candidate_id',
+                      'candidate_name',
+                      'candidate_role',
                       'job_id',
                       'employer_id',
                       'answers',
@@ -171,34 +185,35 @@ service cloud.firestore {
                     && request.resource.data.employer_id == get(/databases/$(database)/documents/jobs/$(request.resource.data.job_id)).data.employer_id;
 
       allow update: if request.auth != null
+                    && request.auth.token.role == 'employer'
                     && get(/databases/$(database)/documents/jobs/$(resource.data.job_id)).data.employer_id == request.auth.uid
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'updated_at']);
 
-      allow read: if request.auth != null
-                  && (
-                    resource.data.candidate_id == request.auth.uid
-                    || get(/databases/$(database)/documents/jobs/$(resource.data.job_id)).data.employer_id == request.auth.uid
-                  );
+      allow read: if request.auth != null && (resource.data.candidate_id == request.auth.uid || request.auth.token.role == 'employer');
     }
 
     // Companies Collection
     match /companies/{companyId} {
-      // Allow public read access so candidates can view company profiles
-      allow read: if true;
+      // Require authentication to read company profiles
+      allow read: if request.auth != null;
 
       // Allow creation by authenticated employers
       allow create: if request.auth != null
-                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
+                    && request.auth.token.role == 'employer'
                     && request.resource.data.employer_ids.hasAll([request.auth.uid]);
 
       // Allow updates by employers associated with the company.
       // Require that the caller is still an employer and prevent changes to employer_ids
       allow update: if request.auth != null
-                    && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer'
+                    && request.auth.token.role == 'employer'
                     && resource.data.employer_ids.hasAny([request.auth.uid])
                     && request.resource.data.employer_ids == resource.data.employer_ids;
+    }
+
+    // Seeker Profiles Collection
+    match /seeker_profiles/{userId} {
+      allow read: if request.auth != null; 
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }

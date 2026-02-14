@@ -1,15 +1,13 @@
-# React + TypeScript + Vite
+## Environment Configuration
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### Security Note
+**Client-side AI keys are strictly forbidden**. All AI features must use the secure server-side proxy in Cloud Functions.
 
-Currently, two official plugins are available:
+- **Frontend Variables**: Required only for Firebase configuration (see `.env.example`).
+- **Secret Management**: `GEMINI_API_KEY` must be set in Firebase Secrets or Cloud Function environment variables (never prefixed with `VITE_`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Architecture
+See [architecture.md](file:///Users/deepaknaik/Downloads/1. AI Live/IEH/architecture.md) for details on the secure AI proxy and platform design.
 
 ## Expanding the ESLint configuration
 

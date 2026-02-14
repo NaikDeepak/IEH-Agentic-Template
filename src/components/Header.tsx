@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Login } from './Login';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+
+const Login = lazy(() => import('./Login').then(module => ({ default: module.Login })));
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,11 @@ export const Header: React.FC = () => {
         { label: 'AI Prep', path: '#ai-prep' },
         { label: 'Pricing', path: '#pricing' },
     ];
+
+    if (userData?.role === 'seeker') {
+        // Add Dashboard for seekers at the beginning
+        navItems.unshift({ label: 'Dashboard', path: '/seeker/dashboard' });
+    }
 
     if (userData?.role === 'employer') {
         const employerNavItems = [
@@ -64,7 +70,9 @@ export const Header: React.FC = () => {
                 </nav>
 
                 <div className="flex items-center gap-6">
-                    <Login variant="navbar" />
+                    <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-gray-200" />}>
+                        <Login variant="navbar" />
+                    </Suspense>
 
                     {/* Mobile Menu Toggle */}
                     <button

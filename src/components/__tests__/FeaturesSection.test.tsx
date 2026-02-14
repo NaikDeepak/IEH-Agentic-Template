@@ -6,11 +6,11 @@ describe('FeaturesSection', () => {
     it('renders key feature cards', () => {
         render(<FeaturesSection />);
 
-        // Check for "AI Hiring Assistant" (Employer Feature)
-        expect(screen.getByText(/Creative & Design/i)).toBeInTheDocument();
+        // Check for "Software Engineering" (Existing sector)
+        expect(screen.getByText(/Software Engineering/i)).toBeInTheDocument();
 
-        // Check for "Resume Analyzer" (Job Seeker Feature)
-        expect(screen.getByText(/Digital Marketing/i)).toBeInTheDocument();
+        // Check for "Cloud & DevOps" (Existing sector)
+        expect(screen.getByText(/Cloud & DevOps/i)).toBeInTheDocument();
 
     });
 });
