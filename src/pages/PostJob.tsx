@@ -423,6 +423,7 @@ export const PostJob: React.FC = () => {
                       type="button"
                       onClick={() => { removeQuestion(index); }}
                       className="absolute -top-3 -right-3 bg-red-600 text-white p-2 border-2 border-black hover:bg-red-700 transition-colors"
+                      aria-label="Remove question"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

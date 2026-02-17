@@ -47,7 +47,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
             return (
                 <Link
                     to="/login"
-                    className="flex items-center gap-2 px-6 py-3 text-xs font-mono font-bold uppercase tracking-widest text-black border-2 border-black bg-white hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 text-xs font-mono font-bold uppercase tracking-widest text-black border-2 border-black bg-white hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                 >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>

@@ -18,8 +18,11 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: 'npm run dev',
+        command: 'cross-env VITE_USE_FIREBASE_EMULATOR=true FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 npm run dev:full',
         url: 'http://localhost:5173',
         reuseExistingServer: !process.env.CI,
+        timeout: 180 * 1000,
+        stdout: 'pipe',
+        stderr: 'pipe',
     },
 });

@@ -57,3 +57,7 @@ Thumbs.db
 next.config.js
 next.config.ts
 *.cache  
+
+# E2E Screenshots
+e2e-seeker*.png
+

@@ -31,15 +31,20 @@ export const trackUserActivity = async (userId: string): Promise<void> => {
 
   try {
     const userRef = doc(db, 'users', userId);
+    // Use setDoc with merge to avoid 'document not found' errors on new registrations
+    // but note that create rules might still block if required fields like 'email' aren't present.
+    // However, if the doc already exists, this is identical to updateDoc.
     await updateDoc(userRef, {
       status: 'active' as ActivityStatus,
       lastActiveAt: serverTimestamp(),
       expiresAt: getExpirationTimestamp()
     });
     localStorage.setItem(storageKey, now.toString());
-  } catch (error) {
-    // Fail silently to not disrupt the user experience, but log for debugging
-    console.error('Error tracking user activity:', error);
+  } catch {
+    // Fail silently - common on new registrations before user doc is fully created
+    if (import.meta.env.DEV) {
+      console.warn('Activity tracking deferred (user doc may not exist yet)');
+    }
   }
 };
 

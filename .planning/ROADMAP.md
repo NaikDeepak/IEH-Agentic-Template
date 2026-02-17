@@ -152,7 +152,17 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Lighthouse performance score ≥ 90
   5. CI/CD pipeline deploys to staging automatically
 **Research**: Unlikely (Standard production hardening)
-**Plans**: TBD
+**Plans**: 10 plans
+- [x] 07-01-PLAN.md — Sentry Enhancement & Structured Logging
+- [ ] 07-02-PLAN.md — E2E Smoke Tests (Playwright)
+- [ ] 07-03-PLAN.md — Firestore Security Rules Audit
+- [ ] 07-04-PLAN.md — Performance & Accessibility Audit
+- [ ] 07-05-PLAN.md — Error Handling & Resilience Hardening
+- [ ] 07-06-PLAN.md — CI/CD Pipeline & Deployment Automation
+- [ ] 07-07-PLAN.md — SEO & Meta Tags Hardening
+- [ ] 07-08-PLAN.md — API Security Headers & Input Validation
+- [ ] 07-09-PLAN.md — Environment & Deployment Hardening
+- [ ] 07-10-PLAN.md — UX Polish & Loading States
 
 > **Note:** v2 features (Career Agents, XAI, Predictive Pathing) are deferred indefinitely pending funding.
 
@@ -169,7 +179,7 @@ Phases execute in numeric order.
 | 4. Employer Suite | 12/12 | Completed | 2026-02-16 |
 | 5. Seeker Tools | 13/13 | Completed | 2026-02-11 |
 | 6. Growth & Monetization | 6/6 | Completed | 2026-02-17 |
-| 7. Stabilization & Prod Readiness | 0/TBD | Planning | — |
+| 7. Stabilization & Prod Readiness | 1/10 | In Progress | — |
 
 ## Requirements
 

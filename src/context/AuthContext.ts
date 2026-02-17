@@ -9,7 +9,7 @@ export interface UserData {
     role: 'seeker' | 'employer' | 'admin' | null;
     employerRole?: 'owner' | 'recruiter' | 'hiring_manager';
     referralCode?: string;
-    referredBy?: string;
+    referredBy?: string | null;
     browniePoints?: number;
     phoneVerified?: boolean;
     linkedinVerified?: boolean;

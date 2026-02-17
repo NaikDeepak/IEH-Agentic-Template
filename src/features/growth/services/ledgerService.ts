@@ -5,10 +5,13 @@ import {
     serverTimestamp,
     increment
 } from 'firebase/firestore';
+import * as Sentry from '@sentry/react';
 import { db } from '../../../lib/firebase';
 
 const USERS_COLLECTION = 'users';
 const LEDGER_COLLECTION = 'ledger';
+
+const { logger } = Sentry;
 
 export type TransactionType = 'referral_bonus' | 'redemption' | 'manual_adjustment';
 
@@ -30,44 +33,58 @@ export const LedgerService = {
         type: TransactionType,
         metadata?: Record<string, unknown>
     ): Promise<void> {
-        const userRef = doc(db, USERS_COLLECTION, uid);
-        const ledgerRef = doc(collection(db, LEDGER_COLLECTION));
+        return Sentry.startSpan(
+            { op: 'ledger.adjust-points', name: 'Adjust Brownie Points' },
+            async (span) => {
+                span.setAttribute('uid', uid);
+                span.setAttribute('amount', amount);
+                span.setAttribute('type', type);
 
-        try {
-            await runTransaction(db, async (transaction) => {
-                const userSnap = await transaction.get(userRef);
+                const userRef = doc(db, USERS_COLLECTION, uid);
+                const ledgerRef = doc(collection(db, LEDGER_COLLECTION));
 
-                if (!userSnap.exists()) {
-                    throw new Error('User does not exist');
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const userSnap = await transaction.get(userRef);
+
+                        if (!userSnap.exists()) {
+                            throw new Error('User does not exist');
+                        }
+
+                        const userData = userSnap.data();
+                        const currentPoints = (userData['browniePoints'] ?? 0) as number;
+                        const newPoints = currentPoints + amount;
+
+                        if (newPoints < 0) {
+                            throw new Error('Insufficient points for this transaction');
+                        }
+
+                        // Update user points
+                        transaction.update(userRef, {
+                            browniePoints: increment(amount),
+                            updated_at: serverTimestamp()
+                        });
+
+                        // Create ledger entry
+                        transaction.set(ledgerRef, {
+                            uid,
+                            amount,
+                            type,
+                            metadata: metadata ?? {},
+                            timestamp: serverTimestamp()
+                        });
+                    });
+
+                    span.setAttribute('success', true);
+                    logger.info(logger.fmt`Ledger: ${type} ${amount} points for user ${uid}`);
+                } catch (error) {
+                    span.setAttribute('success', false);
+                    Sentry.captureException(error);
+                    logger.error(logger.fmt`Ledger transaction failed for user ${uid}: ${type}`);
+                    throw error;
                 }
-
-                const userData = userSnap.data();
-                const currentPoints = (userData['browniePoints'] ?? 0) as number;
-                const newPoints = currentPoints + amount;
-
-                if (newPoints < 0) {
-                    throw new Error('Insufficient points for this transaction');
-                }
-
-                // Update user points
-                transaction.update(userRef, {
-                    browniePoints: increment(amount),
-                    updated_at: serverTimestamp()
-                });
-
-                // Create ledger entry
-                transaction.set(ledgerRef, {
-                    uid,
-                    amount,
-                    type,
-                    metadata: metadata ?? {},
-                    timestamp: serverTimestamp()
-                });
-            });
-        } catch (error) {
-            console.error('Ledger transaction failed:', error);
-            throw error;
-        }
+            }
+        );
     },
 
     /**
@@ -82,3 +99,4 @@ export const LedgerService = {
         );
     }
 };
+

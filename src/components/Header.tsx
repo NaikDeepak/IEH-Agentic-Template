@@ -69,7 +69,7 @@ export const Header: React.FC = () => {
                     ))}
                 </nav>
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
                     <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-gray-200" />}>
                         <Login variant="navbar" />
                     </Suspense>

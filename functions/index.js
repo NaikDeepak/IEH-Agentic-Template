@@ -135,10 +135,15 @@ const aiLimiter = rateLimit({
 
 // Initialize Sentry
 if (process.env.SENTRY_DSN) {
+    const isProd = process.env.NODE_ENV === 'production';
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
-        tracesSampleRate: 1.0,
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        enableLogs: true,
+        integrations: [
+            Sentry.consoleLoggingIntegration({ levels: ["warn", "error"] }),
+        ],
+        tracesSampleRate: isProd ? 0.2 : 1.0,
     });
 }
 
