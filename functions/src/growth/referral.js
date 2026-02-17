@@ -1,12 +1,13 @@
 
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-const db = getFirestore();
+const getDb = () => getFirestore();
 const USERS_COLLECTION = 'users';
 const APPLICATIONS_COLLECTION = 'applications';
 const LEDGER_COLLECTION = 'ledger';
 
 const adjustPoints = async (uid, amount, type, metadata = {}) => {
+    const db = getDb();
     const userRef = db.collection(USERS_COLLECTION).doc(uid);
     const ledgerRef = db.collection(LEDGER_COLLECTION).doc();
 
@@ -55,6 +56,7 @@ export const checkAndRewardReferrer = async (uid) => {
         return;
     }
 
+    const db = getDb();
     const userRef = db.collection(USERS_COLLECTION).doc(uid);
     const ledgerRef = db.collection(LEDGER_COLLECTION).doc();
 
