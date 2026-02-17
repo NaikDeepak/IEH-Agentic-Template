@@ -43,7 +43,6 @@ const adjustPoints = async (uid, amount, type, metadata = {}) => {
                 timestamp: FieldValue.serverTimestamp()
             });
         });
-        console.log(`Successfully rewarded ${amount} points to ${uid} for ${type}`);
     } catch (error) {
         console.error(`Ledger transaction failed for ${uid}:`, error);
         throw error;
@@ -51,10 +50,7 @@ const adjustPoints = async (uid, amount, type, metadata = {}) => {
 };
 
 export const checkAndRewardReferrer = async (uid) => {
-    if (!uid) {
-        console.log("No UID provided for referral check.");
-        return;
-    }
+    if (!uid) return;
 
     const db = getDb();
     const userRef = db.collection(USERS_COLLECTION).doc(uid);
@@ -69,65 +65,25 @@ export const checkAndRewardReferrer = async (uid) => {
             // 1. Read User Data (Transactional)
             const userSnap = await transaction.get(userRef);
 
-            if (!userSnap.exists) {
-                // User might be deleted mid-process?
-                return;
-            }
+            if (!userSnap.exists) return;
 
             const userData = userSnap.data();
 
             // 2. Check Eligibility (Transactional)
-            // If already rewarded, EXIT immediately.
-            if (userData.referralRewarded) {
-                // console.log(`User ${uid} already rewarded.`);
-                return;
-            }
-
-            if (!userData.referredBy) {
-                // No referrer
-                return;
-            }
+            if (userData.referralRewarded || !userData.referredBy) return;
 
             // check verification
-            if (!userData.phoneVerified || !userData.linkedinVerified) {
-                // Not verified yet
-                return;
-            }
+            if (!userData.phoneVerified || !userData.linkedinVerified) return;
 
-            // 3. Check Application Count (Non-Transactional Query, but okay because referralRewarded is the gatekeeper)
-            // We do this inside the transaction block just to be safe, though queries are not technically part of the lock unless we read specific docs.
-            // However, the *decision* to write to userRef depends on this.
-            // Since `referralRewarded` is false, this is the first time we are attempting to reward.
-            // We just need to verify THIS is the first application.
-            // Note: `appsQuery` assumes Firestore consistency.
             const appsSnap = await transaction.get(appsQuery);
 
-            // Note: transaction.get(query) is supported in some SDKs, but strictly speaking "transactional queries" are tricky.
-            // But since we are only worried about "is this the first app?", and we lock on `userRef`, 
-            // no other process can modify `userRef.referralRewarded` concurrently.
-            // So if multiple triggers fire for different apps, they will serialize on `userRef`.
-            // The first one to grab the lock sees `referralRewarded = false`.
-            // It checks apps. If it sees 1 (itself), it rewards.
-            // The second one waits. When it grabs the lock, it sees `referralRewarded = true` (set by first).
-            // So it returns.
-            // Race condition SOLVED by locking `userRef`.
-
-            if (appsSnap.size !== 1) {
-                // Either 0 (impossible if triggered by create) or > 1 (already applied before)
-                return;
-            }
+            if (appsSnap.size !== 1) return;
 
             const referrerUid = userData.referredBy;
             const referrerRef = db.collection(USERS_COLLECTION).doc(referrerUid);
             const referrerSnap = await transaction.get(referrerRef);
 
-            if (!referrerSnap.exists) {
-                // Referrer doesn't exist
-                return;
-            }
-
-            const referrerData = referrerSnap.data();
-            const currentPoints = (referrerData.browniePoints || 0);
+            if (!referrerSnap.exists) return;
 
             // 4. Perform Updates (Transactional)
 
@@ -153,9 +109,9 @@ export const checkAndRewardReferrer = async (uid) => {
             });
         });
 
-        console.log(`Referral check completed for ${uid}`);
+        console.info(`[Referral] Successfully processed reward for ${uid}`);
     } catch (error) {
-        console.error(`Referral transaction failed for ${uid}:`, error);
+        console.error(`[Referral Error] Transaction failed for ${uid}:`, error);
     }
 };
 

@@ -91,7 +91,7 @@ describe('ShortlistService', () => {
             const result = await ShortlistService.getDailyShortlist(userId);
 
             expect(result.jobs).toHaveLength(1);
-            expect(result.jobs[0].matchScore).toBe(0.9);
+            expect(result.jobs?.[0]?.matchScore).toBe(0.9);
             expect(result.isColdStart).toBe(false);
         });
 
@@ -114,7 +114,7 @@ describe('ShortlistService', () => {
             const result = await ShortlistService.getDailyShortlist(userId);
 
             expect(result.jobs).toHaveLength(1);
-            expect(result.jobs[0].id).toBe('job_new');
+            expect(result.jobs?.[0]?.id).toBe('job_new');
             expect(writeBatch).toHaveBeenCalled();
         });
     });

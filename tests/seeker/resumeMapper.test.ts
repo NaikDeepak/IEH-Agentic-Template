@@ -54,7 +54,7 @@ describe('ResumeMapper', () => {
 
         expect(result.score).toBe(85);
         expect(result.parsed_data.name).toBe('John Doe');
-        expect(result.parsed_data.experience[0].company).toBe('Tech Corp');
+        expect(result.parsed_data.experience?.[0]?.company).toBe('Tech Corp');
         expect(result.analyzed_at).toBe('mock-timestamp');
     });
 
@@ -85,7 +85,7 @@ describe('ResumeMapper', () => {
 
         expect(result.parsed_data.name).toBe('Jane Doe');
         expect(result.parsed_data.email).toBe('jane@example.com');
-        expect(result.parsed_data.experience[0].company).toBe('Old Co');
+        expect(result.parsed_data.experience?.[0]?.company).toBe('Old Co');
     });
 
     it('should handle complex experience descriptions (arrays and fallbacks)', () => {
@@ -114,9 +114,9 @@ describe('ResumeMapper', () => {
 
         const result = ResumeMapper.mapToDomain(userId, rawText, filename, aiResponse);
 
-        expect(result.parsed_data.experience[0].description).toEqual(['Line 1', 'Line 2']);
-        expect(result.parsed_data.experience[1].description).toEqual(['Resp 1']);
-        expect(result.parsed_data.experience[2].description).toEqual(['One line']);
+        expect(result.parsed_data.experience?.[0]?.description).toEqual(['Line 1', 'Line 2']);
+        expect(result.parsed_data.experience?.[1]?.description).toEqual(['Resp 1']);
+        expect(result.parsed_data.experience?.[2]?.description).toEqual(['One line']);
     });
 
     it('should provide default values for missing data', () => {

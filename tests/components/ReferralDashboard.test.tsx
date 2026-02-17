@@ -4,7 +4,6 @@ import { useAuth } from '../../src/hooks/useAuth';
 import { ReferralService } from '../../src/features/growth/services/referralService';
 import { LedgerService } from '../../src/features/growth/services/ledgerService';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
 // import React from 'react'; // React is auto-imported in newer versions or unused here if we only use JSX
 
 // Mock sub-components

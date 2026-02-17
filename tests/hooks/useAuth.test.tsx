@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { useAuth } from '../../src/hooks/useAuth';
 import { AuthContext } from '../../src/context/AuthContext';
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 
 describe('useAuth', () => {
     it('should return context when used within provider', () => {
