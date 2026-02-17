@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ReferralService } from '../../src/features/growth/services/referralService';
-import { getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { getDoc } from 'firebase/firestore';
+
+const { mockTransaction } = vi.hoisted(() => ({
+    mockTransaction: {
+        get: vi.fn(),
+        set: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+    }
+}));
 
 // Mock Dependencies
 vi.mock('../../src/lib/firebase', () => ({
@@ -16,7 +25,10 @@ vi.mock('firebase/firestore', () => ({
     getDoc: vi.fn(),
     setDoc: vi.fn(),
     updateDoc: vi.fn(),
-    getFirestore: vi.fn(() => ({}))
+    getFirestore: vi.fn(() => ({})),
+    runTransaction: vi.fn(async (_db, callback) => {
+        return callback(mockTransaction);
+    })
 }));
 
 describe('ReferralService', () => {
@@ -24,6 +36,10 @@ describe('ReferralService', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockTransaction.set.mockClear();
+        mockTransaction.get.mockClear();
+        mockTransaction.update.mockClear();
+        mockTransaction.delete.mockClear();
     });
 
     describe('ensureReferralCode', () => {
@@ -36,7 +52,7 @@ describe('ReferralService', () => {
             const code = await ReferralService.ensureReferralCode(uid);
 
             expect(code).toBe('EXISTING-123');
-            expect(updateDoc).not.toHaveBeenCalled();
+            expect(mockTransaction.set).not.toHaveBeenCalled();
         });
 
         it('should generate and save new code if missing', async () => {
@@ -48,8 +64,7 @@ describe('ReferralService', () => {
             const code = await ReferralService.ensureReferralCode(uid);
 
             expect(code).toBe('IEH-123456');
-            expect(updateDoc).toHaveBeenCalled();
-            expect(setDoc).toHaveBeenCalled();
+            expect(mockTransaction.set).toHaveBeenCalledTimes(2);
         });
 
         it('should throw error if fails to generate unique code after 5 attempts', async () => {

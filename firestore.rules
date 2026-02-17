@@ -6,7 +6,9 @@ service cloud.firestore {
     // They cannot change their role once it has been set.
     match /users/{userId} {
       // Allow authenticated users to read profiles for referral/social features
-      allow read: if request.auth != null;
+      // Allow reading own profile; prevent collection-wide harvesting
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow list: if false;
 
       // Allow creation of a user document with strict validation
       allow create: if request.auth != null

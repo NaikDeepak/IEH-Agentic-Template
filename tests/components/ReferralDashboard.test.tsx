@@ -4,7 +4,8 @@ import { useAuth } from '../../src/hooks/useAuth';
 import { ReferralService } from '../../src/features/growth/services/referralService';
 import { LedgerService } from '../../src/features/growth/services/ledgerService';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import React from 'react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+// import React from 'react'; // React is auto-imported in newer versions or unused here if we only use JSX
 
 // Mock sub-components
 vi.mock('../../src/features/growth/components/Verification/PhoneVerification', () => ({
@@ -71,12 +72,26 @@ describe('ReferralDashboard', () => {
         browniePoints: 150
     };
     const mockRefresh = vi.fn();
+    const mockGetIdToken = vi.fn().mockResolvedValue('mock-token');
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Mock global fetch
+        global.fetch = vi.fn(() =>
+            Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ referrals: [] }),
+            })
+        ) as any;
+
         (useAuth as any).mockReturnValue({
             userData: mockUser,
-            refreshUserData: mockRefresh
+            refreshUserData: mockRefresh,
+            user: {
+                uid: 'user123',
+                getIdToken: mockGetIdToken
+            }
         });
     });
 
@@ -90,7 +105,11 @@ describe('ReferralDashboard', () => {
     it('should call ensureReferralCode if missing', async () => {
         (useAuth as any).mockReturnValue({
             userData: { uid: 'user123', referralCode: null },
-            refreshUserData: mockRefresh
+            refreshUserData: mockRefresh,
+            user: {
+                uid: 'user123',
+                getIdToken: mockGetIdToken
+            }
         });
 
         render(<ReferralDashboard />);
@@ -118,6 +137,11 @@ describe('ReferralDashboard', () => {
 
     it('should show empty state for referral history', async () => {
         render(<ReferralDashboard />);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledWith('/api/growth/referrals', expect.any(Object));
+        });
+
         expect(await screen.findByText(/No referrals yet/i)).toBeInTheDocument();
     });
 });

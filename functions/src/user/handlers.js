@@ -74,7 +74,7 @@ export const verifyPhone = async (req, res) => {
         await db.collection("users").doc(uid).update({
             phoneVerified: true,
             phoneNumber: phoneNumber,
-            updated_at: new Date() // Use server timestamp ideally but Date is fine here for now or import FieldValue
+            updated_at: FieldValue.serverTimestamp()
         });
 
         res.json({ success: true, message: "Phone verified successfully." });

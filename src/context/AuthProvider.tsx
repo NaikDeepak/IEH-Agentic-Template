@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         await updateDoc(userDocRef, {
                             last_login: serverTimestamp()
                         });
-                        
+
                         // Ensure user has a referral code
                         if (!data.referralCode) {
                             await ReferralService.ensureReferralCode(user.uid);
@@ -142,9 +142,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (referralCode) {
                 const referrerUid = await ReferralService.getUserByReferralCode(referralCode);
                 if (referrerUid) {
-                    await updateDoc(doc(db, 'users', userCredential.user.uid), {
-                        referredBy: referrerUid
-                    });
+                    await setDoc(
+                        doc(db, 'users', userCredential.user.uid),
+                        { referredBy: referrerUid },
+                        { merge: true }
+                    );
                 }
             }
         } catch (err: unknown) {

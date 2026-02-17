@@ -44,8 +44,8 @@ interface RawParsedData {
 
 interface AIResumeResponse {
     score: number | string;
-    sections: ResumeAnalysisResult['sections'];
-    keywords: ResumeAnalysisResult['keywords'];
+    sections?: ResumeAnalysisResult['sections'];
+    keywords?: ResumeAnalysisResult['keywords'];
     suggestions: string[];
     parsed_data?: RawParsedData;
     // Fallback if AI ignores "parsed_data" wrapper
@@ -76,6 +76,9 @@ export const ResumeMapper = {
         // The AI might put data inside 'parsed_data' OR at the top level
         const rawParsed = data.parsed_data ?? (data as RawParsedData);
 
+        const sections = (data.sections ?? {}) as Partial<ResumeAnalysisResult['sections']>;
+        const keywords = (data.keywords ?? {}) as Partial<ResumeAnalysisResult['keywords']>;
+
         // Handle Arrays with fallbacks
         const rawExperience = (rawParsed.experience ?? data.work_experience ?? rawParsed.work_experience ?? data.experience ?? []);
         const rawEducation = (rawParsed.education ?? data.education ?? rawParsed.academic_background ?? []);
@@ -101,15 +104,15 @@ export const ResumeMapper = {
             raw_text: rawText,
             score,
             sections: {
-                contact: data.sections.contact || !!rawParsed.email || !!data.email,
-                summary: data.sections.summary || !!data.summary || !!rawParsed.summary,
-                experience: data.sections.experience || rawExperience.length > 0,
-                education: data.sections.education || rawEducation.length > 0,
-                skills: data.sections.skills || !!data.skills || !!rawParsed.skills,
+                contact: !!sections.contact || !!rawParsed.email || !!data.email,
+                summary: !!sections.summary || !!data.summary || !!rawParsed.summary,
+                experience: !!sections.experience || rawExperience.length > 0,
+                education: !!sections.education || rawEducation.length > 0,
+                skills: !!sections.skills || !!data.skills || !!rawParsed.skills,
             },
             keywords: {
-                found: Array.isArray(data.keywords.found) ? data.keywords.found : [],
-                missing: Array.isArray(data.keywords.missing) ? data.keywords.missing : [],
+                found: Array.isArray(keywords.found) ? keywords.found : [],
+                missing: Array.isArray(keywords.missing) ? keywords.missing : [],
             },
             suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
             parsed_data: {

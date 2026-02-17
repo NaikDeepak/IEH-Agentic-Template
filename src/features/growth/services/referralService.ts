@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, runTransaction } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import { generateReferralCode } from '../../../lib/utils/codes';
 
@@ -48,9 +48,12 @@ export const ReferralService = {
       throw new Error('Failed to generate a unique referral code. Please try again.');
     }
 
-    // Save to user profile and reverse lookup collection
-    await updateDoc(userRef, { referralCode: code });
-    await setDoc(doc(db, REFERRAL_CODES_COLLECTION, code), { uid });
+    // Save to user profile and reverse lookup collection (atomic)
+    await runTransaction(db, (tx) => {
+      tx.set(userRef, { referralCode: code }, { merge: true });
+      tx.set(doc(db, REFERRAL_CODES_COLLECTION, code), { uid });
+      return Promise.resolve();
+    });
 
     return code;
   },

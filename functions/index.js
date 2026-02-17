@@ -14,6 +14,7 @@ import nodemailer from "nodemailer";
 import { marketProxy } from "./src/marketProxy.js";
 import * as aiProxy from "./src/ai/proxy.js";
 import * as userHandlers from "./src/user/handlers.js";
+import * as growthHandlers from "./src/growth/handlers.js";
 import rateLimit from "express-rate-limit";
 
 dotenv.config({ path: ".env.production" });
@@ -481,6 +482,9 @@ app.post("/api/ai/outreach", requireAuth, aiLimiter, aiProxy.generateOutreachPro
 // User & Onboarding Routes
 app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
 app.post("/api/user/verify-phone", requireAuth, userHandlers.verifyPhone);
+
+// Growth Routes
+app.post("/api/growth/referrals", requireAuth, growthHandlers.getReferrals);
 
 
 // Expose the Express API as a single Cloud Function

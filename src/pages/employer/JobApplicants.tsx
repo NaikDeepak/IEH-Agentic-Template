@@ -74,8 +74,13 @@ export const JobApplicants: React.FC = () => {
 
             // Revert on error
             if (id) {
-                const refreshed = await ApplicationService.getApplicationsForJob(id);
-                setApplications(refreshed);
+                try {
+                    const refreshed = await ApplicationService.getApplicationsForJob(id);
+                    setApplications(refreshed);
+                } catch (refreshErr) {
+                    console.error("[JobApplicants] Failed to refresh applications after error:", refreshErr);
+                    Sentry.captureException(refreshErr, { extra: { jobId: id } });
+                }
             }
         }
     };

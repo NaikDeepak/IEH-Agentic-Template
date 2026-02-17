@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../hooks/useAuth';
-import { db } from '../../../lib/firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import {
     Gift,
     Copy,
@@ -19,6 +16,7 @@ import { LinkedInVerification } from './Verification/LinkedInVerification';
 import { PointsBadge } from './PointsBadge';
 import { ReferralService } from '../services/referralService';
 import { LedgerService } from '../services/ledgerService';
+import { useAuth } from '../../../hooks/useAuth';
 
 interface ReferralRecord {
     id: string;
@@ -28,22 +26,31 @@ interface ReferralRecord {
     status: 'pending' | 'verified' | 'rewarded';
     joinedAt: unknown;
 }
-
-interface UserDataDoc {
-    email: string;
-    displayName: string;
-    referralRewarded?: boolean;
-    phoneVerified?: boolean;
-    linkedinVerified?: boolean;
-    created_at: unknown;
+// Define interface with optional referrals to allow safe checking
+interface ReferralApiResponse {
+    referrals?: {
+        id: string;
+        uid: string;
+        email: string;
+        displayName: string;
+        status: 'pending' | 'verified' | 'rewarded';
+        joinedAt: string;
+    }[];
 }
 
 export const ReferralDashboard: React.FC = () => {
-    const { userData, refreshUserData } = useAuth();
+    const { userData, refreshUserData, user } = useAuth();
     const [referrals, setReferrals] = useState<ReferralRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
     const [isRedeeming, setIsRedeeming] = useState<string | null>(null);
+    const [origin, setOrigin] = useState('');
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setOrigin(window.location.origin);
+        }
+    }, []);
 
     useEffect(() => {
         // Ensure user has a referral code if missing
@@ -63,31 +70,35 @@ export const ReferralDashboard: React.FC = () => {
 
     useEffect(() => {
         const fetchReferrals = async () => {
-            if (!userData?.uid) return;
+            if (!userData?.uid || !user) return;
 
             try {
-                // Find users referred by this user
-                const q = query(
-                    collection(db, 'users'),
-                    where('referredBy', '==', userData.uid),
-                    orderBy('created_at', 'desc')
-                );
-                const snap = await getDocs(q);
-                const records = snap.docs.map(doc => {
-                    const data = doc.data() as UserDataDoc;
-                    let status: 'pending' | 'verified' | 'rewarded' = 'pending';
-                    if (data.referralRewarded) status = 'rewarded';
-                    else if (data.phoneVerified && data.linkedinVerified) status = 'verified';
-
-                    return {
-                        id: doc.id,
-                        uid: doc.id,
-                        email: data.email,
-                        displayName: data.displayName,
-                        status,
-                        joinedAt: data.created_at
-                    };
+                const token = await user.getIdToken();
+                const response = await fetch('/api/growth/referrals', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json() as ReferralApiResponse;
+
+                // Map API response to component state shape
+                // Safe access with optional chaining now valid due to updated interface
+                const records: ReferralRecord[] = (data.referrals ?? []).map((ref) => ({
+                    id: ref.id,
+                    uid: ref.uid,
+                    email: ref.email,
+                    displayName: ref.displayName,
+                    status: ref.status,
+                    joinedAt: ref.joinedAt
+                }));
+
                 setReferrals(records);
             } catch (error) {
                 console.error('Error fetching referrals:', error);
@@ -97,7 +108,7 @@ export const ReferralDashboard: React.FC = () => {
         };
 
         void fetchReferrals();
-    }, [userData]);
+    }, [userData, user]);
 
     const handleRedeem = async (item: { title: string, cost: number }) => {
         if (!userData || (userData.browniePoints ?? 0) < item.cost || isRedeeming) return;
@@ -132,10 +143,10 @@ export const ReferralDashboard: React.FC = () => {
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
-                        <Gift className="w-6 h-6 text-black" />
+                        <Gift className="w-8 h-8 text-black" />
                         <h1 className="text-4xl font-black uppercase tracking-tighter">Referral Hub</h1>
                     </div>
-                    <p className="text-xs font-mono font-bold text-gray-500 uppercase tracking-widest">
+                    <p className="text-sm font-mono font-bold text-gray-500 uppercase tracking-widest">
                         Share your code. Earn Brownie Points. Level up your career.
                     </p>
                 </div>
@@ -145,14 +156,14 @@ export const ReferralDashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: My Code & Verification */}
                 <div className="lg:col-span-1 space-y-8">
-                    <div className="bg-black text-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(128,128,128,1)]">
+                    <div className="bg-black text-white p-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                         <h2 className="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
                             <Share2 className="w-4 h-4" /> Your Referral Link
                         </h2>
                         <div className="flex gap-2 mb-4">
                             <div className="flex items-center gap-2 bg-white/10 p-4 border border-white/20 flex-grow overflow-hidden">
                                 <span className="text-xs font-mono truncate">
-                                    {window.location.origin}/register?ref={userData?.referralCode}
+                                    {origin}/register?ref={userData?.referralCode}
                                 </span>
                             </div>
                             <button
@@ -184,7 +195,7 @@ export const ReferralDashboard: React.FC = () => {
                                 <MessageCircle className="w-5 h-5" />
                             </button>
                         </div>
-                        <p className="text-[9px] font-mono uppercase text-gray-400 leading-relaxed">
+                        <p className="text-[10px] font-mono uppercase text-gray-400 leading-relaxed">
                             Share this link with fellow professionals. They'll get the referral code automatically, and you'll earn <span className="text-white font-bold">50 Brownie Points</span> once they verify their account and apply for their first job.
                         </p>
                     </div>
@@ -208,10 +219,10 @@ export const ReferralDashboard: React.FC = () => {
                             { label: 'Points Earned', value: stats.rewarded * 50, icon: Trophy, color: 'text-yellow-600' },
                             { label: 'Successful', value: stats.rewarded, icon: CheckCircle2, color: 'text-green-600' },
                         ].map((stat, idx) => (
-                            <div key={idx} className="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                <stat.icon className={`w-4 h-4 mb-2 ${stat.color}`} />
-                                <div className="text-2xl font-black">{stat.value}</div>
-                                <div className="text-[8px] font-mono font-bold uppercase text-gray-500 tracking-wider">{stat.label}</div>
+                            <div key={idx} className="bg-white border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] transition-transform">
+                                <stat.icon className={`w-5 h-5 mb-2 ${stat.color}`} />
+                                <div className="text-3xl font-black">{stat.value}</div>
+                                <div className="text-[10px] font-mono font-bold uppercase text-gray-500 tracking-wider">{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -249,9 +260,9 @@ export const ReferralDashboard: React.FC = () => {
                                                         ref.status === 'verified' ? 'bg-blue-50 border-blue-200 text-blue-700' :
                                                             'bg-gray-50 border-gray-200 text-gray-500'}
                                                 `}>
-                                                    {ref.status === 'rewarded' && <CheckCircle2 className="w-2.5 h-2.5" />}
-                                                    {ref.status === 'verified' && <Zap className="w-2.5 h-2.5" />}
-                                                    {ref.status === 'pending' && <Clock className="w-2.5 h-2.5" />}
+                                                    {ref.status === 'rewarded' && <CheckCircle2 className="w-3 h-3" />}
+                                                    {ref.status === 'verified' && <Zap className="w-3 h-3" />}
+                                                    {ref.status === 'pending' && <Clock className="w-3 h-3" />}
                                                     {ref.status}
                                                 </span>
                                             </td>
@@ -266,10 +277,10 @@ export const ReferralDashboard: React.FC = () => {
                     </div>
 
                     {/* Redemption Store */}
-                    <div className="bg-yellow-50 border-2 border-black p-6 relative overflow-hidden group">
+                    <div className="bg-yellow-50 border-2 border-black p-6 relative overflow-hidden group shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                         <div className="relative z-10">
                             <h2 className="text-lg font-black uppercase tracking-tighter mb-2 flex items-center gap-2">
-                                <Trophy className="w-5 h-5" /> Brownie Points Store
+                                <Trophy className="w-6 h-6" /> Brownie Points Store
                             </h2>
                             <p className="text-xs font-mono font-bold text-gray-600 uppercase mb-6">
                                 Spend your points on career boosters. More items coming soon!
@@ -283,10 +294,10 @@ export const ReferralDashboard: React.FC = () => {
                                     const redeeming = isRedeeming === item.title;
 
                                     return (
-                                        <div key={idx} className={`bg-white border-2 border-black p-4 flex flex-col justify-between ${!canAfford ? 'opacity-60' : ''}`}>
+                                        <div key={idx} className={`bg-white border-2 border-black p-4 flex flex-col justify-between ${!canAfford ? 'opacity-60' : ''} hover:translate-y-[-2px] transition-transform shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`}>
                                             <div className="mb-4">
                                                 <div className="text-xs font-black uppercase mb-1">{item.title}</div>
-                                                <div className="text-lg font-black text-yellow-600">{item.cost} BP</div>
+                                                <div className="text-xl font-black text-yellow-600">{item.cost} BP</div>
                                             </div>
                                             <button
                                                 onClick={() => handleRedeem(item)}
@@ -294,7 +305,7 @@ export const ReferralDashboard: React.FC = () => {
                                                 className={`
                                                     w-full py-2 text-[10px] font-black uppercase tracking-widest border-2 border-black transition-all
                                                     ${canAfford && !redeeming
-                                                        ? 'bg-black text-white hover:bg-white hover:text-black cursor-pointer'
+                                                        ? 'bg-black text-white hover:bg-white hover:text-black cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]'
                                                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'}
                                                 `}
                                             >
