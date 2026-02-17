@@ -22,6 +22,19 @@ vi.mock('firebase/firestore', () => ({
     }
 }));
 
+vi.mock('firebase/auth', () => ({
+    getAuth: vi.fn(() => ({
+        currentUser: {
+            uid: 'test-user',
+            getIdToken: vi.fn().mockResolvedValue('mock-token')
+        }
+    })),
+    GoogleAuthProvider: class {
+        setCustomParameters = vi.fn()
+    },
+    signInWithPopup: vi.fn()
+}));
+
 vi.mock('@sentry/react', async (importOriginal) => {
     const actual = await importOriginal<any>();
     return {

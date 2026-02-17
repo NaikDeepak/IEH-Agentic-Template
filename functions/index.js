@@ -480,6 +480,7 @@ app.post("/api/ai/outreach", requireAuth, aiLimiter, aiProxy.generateOutreachPro
 
 // User & Onboarding Routes
 app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
+app.post("/api/user/verify-phone", requireAuth, userHandlers.verifyPhone);
 
 
 // Expose the Express API as a single Cloud Function
@@ -625,3 +626,7 @@ export const reaper = onSchedule("every 24 hours", async (event) => {
         }
     }
 });
+
+// --- Firestore Triggers ---
+export * from "./src/triggers/onApplicationCreate.js";
+

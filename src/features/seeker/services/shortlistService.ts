@@ -9,9 +9,10 @@ import {
     Timestamp,
     doc,
     getDoc,
-    addDoc
+    writeBatch
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import * as Sentry from "@sentry/react";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
 import { JobService } from "../../jobs/services/jobService";
 import { callAIProxy } from "../../../lib/ai/proxy";
@@ -77,8 +78,7 @@ export const ShortlistService = {
             // 1. Check for cached/existing shortlist for today
             const shortlistRef = collection(db, `users/${userId}/${SHORTLIST_COLLECTION}`);
 
-            // Define "today" as the last 24 hours for simplicity, or strictly calendar day.
-            // Using 24h window:
+            // Define "today" as the last 24 hours for simplicity
             const oneDayAgo = new Date();
             oneDayAgo.setHours(oneDayAgo.getHours() - 24);
 
@@ -86,16 +86,15 @@ export const ShortlistService = {
                 shortlistRef,
                 where("recommended_at", ">=", Timestamp.fromDate(oneDayAgo)),
                 orderBy("recommended_at", "desc"),
-                limit(20) // Fetch more to allow for deduplication
+                limit(20)
             );
 
             const snapshot = await getDocs(q);
 
             if (!snapshot.empty) {
-                // We have recent recommendations.
                 const allShortlisted = snapshot.docs.map(doc => doc.data() as ShortlistedJob);
 
-                // Deduplicate by job_id (taking the most recent one due to orderBy desc)
+                // Deduplicate by job_id
                 const uniqueJobIds = new Set<string>();
                 const shortlistedJobs: ShortlistedJob[] = [];
 
@@ -103,15 +102,18 @@ export const ShortlistService = {
                     if (!uniqueJobIds.has(sj.job_id)) {
                         uniqueJobIds.add(sj.job_id);
                         shortlistedJobs.push(sj);
-                        if (shortlistedJobs.length >= 5) break; // Keep only top 5 unique
+                        if (shortlistedJobs.length >= 5) break;
                     }
                 }
 
-                // Hydrate them with Job details.
-                const hydratedJobs = [];
-                for (const sj of shortlistedJobs) {
-                    try {
-                        const job = await JobService.getJobById(sj.job_id);
+                // Batch Fetch Jobs (Optimized)
+                const hydratedJobs: (JobPosting & { matchScore: number; matchReason: string })[] = [];
+                try {
+                    const jobs = await JobService.getJobsByIds(Array.from(uniqueJobIds));
+                    const jobsMap = new Map(jobs.map(j => [j.id, j]));
+
+                    for (const sj of shortlistedJobs) {
+                        const job = jobsMap.get(sj.job_id);
                         if (job?.status === 'active') {
                             hydratedJobs.push({
                                 ...job,
@@ -119,12 +121,12 @@ export const ShortlistService = {
                                 matchReason: sj.reason
                             });
                         }
-                    } catch (jobError) {
-                        console.warn(`Could not hydrate shortlisted job ${sj.job_id}:`, jobError);
                     }
+                } catch (jobError) {
+                    console.warn(`Error hydrating jobs for shortlist:`, jobError);
+                    Sentry.captureException(jobError);
                 }
 
-                // If we have at least 1 valid job, return it. If jobs expired, we might need to regenerate.
                 if (hydratedJobs.length > 0) {
                     const firstShortlisted = shortlistedJobs[0];
                     return {
@@ -142,7 +144,7 @@ export const ShortlistService = {
 
         } catch (error) {
             console.error("Error fetching daily shortlist:", error);
-            // Fallback to cold start on error to be safe
+            Sentry.captureException(error);
             return {
                 jobs: [],
                 isColdStart: true,
@@ -156,101 +158,111 @@ export const ShortlistService = {
      * Generates a new shortlist by matching user profile/resume against active jobs.
      */
     async generateShortlist(userId: string): Promise<ShortlistResult> {
-        // 1. Get User's Latest Context (Profile or Resume)
-        const profileRef = doc(db, "seeker_profiles", userId);
-        const profileSnap = await getDoc(profileRef);
-        const profileData = profileSnap.exists() ? profileSnap.data() as SeekerProfile : null;
+        return Sentry.startSpan({ name: "generateShortlist", op: "ai.logic" }, async (span) => {
+            try {
+                // 1. Get User's Latest Context (Profile or Resume)
+                const profileRef = doc(db, "seeker_profiles", userId);
+                const profileSnap = await getDoc(profileRef);
+                const profileData = profileSnap.exists() ? profileSnap.data() as SeekerProfile : null;
 
-        let summary = "";
-        let resumeData: ResumeAnalysisResult | null = null;
+                let summary = "";
+                let resumeData: ResumeAnalysisResult | null = null;
 
-        if (profileData && profileData.preferences.roles.length > 0) {
-            // Priority 1: Use Profile Data
-            const skills = profileData.skills.join(", ");
-            const roles = profileData.preferences.roles.join(", ");
-            const bio = profileData.bio ?? "";
-            summary = `
-                Profile for matching:
-                Target Roles: ${roles}
-                Key Skills: ${skills}
-                Background: ${bio}
-            `.trim();
-        } else {
-            // Priority 2: Fallback to Latest Resume
-            const resumesRef = collection(db, `users/${userId}/${RESUMES_SUBCOLLECTION}`);
-            const resumeQuery = query(resumesRef, orderBy("analyzed_at", "desc"), limit(1));
-            const resumeSnap = await getDocs(resumeQuery);
+                if (profileData && profileData.preferences.roles.length > 0) {
+                    const skills = profileData.skills.join(", ");
+                    const roles = profileData.preferences.roles.join(", ");
+                    const bio = profileData.bio ?? "";
+                    summary = `
+                        Profile for matching:
+                        Target Roles: ${roles}
+                        Key Skills: ${skills}
+                        Background: ${bio}
+                    `.trim();
+                } else {
+                    const resumesRef = collection(db, `users/${userId}/${RESUMES_SUBCOLLECTION}`);
+                    const resumeQuery = query(resumesRef, orderBy("analyzed_at", "desc"), limit(1));
+                    const resumeSnap = await getDocs(resumeQuery);
 
-            if (resumeSnap.empty) {
-                return { jobs: [], isColdStart: true, lastUpdated: null };
-            }
+                    if (resumeSnap.empty) {
+                        return { jobs: [], isColdStart: true, lastUpdated: null };
+                    }
 
-            const firstResumeDoc = resumeSnap.docs[0];
-            if (!firstResumeDoc) {
-                return { jobs: [], isColdStart: true, lastUpdated: null };
-            }
+                    const firstResumeDoc = resumeSnap.docs[0];
+                    if (!firstResumeDoc) {
+                        return { jobs: [], isColdStart: true, lastUpdated: null };
+                    }
 
-            resumeData = firstResumeDoc.data() as ResumeAnalysisResult;
-            const skills = resumeData.keywords.found.join(", ");
-            const roles = resumeData.parsed_data.experience?.map(e => e.role).join(" ") ?? "";
-            summary = `
-                Resume Summary for matching:
-                Skills: ${skills}
-                Experience Roles: ${roles}
-                Suggestions: ${resumeData.suggestions.join(" ")}
-            `.trim();
-        }
+                    resumeData = firstResumeDoc.data() as ResumeAnalysisResult;
+                    const skills = resumeData.keywords.found.join(", ");
+                    const roles = resumeData.parsed_data.experience?.map(e => e.role).join(" ") ?? "";
+                    summary = `
+                        Resume Summary for matching:
+                        Skills: ${skills}
+                        Experience Roles: ${roles}
+                        Suggestions: ${resumeData.suggestions.join(" ")}
+                    `.trim();
+                }
 
-        // 3. Generate User Embedding
-        const userEmbedding = await fetchEmbedding(summary);
+                span.setAttribute("user_context_source", profileData ? "profile" : "resume");
 
-        // 4. Fetch Active Jobs (Candidate Pool)
-        const jobsRef = collection(db, "jobs");
-        const jobsQuery = query(
-            jobsRef,
-            where("status", "==", "active"),
-            orderBy("created_at", "desc"),
-            limit(50)
-        );
-        const jobsSnap = await getDocs(jobsQuery);
-        const candidates = jobsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as JobPosting));
+                // 3. Generate User Embedding
+                const userEmbedding = await fetchEmbedding(summary);
 
-        // 5. Score Candidates
-        const scoredJobs = candidates
-            .filter(job => job.embedding && job.embedding.length > 0)
-            .map(job => {
-                const embedding = job.embedding ?? [];
-                const score = cosineSimilarity(userEmbedding, embedding);
-                const matchContext = profileData ?? resumeData;
-                if (!matchContext) throw new Error("No user context for matching");
+                // 4. Fetch Active Jobs (Candidate Pool)
+                const jobsRef = collection(db, "jobs");
+                const jobsQuery = query(
+                    jobsRef,
+                    where("status", "==", "active"),
+                    orderBy("created_at", "desc"),
+                    limit(50)
+                );
+                const jobsSnap = await getDocs(jobsQuery);
+                const candidates = jobsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as JobPosting));
+
+                // 5. Score Candidates
+                const scoredJobs = candidates
+                    .filter(job => job.embedding && job.embedding.length > 0)
+                    .map(job => {
+                        const embedding = job.embedding ?? [];
+                        const score = cosineSimilarity(userEmbedding, embedding);
+                        const matchContext = profileData ?? resumeData;
+                        if (!matchContext) throw new Error("No user context for matching");
+
+                        return {
+                            ...job,
+                            matchScore: score,
+                            matchReason: this.generateMatchReason(score, job, matchContext)
+                        };
+                    })
+                    .sort((a, b) => b.matchScore - a.matchScore)
+                    .slice(0, 5); // Top 5
+
+                // 6. Save using Batch Write (Atomic)
+                const batch = writeBatch(db);
+                scoredJobs.forEach(job => {
+                    const docRef = doc(collection(db, `users/${userId}/${SHORTLIST_COLLECTION}`));
+                    batch.set(docRef, {
+                        user_id: userId,
+                        job_id: job.id,
+                        score: job.matchScore,
+                        reason: job.matchReason,
+                        recommended_at: serverTimestamp()
+                    });
+                });
+
+                await batch.commit();
 
                 return {
-                    ...job,
-                    matchScore: score,
-                    matchReason: this.generateMatchReason(score, job, matchContext)
+                    jobs: scoredJobs,
+                    isColdStart: false,
+                    lastUpdated: new Date()
                 };
-            })
-            .sort((a, b) => b.matchScore - a.matchScore)
-            .slice(0, 5); // Top 5
-
-        // ... rest of the function for saving to Firestore remains similar but updated for context
-        const batchPromises = scoredJobs.map(job => {
-            return addDoc(collection(db, `users/${userId}/${SHORTLIST_COLLECTION}`), {
-                user_id: userId,
-                job_id: job.id,
-                score: job.matchScore,
-                reason: job.matchReason,
-                recommended_at: serverTimestamp()
-            });
+            } catch (error) {
+                console.error("Error generating shortlist:", error);
+                Sentry.captureException(error);
+                throw error;
+            }
         });
-
-        await Promise.all(batchPromises);
-
-        return {
-            jobs: scoredJobs,
-            isColdStart: false,
-            lastUpdated: new Date()
-        };
     },
 
     generateMatchReason(score: number, job: JobPosting, context: SeekerProfile | ResumeAnalysisResult): string {

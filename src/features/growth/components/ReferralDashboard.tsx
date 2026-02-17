@@ -100,7 +100,7 @@ export const ReferralDashboard: React.FC = () => {
     }, [userData]);
 
     const handleRedeem = async (item: { title: string, cost: number }) => {
-        if (!userData || (userData.browniePoints ?? 0) < item.cost) return;
+        if (!userData || (userData.browniePoints ?? 0) < item.cost || isRedeeming) return;
 
         setIsRedeeming(item.title);
         try {
