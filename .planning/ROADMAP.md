@@ -17,7 +17,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Semantic Matching Engine** - Bi-directional vector search
 - [x] **Phase 4: Employer Suite** - AI generation and ATS tools
 - [x] **Phase 5: Seeker Tools** - AI prep, analysis, and insights
-- [ ] **Phase 6: Growth & Monetization** - Referrals and subscriptions
+- [x] **Phase 6: Growth & Monetization** - Referrals and Brownie Points
+- [ ] **Phase 7: Stabilization & Production Readiness** - Hardening, real auth, testing, CI/CD
 
 ## Phase Details
 
@@ -130,9 +131,30 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. User can refer others and track rewards/credits
   2. Affiliates accrue points for successful referrals
   3. Employers and Seekers can purchase/manage subscriptions
-**Research**: Likely (Payment integration)
-**Research topics**: Payment gateway selection (Razorpay/Stripe for India), webhook handling
+**Research**: Completed (Referral architecture, ledger design)
+**Research topics**: Atomic ledger patterns, Firebase Phone Auth, LinkedIn OAuth2
+**Plans**: 6 plans
+- [x] 06-01-PLAN.md — Referral Code Generation & Linking
+- [x] 06-02-PLAN.md — Phone OTP Verification (Simulated)
+- [x] 06-03-PLAN.md — LinkedIn Verification (Simulated)
+- [x] 06-04-PLAN.md — Brownie Points Atomic Ledger
+- [x] 06-05-PLAN.md — Referral Dashboard & Redemption Store
+- [x] 06-06-PLAN.md — Backend Security & Referral API
+
+### Phase 7: Stabilization & Production Readiness
+**Goal**: Harden the platform for real users — real auth, E2E tests, performance, CI/CD
+**Depends on**: Phase 6
+**Requirements**: Production readiness (non-functional)
+**Success Criteria** (what must be TRUE):
+  1. Phone OTP uses real Firebase Phone Auth (no simulation)
+  2. LinkedIn verification uses real OAuth2 flow
+  3. E2E smoke tests pass for critical paths (login → apply → referral)
+  4. Lighthouse performance score ≥ 90
+  5. CI/CD pipeline deploys to staging automatically
+**Research**: Unlikely (Standard production hardening)
 **Plans**: TBD
+
+> **Note:** v2 features (Career Agents, XAI, Predictive Pathing) are deferred indefinitely pending funding.
 
 ## Progress
 
@@ -146,7 +168,8 @@ Phases execute in numeric order.
 | 3. Semantic Matching Engine | 6/6 | Completed | 2026-02-08 |
 | 4. Employer Suite | 12/12 | Completed | 2026-02-16 |
 | 5. Seeker Tools | 13/13 | Completed | 2026-02-11 |
-| 6. Growth & Monetization | 6/6 | Completed | 2026-02-16 |
+| 6. Growth & Monetization | 6/6 | Completed | 2026-02-17 |
+| 7. Stabilization & Prod Readiness | 0/TBD | Planning | — |
 
 ## Requirements
 

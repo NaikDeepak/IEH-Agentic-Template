@@ -18,6 +18,20 @@ The application uses a **Secure AI Proxy** pattern to protect sensitive API keys
     - Verifies user authentication.
 - **AI Handlers (`functions/src/ai/handlers/`)**: Feature-specific logic for processing requests and enforcing JSON schemas.
 
+## Growth & Referral Architecture
+
+The referral and rewards system uses a **Secure Backend + Atomic Ledger** pattern.
+
+### Components
+- **`src/features/growth/services/referralService.ts`**: Generates unique `IEH-[6-CHAR]` codes, links referrals via `referredBy` field, triggers rewards on first application.
+- **`src/features/growth/services/ledgerService.ts`**: Atomic Brownie Points ledger using `runTransaction` for balance integrity with full audit trail in `ledger` collection.
+- **Cloud Function `getReferrals`**: Backend API to query referral data securely, enforcing privacy by preventing direct client-side profile reads.
+- **UI Components**: `ReferralDashboard`, `PointsBadge`, `PhoneVerification`, `LinkedInVerification`.
+
+### Verification Services (Currently Simulated)
+- **Phone OTP**: Simulated in dev; production will use Firebase Phone Auth with `RecaptchaVerifier`.
+- **LinkedIn**: Simulated profile URL capture; production will use LinkedIn OAuth2 via Firebase Identity Platform.
+
 ## Technical Stack
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS.
 - **Backend**: Firebase Cloud Functions (Node.js/Express).
