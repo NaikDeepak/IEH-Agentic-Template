@@ -43,7 +43,7 @@ async function seedJobs() {
     };
     await db.collection('users').doc('test-ref-provider').set(refProvider);
     // Also add to referralCodes collection for lookup
-    await db.collection('referralCodes').doc('IEH-TEST123').set({
+    await db.collection('referralCodes').doc('TEST123').set({
         uid: 'test-ref-provider',
         created_at: new Date()
     });

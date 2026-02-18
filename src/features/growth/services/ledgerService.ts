@@ -52,7 +52,8 @@ export const LedgerService = {
                         }
 
                         const userData = userSnap.data();
-                        const currentPoints = (userData['browniePoints'] ?? 0) as number;
+                        const rawPoints: unknown = userData['browniePoints'];
+                        const currentPoints = typeof rawPoints === 'number' && Number.isFinite(rawPoints) ? rawPoints : 0;
                         const newPoints = currentPoints + amount;
 
                         if (newPoints < 0) {

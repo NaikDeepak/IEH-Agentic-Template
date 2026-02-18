@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import { db } from '../../../../lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '../../../../hooks/useAuth';
 import { Linkedin, CheckCircle2, Loader2, ExternalLink } from 'lucide-react';
 
@@ -29,10 +27,22 @@ export const LinkedInVerification: React.FC = () => {
             // For this prototype, we'll simulate the "Success" after a short delay
             await new Promise(resolve => { setTimeout(() => { resolve(true); }, 2000); });
 
-            await updateDoc(doc(db, 'users', user.uid), {
-                linkedinVerified: true,
-                linkedinProfileUrl: profileUrl
+
+
+            const token = await user.getIdToken();
+            const response = await fetch('/api/user/verify-linkedin', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ profileUrl })
             });
+
+            if (!response.ok) {
+                const data = await response.json() as { error?: string };
+                throw new Error(data.error ?? 'Failed to verify LinkedIn on server.');
+            }
 
             await refreshUserData();
         } catch (err: unknown) {

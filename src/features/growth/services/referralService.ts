@@ -53,6 +53,17 @@ export const ReferralService = {
 
           try {
             await runTransaction(db, async (tx) => {
+              // Re-check inside the transaction to prevent a user-level race condition:
+              // two concurrent calls could both pass the outer getDoc check and both
+              // generate codes. The transaction read here ensures only one wins.
+              const userSnap = await tx.get(userRef);
+              const existing = userSnap.exists()
+                ? (userSnap.data() as UserReferralData).referralCode
+                : undefined;
+              if (existing) {
+                throw new Error('ALREADY_EXISTS');
+              }
+
               const codeSnap = await tx.get(codeRef);
               if (codeSnap.exists()) {
                 // Code already taken — abort this transaction and retry
@@ -66,7 +77,16 @@ export const ReferralService = {
             finalCode = displayCode;
           } catch (err: unknown) {
             const e = err as { message?: string };
-            if (e.message !== 'COLLISION') {
+            if (e.message === 'ALREADY_EXISTS') {
+              // A concurrent request already committed a code for this user.
+              // Read it back and return it — no need to generate another.
+              const latest = await getDoc(userRef);
+              const latestCode = latest.exists()
+                ? (latest.data() as UserReferralData).referralCode
+                : undefined;
+              if (latestCode) return latestCode;
+              // If somehow still missing, fall through to retry loop.
+            } else if (e.message !== 'COLLISION') {
               // Unexpected error — re-throw
               throw err;
             }

@@ -259,8 +259,10 @@ service cloud.firestore {
 
     // Referral Codes Collection
     match /referralCodes/{code} {
-      // Anyone authenticated can look up a code
-      allow read: if request.auth != null;
+      // Anyone authenticated can look up a single code by ID (no collection scanning)
+      allow get: if request.auth != null;
+      // Explicitly deny list to prevent enumeration of all codes and their UIDs
+      allow list: if false;
       // Only the user who owns the code can create it, and it must point to their UID
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
     }

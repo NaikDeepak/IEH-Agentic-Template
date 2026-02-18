@@ -70,14 +70,18 @@ export const ResumeMapper = {
         aiResponse: unknown
     ): ResumeAnalysisResult {
         // Safe Cast
-        const data = aiResponse as AIResumeResponse;
+        const data: Partial<AIResumeResponse> =
+            aiResponse && typeof aiResponse === 'object' ? (aiResponse as AIResumeResponse) : {};
 
         // Normalize Data Access
         // The AI might put data inside 'parsed_data' OR at the top level
-        const rawParsed = data.parsed_data ?? (data as RawParsedData);
+        const rawParsed: Partial<RawParsedData> =
+            data.parsed_data && typeof data.parsed_data === 'object'
+                ? (data.parsed_data)
+                : (data as unknown as Partial<RawParsedData>);
 
-        const sections = (data.sections ?? {}) as Partial<ResumeAnalysisResult['sections']>;
-        const keywords = (data.keywords ?? {}) as Partial<ResumeAnalysisResult['keywords']>;
+        const sections: Partial<ResumeAnalysisResult['sections']> = data.sections ?? {};
+        const keywords: Partial<ResumeAnalysisResult['keywords']> = data.keywords ?? {};
 
         // Handle Arrays with fallbacks
         const rawExperience = (rawParsed.experience ?? data.work_experience ?? rawParsed.work_experience ?? data.experience ?? []);

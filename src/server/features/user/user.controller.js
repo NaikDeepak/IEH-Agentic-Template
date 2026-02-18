@@ -72,6 +72,14 @@ export const verifyPhone = async (req, res) => {
     }
 
     try {
+        // Security: verify the phone is actually linked in Firebase Auth before
+        // touching Firestore. Without this check, any authenticated user could
+        // call this endpoint and claim the 25-point reward without completing OTP.
+        const authUser = await getAuth().getUser(uid);
+        if (!authUser.phoneNumber) {
+            return res.status(403).json({ error: "Phone not verified in Auth" });
+        }
+
         const userRef = db.collection('users').doc(uid);
         const userDoc = await userRef.get();
 
@@ -80,7 +88,6 @@ export const verifyPhone = async (req, res) => {
         }
 
         if (userDoc.data().phoneVerified) {
-            // Idempotent — already verified, nothing to do
             return res.json({ success: true, alreadyVerified: true });
         }
 
@@ -97,5 +104,46 @@ export const verifyPhone = async (req, res) => {
     } catch (error) {
         console.error("Phone verification error:", error);
         res.status(500).json({ error: "Failed to verify phone", details: error.message });
+    }
+};
+
+/**
+ * Verify LinkedIn profile.
+ * Currently just records the URL provided by the client (prototype phase),
+ * but does so via Admin SDK to bypass Firestore rules.
+ * Future: Implement real OAuth callback handling here.
+ */
+export const verifyLinkedin = async (req, res) => {
+    const uid = req.user?.uid;
+    const { profileUrl } = req.body;
+
+    if (!uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    if (!profileUrl || !profileUrl.includes('linkedin.com/in/')) {
+        return res.status(400).json({ error: "Invalid LinkedIn profile URL" });
+    }
+
+    try {
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await userRef.update({
+            linkedinVerified: true,
+            linkedinProfileUrl: profileUrl,
+            linkedinVerifiedAt: FieldValue.serverTimestamp(),
+            updated_at: FieldValue.serverTimestamp()
+        });
+
+        console.log(`User ${uid} LinkedIn verified: ${profileUrl}`);
+        res.json({ success: true });
+    } catch (error) {
+        console.error("LinkedIn verification error:", error);
+        res.status(500).json({ error: "Failed to verify LinkedIn", details: error.message });
     }
 };

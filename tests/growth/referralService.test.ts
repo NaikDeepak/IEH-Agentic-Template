@@ -59,9 +59,10 @@ describe('ReferralService', () => {
             // 1st getDoc (user profile) -> no referral code
             (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
 
-            // The uniqueness check now happens inside the transaction via transaction.get().
-            // Mock transaction.get() to return a non-existent code (unique).
-            mockTransaction.get.mockResolvedValueOnce({ exists: () => false });
+            // Inside the transaction: 1st tx.get = userRef (no existing code), 2nd tx.get = codeRef (unique)
+            mockTransaction.get
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // userRef: no referralCode
+                .mockResolvedValueOnce({ exists: () => false });                   // codeRef: not taken
 
             const code = await ReferralService.ensureReferralCode(uid);
 
@@ -70,12 +71,47 @@ describe('ReferralService', () => {
             expect(mockTransaction.set).toHaveBeenCalledTimes(2);
         });
 
+        it('should return existing code if a concurrent request already committed one', async () => {
+            // Initial getDoc: no code yet
+            (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
+
+            // Inside the transaction: tx.get(userRef) finds a code already written by a concurrent request
+            mockTransaction.get.mockResolvedValueOnce({
+                exists: () => true,
+                data: () => ({ referralCode: 'IEH-CONCURRENT' })
+            });
+
+            // getDoc called after ALREADY_EXISTS to read back the winning code
+            (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+                exists: () => true,
+                data: () => ({ referralCode: 'IEH-CONCURRENT' })
+            });
+
+            const code = await ReferralService.ensureReferralCode(uid);
+            expect(code).toBe('IEH-CONCURRENT');
+            expect(mockTransaction.set).not.toHaveBeenCalled();
+        });
+
         it('should throw error if fails to generate unique code after 5 attempts', async () => {
             // User profile has no referral code
             (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
 
-            // All transaction.get() calls return an existing code (collision every time)
-            mockTransaction.get.mockResolvedValue({ exists: () => true });
+            // All transaction.get() calls: userRef has no code, codeRef always exists (collision)
+            mockTransaction.get
+                .mockResolvedValue({ exists: () => true, data: () => ({}) }); // userRef: no referralCode, codeRef: taken
+            // Make userRef return no referralCode and codeRef return exists
+            // Simulate: tx.get(userRef) -> no code, tx.get(codeRef) -> exists (collision), repeat
+            mockTransaction.get
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 1: userRef
+                .mockResolvedValueOnce({ exists: () => true })                    // attempt 1: codeRef collision
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 2: userRef
+                .mockResolvedValueOnce({ exists: () => true })                    // attempt 2: codeRef collision
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 3: userRef
+                .mockResolvedValueOnce({ exists: () => true })                    // attempt 3: codeRef collision
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 4: userRef
+                .mockResolvedValueOnce({ exists: () => true })                    // attempt 4: codeRef collision
+                .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 5: userRef
+                .mockResolvedValueOnce({ exists: () => true });                   // attempt 5: codeRef collision
 
             await expect(ReferralService.ensureReferralCode(uid)).rejects.toThrow('Failed to generate a unique referral code');
         });

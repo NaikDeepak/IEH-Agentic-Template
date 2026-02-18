@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             // Use the secure backend endpoint instead of a direct updateDoc.
                             // The new Firestore rules block client-side role writes, so this
                             // must go through the Admin SDK via the /api/user/onboard route.
-                            await fetch('/api/user/onboard', {
+                            const resp = await fetch('/api/user/onboard', {
                                 method: 'POST',
                                 headers: {
                                     'Authorization': `Bearer ${token}`,
@@ -109,6 +109,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                 },
                                 body: JSON.stringify({ role: assignedRole })
                             });
+
+                            if (!resp.ok) {
+                                throw new Error(`Onboard failed: ${resp.status}`);
+                            }
 
                             // Refresh from Firestore to pick up server-assigned values
                             // (role, employerRole, onboarded_at set by Admin SDK)
