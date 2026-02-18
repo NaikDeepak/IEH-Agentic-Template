@@ -96,17 +96,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             !claimRole
                         ) {
                             const assignedRole = user.email?.includes('employer') ? 'employer' : 'seeker';
-                            const updateData: Partial<UserData & { employerRole?: string; onboarded_at: import('firebase/firestore').FieldValue }> = {
-                                role: assignedRole,
-                                onboarded_at: serverTimestamp()
-                            };
+                            const token = await user.getIdToken();
 
-                            if (assignedRole === 'employer') {
-                                updateData.employerRole = 'owner';
-                            }
+                            // Use the secure backend endpoint instead of a direct updateDoc.
+                            // The new Firestore rules block client-side role writes, so this
+                            // must go through the Admin SDK via the /api/user/onboard route.
+                            await fetch('/api/user/onboard', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ role: assignedRole })
+                            });
 
-                            await updateDoc(userDocRef, updateData);
-                            setUserData({ ...newUserData, ...updateData as UserData });
+                            // Refresh from Firestore to pick up server-assigned values
+                            // (role, employerRole, onboarded_at set by Admin SDK)
+                            const updatedSnap = await getDoc(userDocRef);
+                            setUserData(updatedSnap.data() as UserData);
                         }
 
                         // Generate referral code for new user

@@ -4,8 +4,7 @@ import {
     linkWithPhoneNumber,
     type ConfirmationResult
 } from 'firebase/auth';
-import { auth, db } from '../../../../lib/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { auth } from '../../../../lib/firebase';
 import { useAuth } from '../../../../hooks/useAuth';
 import { Phone, CheckCircle2, Loader2, Send } from 'lucide-react';
 
@@ -107,27 +106,6 @@ export const PhoneVerification: React.FC = () => {
             if (!response.ok) {
                 const data = await response.json() as { error?: string };
                 throw new Error(data.error ?? 'Failed to verify phone on server.');
-            }
-
-            if (isSimulated) {
-                // For simulation, we still might need to update local state or ensure backend handles it?
-                // The backend handler checks 'req.user.phone_number'.
-                // In simulation, we typically don't have a real phone linked in auth token differently.
-                // So for simulation we might need to stick to client-side (or mock backend).
-                // However, since we are moving to secure backend, we should assume PROD uses backend.
-                // For compliance with the request "critical business logic... moved... to secure backend",
-                // we should use the API.
-                // If simulation: the backend check `!phoneNumber` might fail if we don't actually link phone in Auth.
-
-                // Let's modify the backend handler to allow simulation bypass? No, that defeats security.
-                // The easiest way for simulation is to keep client-side update BUT wrapped in a check.
-                // But for REAL verification, we MUST use the API.
-
-                // Wait, for simulation, the user is just testing UI.
-                // I will keep the client update for simulation, but use API for real flow.
-                await updateDoc(doc(db, 'users', user.uid), {
-                    phoneVerified: true
-                });
             }
 
             await refreshUserData();

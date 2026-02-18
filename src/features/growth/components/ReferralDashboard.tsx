@@ -75,10 +75,9 @@ export const ReferralDashboard: React.FC = () => {
             try {
                 const token = await user.getIdToken();
                 const response = await fetch('/api/growth/referrals', {
-                    method: 'POST',
+                    method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 

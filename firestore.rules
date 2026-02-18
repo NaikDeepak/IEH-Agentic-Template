@@ -71,14 +71,26 @@ service cloud.firestore {
                     ])
                     // Role is immutable once set (and cannot be elevated by client)
                     && !('role' in request.resource.data.diff(resource.data).changedKeys())
-                    // referredBy is write-once: cannot be changed once set
-                    && (!('referredBy' in resource.data)
-                        || !('referredBy' in request.resource.data.diff(resource.data).changedKeys())
-                        || resource.data.referredBy == null)
-                    // Brownie Points Security: Client can ONLY decrease points (spend/redeem)
-                    // Increases (bonuses) must come from backend (Admin SDK)
-                    && ( !('browniePoints' in request.resource.data)
-                         || request.resource.data.browniePoints < resource.data.browniePoints )
+                    // referredBy is write-once: may only be set if previously null/absent,
+                    // and must be a non-empty string. Cannot be changed once set.
+                    && (
+                      !('referredBy' in request.resource.data.diff(resource.data).changedKeys())
+                      || (
+                        ( !('referredBy' in resource.data) || resource.data.referredBy == null )
+                        && request.resource.data.referredBy is string
+                      )
+                    )
+                    // Brownie Points Security: client can only decrease, and never below zero.
+                    // Increases (bonuses) must come from backend (Admin SDK).
+                    && (
+                      !('browniePoints' in request.resource.data.diff(resource.data).changedKeys())
+                      || (
+                        resource.data.browniePoints is number
+                        && request.resource.data.browniePoints is number
+                        && request.resource.data.browniePoints >= 0
+                        && request.resource.data.browniePoints < resource.data.browniePoints
+                      )
+                    )
                     // Embedding validation
                     && ( !('embedding' in request.resource.data)
                          || (request.resource.data.embedding is list

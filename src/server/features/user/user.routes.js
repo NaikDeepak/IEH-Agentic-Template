@@ -5,5 +5,6 @@ import { requireAuth } from '../../middleware/auth.js';
 const router = express.Router();
 
 router.post('/onboard', requireAuth, userController.onboardUser);
+router.post('/verify-phone', requireAuth, userController.verifyPhone);
 
 export default router;

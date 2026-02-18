@@ -65,6 +65,7 @@ describe('ReferralService', () => {
 
             const code = await ReferralService.ensureReferralCode(uid);
 
+            // generateReferralCode mock returns 'IEH-123456'; the full display code is stored on the user profile
             expect(code).toBe('IEH-123456');
             expect(mockTransaction.set).toHaveBeenCalledTimes(2);
         });

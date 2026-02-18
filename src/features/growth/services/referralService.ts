@@ -44,8 +44,12 @@ export const ReferralService = {
         let attempts = 0;
 
         while (!finalCode && attempts < 5) {
-          const candidate = generateReferralCode();
-          const codeRef = doc(db, REFERRAL_CODES_COLLECTION, candidate);
+          // displayCode: shown to the user (e.g. "IEH-ABC123")
+          // normalizedCode: used as the Firestore document ID (e.g. "ABC123")
+          // This ensures getUserByReferralCode (which strips the prefix) finds the right doc.
+          const displayCode = generateReferralCode().toUpperCase();
+          const normalizedCode = displayCode.startsWith('IEH-') ? displayCode.slice(4) : displayCode;
+          const codeRef = doc(db, REFERRAL_CODES_COLLECTION, normalizedCode);
 
           try {
             await runTransaction(db, async (tx) => {
@@ -54,10 +58,12 @@ export const ReferralService = {
                 // Code already taken — abort this transaction and retry
                 throw new Error('COLLISION');
               }
-              tx.set(userRef, { referralCode: candidate }, { merge: true });
+              // Store the full display code on the user profile for UI display
+              tx.set(userRef, { referralCode: displayCode }, { merge: true });
+              // Store the normalized code as the document ID for fast lookup
               tx.set(codeRef, { uid });
             });
-            finalCode = candidate;
+            finalCode = displayCode;
           } catch (err: unknown) {
             const e = err as { message?: string };
             if (e.message !== 'COLLISION') {
