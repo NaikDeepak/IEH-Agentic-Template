@@ -70,7 +70,10 @@ export const ReferralDashboard: React.FC = () => {
 
     useEffect(() => {
         const fetchReferrals = async () => {
-            if (!userData?.uid || !user) return;
+            if (!userData?.uid || !user) {
+                setLoading(false);
+                return;
+            }
 
             try {
                 const token = await user.getIdToken();

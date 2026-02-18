@@ -12,7 +12,10 @@ if (!rootElement) throw new Error('Failed to find the root element');
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Sentry.ErrorBoundary fallback={<FallbackComponent />} showDialog>
+    <Sentry.ErrorBoundary
+      fallback={<FallbackComponent />}
+      showDialog={import.meta.env.PROD}
+    >
       <AuthProvider>
         <App />
       </AuthProvider>

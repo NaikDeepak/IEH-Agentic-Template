@@ -221,16 +221,18 @@ export const ShortlistService = {
 
                 // 5. Score Candidates
                 const scoredJobs = candidates
-                    .filter(job => job.embedding && job.embedding.length > 0)
+                    .filter((job): job is JobPosting & { embedding: number[] } =>
+                        Array.isArray(job.embedding) && job.embedding.length === userEmbedding.length
+                    )
                     .map(job => {
-                        const embedding = job.embedding ?? [];
+                        const embedding = job.embedding;
                         const score = cosineSimilarity(userEmbedding, embedding);
                         const matchContext = profileData ?? resumeData;
                         if (!matchContext) throw new Error("No user context for matching");
 
                         return {
                             ...job,
-                            matchScore: score,
+                            matchScore: Number.isFinite(score) ? score : 0,
                             matchReason: this.generateMatchReason(score, job, matchContext)
                         };
                     })

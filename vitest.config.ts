@@ -12,6 +12,10 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: ['./tests/setup.ts'],
+        env: {
+            // Enables simulation mode in PhoneVerification during tests
+            VITE_USE_FIREBASE_EMULATOR: 'true',
+        },
         exclude: [
             '**/node_modules/**',
             '**/dist/**',

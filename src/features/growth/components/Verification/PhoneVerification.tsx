@@ -16,7 +16,10 @@ export const PhoneVerification: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [step, setStep] = useState<'phone' | 'code'>('phone');
-    const [isSimulated, setIsSimulated] = useState(true);
+    const [isSimulated, setIsSimulated] = useState(() => {
+        // Default to simulation only when explicitly using the emulator in non-prod builds
+        return !import.meta.env.PROD && import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true';
+    });
     const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
 
     useEffect(() => {

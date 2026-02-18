@@ -70,11 +70,11 @@ service cloud.firestore {
                       // are intentionally excluded — only Admin SDK / Cloud Functions can set them
                     ])
                     // Role is immutable once set (and cannot be elevated by client)
-                    && !('role' in request.resource.data.diff(resource.data).changedKeys())
+                    && !request.resource.data.diff(resource.data).changedKeys().hasAny(['role'])
                     // referredBy is write-once: may only be set if previously null/absent,
                     // and must be a non-empty string. Cannot be changed once set.
                     && (
-                      !('referredBy' in request.resource.data.diff(resource.data).changedKeys())
+                      !request.resource.data.diff(resource.data).changedKeys().hasAny(['referredBy'])
                       || (
                         ( !('referredBy' in resource.data) || resource.data.referredBy == null )
                         && request.resource.data.referredBy is string
@@ -83,7 +83,7 @@ service cloud.firestore {
                     // Brownie Points Security: client can only decrease, and never below zero.
                     // Increases (bonuses) must come from backend (Admin SDK).
                     && (
-                      !('browniePoints' in request.resource.data.diff(resource.data).changedKeys())
+                      !request.resource.data.diff(resource.data).changedKeys().hasAny(['browniePoints'])
                       || (
                         resource.data.browniePoints is number
                         && request.resource.data.browniePoints is number
@@ -100,6 +100,7 @@ service cloud.firestore {
                     // Validate expiresAt if present (max 4 days + 1 hour buffer)
                     && ( !('expiresAt' in request.resource.data)
                          || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
+
 
       // Subcollections
       match /resumes/{resumeId} {

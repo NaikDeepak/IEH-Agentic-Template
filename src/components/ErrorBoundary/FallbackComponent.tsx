@@ -9,6 +9,7 @@ const FallbackComponent: React.FC = () => {
                 We&apos;ve been notified and are looking into it.
             </p>
             <button
+                type="button"
                 onClick={handleReload}
                 style={{
                     marginTop: '1rem',

@@ -2,6 +2,16 @@
 import { db } from './src/server/config/firebase.js';
 
 async function seedJobs() {
+    const allowSeed = process.env.ALLOW_SEED === 'true';
+    const isEmulator = !!process.env.FIRESTORE_EMULATOR_HOST;
+
+    if (!allowSeed || !isEmulator) {
+        throw new Error(
+            'Refusing to seed Firestore without emulator. ' +
+            'Set FIRESTORE_EMULATOR_HOST and run with ALLOW_SEED=true.'
+        );
+    }
+
     console.log('Seeding mock jobs to Firestore emulator...');
     const jobs = [
         {
