@@ -81,23 +81,35 @@ export const verifyPhone = async (req, res) => {
         }
 
         const userRef = db.collection('users').doc(uid);
-        const userDoc = await userRef.get();
+        const result = await db.runTransaction(async (tx) => {
+            const userDoc = await tx.get(userRef);
 
-        if (!userDoc.exists) {
+            if (!userDoc.exists) {
+                return { notFound: true };
+            }
+
+            if (userDoc.data().phoneVerified) {
+                return { alreadyVerified: true };
+            }
+
+            tx.update(userRef, {
+                phoneVerified: true,
+                phoneVerifiedAt: FieldValue.serverTimestamp(),
+                // Award brownie points for first-time phone verification
+                browniePoints: FieldValue.increment(25),
+                updated_at: FieldValue.serverTimestamp()
+            });
+
+            return { success: true };
+        });
+
+        if (result.notFound) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        if (userDoc.data().phoneVerified) {
+        if (result.alreadyVerified) {
             return res.json({ success: true, alreadyVerified: true });
         }
-
-        await userRef.update({
-            phoneVerified: true,
-            phoneVerifiedAt: FieldValue.serverTimestamp(),
-            // Award brownie points for first-time phone verification
-            browniePoints: FieldValue.increment(25),
-            updated_at: FieldValue.serverTimestamp()
-        });
 
         console.log(`User ${uid} phone verified`);
         res.json({ success: true });

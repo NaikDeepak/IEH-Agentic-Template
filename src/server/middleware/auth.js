@@ -58,8 +58,8 @@ export const authMiddleware = async (req, res, next) => {
  */
 export const requireAuth = (req, res, next) => {
     if (!req.user) {
-        const errorMessage = req.authError ? `Authentication failed: ${req.authError.message}` : 'Authentication required';
-        return res.status(401).json({ error: errorMessage });
+        // Don't leak token verification details to clients
+        return res.status(401).json({ error: 'Authentication required' });
     }
     next();
 };

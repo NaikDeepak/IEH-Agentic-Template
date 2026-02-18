@@ -36,10 +36,10 @@ describe('ReferralService', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockTransaction.set.mockClear();
-        mockTransaction.get.mockClear();
-        mockTransaction.update.mockClear();
-        mockTransaction.delete.mockClear();
+        mockTransaction.set.mockReset();
+        mockTransaction.get.mockReset();
+        mockTransaction.update.mockReset();
+        mockTransaction.delete.mockReset();
     });
 
     describe('ensureReferralCode', () => {
@@ -81,11 +81,8 @@ describe('ReferralService', () => {
                 data: () => ({ referralCode: 'IEH-CONCURRENT' })
             });
 
-            // getDoc called after ALREADY_EXISTS to read back the winning code
-            (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-                exists: () => true,
-                data: () => ({ referralCode: 'IEH-CONCURRENT' })
-            });
+            // The code logic now returns directly from transaction if existing code found.
+            // No second getDoc call is made.
 
             const code = await ReferralService.ensureReferralCode(uid);
             expect(code).toBe('IEH-CONCURRENT');
@@ -96,11 +93,12 @@ describe('ReferralService', () => {
             // User profile has no referral code
             (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
 
-            // All transaction.get() calls: userRef has no code, codeRef always exists (collision)
-            mockTransaction.get
-                .mockResolvedValue({ exists: () => true, data: () => ({}) }); // userRef: no referralCode, codeRef: taken
-            // Make userRef return no referralCode and codeRef return exists
-            // Simulate: tx.get(userRef) -> no code, tx.get(codeRef) -> exists (collision), repeat
+            // All transaction.get() calls
+            // For each attempt (loop 5 times):
+            // 1. tx.get(userRef) -> exists, no code
+            // 2. tx.get(codeRef) -> exists (collision)
+            // Total 10 calls.
+
             mockTransaction.get
                 .mockResolvedValueOnce({ exists: () => true, data: () => ({}) })  // attempt 1: userRef
                 .mockResolvedValueOnce({ exists: () => true })                    // attempt 1: codeRef collision

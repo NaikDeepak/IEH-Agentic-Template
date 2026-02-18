@@ -13,8 +13,21 @@ export const LinkedInVerification: React.FC = () => {
         if (!user) return;
 
         // Basic validation
-        if (!profileUrl.includes('linkedin.com/in/')) {
-            setError('Please enter a valid LinkedIn profile URL (e.g., linkedin.com/in/username)');
+        // Robust URL validation
+        let parsed: URL | null = null;
+        try {
+            parsed = new URL(profileUrl);
+        } catch {
+            setError('Please enter a valid LinkedIn profile URL (e.g., https://linkedin.com/in/username)');
+            return;
+        }
+
+        const host = parsed.hostname.toLowerCase();
+        const isLinkedInHost = host === 'linkedin.com' || host.endsWith('.linkedin.com');
+        const isProfilePath = parsed.pathname.startsWith('/in/') && parsed.pathname.length > '/in/'.length;
+
+        if (!isLinkedInHost || !isProfilePath) {
+            setError('Please enter a valid LinkedIn profile URL (e.g., https://linkedin.com/in/username)');
             return;
         }
 

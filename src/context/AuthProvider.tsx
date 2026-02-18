@@ -114,6 +114,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                                 throw new Error(`Onboard failed: ${resp.status}`);
                             }
 
+                            // Ensure any server-set custom claims (e.g., role) are available immediately
+                            await user.getIdToken(true);
+
                             // Refresh from Firestore to pick up server-assigned values
                             // (role, employerRole, onboarded_at set by Admin SDK)
                             const updatedSnap = await getDoc(userDocRef);

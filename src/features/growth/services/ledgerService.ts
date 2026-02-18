@@ -2,8 +2,7 @@ import {
     doc,
     runTransaction,
     collection,
-    serverTimestamp,
-    increment
+    serverTimestamp
 } from 'firebase/firestore';
 import * as Sentry from '@sentry/react';
 import { db } from '../../../lib/firebase';
@@ -62,7 +61,7 @@ export const LedgerService = {
 
                         // Update user points
                         transaction.update(userRef, {
-                            browniePoints: increment(amount),
+                            browniePoints: newPoints,
                             updated_at: serverTimestamp()
                         });
 
