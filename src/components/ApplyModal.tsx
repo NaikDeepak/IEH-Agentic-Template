@@ -184,7 +184,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || userData?.role !== 'seeker'}
+                                    disabled={isSubmitting || !!(userData?.role && userData.role !== 'seeker')}
                                     className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Submission'}

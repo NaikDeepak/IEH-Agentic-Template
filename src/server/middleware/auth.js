@@ -71,8 +71,10 @@ export const requireAuth = (req, res, next) => {
 export const requireRole = (allowedRoles) => {
     return (req, res, next) => {
         if (!req.user) {
-            const errorMessage = req.authError ? `Authentication failed: ${req.authError.message}` : 'Authentication required';
-            return res.status(401).json({ error: errorMessage });
+            if (req.authError) {
+                console.warn('[Auth Middleware] Authentication failed:', req.authError.message);
+            }
+            return res.status(401).json({ error: 'Authentication required' });
         }
 
         if (!req.user.role || !allowedRoles.includes(req.user.role)) {

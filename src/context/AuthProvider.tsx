@@ -184,20 +184,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const signupWithEmail = useCallback(async (email: string, password: string, displayName: string, referralCode?: string) => {
         setError(null);
         try {
+            // Defer referral linking until the onAuthStateChanged "new user" bootstrap,
+            // so we don't accidentally perform a failing `create` on `users/{uid}`.
+            if (referralCode) {
+                sessionStorage.setItem('pendingReferralCode', referralCode);
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName });
-
-            // If a referral code was provided, link it
-            if (referralCode) {
-                const referrerUid = await ReferralService.getUserByReferralCode(referralCode);
-                if (referrerUid) {
-                    await setDoc(
-                        doc(db, 'users', userCredential.user.uid),
-                        { referredBy: referrerUid },
-                        { merge: true }
-                    );
-                }
-            }
         } catch (err: unknown) {
             const error = err as { message?: string };
             console.error("Email Signup Error:", error);
