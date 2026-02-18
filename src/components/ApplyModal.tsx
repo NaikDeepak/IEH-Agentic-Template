@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { FocusTrap } from 'focus-trap-react';
 import { ApplicationService } from '../features/applications/services/applicationService';
 import { ProfileService } from '../features/seeker/services/profileService';
 import { useAuth } from '../hooks/useAuth';
@@ -88,141 +89,153 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white border-4 border-black w-full max-w-2xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col max-h-[90vh]">
-                {/* Header */}
-                <div className="border-b-4 border-black p-6 flex justify-between items-center bg-black text-white">
-                    <div>
-                        <h2 className="text-2xl font-black uppercase tracking-tighter">Apply for Role</h2>
-                        <p className="text-xs font-mono text-gray-400 uppercase tracking-widest mt-1">
-                            {job.title}
-                        </p>
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+            role="presentation"
+        >
+            <FocusTrap active={isOpen}>
+                <div
+                    className="bg-white border-4 border-black w-full max-w-2xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col max-h-[90vh]"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="apply-modal-title"
+                    onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
+                    tabIndex={-1}
+                >
+                    {/* Header */}
+                    <div className="border-b-4 border-black p-6 flex justify-between items-center bg-black text-white">
+                        <div>
+                            <h2 id="apply-modal-title" className="text-2xl font-black uppercase tracking-tighter">Apply for Role</h2>
+                            <p className="text-xs font-mono text-gray-400 uppercase tracking-widest mt-1">
+                                {job.title}
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => { onClose(); }}
+                            className="p-2 hover:bg-white hover:text-black transition-colors"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
                     </div>
-                    <button
-                        onClick={() => { onClose(); }}
-                        className="p-2 hover:bg-white hover:text-black transition-colors"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
-                </div>
 
-                {/* Content */}
-                <div className="flex-grow overflow-y-auto p-8">
-                    {checkingStatus ? (
-                        <div className="flex flex-col items-center justify-center py-12 gap-4">
-                            <Loader2 className="w-12 h-12 animate-spin text-black" />
-                            <p className="font-mono text-xs font-bold uppercase tracking-widest">Validating Status...</p>
-                        </div>
-                    ) : hasApplied ? (
-                        <div className="text-center py-12">
-                            <div className="inline-flex items-center justify-center w-20 h-20 border-4 border-black bg-blue-50 mb-6">
-                                <AlertCircle className="w-10 h-10 text-black" />
+                    {/* Content */}
+                    <div className="flex-grow overflow-y-auto p-8">
+                        {checkingStatus ? (
+                            <div className="flex flex-col items-center justify-center py-12 gap-4">
+                                <Loader2 className="w-12 h-12 animate-spin text-black" />
+                                <p className="font-mono text-xs font-bold uppercase tracking-widest">Validating Status...</p>
                             </div>
-                            <h3 className="text-3xl font-black uppercase mb-4 tracking-tighter">Already Applied</h3>
-                            <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-8 max-w-sm mx-auto">
-                                You have already submitted an application for this position. Track your progress in the dashboard.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                                <button
-                                    onClick={() => { onClose(); }}
-                                    className="px-8 py-3 bg-white text-black border-2 border-black font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors"
-                                >
-                                    Close Window
-                                </button>
-                                <button
-                                    onClick={() => { window.location.href = '/seeker/tracker'; }}
-                                    className="px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
-                                >
-                                    View Tracker
-                                </button>
+                        ) : hasApplied ? (
+                            <div className="text-center py-12">
+                                <div className="inline-flex items-center justify-center w-20 h-20 border-4 border-black bg-blue-50 mb-6">
+                                    <AlertCircle className="w-10 h-10 text-black" />
+                                </div>
+                                <h3 className="text-3xl font-black uppercase mb-4 tracking-tighter">Already Applied</h3>
+                                <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-8 max-w-sm mx-auto">
+                                    You have already submitted an application for this position. Track your progress in the dashboard.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                    <button
+                                        onClick={() => { onClose(); }}
+                                        className="px-8 py-3 bg-white text-black border-2 border-black font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                                    >
+                                        Close Window
+                                    </button>
+                                    <button
+                                        onClick={() => { window.location.href = '/seeker/tracker'; }}
+                                        className="px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                                    >
+                                        View Tracker
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ) : step === 'questions' ? (
-                        <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-8">
-                            {job.screening_questions && job.screening_questions.length > 0 ? (
-                                <div>
-                                    <h3 className="text-xl font-black uppercase mb-6 border-l-4 border-black pl-4">Screening Questions</h3>
-                                    <div className="space-y-6">
-                                        {job.screening_questions.map((q, idx) => (
-                                            <div key={idx} className="space-y-2">
-                                                <label className="block text-sm font-black uppercase tracking-tight">
-                                                    {q.question}
-                                                </label>
-                                                <textarea
-                                                    required
-                                                    className="w-full border-2 border-black p-4 font-mono text-sm focus:bg-gray-50 focus:outline-none transition-colors min-h-[100px]"
-                                                    placeholder="Enter your response here..."
-                                                    value={answers[q.question] ?? ''}
-                                                    onChange={e => { handleAnswerChange(q.question, e.target.value); }}
-                                                />
-                                            </div>
-                                        ))}
+                        ) : step === 'questions' ? (
+                            <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-8">
+                                {job.screening_questions && job.screening_questions.length > 0 ? (
+                                    <div>
+                                        <h3 className="text-xl font-black uppercase mb-6 border-l-4 border-black pl-4">Screening Questions</h3>
+                                        <div className="space-y-6">
+                                            {job.screening_questions.map((q, idx) => (
+                                                <div key={idx} className="space-y-2">
+                                                    <label className="block text-sm font-black uppercase tracking-tight">
+                                                        {q.question}
+                                                    </label>
+                                                    <textarea
+                                                        required
+                                                        className="w-full border-2 border-black p-4 font-mono text-sm focus:bg-gray-50 focus:outline-none transition-colors min-h-[100px]"
+                                                        placeholder="Enter your response here..."
+                                                        value={answers[q.question] ?? ''}
+                                                        onChange={e => { handleAnswerChange(q.question, e.target.value); }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="text-center py-8">
-                                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
-                                        No screening questions required. <br /> Ready to submit your profile?
-                                    </p>
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
+                                            No screening questions required. <br /> Ready to submit your profile?
+                                        </p>
+                                    </div>
+                                )}
 
-                            {error && (
-                                <div className="bg-red-50 border-2 border-red-600 p-4 font-mono text-xs text-red-600 flex items-center gap-3">
-                                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                    {error}
-                                </div>
-                            )}
+                                {error && (
+                                    <div className="bg-red-50 border-2 border-red-600 p-4 font-mono text-xs text-red-600 flex items-center gap-3">
+                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                        {error}
+                                    </div>
+                                )}
 
-                            <div className="pt-4 border-t-2 border-dashed border-gray-200 flex justify-end gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => { onClose(); }}
-                                    className="px-6 py-3 font-bold uppercase tracking-widest text-xs border-2 border-black hover:bg-gray-100 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting || !!(userData?.role && userData.role !== 'seeker')}
-                                    className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Submission'}
-                                </button>
+                                <div className="pt-4 border-t-2 border-dashed border-gray-200 flex justify-end gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => { onClose(); }}
+                                        className="px-6 py-3 font-bold uppercase tracking-widest text-xs border-2 border-black hover:bg-gray-100 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting || !!(userData?.role && userData.role !== 'seeker')}
+                                        className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Submission'}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : step === 'submitting' ? (
+                            <div className="flex flex-col items-center justify-center py-24 gap-4">
+                                <Loader2 className="w-16 h-16 animate-spin text-black" />
+                                <p className="font-black uppercase tracking-[0.2em] text-xl">Processing Application</p>
                             </div>
-                        </form>
-                    ) : step === 'submitting' ? (
-                        <div className="flex flex-col items-center justify-center py-24 gap-4">
-                            <Loader2 className="w-16 h-16 animate-spin text-black" />
-                            <p className="font-black uppercase tracking-[0.2em] text-xl">Processing Application</p>
-                        </div>
-                    ) : (
-                        <div className="text-center py-12 flex flex-col items-center">
-                            <div className="w-24 h-24 bg-green-50 border-4 border-black flex items-center justify-center mb-8 animate-in zoom-in duration-300">
-                                <CheckCircle2 className="w-12 h-12 text-black" />
+                        ) : (
+                            <div className="text-center py-12 flex flex-col items-center">
+                                <div className="w-24 h-24 bg-green-50 border-4 border-black flex items-center justify-center mb-8 animate-in zoom-in duration-300">
+                                    <CheckCircle2 className="w-12 h-12 text-black" />
+                                </div>
+                                <h3 className="text-4xl font-black uppercase mb-4 tracking-tighter leading-none">Application Sent</h3>
+                                <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-12 max-w-md mx-auto">
+                                    Your profile and answers have been successfully transmitted to the employer. You can monitor the status on your tracker.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                    <button
+                                        onClick={() => { onClose(); }}
+                                        className="px-8 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors"
+                                    >
+                                        Done
+                                    </button>
+                                    <button
+                                        onClick={() => { window.location.href = '/seeker/tracker'; }}
+                                        className="px-8 py-3 border-2 border-black text-black font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-colors"
+                                    >
+                                        View Tracker
+                                    </button>
+                                </div>
                             </div>
-                            <h3 className="text-4xl font-black uppercase mb-4 tracking-tighter leading-none">Application Sent</h3>
-                            <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-12 max-w-md mx-auto">
-                                Your profile and answers have been successfully transmitted to the employer. You can monitor the status on your tracker.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                                <button
-                                    onClick={() => { onClose(); }}
-                                    className="px-8 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors"
-                                >
-                                    Done
-                                </button>
-                                <button
-                                    onClick={() => { window.location.href = '/seeker/tracker'; }}
-                                    className="px-8 py-3 border-2 border-black text-black font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-colors"
-                                >
-                                    View Tracker
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
+            </FocusTrap>
         </div>
     );
 };

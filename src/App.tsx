@@ -115,7 +115,7 @@ function App() {
             element={
               <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
-                <main className="flex-grow">
+                <main id="main-content" className="flex-grow">
                   <LandingPage />
                 </main>
               </div>
@@ -142,7 +142,7 @@ function App() {
             element={
               <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
-                <main className="flex-grow">
+                <main id="main-content" className="flex-grow">
                   <Register />
                 </main>
               </div>
@@ -270,7 +270,7 @@ function App() {
               <ProtectedRoute allowedRoles={['seeker']}>
                 <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                   <Header />
-                  <main className="flex-grow">
+                  <main id="main-content" className="flex-grow">
                     <ProfileEditor />
                   </main>
                 </div>
@@ -307,7 +307,7 @@ function App() {
               <ProtectedRoute allowedRoles={['employer']}>
                 <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                   <Header />
-                  <main className="flex-grow">
+                  <main id="main-content" className="flex-grow">
                     <TalentSearch />
                   </main>
                 </div>
@@ -321,7 +321,7 @@ function App() {
               <ProtectedRoute allowedRoles={['employer']}>
                 <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                   <Header />
-                  <main className="flex-grow">
+                  <main id="main-content" className="flex-grow">
                     <CompanyEditor />
                   </main>
                 </div>

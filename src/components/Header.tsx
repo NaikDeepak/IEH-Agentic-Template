@@ -53,7 +53,7 @@ export const Header: React.FC = () => {
                             <Link
                                 key={item.label}
                                 to={item.path}
-                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all"
+                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all py-2 px-1"
                             >
                                 {item.label}
                             </Link>
@@ -61,7 +61,7 @@ export const Header: React.FC = () => {
                             <a
                                 key={item.label}
                                 href={item.path}
-                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all"
+                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all py-2 px-1"
                             >
                                 {item.label}
                             </a>

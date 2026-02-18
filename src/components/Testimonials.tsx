@@ -113,11 +113,15 @@ export const Testimonials: React.FC = () => {
 
                         <div className="flex items-center gap-6 border-t-2 border-black pt-8 w-full">
                             <div className="w-16 h-16 bg-gray-200 border-2 border-black overflow-hidden">
-                                <img
-                                    src={current.image}
-                                    alt={current.name}
-                                    className="w-full h-full object-cover filter grayscale"
-                                />
+                                <picture>
+                                    <source srcSet={current.image.replace('.png', '.webp')} type="image/webp" />
+                                    <img
+                                        src={current.image}
+                                        alt={current.name}
+                                        className="w-full h-full object-cover filter grayscale"
+                                        loading="lazy"
+                                    />
+                                </picture>
                             </div>
                             <div>
                                 <h4 className="font-bold text-lg uppercase tracking-wide">{current.name}</h4>

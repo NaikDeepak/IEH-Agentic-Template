@@ -159,7 +159,7 @@ export const CompanyProfile: React.FC = () => {
                         </div>
                         {company.logo && (
                             <div className="w-32 h-32 md:w-48 md:h-48 border-4 border-black bg-white flex items-center justify-center p-4">
-                                <img src={company.logo} alt={company.name} className="max-w-full max-h-full object-contain" />
+                                <img src={company.logo} alt={company.name} loading="lazy" className="max-w-full max-h-full object-contain" />
                             </div>
                         )}
                     </div>
