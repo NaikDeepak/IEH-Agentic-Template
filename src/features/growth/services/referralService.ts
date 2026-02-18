@@ -6,7 +6,7 @@ import { generateReferralCode } from '../../../lib/utils/codes';
 const USERS_COLLECTION = 'users';
 const REFERRAL_CODES_COLLECTION = 'referralCodes';
 
-const { logger } = Sentry;
+const sentryLogger = Sentry.logger;
 
 interface UserReferralData {
   referralCode?: string;
@@ -69,7 +69,13 @@ export const ReferralService = {
           return Promise.resolve();
         });
 
-        logger.info(logger.fmt`Referral code generated for user ${uid} after ${attempts} attempts`);
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (sentryLogger) {
+          sentryLogger.info(sentryLogger.fmt`Referral code generated for user ${uid} after ${attempts} attempts`);
+        } else {
+          // eslint-disable-next-line no-console
+          console.info(`Referral code generated for user ${uid} after ${attempts} attempts`);
+        }
         return code;
       }
     );

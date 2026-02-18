@@ -6,9 +6,10 @@ service cloud.firestore {
     // They cannot change their role once it has been set.
     // Users Collection
     match /users/{userId} {
-      // Allow Authenticated users to read profiles
-      // TODO: In production, you might want to restrict this further (e.g. only public fields)
-      allow get: if request.auth != null; 
+      // Only allow users to read their own profile document.
+      // (If you need public profiles later, expose a separate `publicUsers` collection
+      // or a callable/HTTP endpoint that returns a curated subset.)
+      allow get: if request.auth != null && request.auth.uid == userId;
       allow list: if false; // No collection scanning
 
       // Allow creation of a user document with strict validation

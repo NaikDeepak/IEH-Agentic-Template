@@ -18,6 +18,14 @@ export const JobApplicants: React.FC = () => {
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isMountedRef = React.useRef(true);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     const COLUMNS = [
         { id: 'applied', title: 'Applied' },
@@ -38,6 +46,8 @@ export const JobApplicants: React.FC = () => {
                     ApplicationService.getApplicationsForJob(id)
                 ]);
 
+                if (!isMountedRef.current) return;
+
                 if (!jobData) {
                     setError("Job posting not found.");
                 } else {
@@ -45,10 +55,12 @@ export const JobApplicants: React.FC = () => {
                     setApplications(appData);
                 }
             } catch (err) {
-                console.error("Error loading applicants:", err);
-                setError("Failed to load application data.");
+                if (isMountedRef.current) {
+                    console.error("Error loading applicants:", err);
+                    setError("Failed to load application data.");
+                }
             } finally {
-                setLoading(false);
+                if (isMountedRef.current) setLoading(false);
             }
         };
 
@@ -70,13 +82,14 @@ export const JobApplicants: React.FC = () => {
             });
 
             // Show user feedback
-            alert("Failed to save pipeline changes. Please check your connection and try again.");
+            // (Prefer a toast/snackbar; avoid blocking `alert`.)
+            console.error("Failed to save pipeline changes. Please check your connection and try again.");
 
             // Revert on error
             if (id) {
                 try {
                     const refreshed = await ApplicationService.getApplicationsForJob(id);
-                    setApplications(refreshed);
+                    if (isMountedRef.current) setApplications(refreshed);
                 } catch (refreshErr) {
                     console.error("[JobApplicants] Failed to refresh applications after error:", refreshErr);
                     Sentry.captureException(refreshErr, { extra: { jobId: id } });
