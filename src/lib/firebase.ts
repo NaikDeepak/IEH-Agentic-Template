@@ -20,8 +20,10 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Connect to emulators if enabled in environment
-if (import.meta.env.DEV || import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
+// Connect to emulators ONLY when explicitly opted in via VITE_USE_FIREBASE_EMULATOR=true.
+// Do NOT use import.meta.env.DEV here — that would break local dev against the live DB
+// and cause connection errors when emulators aren't running.
+if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
     connectAuthEmulator(auth, "http://127.0.0.1:9099");
     connectFirestoreEmulator(db, "127.0.0.1", 8080);
 }

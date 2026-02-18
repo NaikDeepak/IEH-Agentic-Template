@@ -86,9 +86,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             { merge: true }
                         );
 
-                        // E2E BYPASS: Automatically onboard in emulator environment
-                        // This avoids the 401 Unauthorized issue in the backend during E2E tests
-                        if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true' && !claimRole) {
+                        // E2E BYPASS: Automatically onboard in emulator environment.
+                        // SECURITY: Double-guarded — requires both the emulator env var AND
+                        // that we are NOT in a production build. This prevents accidental
+                        // activation if the env var is set in a staging/prod environment.
+                        if (
+                            !import.meta.env.PROD &&
+                            import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true' &&
+                            !claimRole
+                        ) {
                             const assignedRole = user.email?.includes('employer') ? 'employer' : 'seeker';
                             const updateData: Partial<UserData & { employerRole?: string; onboarded_at: import('firebase/firestore').FieldValue }> = {
                                 role: assignedRole,

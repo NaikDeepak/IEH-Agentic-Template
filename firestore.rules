@@ -20,8 +20,7 @@ service cloud.firestore {
                       'email',
                       'displayName',
                       'photoURL',
-                      'role',
-                      'employerRole',
+                      // 'role' is intentionally excluded: only Admin SDK / Cloud Functions can set it
                       'last_login',
                       'created_at',
                       'updated_at',
@@ -36,18 +35,13 @@ service cloud.firestore {
                       'referralCode',
                       'browniePoints',
                       'referredBy',
-                      'referralRewarded',
-                      'phoneVerified',
-                      'linkedinVerified',
-                      'rewardedAt',
                       'onboarded_at'
                     ])
                     && request.resource.data.uid == request.auth.uid
                     && request.resource.data.email == request.auth.token.email
-                    && (
-                      request.resource.data.role == null
-                      || request.resource.data.role in ['seeker', 'employer']
-                    );
+                    // browniePoints must be 0 or absent on creation — only backend can grant points
+                    && (!('browniePoints' in request.resource.data)
+                        || request.resource.data.browniePoints == 0);
 
       // Only allow safe user-controlled fields to change
       allow update: if request.auth != null
@@ -66,17 +60,21 @@ service cloud.firestore {
                       'expiresAt',
                       // Referral tracking
                       'referralCode',
+                      // browniePoints: client can ONLY decrease (spend/redeem); increases come from Admin SDK
                       'browniePoints',
-                      'referredBy', // Only set once ideally, but allowed for now
-                      'phoneVerified',
-                      'linkedinVerified',
+                      // referredBy: only set once; client can write it but not change it once set
+                      'referredBy',
                       'onboarded_at',
                       'employerRole'
+                      // NOTE: phoneVerified, linkedinVerified, referralRewarded, rewardedAt, role
+                      // are intentionally excluded — only Admin SDK / Cloud Functions can set them
                     ])
-                    // Role is immutable once set
-                    && (resource.data.role == null
-                        || !('role' in request.resource.data)
-                        || request.resource.data.role == resource.data.role)
+                    // Role is immutable once set (and cannot be elevated by client)
+                    && !('role' in request.resource.data.diff(resource.data).changedKeys())
+                    // referredBy is write-once: cannot be changed once set
+                    && (!('referredBy' in resource.data)
+                        || !('referredBy' in request.resource.data.diff(resource.data).changedKeys())
+                        || resource.data.referredBy == null)
                     // Brownie Points Security: Client can ONLY decrease points (spend/redeem)
                     // Increases (bonuses) must come from backend (Admin SDK)
                     && ( !('browniePoints' in request.resource.data)
@@ -112,8 +110,9 @@ service cloud.firestore {
       allow read: if request.auth != null;
 
       allow create: if request.auth != null
-                    // Allow creation if token has role OR if user doc has role (fallback for E2E/Emulator)
-                    && (request.auth.token.role == 'employer' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer')
+                    // SECURITY: Only trust server-issued custom claims for role check.
+                    // The Firestore-doc role fallback was removed to prevent self-assignment exploits.
+                    && request.auth.token.role == 'employer'
                     && request.resource.data.employer_id == request.auth.uid
                     && request.resource.data.title is string && request.resource.data.title.size() > 5
                     && request.resource.data.description is string && request.resource.data.description.size() > 20
@@ -149,7 +148,8 @@ service cloud.firestore {
 
       // Only the job owner (employer) can update the job
       allow update: if request.auth != null
-                    && (request.auth.token.role == 'employer' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'employer')
+                    // SECURITY: Only trust server-issued custom claims for role check.
+                    && request.auth.token.role == 'employer'
                     && resource.data.employer_id == request.auth.uid
                     // restrict what can change
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly([

@@ -56,10 +56,12 @@ describe('ReferralService', () => {
         });
 
         it('should generate and save new code if missing', async () => {
-            // 1st getDoc (user profile) -> no code
-            (getDoc as any).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
-            // 2nd getDoc (check if generated code is unique) -> doesn't exist
-            (getDoc as any).mockResolvedValueOnce({ exists: () => false });
+            // 1st getDoc (user profile) -> no referral code
+            (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
+
+            // The uniqueness check now happens inside the transaction via transaction.get().
+            // Mock transaction.get() to return a non-existent code (unique).
+            mockTransaction.get.mockResolvedValueOnce({ exists: () => false });
 
             const code = await ReferralService.ensureReferralCode(uid);
 
@@ -68,10 +70,11 @@ describe('ReferralService', () => {
         });
 
         it('should throw error if fails to generate unique code after 5 attempts', async () => {
-            (getDoc as any).mockResolvedValue({
-                exists: () => true,
-                data: () => ({})
-            }); // Always exists for both user and code lookup
+            // User profile has no referral code
+            (getDoc as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ exists: () => true, data: () => ({}) });
+
+            // All transaction.get() calls return an existing code (collision every time)
+            mockTransaction.get.mockResolvedValue({ exists: () => true });
 
             await expect(ReferralService.ensureReferralCode(uid)).rejects.toThrow('Failed to generate a unique referral code');
         });

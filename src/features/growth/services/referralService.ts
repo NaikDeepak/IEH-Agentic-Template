@@ -37,23 +37,38 @@ export const ReferralService = {
           }
         }
 
-        // Generate a unique code
-        let code = '';
-        let isUnique = false;
+        // Generate a unique code and atomically write it inside a transaction.
+        // The uniqueness check is done via transaction.get() to prevent race conditions
+        // where two concurrent calls could generate the same code.
+        let finalCode = '';
         let attempts = 0;
 
-        while (!isUnique && attempts < 5) {
-          code = generateReferralCode();
-          const codeRef = doc(db, REFERRAL_CODES_COLLECTION, code);
-          const codeSnap = await getDoc(codeRef);
+        while (!finalCode && attempts < 5) {
+          const candidate = generateReferralCode();
+          const codeRef = doc(db, REFERRAL_CODES_COLLECTION, candidate);
 
-          if (!codeSnap.exists()) {
-            isUnique = true;
+          try {
+            await runTransaction(db, async (tx) => {
+              const codeSnap = await tx.get(codeRef);
+              if (codeSnap.exists()) {
+                // Code already taken — abort this transaction and retry
+                throw new Error('COLLISION');
+              }
+              tx.set(userRef, { referralCode: candidate }, { merge: true });
+              tx.set(codeRef, { uid });
+            });
+            finalCode = candidate;
+          } catch (err: unknown) {
+            const e = err as { message?: string };
+            if (e.message !== 'COLLISION') {
+              // Unexpected error — re-throw
+              throw err;
+            }
           }
           attempts++;
         }
 
-        if (!isUnique) {
+        if (!finalCode) {
           const error = new Error('Failed to generate a unique referral code. Please try again.');
           Sentry.captureException(error);
           throw error;
@@ -62,13 +77,6 @@ export const ReferralService = {
         span.setAttribute('attempts', attempts);
         span.setAttribute('code_existed', false);
 
-        // Save to user profile and reverse lookup collection (atomic)
-        await runTransaction(db, (tx) => {
-          tx.set(userRef, { referralCode: code }, { merge: true });
-          tx.set(doc(db, REFERRAL_CODES_COLLECTION, code), { uid });
-          return Promise.resolve();
-        });
-
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (sentryLogger) {
           sentryLogger.info(sentryLogger.fmt`Referral code generated for user ${uid} after ${attempts} attempts`);
@@ -76,7 +84,7 @@ export const ReferralService = {
           // eslint-disable-next-line no-console
           console.info(`Referral code generated for user ${uid} after ${attempts} attempts`);
         }
-        return code;
+        return finalCode;
       }
     );
   },
@@ -90,7 +98,12 @@ export const ReferralService = {
       async (span) => {
         if (!code) return null;
 
-        const normalizedCode = code.toUpperCase().trim();
+        // Normalize: uppercase, trim whitespace.
+        // Strip the 'IEH-' prefix if the user included it — codes are stored without it.
+        let normalizedCode = code.toUpperCase().trim();
+        if (normalizedCode.startsWith('IEH-')) {
+          normalizedCode = normalizedCode.slice(4);
+        }
         span.setAttribute('code', normalizedCode);
 
         const codeRef = doc(db, REFERRAL_CODES_COLLECTION, normalizedCode);
