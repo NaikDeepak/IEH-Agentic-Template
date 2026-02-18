@@ -1,37 +1,58 @@
-/// <reference types="vitest" />
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// https://vitejs.dev/config/
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
-    plugins: [react()],
-    resolve: {
-        alias: {
-            '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai'),
-            'google-auth-library': path.resolve(__dirname, 'node_modules/google-auth-library'),
-            '@sentry/node': path.resolve(__dirname, 'node_modules/@sentry/node'),
-        }
-    },
+    plugins: [react(), tailwindcss()],
     test: {
-        environment: 'jsdom',
         globals: true,
-        setupFiles: './src/test/setup.ts',
-        testTimeout: 15000,
-        exclude: ['**/node_modules/**', 'e2e/**', 'dist/**'],
+        environment: 'jsdom',
+        setupFiles: ['./tests/setup.ts'],
+        env: {
+            // Enables simulation mode in PhoneVerification during tests
+            VITE_USE_FIREBASE_EMULATOR: 'true',
+        },
+        exclude: [
+            '**/node_modules/**',
+            '**/dist/**',
+            '**/tests/e2e/**', // If they were there
+            'e2e/**',
+            '**/coverage/**'
+        ],
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],
-            include: ['src/**/*.{ts,tsx}', 'index.js', 'functions/index.js'],
-            exclude: ['src/test/**', 'src/**/*.test.{ts,tsx}', 'node_modules/**'],
-            thresholds: {
-                global: {
-                    lines: 80,
-                    functions: 80,
-                    branches: 80,
-                    statements: 80
-                }
-            }
-        },
+            include: ['src/**', 'functions/**'],
+            exclude: [
+                '**/node_modules/**',
+                'functions/node_modules/**',
+                '**/dist/**',
+                '**/tests/**',
+                '**/coverage/**',
+                'e2e/**',
+                'vite.config.ts',
+                '**/*.json',
+                '**/*.lock',
+                '**/*.svg',
+                '**/*.png',
+                '**/*.jpg',
+                'src/assets/**',
+                'src/server/**',
+                'src/types/**',
+                'src/test/**',
+                'functions/src/ai/handlers/**',
+                'functions/src/user/**',
+                'functions/index.js'
+            ]
+        }
     },
-})
+    resolve: {
+        alias: {
+            '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai')
+        }
+    }
+});

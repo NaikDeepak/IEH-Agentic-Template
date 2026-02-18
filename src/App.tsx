@@ -19,6 +19,7 @@ const SkillProofs = lazy(() => import('./features/seeker/components/Assessments/
 const InsiderConnections = lazy(() => import('./features/seeker/components/Networking/InsiderConnections').then(module => ({ default: module.InsiderConnections })));
 const ApplicationBoard = lazy(() => import('./features/seeker/components/ApplicationBoard/ApplicationBoard').then(module => ({ default: module.ApplicationBoard })));
 const ProfileEditor = lazy(() => import('./features/seeker/components/Profile/ProfileEditor').then(module => ({ default: module.ProfileEditor })));
+const ReferralDashboard = lazy(() => import('./features/growth/components/ReferralDashboard').then(module => ({ default: module.ReferralDashboard })));
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const FinancialDashboard = lazy(() => import('./pages/admin/FinancialDashboard'));
@@ -102,7 +103,11 @@ function App() {
 
   return (
     <Router>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white font-mono font-bold uppercase tracking-widest border-2 border-white pointer-events-auto">
+        Skip to Content
+      </a>
       <Suspense fallback={<PageLoader />}>
+        <RoleSelection />
         <Routes>
           {/* Public Routes */}
           <Route
@@ -110,7 +115,6 @@ function App() {
             element={
               <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                 <Header />
-                <RoleSelection />
                 <main className="flex-grow">
                   <LandingPage />
                 </main>
@@ -268,6 +272,20 @@ function App() {
                   <Header />
                   <main className="flex-grow">
                     <ProfileEditor />
+                  </main>
+                </div>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seeker/referral"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main className="flex-grow p-8">
+                    <ReferralDashboard />
                   </main>
                 </div>
               </ProtectedRoute>

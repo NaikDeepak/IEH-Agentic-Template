@@ -38,11 +38,16 @@ export const ApplicationService = {
   },
 
   async updateApplicationStatus(appId: string, newStatus: ApplicationStatus): Promise<void> {
-    const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
-    await updateDoc(docRef, {
-      status: newStatus,
-      updated_at: serverTimestamp(),
-    });
+    try {
+      const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
+      await updateDoc(docRef, {
+        status: newStatus,
+        updated_at: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error(`[ApplicationService] Firestore update FAILED for appId=${appId}:`, error);
+      throw error;
+    }
   },
 
   async submitApplication(data: SubmitApplicationInput): Promise<string> {
@@ -52,6 +57,11 @@ export const ApplicationService = {
       applied_at: serverTimestamp(),
       updated_at: serverTimestamp(),
     });
+
+    // Check for referral rewards
+    // Referral rewards are now handled by backend trigger (onApplicationCreate)
+
+
     return docRef.id;
   },
 };

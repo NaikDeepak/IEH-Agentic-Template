@@ -98,7 +98,7 @@ describe('Register Component', () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-            expect(signupWithEmailMock).toHaveBeenCalledWith('jane@example.com', 'SecurePass123', 'Jane Doe');
+            expect(signupWithEmailMock).toHaveBeenCalledWith('jane@example.com', 'SecurePass123', 'Jane Doe', '');
         });
     });
 

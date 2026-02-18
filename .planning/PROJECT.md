@@ -12,17 +12,23 @@ Semantic matching that connects the right talent to the right roles by understan
 
 ### Validated
 
-<!-- Inferred from codebase map -->
-- ✓ User Authentication (Google Provider) — existing
-- ✓ Job Creation with AI Embeddings — existing
-- ✓ Semantic Job Search (Vector Search) — existing
-- ✓ Frontend UI (React + Tailwind) — existing
+- ✓ User Authentication (Google/Email, RBAC) — Phase 1
+- ✓ Marketplace Mechanics (4-day Active System, Ghost Job Filter) — Phase 2
+- ✓ Semantic Matching Engine (Bi-directional Vector Search) — Phase 3
+- ✓ Employer Suite (AI JD Generator, Screening Questions, ATS Kanban, Branding) — Phase 4
+- ✓ Seeker Tools (Resume Analyzer, Skill Gap, Interview Prep, Market Index) — Phase 5
+- ✓ Growth & Referrals (Brownie Points, Verification, Referral Dashboard) — Phase 6
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
+- [ ] Phase 7: Stabilization & Production Readiness (real auth, E2E tests, performance, CI/CD)
 
-- [ ] Research new features and improvements for v2
+### Deferred (Post-Funding)
+
+- Autonomous Career Agents
+- Explainable Scoring (XAI)
+- Predictive Career Pathing
+- Subscription / Monetization (Razorpay/Stripe)
 
 ### Out of Scope
 
@@ -35,6 +41,7 @@ Brownfield project using:
 - Backend: Firebase Functions, Firestore (Vector Search)
 - AI: Google Gemini SDK (@google/genai)
 - Infrastructure: Firebase Auth, Hosting
+- Growth: Referral engine with atomic Brownie Points ledger
 
 ## Constraints
 
@@ -48,6 +55,9 @@ Brownfield project using:
 |----------|-----------|---------|
 | Vector Search | Uses Firestore Vector Search with Gemini embeddings | ✓ Good |
 | Architecture | Serverless (Firebase Functions) for backend logic | ✓ Good |
+| Secure AI Proxy | All Gemini calls through Cloud Functions, zero client-side keys | ✓ Good |
+| Atomic Ledger | Firestore transactions for Brownie Points to prevent race conditions | ✓ Good |
+| v2 Deferral | Career Agents, XAI deferred pending funding decision | ✓ Practical |
 
 ---
-*Last updated: 2026-01-16 after initialization*
+*Last updated: 2026-02-17 after Phase 6 closure*

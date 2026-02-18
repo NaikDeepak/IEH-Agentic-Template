@@ -15,11 +15,26 @@ vi.mock('firebase/firestore', () => ({
     query: vi.fn(),
     where: vi.fn(),
     limit: vi.fn(),
+    connectFirestoreEmulator: vi.fn(),
     getFirestore: vi.fn(() => ({})),
     Timestamp: {
         fromDate: vi.fn((date) => date),
         now: vi.fn(() => new Date())
     }
+}));
+
+vi.mock('firebase/auth', () => ({
+    getAuth: vi.fn(() => ({
+        currentUser: {
+            uid: 'test-user',
+            getIdToken: vi.fn().mockResolvedValue('mock-token')
+        }
+    })),
+    connectAuthEmulator: vi.fn(),
+    GoogleAuthProvider: class {
+        setCustomParameters = vi.fn()
+    },
+    signInWithPopup: vi.fn()
 }));
 
 vi.mock('@sentry/react', async (importOriginal) => {

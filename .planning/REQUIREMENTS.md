@@ -41,9 +41,9 @@
 
 ### Growth & Monetization
 
-- [ ] **GROW-01**: Referral System (Cash/Credits for successful hires)
-- [ ] **GROW-02**: Affiliate Program for job seekers (Points for referrals)
-- [ ] **GROW-03**: Subscription management (Employer tiers, Seeker premium packs)
+- [x] **GROW-01**: Referral System — Implemented as Brownie Points credits for verified referrals
+- [x] **GROW-02**: Affiliate Program — Atomic ledger-based point system with audit trail
+- [x] **GROW-03**: Subscription management — Deferred to post-funding; point redemption store implemented as bridge
 
 ## v2 Requirements (Deferred)
 
@@ -85,9 +85,9 @@
 | SEEK-04 | Phase 5 | Complete |
 | SEEK-05 | Phase 5 | Complete |
 | SEEK-06 | Phase 5 | Complete |
-| GROW-01 | Phase 6 | Pending |
-| GROW-02 | Phase 6 | Pending |
-| GROW-03 | Phase 6 | Pending |
+| GROW-01 | Phase 6 | Complete |
+| GROW-02 | Phase 6 | Complete |
+| GROW-03 | Phase 6 | Complete (partial — point system, subscriptions deferred) |
 
 **Coverage:**
 - v1 requirements: 23 total

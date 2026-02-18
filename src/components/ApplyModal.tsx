@@ -51,6 +51,13 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
         e.preventDefault();
         if (!user || !userData || !job.id) return;
 
+        // Only block when role is known to be non-seeker.
+        // If role is still loading/undefined, let the existing `!userData` guard handle it.
+        if (userData.role && userData.role !== 'seeker') {
+            setError("Only registered candidates can apply for jobs.");
+            return;
+        }
+
         try {
             setIsSubmitting(true);
             setError(null);
@@ -177,8 +184,8 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
                                 </button>
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting}
-                                    className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2"
+                                    disabled={isSubmitting || !!(userData?.role && userData.role !== 'seeker')}
+                                    className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Submission'}
                                 </button>

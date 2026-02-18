@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as Sentry from "@sentry/react";
 import { useParams, useNavigate } from 'react-router-dom';
 import { ApplicationService } from '../../features/applications/services/applicationService';
 import { KanbanBoard } from '../../features/applications/components/KanbanBoard';
@@ -17,6 +18,14 @@ export const JobApplicants: React.FC = () => {
     const [applications, setApplications] = useState<Application[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const isMountedRef = React.useRef(true);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     const COLUMNS = [
         { id: 'applied', title: 'Applied' },
@@ -37,6 +46,8 @@ export const JobApplicants: React.FC = () => {
                     ApplicationService.getApplicationsForJob(id)
                 ]);
 
+                if (!isMountedRef.current) return;
+
                 if (!jobData) {
                     setError("Job posting not found.");
                 } else {
@@ -44,10 +55,12 @@ export const JobApplicants: React.FC = () => {
                     setApplications(appData);
                 }
             } catch (err) {
-                console.error("Error loading applicants:", err);
-                setError("Failed to load application data.");
+                if (isMountedRef.current) {
+                    console.error("Error loading applicants:", err);
+                    setError("Failed to load application data.");
+                }
             } finally {
-                setLoading(false);
+                if (isMountedRef.current) setLoading(false);
             }
         };
 
@@ -63,11 +76,24 @@ export const JobApplicants: React.FC = () => {
 
             await ApplicationService.updateApplicationStatus(appId, newStatus);
         } catch (err) {
-            console.error("Failed to update status:", err);
+            console.error("[JobApplicants] Failed to update status:", err);
+            Sentry.captureException(err, {
+                extra: { appId, newStatus, jobId: id }
+            });
+
+            // Show user feedback
+            // (Prefer a toast/snackbar; avoid blocking `alert`.)
+            console.error("Failed to save pipeline changes. Please check your connection and try again.");
+
             // Revert on error
             if (id) {
-                const refreshed = await ApplicationService.getApplicationsForJob(id);
-                setApplications(refreshed);
+                try {
+                    const refreshed = await ApplicationService.getApplicationsForJob(id);
+                    if (isMountedRef.current) setApplications(refreshed);
+                } catch (refreshErr) {
+                    console.error("[JobApplicants] Failed to refresh applications after error:", refreshErr);
+                    Sentry.captureException(refreshErr, { extra: { jobId: id } });
+                }
             }
         }
     };

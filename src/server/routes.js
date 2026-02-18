@@ -3,11 +3,15 @@ import * as aiController from './features/ai/ai.controller.js';
 import aiRoutes from './features/ai/ai.routes.js';
 import jobsRoutes from './features/jobs/jobs.routes.js';
 import candidatesRoutes from './features/candidates/candidates.routes.js';
+import userRoutes from './features/user/user.routes.js';
+import growthRoutes from './features/growth/growth.routes.js';
 
 const router = express.Router();
 
 // Standardized routes
 router.use('/ai', aiRoutes);
+router.use('/user', userRoutes);
+router.use('/growth', growthRoutes);
 
 // Compatibility aliases for legacy frontend
 // These allow /api/v1/embedding and /api/v1/generate-jd to still work

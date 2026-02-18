@@ -263,5 +263,45 @@ export const JobService = {
             console.error("Error fetching jobs by employer:", error);
             throw error;
         }
+    },
+
+    /**
+     * Get multiple jobs by their IDs (Batch Fetch).
+     * Handles Firestore 'in' query limit of 10 by chunking requests.
+     */
+    async getJobsByIds(jobIds: string[]): Promise<JobPosting[]> {
+        if (jobIds.length === 0) return [];
+
+        try {
+            // Deduplicate IDs
+            const uniqueIds = [...new Set(jobIds)];
+            const jobsRef = collection(db, JOBS_COLLECTION);
+            const chunks: string[][] = [];
+            const chunkSize = 10; // Firestore 'in' limit
+
+            for (let i = 0; i < uniqueIds.length; i += chunkSize) {
+                chunks.push(uniqueIds.slice(i, i + chunkSize));
+            }
+
+            const promises = chunks.map(chunk => {
+                const q = query(jobsRef, where("__name__", "in", chunk));
+                return getDocs(q);
+            });
+
+            const snapshots = await Promise.all(promises);
+            const jobs: JobPosting[] = [];
+
+            snapshots.forEach(snap => {
+                snap.docs.forEach(doc => {
+                    jobs.push({ id: doc.id, ...doc.data() } as JobPosting);
+                });
+            });
+
+            return jobs;
+        } catch (error) {
+            console.error("Error fetching jobs by IDs:", error);
+            // Sentry.captureException(error); // Ensure Sentry is imported if used here
+            throw error;
+        }
     }
 };

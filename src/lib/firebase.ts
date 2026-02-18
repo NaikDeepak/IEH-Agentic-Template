@@ -1,9 +1,10 @@
 import { initializeApp } from "firebase/app";
 import {
     getAuth,
+    connectAuthEmulator,
     GoogleAuthProvider,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: import.meta.env['VITE_FIREBASE_API_KEY'] as string,
@@ -18,7 +19,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Connect to emulators ONLY when explicitly opted in via VITE_USE_FIREBASE_EMULATOR=true.
+// Do NOT use import.meta.env.DEV here — that would break local dev against the live DB
+// and cause connection errors when emulators aren't running.
+if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
+    connectAuthEmulator(auth, "http://127.0.0.1:9099");
+    connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
+
 export const googleProvider = new GoogleAuthProvider();
+
 
 export {
     signInWithEmailAndPassword,

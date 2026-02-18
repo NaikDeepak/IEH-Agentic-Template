@@ -59,3 +59,27 @@ export const onboardUser = async (req, res) => {
         res.status(500).json({ error: "Failed to onboard user", details: error.message });
     }
 };
+
+export const verifyPhone = async (req, res) => {
+    try {
+        const uid = req.user.uid;
+        const phoneNumber = req.user.phone_number;
+
+        // Note: Firebase Auth token contains phone_number if user logged in via phone
+        if (!phoneNumber) {
+            return res.status(400).json({ error: "No verified phone number found in authentication token." });
+        }
+
+        const db = getFirestore();
+        await db.collection("users").doc(uid).update({
+            phoneVerified: true,
+            phoneNumber: phoneNumber,
+            updated_at: FieldValue.serverTimestamp()
+        });
+
+        res.json({ success: true, message: "Phone verified successfully." });
+    } catch (error) {
+        console.error("Phone verification error:", error);
+        res.status(500).json({ error: "Failed to verify phone." });
+    }
+};

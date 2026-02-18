@@ -14,6 +14,7 @@ import nodemailer from "nodemailer";
 import { marketProxy } from "./src/marketProxy.js";
 import * as aiProxy from "./src/ai/proxy.js";
 import * as userHandlers from "./src/user/handlers.js";
+import * as growthHandlers from "./src/growth/handlers.js";
 import rateLimit from "express-rate-limit";
 
 dotenv.config({ path: ".env.production" });
@@ -134,10 +135,15 @@ const aiLimiter = rateLimit({
 
 // Initialize Sentry
 if (process.env.SENTRY_DSN) {
+    const isProd = process.env.NODE_ENV === 'production';
     Sentry.init({
         dsn: process.env.SENTRY_DSN,
-        tracesSampleRate: 1.0,
-        environment: process.env.NODE_ENV || 'development'
+        environment: process.env.NODE_ENV || 'development',
+        enableLogs: true,
+        integrations: [
+            Sentry.consoleLoggingIntegration({ levels: ["warn", "error"] }),
+        ],
+        tracesSampleRate: isProd ? 0.2 : 1.0,
     });
 }
 
@@ -480,6 +486,11 @@ app.post("/api/ai/outreach", requireAuth, aiLimiter, aiProxy.generateOutreachPro
 
 // User & Onboarding Routes
 app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
+app.post("/api/user/verify-phone", requireAuth, userHandlers.verifyPhone);
+
+// Growth Routes
+app.get("/api/growth/referrals", requireAuth, growthHandlers.getReferrals);
+app.post("/api/growth/referrals", requireAuth, growthHandlers.getReferrals);
 
 
 // Expose the Express API as a single Cloud Function
@@ -625,3 +636,7 @@ export const reaper = onSchedule("every 24 hours", async (event) => {
         }
     }
 });
+
+// --- Firestore Triggers ---
+export * from "./src/triggers/onApplicationCreate.js";
+

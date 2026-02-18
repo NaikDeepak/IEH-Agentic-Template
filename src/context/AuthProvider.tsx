@@ -15,6 +15,7 @@ import {
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
 import { updateProfile } from 'firebase/auth';
+import { ReferralService } from '../features/growth/services/referralService';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -40,19 +41,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         const effectiveRole = claimRole ?? data.role ?? null;
 
                         setUserData({ ...data, role: effectiveRole });
-                        await updateDoc(userDocRef, {
-                            last_login: serverTimestamp()
-                        });
+                        try {
+                            await updateDoc(userDocRef, {
+                                last_login: serverTimestamp()
+                            });
+                        } catch (updateError) {
+                            console.warn('Failed to update last_login (non-fatal):', updateError);
+                        }
+
+                        // Ensure user has a referral code
+                        if (!data.referralCode) {
+                            await ReferralService.ensureReferralCode(user.uid);
+                            // Refresh data to get the new code
+                            const updatedSnap = await getDoc(userDocRef);
+                            const updatedData = updatedSnap.data() as UserData;
+                            setUserData({
+                                ...updatedData,
+                                role: claimRole ?? updatedData.role ?? null
+                            });
+                        }
                     } else {
+                        // Check for referral code in session storage (passed from loginWithGoogle)
+                        const pendingReferralCode = sessionStorage.getItem('pendingReferralCode');
+                        let referredBy = null;
+
+                        if (pendingReferralCode) {
+                            referredBy = await ReferralService.getUserByReferralCode(pendingReferralCode);
+                            sessionStorage.removeItem('pendingReferralCode');
+                        }
+
                         const newUserData: UserData = {
                             uid: user.uid,
                             email: user.email,
                             displayName: user.displayName,
                             photoURL: user.photoURL,
                             role: claimRole ?? null,
+                            browniePoints: 0, // Initialize with 0 points
+                            referredBy: referredBy // Will be null if not referred
                         };
                         setUserData(newUserData);
-
                         await setDoc(
                             userDocRef,
                             {
@@ -62,8 +89,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             },
                             { merge: true }
                         );
+
+                        // E2E BYPASS: Automatically onboard in emulator environment.
+                        // SECURITY: Double-guarded — requires both the emulator env var AND
+                        // that we are NOT in a production build. This prevents accidental
+                        // activation if the env var is set in a staging/prod environment.
+                        if (
+                            !import.meta.env.PROD &&
+                            import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true' &&
+                            !claimRole
+                        ) {
+                            const assignedRole = user.email?.includes('employer') ? 'employer' : 'seeker';
+                            const token = await user.getIdToken();
+
+                            // Use the secure backend endpoint instead of a direct updateDoc.
+                            // The new Firestore rules block client-side role writes, so this
+                            // must go through the Admin SDK via the /api/user/onboard route.
+                            const resp = await fetch('/api/user/onboard', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ role: assignedRole })
+                            });
+
+                            if (!resp.ok) {
+                                throw new Error(`Onboard failed: ${resp.status}`);
+                            }
+
+                            // Ensure any server-set custom claims (e.g., role) are available immediately
+                            await user.getIdToken(true);
+
+                            // Refresh from Firestore to pick up server-assigned values
+                            // (role, employerRole, onboarded_at set by Admin SDK)
+                            const updatedSnap = await getDoc(userDocRef);
+                            setUserData(updatedSnap.data() as UserData);
+                        }
+
+                        // Generate referral code for new user
+                        await ReferralService.ensureReferralCode(user.uid);
+                        const updatedSnap = await getDoc(userDocRef);
+                        const updatedData = updatedSnap.data() as UserData;
+                        setUserData({
+                            ...updatedData,
+                            role: claimRole ?? updatedData.role ?? null
+                        });
                     }
                 } catch (err: unknown) {
+
                     const error = err as { code?: string; message?: string };
                     console.error("Auth Transition Error:", error);
                     setError(error.message ?? "An error occurred during authentication.");
@@ -80,9 +154,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, []);
 
-    const loginWithGoogle = useCallback(async () => {
+    const loginWithGoogle = useCallback(async (referralCode?: string) => {
         setError(null);
         try {
+            if (referralCode) {
+                sessionStorage.setItem('pendingReferralCode', referralCode);
+            }
             await signInWithPopup(auth, googleProvider);
         } catch (err: unknown) {
             const error = err as { message?: string };
@@ -104,9 +181,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-    const signupWithEmail = useCallback(async (email: string, password: string, displayName: string) => {
+    const signupWithEmail = useCallback(async (email: string, password: string, displayName: string, referralCode?: string) => {
         setError(null);
         try {
+            // Defer referral linking until the onAuthStateChanged "new user" bootstrap,
+            // so we don't accidentally perform a failing `create` on `users/{uid}`.
+            if (referralCode) {
+                sessionStorage.setItem('pendingReferralCode', referralCode);
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName });
         } catch (err: unknown) {
