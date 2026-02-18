@@ -54,7 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             await ReferralService.ensureReferralCode(user.uid);
                             // Refresh data to get the new code
                             const updatedSnap = await getDoc(userDocRef);
-                            setUserData(updatedSnap.data() as UserData);
+                            const updatedData = updatedSnap.data() as UserData;
+                            setUserData({
+                                ...updatedData,
+                                role: claimRole ?? updatedData.role ?? null
+                            });
                         }
                     } else {
                         // Check for referral code in session storage (passed from loginWithGoogle)
@@ -126,7 +130,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         // Generate referral code for new user
                         await ReferralService.ensureReferralCode(user.uid);
                         const updatedSnap = await getDoc(userDocRef);
-                        setUserData(updatedSnap.data() as UserData);
+                        const updatedData = updatedSnap.data() as UserData;
+                        setUserData({
+                            ...updatedData,
+                            role: claimRole ?? updatedData.role ?? null
+                        });
                     }
                 } catch (err: unknown) {
 

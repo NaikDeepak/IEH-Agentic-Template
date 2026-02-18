@@ -489,6 +489,7 @@ app.post("/api/user/onboard", requireAuth, userHandlers.onboardUser);
 app.post("/api/user/verify-phone", requireAuth, userHandlers.verifyPhone);
 
 // Growth Routes
+app.get("/api/growth/referrals", requireAuth, growthHandlers.getReferrals);
 app.post("/api/growth/referrals", requireAuth, growthHandlers.getReferrals);
 
 

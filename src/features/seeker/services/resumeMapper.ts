@@ -84,8 +84,24 @@ export const ResumeMapper = {
         const keywords: Partial<ResumeAnalysisResult['keywords']> = data.keywords ?? {};
 
         // Handle Arrays with fallbacks
-        const rawExperience = (rawParsed.experience ?? data.work_experience ?? rawParsed.work_experience ?? data.experience ?? []);
-        const rawEducation = (rawParsed.education ?? data.education ?? rawParsed.academic_background ?? []);
+        // Handle Arrays with fallbacks - Guard against non-array AI responses
+        const rawExperience: RawExperience[] = Array.isArray(rawParsed.experience)
+            ? rawParsed.experience
+            : Array.isArray(data.work_experience)
+                ? data.work_experience
+                : Array.isArray(rawParsed.work_experience)
+                    ? rawParsed.work_experience
+                    : Array.isArray(data.experience)
+                        ? data.experience
+                        : [];
+
+        const rawEducation: RawEducation[] = Array.isArray(rawParsed.education)
+            ? rawParsed.education
+            : Array.isArray(data.education)
+                ? data.education
+                : Array.isArray(rawParsed.academic_background)
+                    ? rawParsed.academic_background
+                    : [];
 
         // Normalize Score (0-100)
         let score = 0;

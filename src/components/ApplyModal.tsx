@@ -51,7 +51,9 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
         e.preventDefault();
         if (!user || !userData || !job.id) return;
 
-        if (userData.role !== 'seeker') {
+        // Only block when role is known to be non-seeker.
+        // If role is still loading/undefined, let the existing `!userData` guard handle it.
+        if (userData.role && userData.role !== 'seeker') {
             setError("Only registered candidates can apply for jobs.");
             return;
         }
