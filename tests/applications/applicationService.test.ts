@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ApplicationService } from '../../src/features/applications/services/applicationService';
-import { getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { getDocs, addDoc, updateDoc, doc, collection } from 'firebase/firestore';
 
 // Mock Dependencies
 vi.mock('../../src/lib/firebase', () => ({
@@ -36,8 +36,8 @@ describe('ApplicationService', () => {
             const results = await ApplicationService.getApplicationsForJob('job123');
 
             expect(results).toHaveLength(2);
-            expect(results[0].id).toBe('app1');
-            expect(results[1].status).toBe('shortlisted');
+            expect(results[0]?.id).toBe('app1');
+            expect(results[1]?.status).toBe('shortlisted');
         });
     });
 
@@ -80,13 +80,15 @@ describe('ApplicationService', () => {
 
     describe('submitApplication', () => {
         it('should create a new application document', async () => {
+            const mockCollectionRef = { id: 'applications' };
+            (collection as any).mockReturnValue(mockCollectionRef);
             (addDoc as any).mockResolvedValueOnce({ id: 'new-app-id' });
             const input = { job_id: 'job1', candidate_id: 'user1', resume_url: 'url' };
 
             const appId = await ApplicationService.submitApplication(input as any);
 
             expect(appId).toBe('new-app-id');
-            expect(addDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
+            expect(addDoc).toHaveBeenCalledWith(mockCollectionRef, expect.objectContaining({
                 ...input,
                 status: 'applied',
                 applied_at: 'mock-timestamp'

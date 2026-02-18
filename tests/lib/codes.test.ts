@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { generateReferralCode } from '../../src/lib/utils/codes';
 
 describe('generateReferralCode', () => {
@@ -14,15 +14,12 @@ describe('generateReferralCode', () => {
     });
 
     it('should use Math.random fallback when crypto is unavailable', () => {
-        const originalCrypto = globalThis.crypto;
-        // The following line is safe because of 'as any' cast
-        delete (globalThis as any).crypto;
+        const cryptoSpy = vi.spyOn(globalThis, 'crypto', 'get').mockReturnValue(undefined as any);
 
         const code = generateReferralCode();
         expect(code).toMatch(/^IEH-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
 
-        // Restore
-        (globalThis as any).crypto = originalCrypto;
+        cryptoSpy.mockRestore();
     });
 
     it('should correctly map random values to the charset', () => {
