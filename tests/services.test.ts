@@ -15,6 +15,7 @@ vi.mock('firebase/firestore', () => ({
     query: vi.fn(),
     where: vi.fn(),
     limit: vi.fn(),
+    connectFirestoreEmulator: vi.fn(),
     getFirestore: vi.fn(() => ({})),
     Timestamp: {
         fromDate: vi.fn((date) => date),
@@ -29,6 +30,7 @@ vi.mock('firebase/auth', () => ({
             getIdToken: vi.fn().mockResolvedValue('mock-token')
         }
     })),
+    connectAuthEmulator: vi.fn(),
     GoogleAuthProvider: class {
         setCustomParameters = vi.fn()
     },

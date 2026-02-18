@@ -21,6 +21,7 @@ vi.mock('firebase/auth', () => ({
     getAuth: vi.fn(() => ({
         currentUser: { uid: 'user123' }
     })),
+    connectAuthEmulator: vi.fn(),
     GoogleAuthProvider: class {
         setCustomParameters = vi.fn();
     },
@@ -34,6 +35,7 @@ vi.mock('firebase/auth', () => ({
 vi.mock('firebase/firestore', () => ({
     doc: vi.fn(),
     updateDoc: vi.fn(),
+    connectFirestoreEmulator: vi.fn(),
     getFirestore: vi.fn(() => ({}))
 }));
 
