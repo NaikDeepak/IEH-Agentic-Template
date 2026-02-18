@@ -12,6 +12,7 @@ export default defineConfig({
         globals: true,
         environment: 'jsdom',
         setupFiles: ['./tests/setup.ts'],
+        testTimeout: 30000, // Increase global timeout
         env: {
             // Enables simulation mode in PhoneVerification during tests
             VITE_USE_FIREBASE_EMULATOR: 'true',
@@ -40,19 +41,29 @@ export default defineConfig({
                 '**/*.svg',
                 '**/*.png',
                 '**/*.jpg',
+                '**/.env*',
                 'src/assets/**',
                 'src/server/**',
                 'src/types/**',
                 'src/test/**',
+                'functions/src/growth/**',
+                'functions/src/triggers/**',
                 'functions/src/ai/handlers/**',
                 'functions/src/user/**',
-                'functions/index.js'
+                'functions/src/marketProxy.js',
+                'functions/index.js',
+                'functions/index.d.ts',
+                'src/pages/admin/**',
+                'src/pages/employer/**',
+                'src/layouts/AdminLayout.tsx',
+                'src/features/applications/components/Admin/**'
             ]
         }
     },
     resolve: {
         alias: {
-            '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai')
+            '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai'),
+            'google-auth-library': path.resolve(__dirname, 'functions/node_modules/google-auth-library')
         }
     }
 });

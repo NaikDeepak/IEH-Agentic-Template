@@ -38,6 +38,7 @@ india-emp-hub-firebase-*.json
 
 # Test & Coverage
 coverage
+*coverage*.txt
 test-results/
 playwright-report/
 blob-report/
