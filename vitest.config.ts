@@ -63,7 +63,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@google/genai': path.resolve(__dirname, 'node_modules/@google/genai'),
-            'google-auth-library': path.resolve(__dirname, 'functions/node_modules/google-auth-library')
+            'google-auth-library': path.resolve(__dirname, 'node_modules/google-auth-library')
         }
     }
 });
