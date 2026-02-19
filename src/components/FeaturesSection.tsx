@@ -14,12 +14,15 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
     return (
         <motion.button
             whileHover={{ y: -5 }}
-            className={`relative overflow-hidden p-8 h-[400px] flex flex-col justify-between group text-left w-full border-2 border-black outline-none transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${className} ${dark ? 'text-white' : 'text-black'}`}
+            className={`relative overflow-hidden p-8 h-auto min-h-[400px] flex flex-col justify-between group text-left w-full border-2 border-black outline-none transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${className} ${dark ? 'text-white' : 'text-black'}`}
             aria-label={`View jobs for ${title}`}
         >
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
-                <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale group-hover:grayscale-0" />
+                <picture>
+                    <source srcSet={image.replace('.png', '.webp')} type="image/webp" />
+                    <img src={image} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale group-hover:grayscale-0" />
+                </picture>
                 <div className={`absolute inset-0 ${dark ? 'bg-black/70 group-hover:bg-black/50' : 'bg-white/80 group-hover:bg-white/60'} transition-colors duration-500`} />
             </div>
 
@@ -99,7 +102,7 @@ export const FeaturesSection: React.FC = () => {
 
                     {/* ITES & Business Operations (Wide Card) */}
                     <div className="md:col-span-12 border-t-2 border-black">
-                        <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden group bg-gray-100 flex flex-col md:flex-row">
+                        <div className="relative min-h-[400px] md:h-[500px] w-full overflow-hidden group bg-gray-100 flex flex-col md:flex-row">
                             <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b-2 md:border-b-0 md:border-r-2 border-black bg-white z-10">
                                 <div>
                                     <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">ITES & Business<br />Operations</h3>
@@ -117,7 +120,10 @@ export const FeaturesSection: React.FC = () => {
                             </div>
 
                             <div className="w-full md:w-1/2 relative overflow-hidden">
-                                <img src="/images/sector_ites.png" alt="ITES & Business Operations" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                <picture>
+                                    <source srcSet="/images/sector_ites.webp" type="image/webp" />
+                                    <img src="/images/sector_ites.png" alt="ITES & Business Operations" loading="lazy" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
+                                </picture>
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                             </div>
                         </div>

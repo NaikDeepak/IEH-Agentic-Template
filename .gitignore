@@ -38,10 +38,13 @@ india-emp-hub-firebase-*.json
 
 # Test & Coverage
 coverage
+*coverage*.txt
 test-results/
 playwright-report/
 blob-report/
 playwright/.cache/
+.lighthouseci/
+lighthouse-reports/
 
 # TypeScript
 *.tsbuildinfo
@@ -61,3 +64,8 @@ next.config.ts
 # E2E Screenshots
 e2e-seeker*.png
 
+
+# GSD session files
+.gsd/STATE.md
+.gsd/JOURNAL.md
+.gsd/TODO.md

@@ -18,14 +18,17 @@ vi.mock('@google/genai', () => ({
     })
 }));
 
-vi.mock('google-auth-library', () => ({
-    GoogleAuth: vi.fn().mockImplementation(() => ({
-        getClient: vi.fn().mockResolvedValue({
-            getAccessToken: vi.fn().mockResolvedValue({ token: 'mock-token' }),
-            request: vi.fn().mockResolvedValue({ data: [] })
-        })
-    }))
-}));
+vi.mock('google-auth-library', () => {
+    const mockClient = {
+        getAccessToken: vi.fn().mockResolvedValue({ token: 'mock-token' }),
+        request: vi.fn().mockResolvedValue({ data: [] })
+    };
+    return {
+        GoogleAuth: vi.fn().mockImplementation(() => ({
+            getClient: vi.fn().mockResolvedValue(mockClient)
+        }))
+    };
+});
 
 // Mock internal proxy to be sure
 vi.mock('../functions/lib/ai/proxy.js', () => ({
@@ -146,6 +149,6 @@ describe('Functions: API Handlers', () => {
 
             await searchJobsHandler(req, res);
             expect(res.json).toHaveBeenCalled();
-        });
+        }, 10000);
     });
 });

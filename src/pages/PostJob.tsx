@@ -251,7 +251,7 @@ export const PostJob: React.FC = () => {
           {/* Section 1: The Basics */}
           <div className="space-y-6">
             <div className="bg-black text-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
-              <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.3em] mb-4 block text-gray-400">What's the position?</label>
+              <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.3em] mb-4 block text-gray-500">What's the position?</label>
               <input
                 id="title"
                 required
@@ -259,7 +259,7 @@ export const PostJob: React.FC = () => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. Senior Frontend Engineer"
-                className="w-full bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-gray-700 py-2"
+                className="w-full bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-white/20 py-2"
               />
             </div>
           </div>
@@ -356,7 +356,7 @@ export const PostJob: React.FC = () => {
                 <div className="flex justify-between items-center mb-2">
                   <label htmlFor="description" className={labelClasses}>Job Description</label>
                   {formData.description && (
-                    <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">AI Generated • Editable</span>
+                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">AI Generated • Editable</span>
                   )}
                 </div>
                 <textarea
@@ -524,7 +524,7 @@ export const PostJob: React.FC = () => {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label htmlFor="company_bio" className={labelClasses}>Company Description</label>
-                <div className="flex items-center gap-1 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+                <div className="flex items-center gap-1 text-[10px] font-mono text-gray-500 uppercase tracking-widest">
                   <Building2 className="w-3 h-3" /> Pre-filled from profile
                 </div>
               </div>

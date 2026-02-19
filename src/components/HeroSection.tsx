@@ -37,7 +37,7 @@ export const HeroSection: React.FC = () => {
                                 <span className="text-xs font-mono font-bold uppercase tracking-widest">Live Platform</span>
                             </div>
 
-                            <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
+                            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
                                 India<br />
                                 Employment<br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-500 to-black animate-gradient-x">Hub</span>
@@ -57,7 +57,7 @@ export const HeroSection: React.FC = () => {
                                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                         placeholder="SEARCH ROLES..."
                                         aria-label="Search for job roles"
-                                        className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-black placeholder:text-gray-400 font-mono text-sm uppercase tracking-wider"
+                                        className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-black placeholder:text-gray-500 font-mono text-sm uppercase tracking-wider"
                                     />
                                     <button
                                         onClick={handleSearch}
@@ -102,11 +102,14 @@ export const HeroSection: React.FC = () => {
                         </div>
 
                         <div className="flex-1 relative overflow-hidden group">
-                            <img
-                                src="/images/hero.png"
-                                alt="Professional"
-                                className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
-                            />
+                            <picture>
+                                <source srcSet="/images/hero.webp" type="image/webp" />
+                                <img
+                                    src="/images/hero.png"
+                                    alt="Professional"
+                                    className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                                />
+                            </picture>
 
                             {/* Dark Overlay for Readability */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
