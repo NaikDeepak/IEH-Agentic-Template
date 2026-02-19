@@ -5,6 +5,8 @@ import { analyzeResume } from '../../services/resumeService';
 import type { ResumeAnalysisResult } from '../../types';
 import { useAuth } from '../../../../hooks/useAuth';
 import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import * as Sentry from '@sentry/react';
 
 export const ResumeAnalyzer: React.FC = () => {
     const { user } = useAuth();
@@ -21,9 +23,13 @@ export const ResumeAnalyzer: React.FC = () => {
         try {
             const analysisResult = await analyzeResume(user.uid, data.content, data.type);
             setResult(analysisResult);
+            toast.success('Resume analyzed! Scroll down to view your report.');
         } catch (err) {
+            Sentry.captureException(err);
             console.error(err);
-            setError("Failed to analyze resume. Please try again. " + (err instanceof Error ? err.message : ""));
+            const msg = "Failed to analyze resume. Please try again.";
+            setError(msg + " " + (err instanceof Error ? err.message : ''));
+            toast.error(msg);
         } finally {
             setIsAnalyzing(false);
         }

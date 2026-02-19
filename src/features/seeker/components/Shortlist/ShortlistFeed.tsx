@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShortlistService, type ShortlistResult } from '../../services/shortlistService';
 import type { JobPosting } from '../../../jobs/types';
-import { Briefcase, MapPin, Building, Clock, ArrowRight, ArrowUpRight, Loader2, Sparkles } from 'lucide-react';
+import { Briefcase, MapPin, Building, Clock, ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
+import { SkeletonShortlistCard } from '../../../../components/ui/Skeleton';
 
 interface ShortlistFeedProps {
     userId: string;
@@ -15,30 +16,32 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchShortlist = async () => {
-            try {
-                setLoading(true);
-                const result = await ShortlistService.getDailyShortlist(userId);
-                setShortlist(result);
-            } catch (err) {
-                console.error("Failed to fetch shortlist:", err);
-                setError("Failed to load your daily recommendations.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (userId) {
-            void fetchShortlist();
+    const fetchShortlist = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const result = await ShortlistService.getDailyShortlist(userId);
+            setShortlist(result);
+        } catch (err) {
+            console.error("Failed to fetch shortlist:", err);
+            setError("Failed to load your daily recommendations.");
+        } finally {
+            setLoading(false);
         }
     }, [userId]);
 
+    useEffect(() => {
+        if (userId) {
+            void fetchShortlist();
+        }
+    }, [fetchShortlist, userId]);
+
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-12 border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <Loader2 className="h-8 w-8 text-black animate-spin mb-4" />
-                <p className="text-sm font-mono uppercase font-bold tracking-widest">Curating your daily feed...</p>
+            <div className="space-y-4" aria-busy="true" aria-label="Loading recommendations">
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonShortlistCard key={i} />
+                ))}
             </div>
         );
     }
@@ -48,7 +51,7 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
             <div className="bg-white p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
                 <p className="text-black font-bold mb-4 uppercase tracking-tight">{error}</p>
                 <button
-                    onClick={() => { window.location.reload(); }}
+                    onClick={() => { void fetchShortlist(); }}
                     className="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                 >
                     Try Again
@@ -62,12 +65,6 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
         return (
             <div className="bg-white p-8 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:24px_24px] opacity-10 -z-10"></div>
-
-                {shortlist.error && (
-                    <div className="mb-6 p-3 bg-white border-2 border-black text-black text-xs font-mono font-bold uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                        DEBUG ERR: {shortlist.error}
-                    </div>
-                )}
 
                 <div className="inline-flex items-center justify-center p-4 bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] mb-8">
                     <Sparkles className="h-8 w-8 text-yellow-400" />

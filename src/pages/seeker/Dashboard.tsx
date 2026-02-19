@@ -9,7 +9,6 @@ import {
     Video,
     ShieldCheck,
     ChevronRight,
-    Loader2,
     Gift
 } from 'lucide-react';
 
@@ -19,9 +18,11 @@ import { ProfileService } from '../../features/seeker/services/profileService';
 import { TrackerService } from '../../features/seeker/services/trackerService';
 import { ShortlistFeed } from '../../features/seeker/components/Shortlist/ShortlistFeed';
 import { MarketTrends } from '../../features/seeker/components/Market/MarketTrends';
+import { SkeletonDashboardCard, SkeletonJobCard } from '../../components/ui/Skeleton';
 import type { ResumeAnalysisResult, SkillGap, SeekerProfile } from '../../features/seeker/types';
 import type { Application } from '../../features/applications/types';
 import { Edit3 } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 
 export const SeekerDashboard: React.FC = () => {
     const { user } = useAuth();
@@ -57,6 +58,7 @@ export const SeekerDashboard: React.FC = () => {
                     setProfile(newProfile);
                 }
             } catch (error) {
+                Sentry.captureException(error);
                 console.error("Dashboard data fetch error:", error);
             } finally {
                 setLoading(false);
@@ -68,9 +70,34 @@ export const SeekerDashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-                <Loader2 className="w-12 h-12 animate-spin text-black mb-4" />
-                <span className="font-mono font-black uppercase tracking-widest text-sm">Initializing Command Center...</span>
+            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow p-6 md:p-12">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Skeleton header */}
+                        <div className="mb-12">
+                            <div className="h-14 w-64 bg-gray-200 animate-pulse mb-4" />
+                            <div className="h-4 w-48 bg-gray-100 animate-pulse" />
+                        </div>
+                        {/* Skeleton two-column grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-8">
+                                <div className="space-y-4">
+                                    {[0, 1, 2].map(i => <SkeletonJobCard key={i} />)}
+                                </div>
+                                <SkeletonDashboardCard />
+                            </div>
+                            <div className="space-y-8">
+                                <SkeletonDashboardCard />
+                                <div className="space-y-4">
+                                    {[0, 1, 2].map(i => (
+                                        <div key={i} className="h-16 bg-gray-100 animate-pulse border-2 border-gray-200" />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         );
     }
