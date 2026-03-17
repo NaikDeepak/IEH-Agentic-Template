@@ -50,7 +50,9 @@ const PageLoader = () => (
 );
 
 function DashboardRedirect() {
-  const { userData } = useAuth();
+  const { userData, loading } = useAuth();
+  
+  if (loading) return <PageLoader />;
   if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
   if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
   return <Navigate to="/seeker/dashboard" replace />;
@@ -170,24 +172,28 @@ function App() {
           <Route
             path="/register"
             element={
-              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
-                <Header />
-                <main id="main-content" className="flex-grow">
-                  <Register />
-                </main>
-              </div>
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main id="main-content" className="flex-grow">
+                    <Register />
+                  </main>
+                </div>
+              )
             }
           />
 
           <Route
             path="/login"
             element={
-              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
-                <Header />
-                <main className="flex-grow flex items-center justify-center p-4">
-                  <Login variant="card" />
-                </main>
-              </div>
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main className="flex-grow flex items-center justify-center p-4">
+                    <Login variant="card" />
+                  </main>
+                </div>
+              )
             }
           />
 
