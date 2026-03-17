@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:full": "cross-env VITE_USE_FIREBASE_EMULATOR=true FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 concurrently \"npm start\" \"npm run dev\" \"sleep 5 && node seed-jobs.js\"",
+    "dev:full": "concurrently \"npm start\" \"npm run dev\" ",
+    "dev:full:emulator": "cross-env VITE_USE_FIREBASE_EMULATOR=true FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 concurrently \"npm start\" \"npm run dev\" \"sleep 5 && node seed-jobs.js\"",
     "build": "vite build",
     "lighthouse": "npm run build && lhci autorun",
     "start": "node index.js",
@@ -34,6 +35,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.12.0",
+    "sonner": "^2.0.7",
     "zod": "^4.3.6"
   },
   "devDependencies": {
