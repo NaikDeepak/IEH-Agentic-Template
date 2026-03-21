@@ -2,6 +2,58 @@ import { generateEmbedding, analyzeQuery } from '../../lib/gemini.js';
 import { runVectorSearch, createFilter } from '../../lib/firestore.js';
 import * as gemini from '../../lib/gemini.js';
 import { CONSTANTS } from '../../config/constants.js';
+import { db } from '../../config/firebase.js';
+
+// --- Fuzzy suggestion helpers ---
+
+function getTrigrams(str) {
+    const s = '  ' + str.toLowerCase() + '  ';
+    const trigrams = new Set();
+    for (let i = 0; i < s.length - 2; i++) {
+        trigrams.add(s.slice(i, i + 3));
+    }
+    return trigrams;
+}
+
+function trigramSimilarity(a, b) {
+    const ta = getTrigrams(a);
+    const tb = getTrigrams(b);
+    let intersection = 0;
+    ta.forEach(t => { if (tb.has(t)) intersection++; });
+    return (2 * intersection) / (ta.size + tb.size);
+}
+
+/**
+ * Returns up to `limit` job title suggestions that fuzzy-match the query.
+ */
+export const getJobSuggestions = async (query, limit = 5) => {
+    if (!query || query.trim().length < 2) return [];
+
+    const snapshot = await db.collection(CONSTANTS.FIREBASE.COLLECTIONS.JOBS)
+        .where('status', '==', CONSTANTS.FILTERS.STATUS.ACTIVE)
+        .select('title', 'skills')
+        .limit(150)
+        .get();
+
+    const q = query.toLowerCase();
+    const seen = new Set();
+
+    return snapshot.docs
+        .map(doc => {
+            const { title = '', skills = [] } = doc.data();
+            const skillText = Array.isArray(skills) ? skills.join(' ') : String(skills);
+            const score = trigramSimilarity(q, title) + trigramSimilarity(q, skillText) * 0.4;
+            return { title, score };
+        })
+        .filter(({ title, score }) => {
+            if (score < 0.1 || seen.has(title.toLowerCase())) return false;
+            seen.add(title.toLowerCase());
+            return true;
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, limit)
+        .map(({ title }) => title);
+};
 
 export const searchJobs = async (searchQuery, location, limit = CONSTANTS.DEFAULTS.PAGINATION_LIMIT, authToken = null, explicitFilters = {}) => {
     const { city = '', jobType = '', experienceLevel = '', salaryMin = 0 } = explicitFilters;

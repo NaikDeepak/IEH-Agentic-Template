@@ -111,6 +111,22 @@ export async function searchJobs(searchQuery: string, filters: Partial<JobSearch
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching candidate profiles
  */
+const SuggestResponseSchema = z.object({
+    suggestions: z.array(z.string()).optional().default([])
+});
+
+export async function getJobSuggestions(query: string): Promise<string[]> {
+    try {
+        const response = await fetch(`/api/jobs/suggest?q=${encodeURIComponent(query)}`);
+        if (!response.ok) return [];
+        const rawData = (await response.json()) as unknown;
+        const data = SuggestResponseSchema.parse(rawData);
+        return data.suggestions;
+    } catch {
+        return [];
+    }
+}
+
 export async function searchCandidates(searchQuery: string, limitCount = 10): Promise<CandidateSearchResult[]> {
     try {
         const rawData = await callAIProxy('/api/candidates/search', { query: searchQuery, limit: limitCount });

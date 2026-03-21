@@ -1,5 +1,18 @@
 import * as jobsService from './jobs.service.js';
 
+export const suggestJobs = async (req, res, next) => {
+    try {
+        const query = req.query.q;
+        if (!query || typeof query !== 'string') {
+            return res.json({ suggestions: [] });
+        }
+        const suggestions = await jobsService.getJobSuggestions(query);
+        res.json({ suggestions });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const searchJobs = async (req, res, next) => {
     try {
         const { query: searchQuery, location, city, jobType, experienceLevel, salaryMin, limit = 10 } = req.body;

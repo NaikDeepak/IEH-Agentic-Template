@@ -11,7 +11,7 @@ import { Header } from '../components/Header';
 import { SkeletonJobCard } from '../components/ui/Skeleton';
 import { X } from 'lucide-react';
 import * as Sentry from '@sentry/react';
-import { searchJobs } from '../lib/ai/search';
+import { searchJobs, getJobSuggestions } from '../lib/ai/search';
 import { useAuth } from '../hooks/useAuth';
 
 type JobWithMatch = Job & { matchScore?: number };
@@ -30,6 +30,7 @@ export const JobsPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [currentSearchQuery, setCurrentSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<string[]>([]);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
 
     useEffect(() => {
@@ -71,17 +72,16 @@ export const JobsPage: React.FC = () => {
             const mappedResults: JobWithMatch[] = results.map((result) => {
                 const posting = result as unknown as JobPosting;
                 const matchScore = (result['matchScore'] as number | undefined) ?? 0;
-
-                // Backend returns 0-100 based on cosine similarity * 100
-                const normalizedScore = matchScore;
-
-                return {
-                    ...mapJobPostingToJob(posting),
-                    matchScore: normalizedScore
-                };
+                return { ...mapJobPostingToJob(posting), matchScore };
             });
 
             setDisplayedJobs(mappedResults);
+            setSuggestions([]);
+
+            // If no results, fetch fuzzy suggestions in background
+            if (mappedResults.length === 0) {
+                void getJobSuggestions(query).then(setSuggestions);
+            }
         } catch (err) {
             Sentry.captureException(err);
             console.error("Search failed:", err);
@@ -96,6 +96,7 @@ export const JobsPage: React.FC = () => {
         setIsSearching(false);
         setCurrentSearchQuery('');
         setDisplayedJobs(browseJobs);
+        setSuggestions([]);
         setError(null);
     };
 
@@ -208,19 +209,39 @@ export const JobsPage: React.FC = () => {
                             )}
                         </div>
                     ) : displayedJobs.length === 0 ? (
-                        <div className="py-24 text-center">
-                            <h3 className="text-2xl font-semibold text-slate-400 mb-3">
-                                {isSearching ? "No matches found" : "No active roles"}
-                            </h3>
-                            <p className="text-sm text-slate-400">
-                                {isSearching
-                                    ? "Try a different search or clear your filters."
-                                    : "Check back later for updates."}
-                            </p>
+                        <div className="py-20 text-center flex flex-col items-center gap-6">
+                            <div>
+                                <h3 className="text-2xl font-semibold text-slate-400 mb-2">
+                                    {isSearching ? "No matches found" : "No active roles"}
+                                </h3>
+                                <p className="text-sm text-slate-400">
+                                    {isSearching
+                                        ? "Try a different search or clear your filters."
+                                        : "Check back later for updates."}
+                                </p>
+                            </div>
+
+                            {isSearching && suggestions.length > 0 && (
+                                <div className="flex flex-col items-center gap-3">
+                                    <p className="text-sm text-slate-500 font-medium">Did you mean:</p>
+                                    <div className="flex flex-wrap justify-center gap-2">
+                                        {suggestions.map((suggestion) => (
+                                            <button
+                                                key={suggestion}
+                                                onClick={() => { void handleSearch(suggestion, {}); }}
+                                                className="px-4 py-2 bg-white border border-sky-200 hover:border-sky-400 hover:bg-sky-50 text-sky-700 text-sm font-medium rounded-full transition-all shadow-soft"
+                                            >
+                                                {suggestion}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
                             {isSearching && (
                                 <button
                                     onClick={handleClearSearch}
-                                    className="mt-6 px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm rounded-xl transition-colors"
+                                    className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm rounded-xl transition-colors"
                                 >
                                     Clear Search
                                 </button>
