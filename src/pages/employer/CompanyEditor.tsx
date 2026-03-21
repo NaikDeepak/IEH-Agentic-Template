@@ -85,14 +85,14 @@ export const CompanyEditor: React.FC = () => {
     }
   };
 
-  const inputClasses = "w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:bg-black focus:text-white transition-colors placeholder:text-gray-400";
-  const labelClasses = "text-xs font-black uppercase tracking-widest mb-2 flex items-center gap-2";
+  const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
+  const labelClasses = "text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1.5";
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24">
-        <Loader2 className="w-12 h-12 animate-spin text-black mb-6" />
-        <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">Loading Company Profile...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-sky-600 mb-4" />
+        <p className="text-sm text-slate-400">Loading company profile...</p>
       </div>
     );
   }
@@ -101,29 +101,30 @@ export const CompanyEditor: React.FC = () => {
     <div className="max-w-3xl mx-auto px-4 py-12">
       <button
         onClick={() => navigate(-1)}
-        className="group flex items-center gap-2 mb-8 font-mono text-xs uppercase tracking-widest hover:translate-x-[-4px] transition-transform"
+        className="flex items-center gap-2 mb-8 text-sm font-medium text-slate-500 hover:text-sky-700 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
 
-      <div className="border-t-4 border-black pt-8 mb-12">
-        <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+      <div className="border-b border-slate-200 pb-8 mb-10">
+        <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest mb-2 block">Employer Profile</span>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
           Company Branding
         </h1>
-        <p className="text-xl font-light text-gray-500 mt-4">
-          Establish your identity. Help candidates understand <span className="text-black font-medium">who you are</span> and <span className="text-black font-medium">why they should join</span>.
+        <p className="text-base text-slate-500 mt-2">
+          Help candidates understand <span className="text-slate-700 font-medium">who you are</span> and <span className="text-slate-700 font-medium">why they should join</span>.
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border-2 border-red-600 p-4 mb-8 font-mono text-sm text-red-600">
-          [ERROR]: {error}
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-sm text-red-600">
+          {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 border-2 border-green-600 p-4 mb-8 font-mono text-sm text-green-600">
-          [SUCCESS]: Profile updated successfully.
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6 text-sm text-emerald-700">
+          Profile updated successfully.
         </div>
       )}
 
@@ -219,7 +220,7 @@ export const CompanyEditor: React.FC = () => {
         <button
           type="submit"
           disabled={saving}
-          className="w-full bg-black text-white py-6 font-black uppercase tracking-[0.2em] text-lg hover:bg-gray-900 disabled:bg-gray-400 transition-colors flex justify-center items-center gap-4 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:translate-x-1 hover:shadow-none"
+          className="w-full bg-sky-700 hover:bg-sky-800 text-white py-3.5 font-semibold text-sm rounded-xl disabled:opacity-50 transition-colors flex justify-center items-center gap-2"
         >
           {saving ? (
             <>

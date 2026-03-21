@@ -21,49 +21,45 @@ export const HeroSection: React.FC = () => {
     };
 
     return (
-        <section className="relative w-full border-b-2 border-black bg-white font-sans text-black">
-            <div className="container mx-auto max-w-7xl px-4 md:px-8 pt-12 md:pt-24 pb-12">
-                <div className="flex flex-col lg:flex-row gap-0 border-2 border-black">
+        <section className="relative w-full bg-gradient-to-br from-sky-50 via-white to-slate-50 font-sans">
+            <div className="container mx-auto max-w-7xl px-4 md:px-8 pt-10 md:pt-20 pb-16">
+                <div className="flex flex-col lg:flex-row gap-6">
 
-                    {/* Left Content — Job Seekers */}
-                    <div className="w-full lg:w-7/12 p-8 md:p-12 lg:p-16 flex flex-col justify-between border-b-2 lg:border-b-0 lg:border-r-2 border-black relative overflow-hidden">
+                    {/* Left Content — Job Seekers (Option 3: Soft UI) */}
+                    <div className="w-full lg:w-7/12 flex flex-col justify-between gap-10">
 
-                        {/* Decorative Grid Background */}
-                        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:24px_24px] opacity-20 -z-10"></div>
-
-                        <div className="flex flex-col gap-8">
-                            <div className="inline-flex items-center gap-2 border border-black px-3 py-1 w-fit bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="flex flex-col gap-7">
+                            <div className="inline-flex items-center gap-2 bg-white border border-sky-200 rounded-full px-4 py-1.5 w-fit shadow-soft">
                                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                <span className="text-xs font-mono font-bold uppercase tracking-widest">Live Platform</span>
+                                <span className="text-xs font-semibold text-sky-700 tracking-wide">Live Platform</span>
                             </div>
 
-                            <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter leading-[0.85] text-black">
-                                India<br />
-                                Employment<br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-500 to-black animate-gradient-x">Hub</span>
+                            <h1 className="text-5xl md:text-7xl font-bold leading-tight text-slate-900">
+                                India's Smartest<br />
+                                <span className="text-sky-700">Job Platform</span>
                             </h1>
 
-                            <p className="text-lg md:text-xl font-medium text-gray-600 max-w-lg leading-relaxed border-l-4 border-black pl-6">
-                                Find your next career move. AI-powered matching connects you to verified opportunities — zero friction, zero ghosting.
+                            <p className="text-lg md:text-xl text-slate-500 max-w-lg leading-relaxed">
+                                AI-powered matching connects you to verified opportunities — zero friction, zero ghosting.
                             </p>
 
                             {/* Search Box */}
-                            <div className="w-full max-w-md mt-4">
-                                <div className="flex border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-transform focus-within:-translate-y-1 focus-within:translate-x-1 focus-within:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="w-full max-w-lg">
+                                <div className="flex bg-white rounded-xl border border-slate-200 shadow-soft-md overflow-hidden focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
                                     <input
                                         type="text"
                                         value={searchTerm}
                                         onChange={(e) => { setSearchTerm(e.target.value); }}
                                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                        placeholder="SEARCH ROLES..."
+                                        placeholder="Search roles, skills, companies..."
                                         aria-label="Search for job roles"
-                                        className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-black placeholder:text-gray-500 font-mono text-sm uppercase tracking-wider"
+                                        className="flex-1 bg-transparent border-none outline-none px-5 py-3.5 text-slate-900 placeholder:text-slate-400 text-sm"
                                     />
                                     <button
                                         onClick={handleSearch}
                                         disabled={isLoading}
                                         aria-label="Search"
-                                        className="bg-black text-white px-6 py-4 hover:bg-[#003366] transition-colors flex items-center justify-center border-l-2 border-black"
+                                        className="bg-sky-700 hover:bg-sky-800 text-white px-5 py-3.5 transition-colors flex items-center justify-center cursor-pointer"
                                     >
                                         <ArrowRight className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
                                     </button>
@@ -72,79 +68,71 @@ export const HeroSection: React.FC = () => {
                         </div>
 
                         {/* Stats Row */}
-                        <div className="mt-16 pt-8 border-t-2 border-black flex flex-wrap gap-8 md:gap-16">
-                            <div>
-                                <p className="text-4xl font-black tabular-nums tracking-tighter">50K+</p>
-                                <p className="text-xs font-mono uppercase tracking-widest text-gray-500 mt-1">Active Talent</p>
-                            </div>
-                            <div>
-                                <p className="text-4xl font-black tabular-nums tracking-tighter">12K+</p>
-                                <p className="text-xs font-mono uppercase tracking-widest text-gray-500 mt-1">Open Roles</p>
-                            </div>
-                            <div>
-                                <p className="text-4xl font-black tabular-nums tracking-tighter">98%</p>
-                                <p className="text-xs font-mono uppercase tracking-widest text-gray-500 mt-1">Match Rate</p>
-                            </div>
+                        <div className="pt-8 border-t border-slate-200 flex flex-wrap gap-8 md:gap-12">
+                            {[
+                                { stat: '50K+', label: 'Active Talent' },
+                                { stat: '12K+', label: 'Open Roles' },
+                                { stat: '98%', label: 'Match Rate' },
+                            ].map(({ stat, label }) => (
+                                <div key={label}>
+                                    <p className="text-3xl font-bold text-slate-900 tabular-nums">{stat}</p>
+                                    <p className="text-xs font-medium text-slate-400 mt-1 tracking-wide">{label}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Right Panel — Employers */}
-                    <div className="w-full lg:w-5/12 bg-gray-100 relative min-h-[500px] lg:min-h-auto flex flex-col">
-                        {/* Top Marquee Strip */}
-                        <div className="bg-[#003366] text-white py-2 overflow-hidden border-b-2 border-black">
+                    {/* Right Panel — Employers (Option 1: Professional SaaS) */}
+                    <div className="w-full lg:w-5/12 relative min-h-[460px] rounded-2xl overflow-hidden shadow-soft-md">
+                        {/* Marquee Strip */}
+                        <div className="bg-sky-700 text-white py-2 overflow-hidden">
                             <div className="flex animate-marquee whitespace-nowrap">
                                 {Array.from({ length: 10 }).map((_, i) => (
-                                    <span key={i} className="mx-4 text-xs font-mono uppercase tracking-widest font-bold flex items-center gap-2">
-                                        <Globe className="w-3 h-3" /> Hiring Globally
+                                    <span key={i} className="mx-4 text-xs font-semibold flex items-center gap-2 tracking-wide">
+                                        <Globe className="w-3 h-3" /> Hiring Across India
                                     </span>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="flex-1 relative overflow-hidden group">
+                        <div className="relative overflow-hidden group h-full min-h-[420px]">
                             <picture>
                                 <source srcSet="/images/hero.webp" type="image/webp" />
                                 <img
                                     src="/images/hero.png"
                                     alt="Professional"
-                                    className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                             </picture>
-
-                            {/* Dark Overlay for Readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent"></div>
 
                             {/* Employer Value Overlay */}
                             <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                                <div className="mb-6">
-                                    <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter leading-none mb-3">
-                                        Hire Smarter.<br />Hire Faster.
-                                    </h2>
-                                    <p className="text-sm font-mono opacity-80 leading-relaxed max-w-sm">
-                                        AI-POWERED TALENT MATCHING. POST JOBS. FIND CANDIDATES. ZERO FRICTION.
-                                    </p>
-                                </div>
+                                <h2 className="text-3xl font-bold leading-tight mb-2">
+                                    Hire Smarter.<br />Hire Faster.
+                                </h2>
+                                <p className="text-sm text-white/70 leading-relaxed max-w-sm mb-5">
+                                    AI-powered talent matching. Post jobs. Find candidates. Zero friction.
+                                </p>
 
-                                {/* Employer Stats */}
-                                <div className="flex gap-6 mb-6 border-t border-white/30 pt-4">
+                                <div className="flex gap-5 mb-6 pt-4 border-t border-white/20">
                                     <div className="flex items-center gap-2">
                                         <Zap className="w-4 h-4 text-emerald-400" />
-                                        <span className="text-xs font-mono font-bold uppercase tracking-wider">40% Faster Hiring</span>
+                                        <span className="text-xs font-semibold text-white/90">40% Faster Hiring</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Target className="w-4 h-4 text-emerald-400" />
-                                        <span className="text-xs font-mono font-bold uppercase tracking-wider">93% Placement</span>
+                                        <span className="text-xs font-semibold text-white/90">93% Placement Rate</span>
                                     </div>
                                 </div>
 
-                                {/* Employer CTA */}
                                 <Link
                                     to="/post-job"
-                                    className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 font-bold uppercase tracking-widest text-sm hover:bg-emerald-400 hover:text-black transition-colors border-2 border-white hover:border-emerald-400 group/cta shadow-[4px_4px_0px_0px_rgba(255,255,255,0.3)]"
+                                    className="inline-flex items-center gap-2 bg-white text-sky-700 hover:bg-sky-50 font-semibold px-6 py-3 rounded-lg transition-colors duration-200 text-sm"
                                 >
-                                    <Users className="w-5 h-5" />
+                                    <Users className="w-4 h-4" />
                                     Post a Job Free
-                                    <ArrowUpRight className="w-4 h-4 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5 transition-transform" />
+                                    <ArrowUpRight className="w-4 h-4" />
                                 </Link>
                             </div>
                         </div>

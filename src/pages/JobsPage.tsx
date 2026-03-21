@@ -127,20 +127,21 @@ export const JobsPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans text-black selection:bg-black selection:text-white">
+        <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
             <Header />
 
             <main className="flex-grow container mx-auto px-4 md:px-8 py-12 max-w-7xl">
-                <div className="flex flex-col gap-16">
+                <div className="flex flex-col gap-10">
 
                     {/* Header / Title Section */}
-                    <div className="flex flex-col gap-6 border-b-2 border-black pb-8">
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase mb-0 leading-none">
+                    <div className="flex flex-col gap-3 border-b border-slate-200 pb-8">
+                        <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">Browse Opportunities</span>
+                        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">
                             Open Positions
                         </h1>
-                        <p className="text-xl md:text-2xl font-light text-gray-500 max-w-2xl leading-relaxed tracking-tight">
-                            Find your next role in our curated list of opportunities. <br />
-                            <span className="text-black font-medium">Powered by semantic search.</span>
+                        <p className="text-base text-slate-500 max-w-2xl leading-relaxed">
+                            Find your next role in our curated list of opportunities.{' '}
+                            <span className="text-slate-700 font-medium">Powered by semantic search.</span>
                         </p>
                     </div>
 
@@ -151,18 +152,16 @@ export const JobsPage: React.FC = () => {
 
                     {/* Search Status / Clear */}
                     {isSearching && (
-                        <div className="flex flex-col md:flex-row md:items-center justify-between border-l-4 border-black pl-6 py-2 gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between border-l-4 border-sky-400 pl-5 py-2 gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
                             <div>
-                                <h2 className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 mb-1">
-                                    Search Results
-                                </h2>
-                                <p className="text-2xl font-bold text-black tracking-tight">
-                                    "{currentSearchQuery}" <span className="text-gray-400 font-normal italic">in context</span>
+                                <h2 className="text-xs font-medium text-slate-400 mb-1">Search Results</h2>
+                                <p className="text-xl font-semibold text-slate-900">
+                                    "{currentSearchQuery}" <span className="text-slate-400 font-normal">in context</span>
                                 </p>
                             </div>
                             <button
                                 onClick={handleClearSearch}
-                                className="group flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-black hover:text-white transition-all duration-200 font-mono text-xs uppercase tracking-widest font-bold"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 rounded-xl transition-all text-sm font-medium"
                             >
                                 <X className="w-4 h-4" />
                                 Clear Filters
@@ -178,32 +177,32 @@ export const JobsPage: React.FC = () => {
                             ))}
                         </div>
                     ) : error ? (
-                        <div className="border-4 border-black p-12 text-center bg-gray-50">
-                            <h3 className="text-3xl font-black text-black uppercase mb-4">System Error</h3>
-                            <p className="font-mono text-gray-500 mb-8">{error}</p>
+                        <div className="bg-white rounded-2xl border border-red-100 p-12 text-center shadow-soft">
+                            <h3 className="text-xl font-semibold text-slate-900 mb-3">Something went wrong</h3>
+                            <p className="text-slate-500 text-sm mb-8">{error}</p>
                             {isSearching && (
                                 <button
                                     onClick={handleClearSearch}
-                                    className="px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                                    className="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm rounded-xl transition-colors"
                                 >
                                     Reset Search
                                 </button>
                             )}
                         </div>
                     ) : displayedJobs.length === 0 ? (
-                        <div className="py-24 border-y-2 border-dashed border-gray-200 text-center">
-                            <h3 className="text-4xl font-black text-gray-300 uppercase tracking-tighter mb-4">
-                                {isSearching ? "0 Matches Found" : "No Active Roles"}
+                        <div className="py-24 text-center">
+                            <h3 className="text-2xl font-semibold text-slate-400 mb-3">
+                                {isSearching ? "No matches found" : "No active roles"}
                             </h3>
-                            <p className="font-mono text-gray-400 uppercase tracking-widest text-sm">
+                            <p className="text-sm text-slate-400">
                                 {isSearching
-                                    ? "Refine your parameters or clear filters."
+                                    ? "Try a different search or clear your filters."
                                     : "Check back later for updates."}
                             </p>
                             {isSearching && (
                                 <button
                                     onClick={handleClearSearch}
-                                    className="mt-8 px-8 py-3 border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors"
+                                    className="mt-6 px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm rounded-xl transition-colors"
                                 >
                                     Clear Search
                                 </button>

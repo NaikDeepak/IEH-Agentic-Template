@@ -70,14 +70,14 @@ export const SeekerDashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black" data-testid="dashboard-skeleton">
+            <div className="min-h-screen bg-sky-50 flex flex-col font-sans" data-testid="dashboard-skeleton">
                 <Header />
                 <main className="flex-grow p-6 md:p-12">
                     <div className="max-w-7xl mx-auto">
                         {/* Skeleton header */}
                         <div className="mb-12">
-                            <div className="h-14 w-64 bg-gray-200 animate-pulse mb-4" />
-                            <div className="h-4 w-48 bg-gray-100 animate-pulse" />
+                            <div className="h-10 w-56 bg-slate-200 animate-pulse rounded-lg mb-3" />
+                            <div className="h-4 w-40 bg-slate-100 animate-pulse rounded" />
                         </div>
                         {/* Skeleton two-column grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -91,7 +91,7 @@ export const SeekerDashboard: React.FC = () => {
                                 <SkeletonDashboardCard />
                                 <div className="space-y-4">
                                     {[0, 1, 2].map(i => (
-                                        <div key={i} className="h-16 bg-gray-100 animate-pulse border-2 border-gray-200" />
+                                        <div key={i} className="h-16 bg-slate-100 animate-pulse rounded-xl" />
                                     ))}
                                 </div>
                             </div>
@@ -108,56 +108,49 @@ export const SeekerDashboard: React.FC = () => {
     const targetRole = profile?.preferences.roles[0] ?? skillGap?.target_role ?? resume?.parsed_data.experience?.[0]?.role ?? "Your Target Role";
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+        <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
             <Header />
 
             <main className="flex-grow p-6 md:p-12">
                 <div className="max-w-7xl mx-auto">
                     {/* Hero Header */}
-                    <header className="mb-12">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <header className="mb-10">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div>
-                                <h1 className="text-6xl font-black uppercase tracking-tighter mb-2 italic">
-                                    Command Center
+                                <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest mb-2 block">Your Dashboard</span>
+                                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                                    Welcome back, {user?.displayName?.split(' ')[0] ?? 'Seeker'}
                                 </h1>
-                                <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
-                                    Welcome back, {user?.displayName?.split(' ')[0] ?? 'Seeker'}.
-                                </p>
+                                <p className="text-sm text-slate-500">Here's your career snapshot for today.</p>
                             </div>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => navigate('/seeker/tracker')}
-                                    className="border-2 border-black p-4 flex items-center gap-6 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all group text-left relative overflow-hidden"
-                                    aria-label={`View ${activeApplications.length} active applications in tracker`}
-                                >
-                                    <div className="bg-black p-2 group-hover:bg-indigo-600 transition-colors">
-                                        <Briefcase className="w-6 h-6 text-white" />
+                            <button
+                                onClick={() => navigate('/seeker/tracker')}
+                                className="bg-white rounded-2xl border border-sky-100 shadow-soft p-5 flex items-center gap-5 hover:shadow-soft-md hover:border-sky-200 transition-all group text-left"
+                                aria-label={`View ${activeApplications.length} active applications in tracker`}
+                            >
+                                <div className="w-12 h-12 bg-sky-100 rounded-xl flex items-center justify-center group-hover:bg-sky-600 transition-colors">
+                                    <Briefcase className="w-6 h-6 text-sky-600 group-hover:text-white transition-colors" />
+                                </div>
+                                <div>
+                                    <div className="flex items-baseline gap-2">
+                                        <div className="text-3xl font-bold text-slate-900 leading-none">{activeApplications.length}</div>
+                                        <div className="text-xs text-slate-400 font-medium">Active Apps</div>
                                     </div>
-                                    <div className="relative z-10">
-                                        <div className="flex items-baseline gap-2">
-                                            <div className="text-4xl font-black leading-none">{activeApplications.length}</div>
-                                            <div className="text-[10px] font-bold uppercase text-gray-400">Active Apps</div>
+                                    <div className="flex gap-4 mt-1.5">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-semibold text-emerald-600">
+                                                {activeApplications.filter(a => a.status === 'interview').length} Interviewing
+                                            </span>
                                         </div>
-                                        <div className="flex gap-4 mt-1">
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] font-black leading-none text-emerald-600 uppercase">
-                                                    {activeApplications.filter(a => a.status === 'interview').length}
-                                                </span>
-                                                <span className="text-[8px] font-bold text-gray-400 uppercase">Interviewing</span>
-                                            </div>
-                                            <div className="flex flex-col border-l border-gray-200 pl-4">
-                                                <span className="text-[10px] font-black leading-none text-indigo-600 uppercase">
-                                                    {activeApplications.filter(a => a.status === 'applied').length}
-                                                </span>
-                                                <span className="text-[8px] font-bold text-gray-400 uppercase">Applied</span>
-                                            </div>
+                                        <div className="flex flex-col border-l border-slate-200 pl-4">
+                                            <span className="text-xs font-semibold text-sky-600">
+                                                {activeApplications.filter(a => a.status === 'applied').length} Applied
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="absolute top-0 right-0 h-full w-1.5 bg-indigo-600 transform translate-x-full group-hover:translate-x-0 transition-transform"></div>
-                                </button>
-                            </div>
+                                </div>
+                            </button>
                         </div>
-                        <div className="h-2 w-32 bg-black mt-8"></div>
                     </header>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -165,7 +158,7 @@ export const SeekerDashboard: React.FC = () => {
                         <div className="lg:col-span-2 space-y-8">
 
                             {/* 1. Daily Shortlist */}
-                            <section className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+                            <section className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
                                 <ShortlistFeed userId={user?.uid ?? ''} />
                             </section>
 
@@ -175,110 +168,105 @@ export const SeekerDashboard: React.FC = () => {
                             </section>
 
                             {/* 3. Professional Identity Card */}
-                            <section className="border-4 border-black p-0 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400 -mr-16 -mt-16 rotate-45 border-b-4 border-black group-hover:bg-emerald-400 transition-colors"></div>
-                                <div className="p-8 relative z-10">
-                                    <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
-                                        <div className="space-y-4">
+                            <section className="bg-white rounded-2xl border border-slate-200 shadow-soft p-8">
+                                <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <h2 className="text-xl font-bold text-slate-900">Professional Identity</h2>
+                                            {profile?.verified_skills && profile.verified_skills.length > 0 && (
+                                                <span className="bg-emerald-100 p-1 rounded-full" title="Verified Profile">
+                                                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="flex flex-col gap-1">
+                                            <p className="text-xs font-medium text-slate-400">Target Role</p>
+                                            <div className="inline-block bg-sky-50 border border-sky-200 text-sky-800 px-4 py-2 text-lg font-semibold rounded-xl">
+                                                {targetRole}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="w-full md:w-auto space-y-3">
+                                        <div className="bg-sky-50 border border-sky-100 rounded-xl p-4">
+                                            <p className="text-xs font-medium text-slate-400 mb-2">Profile Health</p>
                                             <div className="flex items-center gap-3">
-                                                <h2 className="text-3xl font-black uppercase tracking-tighter">Professional Identity</h2>
-                                                {profile?.verified_skills && profile.verified_skills.length > 0 && (
-                                                    <span className="bg-emerald-400 p-1 border-2 border-black" title="Verified Profile">
-                                                        <ShieldCheck className="w-5 h-5 text-black" />
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            <div className="flex flex-col gap-1">
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Target Role</p>
-                                                <div className="inline-block bg-black text-white px-4 py-2 text-2xl font-black uppercase tracking-tight shadow-[4px_4px_0px_0px_rgba(16,185,129,0.5)]">
-                                                    {targetRole}
+                                                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-sky-500 rounded-full transition-all duration-1000"
+                                                        style={{
+                                                            width: `${((profile ? 20 : 0) +
+                                                                (resume ? 20 : 0) +
+                                                                (profile?.bio ? 20 : 0) +
+                                                                ((profile?.skills.length ?? 0) > 0 ? 20 : 0) +
+                                                                (profile?.preferences.roles.length ? 20 : 0))
+                                                                }%`
+                                                        }}
+                                                    />
                                                 </div>
+                                                <span className="font-bold text-sm text-slate-700 tabular-nums">
+                                                    {((profile ? 20 : 0) +
+                                                        (resume ? 20 : 0) +
+                                                        (profile?.bio ? 20 : 0) +
+                                                        ((profile?.skills.length ?? 0) > 0 ? 20 : 0) +
+                                                        (profile?.preferences.roles.length ? 20 : 0))}%
+                                                </span>
                                             </div>
                                         </div>
-
-                                        <div className="w-full md:w-auto text-right space-y-4">
-                                            <div className="inline-block text-left p-4 border-4 border-black bg-yellow-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                                <p className="text-[10px] font-black uppercase tracking-widest mb-1">Profile Health</p>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-32 h-4 bg-white border-2 border-black p-0.5">
-                                                        <div
-                                                            className="h-full bg-black transition-all duration-1000"
-                                                            style={{
-                                                                width: `${((profile ? 20 : 0) +
-                                                                    (resume ? 20 : 0) +
-                                                                    (profile?.bio ? 20 : 0) +
-                                                                    ((profile?.skills.length ?? 0) > 0 ? 20 : 0) +
-                                                                    (profile?.preferences.roles.length ? 20 : 0))
-                                                                    }%`
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <span className="font-black text-lg">
-                                                        {((profile ? 20 : 0) +
-                                                            (resume ? 20 : 0) +
-                                                            (profile?.bio ? 20 : 0) +
-                                                            ((profile?.skills.length ?? 0) > 0 ? 20 : 0) +
-                                                            (profile?.preferences.roles.length ? 20 : 0))}%
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => navigate('/seeker/profile')}
-                                                    className="px-6 py-2 border-4 border-black bg-white hover:bg-black hover:text-white font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none transition-all flex items-center gap-2"
-                                                >
-                                                    <Edit3 className="w-4 h-4" /> Edit Profile
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {/* Bio / Headline */}
-                                        <div className="space-y-4">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Professional Narrative</p>
-                                            <p className="font-bold leading-relaxed border-l-8 border-yellow-400 pl-6 italic bg-gray-50 py-4">
-                                                {profile?.bio ?? "No professional summary added yet. Update your profile to stand out to employers."}
-                                            </p>
-                                        </div>
-
-                                        {/* Top Skills section */}
-                                        <div className="space-y-4">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Core Expertise (Derived from Resume)</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {(profile?.skills ?? resume?.keywords.found ?? []).slice(0, 8).map((skill, i) => (
-                                                    <span key={i} className="bg-white border-2 border-black px-3 py-1.5 text-xs font-black uppercase hover:bg-black hover:text-white transition-colors cursor-default">
-                                                        {skill}
-                                                    </span>
-                                                ))}
-                                                {(profile?.skills.length ?? 0) === 0 && (resume?.keywords.found.length ?? 0) === 0 && (
-                                                    <p className="text-sm font-bold text-gray-400 uppercase italic">No skills identified yet.</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-10 pt-8 border-t-4 border-black flex flex-col md:flex-row justify-between items-center gap-6">
-                                        <div className="flex gap-4">
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-3 h-3 border-2 border-black ${resume ? 'bg-emerald-400' : 'bg-gray-200'}`}></div>
-                                                <span className="text-[10px] font-black uppercase">Resume Linked</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-3 h-3 border-2 border-black ${profile?.skills.length ? 'bg-emerald-400' : 'bg-gray-200'}`}></div>
-                                                <span className="text-[10px] font-black uppercase">Skills Mapped</span>
-                                            </div>
-                                        </div>
-
                                         <button
-                                            onClick={() => navigate('/seeker/skills')}
-                                            className="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white border-4 border-black font-black uppercase tracking-tight shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-3"
+                                            onClick={() => navigate('/seeker/profile')}
+                                            className="w-full px-4 py-2 bg-white border border-slate-200 hover:border-sky-300 hover:bg-sky-50 text-slate-700 hover:text-sky-700 font-medium text-sm rounded-xl transition-all flex items-center justify-center gap-2"
                                         >
-                                            <TrendingUp className="w-5 h-5" />
-                                            Open Gap Analysis
+                                            <Edit3 className="w-4 h-4" /> Edit Profile
                                         </button>
                                     </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Bio / Headline */}
+                                    <div className="space-y-3">
+                                        <p className="text-xs font-medium text-slate-400">Professional Summary</p>
+                                        <p className="text-sm text-slate-600 leading-relaxed border-l-4 border-sky-200 pl-4 italic">
+                                            {profile?.bio ?? "No professional summary added yet. Update your profile to stand out to employers."}
+                                        </p>
+                                    </div>
+
+                                    {/* Top Skills section */}
+                                    <div className="space-y-3">
+                                        <p className="text-xs font-medium text-slate-400">Core Skills</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {(profile?.skills ?? resume?.keywords.found ?? []).slice(0, 8).map((skill, i) => (
+                                                <span key={i} className="bg-sky-50 text-sky-700 border border-sky-100 px-3 py-1 text-xs font-medium rounded-full">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                            {(profile?.skills.length ?? 0) === 0 && (resume?.keywords.found.length ?? 0) === 0 && (
+                                                <p className="text-sm text-slate-400 italic">No skills identified yet.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                                    <div className="flex gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2.5 h-2.5 rounded-full ${resume ? 'bg-emerald-400' : 'bg-slate-200'}`}></div>
+                                            <span className="text-xs text-slate-500">Resume Linked</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-2.5 h-2.5 rounded-full ${profile?.skills.length ? 'bg-emerald-400' : 'bg-slate-200'}`}></div>
+                                            <span className="text-xs text-slate-500">Skills Mapped</span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        onClick={() => navigate('/seeker/skills')}
+                                        className="w-full md:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm rounded-xl transition-colors flex items-center gap-2"
+                                    >
+                                        <TrendingUp className="w-4 h-4" />
+                                        Open Gap Analysis
+                                    </button>
                                 </div>
                             </section>
                         </div>
@@ -287,32 +275,32 @@ export const SeekerDashboard: React.FC = () => {
                         <div className="space-y-8">
 
                             {/* 4. Resume Score Card */}
-                            <section className="border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
-                                <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2">
-                                    <FileText className="w-5 h-5" />
+                            <section className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
+                                <h2 className="text-base font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-sky-600" />
                                     Resume Health
                                 </h2>
                                 {resume ? (
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-20 h-20 rounded-full border-4 border-black flex items-center justify-center bg-yellow-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                            <span className="text-2xl font-black">{Math.round(resume.score)}</span>
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-16 h-16 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl font-bold text-sky-700 tabular-nums">{Math.round(resume.score)}</span>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold uppercase text-gray-500 mb-1">ATS Compatibility</p>
+                                            <p className="text-xs font-medium text-slate-400 mb-1.5">ATS Compatibility Score</p>
                                             <button
                                                 onClick={() => navigate('/seeker/resume')}
-                                                className="text-xs font-black uppercase underline hover:text-indigo-600"
+                                                className="text-xs font-semibold text-sky-600 hover:text-sky-700 underline underline-offset-2"
                                             >
                                                 Improve Resume
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-gray-50 p-4 border-2 border-black border-dashed text-center">
-                                        <p className="text-xs font-bold uppercase text-gray-400 mb-3">No Resume Analyzed</p>
+                                    <div className="bg-slate-50 rounded-xl border border-dashed border-slate-200 p-5 text-center">
+                                        <p className="text-xs font-medium text-slate-400 mb-3">No Resume Analyzed</p>
                                         <button
                                             onClick={() => navigate('/seeker/resume')}
-                                            className="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-widest"
+                                            className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 text-xs font-semibold rounded-lg transition-colors"
                                         >
                                             Upload Now
                                         </button>
@@ -321,8 +309,8 @@ export const SeekerDashboard: React.FC = () => {
                             </section>
 
                             {/* 5. Tool Navigator */}
-                            <section className="space-y-4">
-                                <h2 className="text-xl font-black uppercase tracking-tight mb-4">Quick Tools</h2>
+                            <section className="space-y-3">
+                                <h2 className="text-base font-semibold text-slate-900 mb-4">Quick Tools</h2>
 
                                 <ToolLink
                                     icon={<Gift className="w-5 h-5" />}
@@ -380,17 +368,17 @@ interface ToolLinkProps {
 const ToolLink: React.FC<ToolLinkProps> = ({ icon, title, description, onClick }) => (
     <button
         onClick={onClick}
-        className="w-full flex items-center justify-between p-4 border-2 border-black bg-white hover:bg-black hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none translate-x-[-2px] translate-y-[-2px] hover:translate-x-0 hover:translate-y-0"
+        className="w-full flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-sky-200 hover:shadow-soft transition-all group"
     >
-        <div className="flex items-center gap-4 text-left">
-            <div className="bg-black text-white p-2 group-hover:bg-white group-hover:text-black transition-colors">
+        <div className="flex items-center gap-3 text-left">
+            <div className="w-9 h-9 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600 group-hover:bg-sky-100 transition-colors flex-shrink-0">
                 {icon}
             </div>
             <div>
-                <div className="text-sm font-black uppercase tracking-tight">{title}</div>
-                <div className="text-[10px] font-bold uppercase opacity-60 tracking-wider">{description}</div>
+                <div className="text-sm font-semibold text-slate-900">{title}</div>
+                <div className="text-xs text-slate-400">{description}</div>
             </div>
         </div>
-        <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-sky-500 transition-colors" />
     </button>
 );

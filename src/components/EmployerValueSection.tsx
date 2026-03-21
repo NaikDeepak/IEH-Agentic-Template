@@ -11,18 +11,18 @@ interface ValueCardProps {
 }
 
 const ValueCard: React.FC<ValueCardProps> = ({ icon, title, description, stat, statLabel }) => (
-    <div className="p-8 md:p-12 border-2 border-black bg-white group hover:bg-black hover:text-white transition-colors duration-300">
-        <div className="flex items-start justify-between mb-6">
-            <div className="w-14 h-14 border-2 border-current flex items-center justify-center group-hover:border-white transition-colors">
+    <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-soft hover:shadow-soft-md hover:border-sky-200 transition-all duration-200">
+        <div className="flex items-start justify-between mb-5">
+            <div className="w-12 h-12 bg-sky-50 rounded-lg flex items-center justify-center text-sky-700">
                 {icon}
             </div>
             <div className="text-right">
-                <p className="text-3xl font-black tabular-nums tracking-tighter">{stat}</p>
-                <p className="text-[10px] font-mono font-bold uppercase tracking-widest opacity-60 mt-1">{statLabel}</p>
+                <p className="text-2xl font-bold tabular-nums text-slate-900">{stat}</p>
+                <p className="text-xs font-medium text-slate-400 mt-0.5 tracking-wide">{statLabel}</p>
             </div>
         </div>
-        <h3 className="text-2xl font-black uppercase tracking-tight mb-3">{title}</h3>
-        <p className="text-sm font-mono opacity-70 leading-relaxed uppercase">{description}</p>
+        <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+        <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
     </div>
 );
 
@@ -52,44 +52,44 @@ export const EmployerValueSection: React.FC = () => {
     ];
 
     return (
-        <section className="py-24 px-4 md:px-8 bg-gray-50 font-sans text-black border-b-2 border-black">
+        <section className="py-20 px-4 md:px-8 bg-white font-sans">
             <div className="container mx-auto max-w-7xl">
 
                 {/* Header */}
-                <div className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-black pb-8 gap-8">
+                <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 border border-black px-3 py-1 w-fit bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] mb-6">
-                            <Sparkles className="w-3 h-3" />
-                            <span className="text-xs font-mono font-bold uppercase tracking-widest">For Employers</span>
+                        <div className="inline-flex items-center gap-2 bg-sky-50 border border-sky-200 rounded-full px-3 py-1 w-fit mb-4">
+                            <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+                            <span className="text-xs font-semibold text-sky-700 tracking-wide">For Employers</span>
                         </div>
-                        <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-4 leading-[0.85]">
-                            Why Employers<br />Choose IEH
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
+                            Why Employers Choose IEH
                         </h2>
                     </div>
-                    <p className="text-gray-600 max-w-sm text-sm font-mono uppercase tracking-wide text-right">
+                    <p className="text-slate-500 max-w-sm text-sm leading-relaxed">
                         The tools, talent, and technology to build your dream team.
                     </p>
                 </div>
 
                 {/* Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
                     {cards.map((card) => (
                         <ValueCard key={card.title} {...card} />
                     ))}
                 </div>
 
                 {/* CTA */}
-                <div className="flex flex-col sm:flex-row items-center justify-between bg-black text-white p-8 md:p-12 border-2 border-black">
+                <div className="flex flex-col sm:flex-row items-center justify-between bg-sky-700 text-white p-8 md:p-10 rounded-2xl shadow-soft-md gap-6">
                     <div>
-                        <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-2">Start Hiring Today</h3>
-                        <p className="text-sm font-mono opacity-70 uppercase tracking-wide">Free to post. No credit card required.</p>
+                        <h3 className="text-2xl font-bold mb-1">Start Hiring Today</h3>
+                        <p className="text-sky-200 text-sm">Free to post. No credit card required.</p>
                     </div>
                     <Link
                         to="/register"
-                        className="mt-6 sm:mt-0 inline-flex items-center gap-3 bg-white text-black px-10 py-5 font-bold uppercase tracking-widest text-sm hover:bg-emerald-400 transition-colors border-2 border-white hover:border-emerald-400 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+                        className="inline-flex items-center gap-2 bg-white text-sky-700 hover:bg-sky-50 font-semibold px-8 py-3.5 rounded-xl transition-colors duration-200 text-sm whitespace-nowrap"
                     >
                         Get Started
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
 

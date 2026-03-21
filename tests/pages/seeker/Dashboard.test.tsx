@@ -89,7 +89,7 @@ describe('SeekerDashboard', () => {
         );
 
         await waitFor(() => {
-            expect(screen.getByText('Command Center')).toBeInTheDocument();
+            expect(screen.getByText(/Welcome back, John/i)).toBeInTheDocument();
             expect(screen.getByLabelText(/1 active applications/i)).toBeInTheDocument();
             expect(screen.getByText('Senior Dev')).toBeInTheDocument();
         }, { timeout: 4000 });

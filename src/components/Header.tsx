@@ -34,26 +34,26 @@ export const Header: React.FC = () => {
     }
 
     return (
-        <header className="sticky top-0 z-50 w-full bg-white border-b-2 border-black">
-            <div className="container mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-                    <div className="w-10 h-10 bg-black flex items-center justify-center">
-                        <span className="text-white font-black text-xl tracking-tighter">IEH</span>
+        <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-soft">
+            <div className="container mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
+                <Link to="/" className="flex items-center gap-2.5 cursor-pointer">
+                    <div className="w-9 h-9 bg-sky-700 rounded-lg flex items-center justify-center shadow-sm">
+                        <span className="text-white font-bold text-sm tracking-tight">IEH</span>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-black uppercase tracking-tight leading-none text-lg">India</span>
-                        <span className="text-[10px] text-gray-500 font-mono font-bold uppercase tracking-widest leading-none">Employment Hub</span>
+                    <div className="flex flex-col leading-none">
+                        <span className="font-bold text-slate-900 text-base leading-tight">India</span>
+                        <span className="text-[10px] text-slate-400 font-medium tracking-wide leading-tight">Employment Hub</span>
                     </div>
                 </Link>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-8 mr-8 ml-auto">
+                <nav className="hidden md:flex items-center gap-1 mr-6 ml-auto">
                     {navItems.map((item) => (
                         item.path.startsWith('/') ? (
                             <Link
                                 key={item.label}
                                 to={item.path}
-                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all py-2 px-1"
+                                className="text-sm font-medium text-slate-600 hover:text-sky-700 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors duration-150"
                             >
                                 {item.label}
                             </Link>
@@ -61,7 +61,7 @@ export const Header: React.FC = () => {
                             <a
                                 key={item.label}
                                 href={item.path}
-                                className="text-sm font-mono font-bold text-black uppercase tracking-wider hover:underline decoration-2 underline-offset-4 transition-all py-2 px-1"
+                                className="text-sm font-medium text-slate-600 hover:text-sky-700 hover:bg-sky-50 px-3 py-2 rounded-lg transition-colors duration-150"
                             >
                                 {item.label}
                             </a>
@@ -69,20 +69,20 @@ export const Header: React.FC = () => {
                     ))}
                 </nav>
 
-                <div className="flex items-center gap-4 md:gap-6">
-                    <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-gray-200" />}>
+                <div className="flex items-center gap-3">
+                    <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-slate-100 rounded-lg" />}>
                         <Login variant="navbar" />
                     </Suspense>
 
                     {/* Mobile Menu Toggle */}
                     <button
-                        className="md:hidden p-2 text-black hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-black"
+                        className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                         onClick={() => { setIsMenuOpen((open) => !open); }}
                         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                         aria-expanded={isMenuOpen}
                         aria-controls="mobile-menu"
                     >
-                        {isMenuOpen ? <X aria-hidden="true" className="w-6 h-6" /> : <Menu aria-hidden="true" className="w-6 h-6" />}
+                        {isMenuOpen ? <X aria-hidden="true" className="w-5 h-5" /> : <Menu aria-hidden="true" className="w-5 h-5" />}
                     </button>
                 </div>
             </div>
@@ -91,15 +91,15 @@ export const Header: React.FC = () => {
             {isMenuOpen && (
                 <div
                     id="mobile-menu"
-                    className="md:hidden absolute top-20 left-0 w-full bg-white border-b-2 border-black animate-in fade-in slide-in-from-top-4 duration-200 z-40"
+                    className="md:hidden absolute top-16 left-0 w-full bg-white border-b border-slate-200 shadow-soft-md animate-in fade-in slide-in-from-top-4 duration-200 z-40"
                 >
-                    <nav className="flex flex-col p-6 space-y-4" aria-label="Mobile navigation">
+                    <nav className="flex flex-col p-4 gap-1" aria-label="Mobile navigation">
                         {navItems.map((item) => (
                             item.path.startsWith('/') ? (
                                 <Link
                                     key={item.label}
                                     to={item.path}
-                                    className="text-lg font-black uppercase tracking-tight text-black hover:bg-black hover:text-white px-4 py-3 border-2 border-transparent hover:border-black transition-colors"
+                                    className="text-base font-medium text-slate-700 hover:text-sky-700 hover:bg-sky-50 px-4 py-3 rounded-lg transition-colors"
                                     onClick={() => { setIsMenuOpen(false); }}
                                 >
                                     {item.label}
@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
                                 <a
                                     key={item.label}
                                     href={item.path}
-                                    className="text-lg font-black uppercase tracking-tight text-black hover:bg-black hover:text-white px-4 py-3 border-2 border-transparent hover:border-black transition-colors"
+                                    className="text-base font-medium text-slate-700 hover:text-sky-700 hover:bg-sky-50 px-4 py-3 rounded-lg transition-colors"
                                     onClick={() => { setIsMenuOpen(false); }}
                                 >
                                     {item.label}

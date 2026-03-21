@@ -217,41 +217,42 @@ export const PostJob: React.FC = () => {
     }));
   };
 
-  const inputClasses = "w-full px-4 py-3 border-2 border-black font-mono text-sm focus:outline-none focus:bg-black focus:text-white transition-colors placeholder:text-gray-400";
-  const labelClasses = "text-xs font-black uppercase tracking-widest mb-2 block";
+  const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
+  const labelClasses = "text-xs font-medium text-slate-500 mb-1.5 block";
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans text-black selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header />
 
       <main className="flex-grow container mx-auto px-4 md:px-8 py-12 max-w-3xl">
         <button
           onClick={() => navigate(-1)}
-          className="group flex items-center gap-2 mb-8 font-mono text-xs uppercase tracking-widest hover:translate-x-[-4px] transition-transform"
+          className="flex items-center gap-2 mb-8 text-sm font-medium text-slate-500 hover:text-sky-700 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
 
-        <div className="border-t-4 border-black pt-8 mb-12">
-          <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+        <div className="border-b border-slate-200 pb-8 mb-10">
+          <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest mb-2 block">New Posting</span>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
             Post a Position
           </h1>
-          <p className="text-xl font-light text-gray-500 mt-4">
-            Fill in the details below. Our <span className="text-black font-medium">semantic matching engine</span> will do the rest.
+          <p className="text-base text-slate-500 mt-2">
+            Fill in the details below. Our <span className="text-slate-700 font-medium">semantic matching engine</span> will do the rest.
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border-2 border-red-600 p-4 mb-8 font-mono text-sm text-red-600">
-            [ERROR]: {error}
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-8 text-sm text-red-600">
+            {error}
           </div>
         )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className="flex flex-col gap-12">
           {/* Section 1: The Basics */}
           <div className="space-y-6">
-            <div className="bg-black text-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]">
-              <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.3em] mb-4 block text-gray-500">What's the position?</label>
+            <div className="bg-sky-700 text-white p-8 rounded-2xl">
+              <label htmlFor="title" className="text-xs font-medium text-sky-200 mb-3 block">What's the position?</label>
               <input
                 id="title"
                 required
@@ -259,7 +260,7 @@ export const PostJob: React.FC = () => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. Senior Frontend Engineer"
-                className="w-full bg-transparent border-b-4 border-white text-3xl font-black focus:outline-none placeholder:text-white/20 py-2"
+                className="w-full bg-transparent border-b-2 border-white/30 focus:border-white text-2xl font-bold focus:outline-none placeholder:text-white/30 py-2 transition-colors"
               />
             </div>
           </div>
@@ -325,23 +326,23 @@ export const PostJob: React.FC = () => {
           </div>
 
           {/* AI Generation Action */}
-          <div className="flex flex-col items-center gap-4 py-4 border-y-2 border-dashed border-gray-200">
+          <div className="flex flex-col items-center gap-3 py-6 border-y border-dashed border-slate-200">
             <button
               type="button"
               onClick={() => void handleAiGenerateJd()}
               disabled={generatingJd || !formData.title}
-              className="flex items-center justify-center gap-3 bg-black text-white px-8 py-4 font-black uppercase tracking-widest hover:bg-gray-800 disabled:bg-gray-400 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none w-full md:w-auto"
+              className="flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-800 text-white px-8 py-3 font-semibold rounded-xl disabled:opacity-50 transition-colors w-full md:w-auto text-sm"
             >
               {generatingJd ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Sparkles className="w-5 h-5 text-yellow-400" />
+                <Sparkles className="w-4 h-4" />
               )}
               Generate Description with AI
             </button>
-            <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest text-center flex items-center gap-2">
+            <p className="text-xs text-slate-400 text-center flex items-center gap-2">
               {companyContext.name && (
-                <span className="flex items-center gap-1 text-green-600 font-bold border-r-2 border-gray-200 pr-2">
+                <span className="flex items-center gap-1 text-emerald-600 font-medium border-r border-slate-200 pr-2">
                   <Building2 className="w-3 h-3" /> {companyContext.name} Branding Applied
                 </span>
               )}
@@ -356,7 +357,7 @@ export const PostJob: React.FC = () => {
                 <div className="flex justify-between items-center mb-2">
                   <label htmlFor="description" className={labelClasses}>Job Description</label>
                   {formData.description && (
-                    <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">AI Generated • Editable</span>
+                    <span className="text-xs text-slate-400">AI Generated · Editable</span>
                   )}
                 </div>
                 <textarea
@@ -375,7 +376,7 @@ export const PostJob: React.FC = () => {
                   type="button"
                   onClick={() => void handleAiReviewDraft()}
                   disabled={generatingAssist || !formData.description}
-                  className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] bg-white text-black px-6 py-3 hover:bg-gray-50 disabled:bg-gray-100 transition-all border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                  className="flex items-center gap-2 text-xs font-medium bg-white text-slate-700 px-5 py-2.5 hover:bg-slate-50 disabled:opacity-50 transition-colors border border-slate-200 rounded-lg"
                 >
                   {generatingAssist ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -389,14 +390,14 @@ export const PostJob: React.FC = () => {
 
             {/* Suggestions (Visible if generated) */}
             {suggestions.length > 0 && (
-              <div className="border-2 border-black p-6 bg-yellow-50 relative">
-                <div className="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                  <Lightbulb className="w-3 h-3" /> AI Optimization Tips
+              <div className="bg-sky-50 border border-sky-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 text-sky-700 font-semibold text-sm mb-3">
+                  <Lightbulb className="w-4 h-4" /> AI Optimization Tips
                 </div>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {suggestions.map((s, i) => (
-                    <li key={i} className="text-xs font-mono flex gap-2 items-start">
-                      <span className="text-black font-bold">›</span> {s}
+                    <li key={i} className="text-xs text-slate-600 flex gap-2 items-start">
+                      <span className="text-sky-500 font-bold mt-0.5">›</span> {s}
                     </li>
                   ))}
                 </ul>
@@ -406,48 +407,46 @@ export const PostJob: React.FC = () => {
 
           {/* Section 3: Screening & Quality */}
           <div className="space-y-8">
-            <div className="border-4 border-black p-8 bg-gray-50 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                <div>
-                  <h2 className="text-2xl font-black uppercase tracking-tighter">Application Screening</h2>
-                  <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest mt-1">
-                    Questions generated by AI based on your description. Add or remove as needed.
-                  </p>
-                </div>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-8">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-slate-900">Application Screening</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Questions generated by AI based on your description. Add or remove as needed.
+                </p>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {screeningQuestions.map((q, index) => (
-                  <div key={index} className="bg-white border-2 border-black p-6 relative group">
+                  <div key={index} className="bg-slate-50 rounded-xl border border-slate-200 p-5 relative">
                     <button
                       type="button"
                       onClick={() => { removeQuestion(index); }}
-                      className="absolute -top-3 -right-3 bg-red-600 text-white p-2 border-2 border-black hover:bg-red-700 transition-colors"
+                      className="absolute top-4 right-4 bg-red-50 hover:bg-red-100 text-red-500 p-1.5 rounded-lg transition-colors"
                       aria-label="Remove question"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-3 pr-10">
                       <div>
-                        <label htmlFor={`q-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 block">Question {index + 1}</label>
+                        <label htmlFor={`q-${index}`} className="text-xs font-medium text-slate-500 mb-1.5 block">Question {index + 1}</label>
                         <input
                           id={`q-${index}`}
                           value={q.question}
                           onChange={(e) => { handleQuestionChange(index, 'question', e.target.value); }}
                           placeholder="e.g. How many years of experience do you have with React?"
-                          className={`${inputClasses} py-2`}
+                          className={inputClasses}
                         />
                       </div>
                       <div>
-                        <label htmlFor={`h-${index}`} className="text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-1">
-                          <Info className="w-3 h-3" /> Hint (Optional guidance for candidate)
+                        <label htmlFor={`h-${index}`} className="text-xs font-medium text-slate-400 mb-1.5 flex items-center gap-1">
+                          <Info className="w-3 h-3" /> Hint (Optional)
                         </label>
                         <input
                           id={`h-${index}`}
                           value={q.hint}
                           onChange={(e) => { handleQuestionChange(index, 'hint', e.target.value); }}
                           placeholder="e.g. Please mention specific projects or length of time."
-                          className={`${inputClasses} py-2 text-xs opacity-70`}
+                          className={inputClasses}
                         />
                       </div>
                     </div>
@@ -457,7 +456,7 @@ export const PostJob: React.FC = () => {
                 <button
                   type="button"
                   onClick={addQuestion}
-                  className="w-full border-2 border-dashed border-black py-4 flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                  className="w-full border border-dashed border-slate-200 rounded-xl py-3.5 flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-sky-600 hover:border-sky-200 hover:bg-sky-50 transition-colors"
                 >
                   <Plus className="w-4 h-4" /> Add Question Manually
                 </button>
@@ -466,13 +465,13 @@ export const PostJob: React.FC = () => {
           </div>
 
           {/* Section 3: Compensation & Contact */}
-          <div className="space-y-8">
-            <div className="border-b-2 border-black pb-2">
-              <h2 className="text-sm font-black uppercase tracking-[0.3em]">3. Compensation & Contact</h2>
+          <div className="space-y-6">
+            <div className="border-b border-slate-200 pb-2">
+              <h2 className="text-sm font-semibold text-slate-700">Compensation & Contact</h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
-              <div className="border-2 border-black p-6">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="bg-slate-50 rounded-xl border border-slate-200 p-5">
                 <h3 className={labelClasses}>Salary Range</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <input
@@ -517,14 +516,14 @@ export const PostJob: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-8">
-            <div className="border-b-2 border-black pb-2 mb-8">
-              <h2 className="text-sm font-black uppercase tracking-[0.3em]">4. About the Company</h2>
+          <div className="pt-4">
+            <div className="border-b border-slate-200 pb-2 mb-6">
+              <h2 className="text-sm font-semibold text-slate-700">About the Company</h2>
             </div>
             <div>
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex justify-between items-center mb-1.5">
                 <label htmlFor="company_bio" className={labelClasses}>Company Description</label>
-                <div className="flex items-center gap-1 text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                <div className="flex items-center gap-1 text-xs text-slate-400">
                   <Building2 className="w-3 h-3" /> Pre-filled from profile
                 </div>
               </div>
@@ -544,11 +543,11 @@ export const PostJob: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-black text-white py-8 font-black uppercase tracking-[0.3em] text-xl hover:bg-gray-900 disabled:bg-gray-400 transition-all shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 active:shadow-none active:translate-x-0 active:translate-y-0 flex justify-center items-center gap-4"
+              className="w-full bg-sky-700 hover:bg-sky-800 text-white py-4 font-semibold text-base rounded-xl disabled:opacity-50 transition-colors flex justify-center items-center gap-3"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Publishing...
                 </>
               ) : (

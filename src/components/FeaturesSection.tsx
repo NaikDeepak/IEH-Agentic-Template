@@ -13,29 +13,24 @@ interface ServiceCardProps {
 const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className = "", dark = false }) => {
     return (
         <motion.button
-            whileHover={{ y: -5 }}
-            className={`relative overflow-hidden p-8 h-auto min-h-[400px] flex flex-col justify-between group text-left w-full border-2 border-black outline-none transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${className} ${dark ? 'text-white' : 'text-black'}`}
+            whileHover={{ y: -4 }}
+            className={`relative overflow-hidden p-7 h-auto min-h-[360px] flex flex-col justify-between group text-left w-full rounded-2xl outline-none transition-all shadow-soft hover:shadow-soft-md ${className} ${dark ? 'text-white' : 'text-white'}`}
             aria-label={`View jobs for ${title}`}
         >
             {/* Background Image */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden">
                 <picture>
                     <source srcSet={image.replace('.png', '.webp')} type="image/webp" />
-                    <img src={image} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale group-hover:grayscale-0" />
+                    <img src={image} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 </picture>
-                <div className={`absolute inset-0 ${dark ? 'bg-black/70 group-hover:bg-black/50' : 'bg-white/80 group-hover:bg-white/60'} transition-colors duration-500`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/40 to-transparent transition-colors duration-500" />
             </div>
 
             {/* Content */}
             <div className="relative z-10 w-full">
-                <div className="flex justify-between items-start w-full border-b-2 border-current pb-4 mb-4">
-                    <h3 className="text-3xl font-black uppercase tracking-tighter leading-none">{title}</h3>
-                    <ArrowUpRight className="w-6 h-6 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </div>
-
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                     {tags.map((tag, i) => (
-                        <span key={i} className={`text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-1 border ${dark ? 'border-white text-white' : 'border-black text-black'}`}>
+                        <span key={i} className="text-[10px] font-semibold px-2.5 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white tracking-wide">
                             {tag}
                         </span>
                     ))}
@@ -43,7 +38,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
             </div>
 
             <div className="relative z-10">
-                <span className="text-xs font-mono font-bold uppercase tracking-widest border-b border-current pb-0.5 group-hover:pb-1 transition-all">Explore Roles</span>
+                <div className="flex justify-between items-end">
+                    <h3 className="text-2xl font-bold leading-tight text-white">{title}</h3>
+                    <ArrowUpRight className="w-5 h-5 text-white/70 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                </div>
+                <span className="text-xs text-white/60 group-hover:text-white/90 transition-colors mt-2 block">Explore Roles</span>
             </div>
         </motion.button>
     );
@@ -51,95 +50,72 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ title, image, tags, className
 
 export const FeaturesSection: React.FC = () => {
     return (
-        <section className="py-24 px-4 md:px-8 bg-white font-sans text-black border-b-2 border-black">
+        <section className="py-20 px-4 md:px-8 bg-slate-50 font-sans">
             <div className="container mx-auto max-w-7xl">
 
                 {/* Header */}
-                <div className="mb-16 flex flex-col md:flex-row justify-between items-end border-b-2 border-black pb-8 gap-8">
+                <div className="mb-10 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div>
-                        <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-4 leading-[0.85]">
-                            Trending<br />Sectors
-                        </h2>
+                        <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest mb-3 block">Explore Sectors</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Trending Sectors</h2>
                     </div>
-                    <p className="text-gray-600 max-w-md text-sm font-mono uppercase tracking-wide text-right md:text-left">
-                        Verified opportunities from 12K+ employers across India. Specializing in IT & digital services.
+                    <p className="text-slate-500 max-w-md text-sm leading-relaxed">
+                        Verified opportunities from 12K+ employers across India. Specialising in IT & digital services.
                     </p>
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-0 border-2 border-black bg-black">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <ServiceCard
+                        title="Software Engineering"
+                        image="/images/sector_software.png"
+                        tags={['Frontend', 'Backend', 'Systems']}
+                    />
+                    <ServiceCard
+                        title="Cloud & DevOps"
+                        image="/images/sector_cloud.png"
+                        tags={['Infrastructure', 'AWS', 'Security']}
+                        dark
+                    />
+                    <ServiceCard
+                        title="Data Science & AI"
+                        image="/images/sector_data_ai.png"
+                        tags={['MLOps', 'Big Data', 'Analytics']}
+                    />
+                </div>
 
-                    {/* Software Engineering */}
-                    <div className="md:col-span-4">
-                        <ServiceCard
-                            title="Software Engineering"
-                            image="/images/sector_software.png"
-                            tags={['Frontend', 'Backend', 'Systems']}
-                            className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white"
-                        />
-                    </div>
-
-                    {/* Cloud & DevOps */}
-                    <div className="md:col-span-4">
-                        <ServiceCard
-                            title="Cloud & DevOps"
-                            image="/images/sector_cloud.png"
-                            tags={['Infrastructure', 'AWS', 'Security']}
-                            className="h-full border-0 border-b-2 md:border-b-0 md:border-r-2 border-black bg-black"
-                            dark
-                        />
-                    </div>
-
-                    {/* Data Science & AI */}
-                    <div className="md:col-span-4">
-                        <ServiceCard
-                            title="Data Science & AI"
-                            image="/images/sector_data_ai.png"
-                            tags={['MLOps', 'Big Data', 'Analytics']}
-                            className="h-full border-0 bg-white"
-                        />
-                    </div>
-
-                    {/* ITES & Business Operations (Wide Card) */}
-                    <div className="md:col-span-12 border-t-2 border-black">
-                        <div className="relative min-h-[400px] md:h-[500px] w-full overflow-hidden group bg-gray-100 flex flex-col md:flex-row">
-                            <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-between border-b-2 md:border-b-0 md:border-r-2 border-black bg-white z-10">
-                                <div>
-                                    <h3 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-6">ITES & Business<br />Operations</h3>
-                                    <div className="flex flex-wrap gap-3">
-                                        {['Customer Success', 'Tech Support', 'Global Ops', 'BPO', 'Management'].map((tag, i) => (
-                                            <span key={i} className="text-xs font-mono font-bold uppercase tracking-wider px-3 py-1.5 border-2 border-black bg-transparent hover:bg-black hover:text-white transition-colors cursor-default">
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <button className="flex items-center gap-4 text-lg font-bold uppercase tracking-wide group-hover:translate-x-2 transition-transform w-fit">
-                                    View 450+ Openings <ArrowRight className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <div className="w-full md:w-1/2 relative overflow-hidden">
-                                <picture>
-                                    <source srcSet="/images/sector_ites.webp" type="image/webp" />
-                                    <img src="/images/sector_ites.png" alt="ITES & Business Operations" loading="lazy" className="absolute inset-0 w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700" />
-                                </picture>
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                {/* Wide ITES Card */}
+                <div className="mt-5 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-soft group flex flex-col md:flex-row min-h-[320px]">
+                    <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between">
+                        <div>
+                            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-5">ITES & Business Operations</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {['Customer Success', 'Tech Support', 'Global Ops', 'BPO', 'Management'].map((tag, i) => (
+                                    <span key={i} className="text-xs font-semibold px-3 py-1.5 bg-slate-100 text-slate-600 rounded-full hover:bg-sky-100 hover:text-sky-700 transition-colors cursor-default">
+                                        {tag}
+                                    </span>
+                                ))}
                             </div>
                         </div>
+                        <button className="inline-flex items-center gap-2 text-sky-700 hover:text-sky-800 font-semibold text-sm mt-6 transition-colors cursor-pointer">
+                            View 450+ Openings <ArrowRight className="w-4 h-4" />
+                        </button>
                     </div>
-
+                    <div className="w-full md:w-1/2 relative overflow-hidden min-h-[200px]">
+                        <picture>
+                            <source srcSet="/images/sector_ites.webp" type="image/webp" />
+                            <img src="/images/sector_ites.png" alt="ITES & Business Operations" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        </picture>
+                        <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/10 transition-colors"></div>
+                    </div>
                 </div>
 
                 {/* Employer CTA */}
-                <div className="mt-8 flex items-center justify-between border-2 border-black p-6 bg-gray-50">
-                    <p className="text-sm font-mono font-bold uppercase tracking-wider text-gray-600">
+                <div className="mt-6 flex items-center justify-between bg-white rounded-xl border border-slate-200 p-5 shadow-soft">
+                    <p className="text-sm text-slate-500">
                         Can't find your industry? Reach talent across all sectors.
                     </p>
-                    <a
-                        href="/post-job"
-                        className="hidden md:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4"
-                    >
+                    <a href="/post-job" className="hidden md:inline-flex items-center gap-1.5 text-sm font-semibold text-sky-700 hover:text-sky-800 transition-colors">
                         Post a Job <ArrowUpRight className="w-4 h-4" />
                     </a>
                 </div>

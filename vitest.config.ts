@@ -8,6 +8,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
     plugins: [react(), tailwindcss()],
+    define: {
+        __APP_VERSION__: JSON.stringify('test'),
+    },
     test: {
         globals: true,
         environment: 'jsdom',

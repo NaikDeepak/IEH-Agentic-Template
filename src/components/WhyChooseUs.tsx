@@ -7,16 +7,6 @@ interface BenefitProps {
     description: string;
 }
 
-const Benefit: React.FC<BenefitProps> = ({ icon, title, description }) => (
-    <div className="group border border-white/20 p-6 hover:bg-white hover:text-black transition-colors duration-300">
-        <div className="flex items-start justify-between mb-4">
-            <h3 className="text-xl font-bold uppercase tracking-tight">{title}</h3>
-            {icon}
-        </div>
-        <p className="text-sm font-mono opacity-70 leading-relaxed uppercase">{description}</p>
-    </div>
-);
-
 export const WhyChooseUs: React.FC = () => {
 
     const seekerBenefits: BenefitProps[] = [
@@ -56,67 +46,68 @@ export const WhyChooseUs: React.FC = () => {
     ];
 
     return (
-        <section className="py-24 px-4 md:px-8 bg-black text-white font-sans">
+        <section className="py-20 px-4 md:px-8 bg-slate-900 text-white font-sans">
             <div className="container mx-auto max-w-7xl">
                 <div className="flex flex-col gap-16">
 
                     {/* Header */}
-                    <div className="border-l-4 border-white pl-8">
-                        <span className="text-sm font-mono font-bold text-gray-400 uppercase tracking-widest mb-2 block">Our Mission</span>
-                        <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
-                            Built for <br /> Ambition.
-                        </h2>
-                        <p className="text-xl text-gray-400 font-light leading-relaxed max-w-lg">
+                    <div className="max-w-2xl">
+                        <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest mb-3 block">Our Mission</span>
+                        <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-4">Built for Ambition.</h2>
+                        <p className="text-lg text-slate-400 leading-relaxed">
                             We've dismantled the traditional hiring chaos. No ghosting. No black boxes. Just verified opportunities and direct connections.
                         </p>
                     </div>
 
                     {/* Dual-Column Benefits */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border-2 border-white">
-
-                        {/* Seekers Column */}
-                        <div className="border-b-2 lg:border-b-0 lg:border-r-2 border-white">
-                            <div className="p-6 border-b border-white/20 flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-emerald-400" />
-                                <h3 className="font-bold uppercase tracking-widest text-sm">For Job Seekers</h3>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="bg-slate-800 rounded-2xl p-8">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700">
+                                <FileText className="w-5 h-5 text-sky-400" />
+                                <h3 className="font-semibold text-slate-200 text-sm tracking-wide">For Job Seekers</h3>
                             </div>
-                            <div className="flex flex-col">
-                                {seekerBenefits.map((benefit, i) => (
-                                    <div key={benefit.title} className={i < seekerBenefits.length - 1 ? 'border-b border-white/10' : ''}>
-                                        <Benefit {...benefit} />
+                            <div className="flex flex-col gap-5">
+                                {seekerBenefits.map((benefit) => (
+                                    <div key={benefit.title} className="flex gap-4">
+                                        <div className="w-9 h-9 bg-sky-700/30 rounded-lg flex items-center justify-center flex-shrink-0 text-sky-400">{benefit.icon}</div>
+                                        <div>
+                                            <h4 className="font-semibold text-white mb-1">{benefit.title}</h4>
+                                            <p className="text-sm text-slate-400 leading-relaxed">{benefit.description}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-
-                        {/* Employers Column */}
-                        <div>
-                            <div className="p-6 border-b border-white/20 flex items-center gap-3">
-                                <Sparkles className="w-5 h-5 text-emerald-400" />
-                                <h3 className="font-bold uppercase tracking-widest text-sm">For Employers</h3>
+                        <div className="bg-slate-800 rounded-2xl p-8">
+                            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700">
+                                <Sparkles className="w-5 h-5 text-sky-400" />
+                                <h3 className="font-semibold text-slate-200 text-sm tracking-wide">For Employers</h3>
                             </div>
-                            <div className="flex flex-col">
-                                {employerBenefits.map((benefit, i) => (
-                                    <div key={benefit.title} className={i < employerBenefits.length - 1 ? 'border-b border-white/10' : ''}>
-                                        <Benefit {...benefit} />
+                            <div className="flex flex-col gap-5">
+                                {employerBenefits.map((benefit) => (
+                                    <div key={benefit.title} className="flex gap-4">
+                                        <div className="w-9 h-9 bg-sky-700/30 rounded-lg flex items-center justify-center flex-shrink-0 text-sky-400">{benefit.icon}</div>
+                                        <div>
+                                            <h4 className="font-semibold text-white mb-1">{benefit.title}</h4>
+                                            <p className="text-sm text-slate-400 leading-relaxed">{benefit.description}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-
                     </div>
 
                     {/* Stats Bar */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-2 border-white">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
                             { stat: '93%', label: 'Placement Rate' },
                             { stat: '14d', label: 'Avg. Time to Hire' },
                             { stat: '85%', label: 'Interview in 7 Days' },
                             { stat: '50K+', label: 'Active Professionals' },
-                        ].map((item, i) => (
-                            <div key={item.label} className={`p-8 text-center ${i < 3 ? 'border-b md:border-b-0 md:border-r border-white/20' : ''}`}>
-                                <p className="text-4xl font-black tabular-nums tracking-tighter">{item.stat}</p>
-                                <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-400 mt-2">{item.label}</p>
+                        ].map((item) => (
+                            <div key={item.label} className="bg-slate-800 rounded-xl p-6 text-center">
+                                <p className="text-3xl font-bold tabular-nums text-white">{item.stat}</p>
+                                <p className="text-xs font-medium text-slate-400 mt-2 tracking-wide">{item.label}</p>
                             </div>
                         ))}
                     </div>

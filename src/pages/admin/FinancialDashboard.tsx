@@ -75,7 +75,7 @@ const FinancialDashboard: React.FC = () => {
     };
 
     return (
-        <div className={`min-h-screen bg-white transition-colors duration-700 ${isPitchMode ? 'p-12' : 'p-8'} font-sans text-black relative`}>
+        <div className={`min-h-screen bg-slate-50 transition-colors duration-700 ${isPitchMode ? 'p-12' : 'p-8'} font-sans relative`}>
 
             {/* Exit Pitch Mode Button */}
             <AnimatePresence>
@@ -85,7 +85,7 @@ const FinancialDashboard: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => { setIsPitchMode(false); }}
-                        className="fixed top-8 right-8 z-50 flex items-center gap-2 px-6 py-3 bg-black text-white font-black uppercase tracking-widest text-xs shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] hover:bg-gray-900 transition-all"
+                        className="fixed top-8 right-8 z-50 flex items-center gap-2 px-5 py-2.5 bg-sky-700 text-white font-semibold text-sm rounded-xl hover:bg-sky-800 transition-colors shadow-soft-md"
                     >
                         <X size={16} /> Exit Pitch Mode
                     </motion.button>
@@ -95,14 +95,14 @@ const FinancialDashboard: React.FC = () => {
             {/* Header Section */}
             <motion.div
                 layout
-                className={`max-w-7xl mx-auto mb-16 border-b-4 border-black pb-8 ${isPitchMode ? 'text-center' : ''}`}
+                className={`max-w-7xl mx-auto mb-12 border-b border-slate-200 pb-8 ${isPitchMode ? 'text-center' : ''}`}
             >
                 <div className={`flex flex-col ${isPitchMode ? 'items-center' : 'md:flex-row justify-between items-end'} gap-6`}>
                     <div>
-                        <motion.h1 layout className={`${isPitchMode ? 'text-8xl' : 'text-6xl'} font-black uppercase tracking-tighter leading-none mb-3 transition-all`}>
+                        <motion.h1 layout className={`${isPitchMode ? 'text-7xl' : 'text-4xl'} font-bold text-slate-900 leading-tight mb-2 transition-all`}>
                             {isPitchMode ? "Scalability" : "Seed Economics"}
                         </motion.h1>
-                        <p className="font-mono text-xs font-bold uppercase tracking-widest text-gray-500">
+                        <p className="text-xs font-medium text-slate-400">
                             IEH // Startup Unit Economics
                         </p>
                     </div>
@@ -110,15 +110,15 @@ const FinancialDashboard: React.FC = () => {
                         <div className="flex gap-4">
                             <button
                                 onClick={handleExport}
-                                className="flex items-center gap-2 px-8 py-4 border-2 border-black font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 text-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 border border-slate-200 bg-white font-semibold hover:bg-slate-50 transition-colors rounded-xl text-sm text-slate-700"
                             >
-                                <Download size={18} /> Export CSV
+                                <Download size={16} /> Export CSV
                             </button>
                             <button
                                 onClick={() => { setIsPitchMode(true); }}
-                                className="flex items-center gap-2 px-8 py-4 bg-black text-white border-2 border-black font-black uppercase tracking-widest hover:bg-gray-900 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 text-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-sky-700 hover:bg-sky-800 text-white font-semibold transition-colors rounded-xl text-sm"
                             >
-                                <Play size={18} fill="white" /> Pitch Mode
+                                <Play size={16} fill="white" /> Pitch Mode
                             </button>
                         </div>
                     )}
@@ -179,14 +179,14 @@ const FinancialDashboard: React.FC = () => {
                                         min={0} max={50}
                                         unit="%"
                                     />
-                                    <div className="pt-4 border-t-2 border-black/5 flex justify-between gap-4">
-                                        <div className="flex-1 p-3 bg-gray-50 border-2 border-black">
-                                            <div className="text-[10px] font-mono font-black border-b border-black/10 mb-1">PRO</div>
-                                            <div className="text-xl font-black">{Math.round(stats.revenue.counts.pro)}</div>
+                                    <div className="pt-4 border-t border-slate-100 flex justify-between gap-3">
+                                        <div className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                                            <div className="text-[10px] font-medium text-slate-400 border-b border-slate-200 pb-1 mb-1">PRO</div>
+                                            <div className="text-xl font-bold text-slate-900 tabular-nums">{Math.round(stats.revenue.counts.pro)}</div>
                                         </div>
-                                        <div className="flex-1 p-3 bg-black text-white border-2 border-black">
-                                            <div className="text-[10px] font-mono font-black border-b border-white/20 mb-1 text-gray-400">ENT</div>
-                                            <div className="text-xl font-black">{Math.round(stats.revenue.counts.enterprise)}</div>
+                                        <div className="flex-1 p-3 bg-sky-700 text-white border border-sky-600 rounded-lg">
+                                            <div className="text-[10px] font-medium text-sky-300 border-b border-sky-600 pb-1 mb-1">ENT</div>
+                                            <div className="text-xl font-bold tabular-nums">{Math.round(stats.revenue.counts.enterprise)}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -249,18 +249,18 @@ const FinancialDashboard: React.FC = () => {
                     {/* Chart Card */}
                     <motion.div
                         layout
-                        className="border-4 border-black p-10 bg-white shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden"
+                        className="bg-white border border-slate-200 rounded-2xl shadow-soft p-8 relative overflow-hidden"
                     >
                         <div className="flex items-center justify-between mb-10">
-                            <h3 className="text-3xl font-black uppercase tracking-tighter flex items-center gap-4">
-                                <span className="w-5 h-5 bg-black"></span>
+                            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-3">
+                                <span className="w-3 h-3 bg-sky-600 rounded-full"></span>
                                 Capital Allocation
                             </h3>
-                            <span className="font-mono text-xs font-black uppercase tracking-[0.2em] bg-black text-white px-4 py-1.5">Simulation Data</span>
+                            <span className="text-xs font-medium bg-sky-100 text-sky-700 px-3 py-1 rounded-full">Simulation Data</span>
                         </div>
 
                         <div className="py-6">
-                            <div className="flex h-20 border-4 border-black mb-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+                            <div className="flex h-16 border border-slate-200 rounded-xl mb-10 overflow-hidden shadow-soft">
                                 <BarPart value={stats.burn.human} total={stats.burn.total} color="bg-gray-100" label="Humans" breakdown={stats.breakdown.human} />
                                 <BarPart value={stats.burn.tools} total={stats.burn.total} color="bg-gray-200" label="Tools" breakdown={stats.breakdown.tools} />
                                 <BarPart value={stats.burn.api} total={stats.burn.total} color="bg-gray-400" label="APIs" breakdown={stats.breakdown.api} />
@@ -270,20 +270,20 @@ const FinancialDashboard: React.FC = () => {
 
                             <div className={`grid grid-cols-1 ${isPitchMode ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-12 text-sm`}>
                                 <div className="space-y-6">
-                                    <h4 className="text-black font-black uppercase tracking-widest text-xs border-b-2 border-black pb-2">Human Capital</h4>
+                                    <h4 className="text-slate-700 font-semibold text-xs border-b border-slate-200 pb-2">Human Capital</h4>
                                     <CostItem label="Engineering (Partner)" value={stats.burn.human} />
                                     <CostItem label="Product Infrastructure" value={stats.burn.infra} />
                                 </div>
                                 <div className="space-y-6">
-                                    <h4 className="text-black font-black uppercase tracking-widest text-xs border-b-2 border-black pb-2">AI Efficiency</h4>
+                                    <h4 className="text-slate-700 font-semibold text-xs border-b border-slate-200 pb-2">AI Efficiency</h4>
                                     <CostItem label="Gemini Scaling Cost" value={stats.burn.api} />
                                     <CostItem label="Growth & Marketing" value={stats.burn.ops} />
                                 </div>
                                 {isPitchMode && (
                                     <div className="space-y-6">
-                                        <h4 className="text-black font-black uppercase tracking-widest text-xs border-b-2 border-black pb-2">Projected ROI</h4>
+                                        <h4 className="text-slate-700 font-semibold text-xs border-b border-slate-200 pb-2">Projected ROI</h4>
                                         <CostItem label="Total Monthly Revenue" value={stats.revenue.total} />
-                                        <div className="p-4 bg-gray-50 border-2 border-black italic font-mono text-xs">
+                                        <div className="p-4 bg-sky-50 border border-sky-100 rounded-lg text-xs italic font-mono text-slate-500">
                                             ~{Math.round((stats.profit / stats.burn.total) * 100)}% Monthly Margin
                                         </div>
                                     </div>
@@ -295,15 +295,15 @@ const FinancialDashboard: React.FC = () => {
                     {/* Simulation Note */}
                     <motion.div
                         layout
-                        className={`bg-black text-white p-12 border-4 border-black relative overflow-hidden transition-all ${isPitchMode ? 'text-center' : ''}`}
+                        className={`bg-sky-700 text-white p-10 rounded-2xl relative overflow-hidden transition-all ${isPitchMode ? 'text-center' : ''}`}
                     >
                         <div className="absolute top-0 right-0 p-8 opacity-5">
                             <Building2 size={240} strokeWidth={0.5} />
                         </div>
-                        <h3 className={`${isPitchMode ? 'text-5xl mb-8' : 'text-3xl mb-4'} font-black uppercase tracking-tighter relative z-10 italic`}>
+                        <h3 className={`${isPitchMode ? 'text-5xl mb-8' : 'text-2xl mb-3'} font-bold relative z-10`}>
                             The AI-Native Advantage
                         </h3>
-                        <p className={`font-mono ${isPitchMode ? 'text-lg max-w-4xl mx-auto' : 'text-sm max-w-2xl'} tracking-tight text-gray-400 leading-relaxed relative z-10`}>
+                        <p className={`${isPitchMode ? 'text-lg max-w-4xl mx-auto' : 'text-sm max-w-2xl'} text-sky-200 leading-relaxed relative z-10`}>
                             While legacy competitors scale burn rate linearly with headcount, IEH scales revenue exponentially with token efficiency.
                             Our "Agent-First" workforce model ensures high-velocity feature deployment with ultra-low CapEx overhead.
                         </p>
@@ -312,7 +312,7 @@ const FinancialDashboard: React.FC = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="mt-12 flex justify-center gap-16 border-t-2 border-white/10 pt-12"
+                                className="mt-10 flex justify-center gap-16 border-t border-white/20 pt-10"
                             >
                                 <Metric value="88%" label="Gross Margin" />
                                 <Metric value="10:1" label="Rev/Dev Ratio" />
@@ -329,19 +329,19 @@ const FinancialDashboard: React.FC = () => {
 // Sub-components
 const Metric = ({ value, label }: { value: string; label: string }) => (
     <div className="text-center">
-        <div className="text-6xl font-black italic tracking-tighter text-white mb-2">{value}</div>
-        <div className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</div>
+        <div className="text-5xl font-bold text-white mb-1 tabular-nums">{value}</div>
+        <div className="text-xs font-medium text-sky-200">{label}</div>
     </div>
 );
 
 const Card = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
     <motion.div
         layout
-        className="p-8 bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+        className="p-6 bg-white border border-slate-200 rounded-xl shadow-soft"
     >
-        <div className="flex items-center gap-3 mb-8 border-b-2 border-black pb-4">
+        <div className="flex items-center gap-2.5 mb-6 border-b border-slate-100 pb-4 text-sky-700">
             {icon}
-            <h3 className="font-black text-xl uppercase tracking-tight leading-none">{title}</h3>
+            <h3 className="font-semibold text-base text-slate-900">{title}</h3>
         </div>
         {children}
     </motion.div>
@@ -350,29 +350,29 @@ const Card = ({ title, icon, children }: { title: string; icon: React.ReactNode;
 const StatCard = ({ label, value, icon, isPrimary = false, isPitchMode = false }: { label: string; value: string; icon: React.ReactNode; isPrimary?: boolean; isPitchMode?: boolean }) => (
     <motion.div
         layout
-        className={`p-8 border-2 border-black transition-all ${isPrimary ? 'bg-white shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]' : 'bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'} ${isPitchMode ? 'transform scale-110' : ''}`}
+        className={`p-6 border rounded-xl transition-all ${isPrimary ? 'bg-white border-sky-200 shadow-soft-md' : 'bg-white border-slate-200 shadow-soft'} ${isPitchMode ? 'transform scale-105' : ''}`}
     >
-        <div className="flex justify-between items-start mb-6">
-            <span className="font-mono text-xs font-black uppercase tracking-widest text-gray-500">{label}</span>
+        <div className="flex justify-between items-start mb-4">
+            <span className="text-xs font-medium text-slate-400">{label}</span>
             {icon}
         </div>
-        <div className={`${isPitchMode ? 'text-5xl' : 'text-4xl'} font-black tracking-tighter transition-all`}>{value}</div>
+        <div className={`${isPitchMode ? 'text-4xl' : 'text-3xl'} font-bold text-slate-900 tabular-nums transition-all`}>{value}</div>
     </motion.div>
 );
 
 const Slider = ({ label, value, onChange, min, max, unit, step = 1 }: { label: string; value: number; onChange: (v: number) => void; min: number; max: number; unit: string; step?: number }) => (
-    <div className="space-y-4">
-        <div className="flex justify-between font-mono text-xs font-bold uppercase tracking-widest">
-            <label className="text-black">{label}</label>
-            <span className="bg-black text-white px-2 py-0.5">{value}{unit}</span>
+    <div className="space-y-3">
+        <div className="flex justify-between text-xs font-medium">
+            <label className="text-slate-600">{label}</label>
+            <span className="bg-sky-700 text-white px-2 py-0.5 rounded tabular-nums">{value}{unit}</span>
         </div>
-        <div className="relative flex items-center h-4">
+        <div className="relative flex items-center">
             <input
                 type="range"
                 min={min} max={max} step={step}
                 value={value}
                 onChange={(e) => { onChange(Number(e.target.value)); }}
-                className="w-full h-2 bg-gray-100 border-2 border-black appearance-none cursor-pointer accent-black"
+                className="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-sky-600"
             />
         </div>
     </div>
@@ -384,21 +384,21 @@ const BarPart = ({ value, total, color, label, breakdown }: { value: number; tot
     return (
         <div
             style={{ width: `${percent}%` }}
-            className={`${color} h-full border-r-2 border-black last:border-r-0 relative group transition-all cursor-crosshair`}
+            className={`${color} h-full last:border-r-0 relative group transition-all cursor-crosshair`}
         >
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 text-white text-[8px] font-black uppercase tracking-tighter text-center px-1 z-10">
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/50 text-white text-[8px] font-semibold text-center px-1 z-10">
                 {label} ({Math.round(percent)}%)
             </div>
 
             {/* Hover Tooltip Breakdown */}
             {breakdown && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-black text-white p-4 border-2 border-white shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                    <div className="font-black uppercase text-xs border-b border-white/20 pb-2 mb-2 tracking-widest">{label} Breakdown</div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-900 text-white p-4 rounded-xl shadow-soft-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                    <div className="font-semibold text-xs border-b border-white/20 pb-2 mb-2">{label} Breakdown</div>
                     <div className="space-y-1">
                         {Object.entries(breakdown).map(([k, v]) => v > 0 && (
-                            <div key={k} className="flex justify-between text-[10px] font-mono">
-                                <span className="text-gray-400">{k}</span>
-                                <span className="font-bold">₹{(v / 1000).toFixed(1)}k</span>
+                            <div key={k} className="flex justify-between text-[10px]">
+                                <span className="text-slate-400">{k}</span>
+                                <span className="font-semibold">₹{(v / 1000).toFixed(1)}k</span>
                             </div>
                         ))}
                     </div>
@@ -410,9 +410,9 @@ const BarPart = ({ value, total, color, label, breakdown }: { value: number; tot
 
 const CostItem = ({ label, value }: { label: string; value: number }) => {
     return (
-        <div className="flex justify-between items-center py-4 border-b border-black/5 group hover:bg-gray-50 px-2 transition-colors">
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-gray-400 group-hover:text-black">{label}</span>
-            <span className="font-black text-xl italic tracking-tight transition-all group-hover:scale-105">₹{value.toLocaleString('en-IN')}</span>
+        <div className="flex justify-between items-center py-3 border-b border-slate-100 last:border-0 group hover:bg-slate-50 px-2 -mx-2 rounded transition-colors">
+            <span className="text-xs font-medium text-slate-400 group-hover:text-slate-600 transition-colors">{label}</span>
+            <span className="font-semibold text-lg text-slate-900 tabular-nums">₹{value.toLocaleString('en-IN')}</span>
         </div>
     );
 };
@@ -423,18 +423,18 @@ const Toggle = ({ label, enabled, onToggle, price }: { label: string; enabled: b
         <div
             role="button"
             tabIndex={0}
-            className="flex justify-between items-center p-4 border-2 border-black bg-white group select-none cursor-pointer active:translate-x-0.5 active:translate-y-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:shadow-none"
+            className="flex justify-between items-center p-4 border border-slate-200 bg-white rounded-lg group select-none cursor-pointer hover:border-sky-200 hover:bg-sky-50 transition-colors"
             onClick={handleToggle}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleToggle(); } }}
         >
             <div>
-                <div className="font-black text-xs uppercase tracking-tight">{label}</div>
-                <div className="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest leading-none mt-1 group-hover:text-black transition-colors">{price}/mo</div>
+                <div className="font-medium text-sm text-slate-800">{label}</div>
+                <div className="text-xs text-slate-400 mt-0.5">{price}/mo</div>
             </div>
-            <div className={`w-14 h-7 border-2 border-black transition-colors relative ${enabled ? 'bg-black' : 'bg-white'}`}>
+            <div className={`w-12 h-6 rounded-full transition-colors relative flex-shrink-0 ${enabled ? 'bg-sky-600' : 'bg-slate-200'}`}>
                 <motion.div
-                    animate={{ x: enabled ? 28 : 2 }}
-                    className={`w-5 h-5 absolute top-0.5 border-2 border-black transition-colors ${enabled ? 'bg-white' : 'bg-black'}`}
+                    animate={{ x: enabled ? 24 : 2 }}
+                    className="w-5 h-5 absolute top-0.5 bg-white rounded-full shadow-sm"
                 />
             </div>
         </div>

@@ -34,6 +34,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
       role="presentation"
     >
       <FocusTrap active={isOpen}>
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
           className="bg-white border-4 border-black w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative animate-in zoom-in-95 duration-200"
           onClick={(e) => { e.stopPropagation(); }}

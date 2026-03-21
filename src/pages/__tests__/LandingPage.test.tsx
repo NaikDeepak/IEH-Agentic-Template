@@ -12,7 +12,7 @@ describe('LandingPage', () => {
         );
 
         // Hero Section — dual-persona headlines
-        expect(screen.getByText(/India Employment Hub/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/India Employment Hub/i).length).toBeGreaterThan(0);
         expect(screen.getByText(/Hire Smarter/i)).toBeInTheDocument();
 
         // How It Works section

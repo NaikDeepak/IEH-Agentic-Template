@@ -68,10 +68,8 @@ describe('Seeker Dashboard', () => {
 
         // Wait for data load
         await waitFor(() => {
-            expect(screen.getByText(/Command Center/i)).toBeInTheDocument();
+            expect(screen.getByText(/Welcome back, John/i)).toBeInTheDocument();
         });
-
-        expect(screen.getByText(/Welcome back, John/i)).toBeInTheDocument();
         expect(screen.getByText(/Professional Identity/i)).toBeInTheDocument();
         expect(screen.getByText(/Referral Hub/i)).toBeInTheDocument();
     });

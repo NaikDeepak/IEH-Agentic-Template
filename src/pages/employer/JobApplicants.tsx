@@ -100,11 +100,11 @@ export const JobApplicants: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
                 <Header />
                 <div className="flex-grow flex flex-col items-center justify-center py-24">
-                    <Loader2 className="w-12 h-12 animate-spin text-black mb-6" />
-                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">Scanning Pipeline...</p>
+                    <Loader2 className="w-8 h-8 animate-spin text-sky-600 mb-4" />
+                    <p className="text-sm text-slate-400">Loading applicant pipeline...</p>
                 </div>
             </div>
         );
@@ -112,14 +112,14 @@ export const JobApplicants: React.FC = () => {
 
     if (error || !job) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
                 <Header />
                 <div className="flex-grow container mx-auto px-4 py-24 text-center">
-                    <h1 className="text-4xl font-black uppercase mb-4">Pipeline Error</h1>
-                    <p className="font-mono text-gray-500 mb-8">{error ?? "The job posting you're looking for doesn't exist."}</p>
+                    <h1 className="text-2xl font-semibold text-slate-900 mb-3">Something went wrong</h1>
+                    <p className="text-slate-500 mb-8">{error ?? "The job posting you're looking for doesn't exist."}</p>
                     <button
                         onClick={() => navigate('/jobs')}
-                        className="bg-black text-white px-8 py-3 font-bold uppercase tracking-widest"
+                        className="bg-sky-700 hover:bg-sky-800 text-white px-6 py-3 font-semibold rounded-xl text-sm transition-colors"
                     >
                         Return to Jobs
                     </button>
@@ -129,38 +129,38 @@ export const JobApplicants: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
             <Header />
 
             <main className="flex-grow container mx-auto px-4 md:px-8 py-12 max-w-[1600px]">
-                <div className="mb-12 border-b-4 border-black pb-8">
+                <div className="mb-10 border-b border-slate-200 pb-8">
                     <button
                         onClick={() => navigate(-1)}
-                        className="group flex items-center gap-2 mb-6 font-mono text-xs uppercase tracking-widest hover:translate-x-[-4px] transition-transform"
+                        className="flex items-center gap-2 mb-6 text-sm font-medium text-slate-500 hover:text-sky-700 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" /> Back to dashboard
                     </button>
 
                     <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                         <div>
-                            <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none mb-4">
+                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
                                 Applicant Pipeline
                             </h1>
                             <div className="flex items-center gap-3">
-                                <span className="bg-black text-white px-2 py-1 text-xs font-mono font-bold uppercase">
+                                <span className="bg-sky-100 text-sky-700 px-3 py-1 text-xs font-medium rounded-full">
                                     {job.title}
                                 </span>
-                                <div className="flex items-center gap-1 text-gray-400 font-mono text-[10px] uppercase tracking-widest">
-                                    <Users className="w-3 h-3" /> {applications.length} Total Applicants
+                                <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+                                    <Users className="w-3.5 h-3.5" /> {applications.length} Total Applicants
                                 </div>
                             </div>
                         </div>
 
                         <button
                             onClick={() => window.open(`/jobs`, '_blank')}
-                            className="flex items-center gap-2 border-2 border-black px-4 py-2 font-black uppercase text-xs tracking-widest hover:bg-black hover:text-white transition-all"
+                            className="flex items-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-sm font-medium transition-colors"
                         >
-                            View Live Post <ExternalLink className="w-3 h-3" />
+                            View Live Post <ExternalLink className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </div>

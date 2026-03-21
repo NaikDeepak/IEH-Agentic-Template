@@ -49,95 +49,88 @@ export const Testimonials: React.FC = () => {
     const personaLabel = current.persona === 'employer' ? 'Employer' : 'Job Seeker';
 
     return (
-        <section className="py-24 px-4 md:px-8 bg-gray-50 border-b-2 border-black font-sans">
+        <section className="py-20 px-4 md:px-8 bg-slate-50 font-sans">
             <div className="container mx-auto max-w-7xl">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border-2 border-black bg-white">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                     {/* Left Header Panel */}
-                    <div className="lg:col-span-4 p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-black bg-[#003366] text-white flex flex-col justify-between min-h-[400px]">
+                    <div className="lg:col-span-4 bg-sky-700 rounded-2xl p-10 text-white flex flex-col justify-between min-h-[360px] shadow-soft-md">
                         <div>
-                            <Quote className="w-12 h-12 mb-8 text-white/20" />
-                            <h2 className="text-5xl font-black uppercase tracking-tighter leading-none mb-6">
-                                Impact<br />Stories
-                            </h2>
-                            <p className="font-mono text-sm opacity-70 max-w-xs leading-relaxed">
-                                REAL FEEDBACK FROM ENTERPRISE PARTNERS AND SUCCESSFUL CANDIDATES.
+                            <Quote className="w-10 h-10 mb-6 text-white/30" />
+                            <h2 className="text-3xl font-bold leading-tight mb-4">Impact Stories</h2>
+                            <p className="text-sm text-sky-200 leading-relaxed">
+                                Real feedback from enterprise partners and successful candidates.
                             </p>
                         </div>
 
                         {/* Navigation + Counter */}
-                        <div className="flex items-center gap-6 pt-12">
-                            <div className="flex gap-0">
+                        <div className="flex items-center gap-4 pt-8">
+                            <div className="flex gap-2">
                                 <button
                                     onClick={goPrev}
                                     aria-label="Previous testimonial"
-                                    className="w-14 h-14 border-2 border-white hover:bg-white hover:text-[#003366] flex items-center justify-center transition-colors"
+                                    className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                    <ArrowLeft className="w-6 h-6" />
+                                    <ArrowLeft className="w-5 h-5" />
                                 </button>
                                 <button
                                     onClick={goNext}
                                     aria-label="Next testimonial"
-                                    className="w-14 h-14 border-2 border-l-0 border-white hover:bg-white hover:text-[#003366] flex items-center justify-center transition-colors"
+                                    className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
                                 >
-                                    <ArrowRight className="w-6 h-6" />
+                                    <ArrowRight className="w-5 h-5" />
                                 </button>
                             </div>
-                            <span className="font-mono text-sm font-bold tabular-nums opacity-70">
-                                {String(currentIndex + 1).padStart(2, '0')} / {String(testimonials.length).padStart(2, '0')}
+                            <span className="text-sm font-medium tabular-nums text-sky-200">
+                                {currentIndex + 1} / {testimonials.length}
                             </span>
                         </div>
                     </div>
 
                     {/* Right Content Panel */}
-                    <div className="lg:col-span-8 p-12 lg:p-20 flex flex-col justify-center">
+                    <div className="lg:col-span-8 bg-white rounded-2xl p-10 lg:p-14 flex flex-col justify-center shadow-soft border border-slate-200">
 
-                        {/* Persona Badge */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1 border-2 ${current.persona === 'employer'
-                                ? 'border-[#003366] text-[#003366] bg-blue-50'
-                                : 'border-emerald-600 text-emerald-700 bg-emerald-50'
-                                }`}>
+                        {/* Persona Badge + Stars */}
+                        <div className="flex items-center gap-3 mb-6">
+                            <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                                current.persona === 'employer'
+                                    ? 'bg-sky-100 text-sky-700'
+                                    : 'bg-emerald-100 text-emerald-700'
+                            }`}>
                                 {personaLabel}
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex gap-0.5">
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-black text-black" />
+                                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                                 ))}
                             </div>
                         </div>
 
-                        <blockquote className="text-2xl md:text-3xl font-black uppercase leading-tight tracking-tight mb-12">
+                        <blockquote className="text-xl md:text-2xl font-semibold text-slate-800 leading-relaxed mb-10">
                             {current.quote}
                         </blockquote>
 
-                        <div className="flex items-center gap-6 border-t-2 border-black pt-8 w-full">
-                            <div className="w-16 h-16 bg-gray-200 border-2 border-black overflow-hidden">
+                        <div className="flex items-center gap-4 border-t border-slate-100 pt-8">
+                            <div className="w-12 h-12 bg-slate-200 rounded-full overflow-hidden flex-shrink-0">
                                 <picture>
                                     <source srcSet={current.image.replace('.png', '.webp')} type="image/webp" />
-                                    <img
-                                        src={current.image}
-                                        alt={current.name}
-                                        className="w-full h-full object-cover filter grayscale"
-                                        loading="lazy"
-                                    />
+                                    <img src={current.image} alt={current.name} className="w-full h-full object-cover" loading="lazy" />
                                 </picture>
                             </div>
                             <div>
-                                <h4 className="font-bold text-lg uppercase tracking-wide">{current.name}</h4>
-                                <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">{current.role}</p>
+                                <h4 className="font-semibold text-slate-900">{current.name}</h4>
+                                <p className="text-xs text-slate-400 mt-0.5">{current.role}</p>
                             </div>
                         </div>
 
-                        {/* Dots Indicator */}
-                        <div className="flex gap-2 mt-8">
+                        {/* Dots */}
+                        <div className="flex gap-2 mt-6">
                             {testimonials.map((_, i) => (
                                 <button
                                     key={i}
                                     onClick={() => { setCurrentIndex(i); }}
                                     aria-label={`Go to testimonial ${i + 1}`}
-                                    className={`w-3 h-3 border-2 border-black transition-colors ${i === currentIndex ? 'bg-black' : 'bg-transparent hover:bg-gray-300'
-                                        }`}
+                                    className={`h-2 rounded-full transition-all duration-200 cursor-pointer ${i === currentIndex ? 'w-6 bg-sky-600' : 'w-2 bg-slate-300 hover:bg-slate-400'}`}
                                 />
                             ))}
                         </div>
