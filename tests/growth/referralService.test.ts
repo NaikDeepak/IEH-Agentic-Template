@@ -17,7 +17,7 @@ vi.mock('../../src/lib/firebase', () => ({
 }));
 
 vi.mock('../../src/lib/utils/codes', () => ({
-    generateReferralCode: vi.fn().mockReturnValue('IEH-123456')
+    generateReferralCode: vi.fn().mockReturnValue('WM-123456')
 }));
 
 vi.mock('firebase/firestore', () => ({
@@ -66,8 +66,8 @@ describe('ReferralService', () => {
 
             const code = await ReferralService.ensureReferralCode(uid);
 
-            // generateReferralCode mock returns 'IEH-123456'; the full display code is stored on the user profile
-            expect(code).toBe('IEH-123456');
+            // generateReferralCode mock returns 'WM-123456'; the full display code is stored on the user profile
+            expect(code).toBe('WM-123456');
             expect(mockTransaction.set).toHaveBeenCalledTimes(2);
         });
 
@@ -78,14 +78,14 @@ describe('ReferralService', () => {
             // Inside the transaction: tx.get(userRef) finds a code already written by a concurrent request
             mockTransaction.get.mockResolvedValueOnce({
                 exists: () => true,
-                data: () => ({ referralCode: 'IEH-CONCURRENT' })
+                data: () => ({ referralCode: 'WM-CONCURRENT' })
             });
 
             // The code logic now returns directly from transaction if existing code found.
             // No second getDoc call is made.
 
             const code = await ReferralService.ensureReferralCode(uid);
-            expect(code).toBe('IEH-CONCURRENT');
+            expect(code).toBe('WM-CONCURRENT');
             expect(mockTransaction.set).not.toHaveBeenCalled();
         });
 

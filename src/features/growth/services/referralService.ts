@@ -44,11 +44,11 @@ export const ReferralService = {
         let attempts = 0;
 
         while (!finalCode && attempts < 5) {
-          // displayCode: shown to the user (e.g. "IEH-ABC123")
+          // displayCode: shown to the user (e.g. "WM-ABC123")
           // normalizedCode: used as the Firestore document ID (e.g. "ABC123")
           // This ensures getUserByReferralCode (which strips the prefix) finds the right doc.
           const displayCode = generateReferralCode().toUpperCase();
-          const normalizedCode = displayCode.startsWith('IEH-') ? displayCode.slice(4) : displayCode;
+          const normalizedCode = displayCode.startsWith('WM-') ? displayCode.slice(3) : displayCode;
           const codeRef = doc(db, REFERRAL_CODES_COLLECTION, normalizedCode);
 
           try {
@@ -123,10 +123,10 @@ export const ReferralService = {
         if (!code) return null;
 
         // Normalize: uppercase, trim whitespace.
-        // Strip the 'IEH-' prefix if the user included it — codes are stored without it.
+        // Strip the 'WM-' prefix if the user included it — codes are stored without it.
         let normalizedCode = code.toUpperCase().trim();
-        if (normalizedCode.startsWith('IEH-')) {
-          normalizedCode = normalizedCode.slice(4);
+        if (normalizedCode.startsWith('WM-')) {
+          normalizedCode = normalizedCode.slice(3);
         }
         span.setAttribute('code', normalizedCode);
 

@@ -39,13 +39,14 @@ const RoleSelection = lazy(() => import('./components/RoleSelection').then(modul
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-white flex-col gap-6">
-    <div className="flex items-center gap-3">
-      <div className="w-8 h-8 bg-black border-2 border-black"></div>
-      <span className="text-2xl font-black uppercase tracking-tighter">IEH</span>
+  <div className="min-h-screen flex items-center justify-center bg-sky-50 flex-col gap-4">
+    <div className="flex items-center gap-2.5">
+      <div className="w-9 h-9 bg-sky-700 rounded-lg flex items-center justify-center shadow-sm">
+        <span className="text-white font-bold text-sm tracking-tight">WM</span>
+      </div>
+      <span className="text-lg font-bold text-slate-900">WorkMila</span>
     </div>
-    <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-    <p className="font-mono text-xs font-bold uppercase tracking-widest text-gray-400">Loading...</p>
+    <div className="w-8 h-8 border-2 border-sky-700 border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
@@ -96,11 +97,11 @@ function SeekerTrackerPage() {
   if (loading) return (
     <div className="space-y-4 p-8" aria-label="Loading application tracker" role="status">
       {[0, 1, 2, 3].map(i => (
-        <div key={i} className="border-2 border-gray-200 p-4 animate-pulse">
-          <div className="h-5 w-1/3 bg-gray-200 mb-3" />
+        <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 animate-pulse">
+          <div className="h-4 w-1/3 bg-slate-100 rounded-lg mb-3" />
           <div className="flex gap-4">
-            <div className="h-3 w-1/4 bg-gray-100" />
-            <div className="h-3 w-1/4 bg-gray-100" />
+            <div className="h-3 w-1/4 bg-slate-100 rounded-lg" />
+            <div className="h-3 w-1/4 bg-slate-100 rounded-lg" />
           </div>
         </div>
       ))}
@@ -109,7 +110,7 @@ function SeekerTrackerPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <h1 className="text-4xl font-black uppercase tracking-tighter mb-8">Application Tracker</h1>
+      <h1 className="text-3xl font-bold text-slate-900 mb-8">Application Tracker</h1>
       <ApplicationBoard applications={applications} onStatusChange={handleStatusChange} />
     </div>
   );
@@ -126,7 +127,7 @@ function App() {
 
   return (
     <Router>
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white font-mono font-bold uppercase tracking-widest border-2 border-white pointer-events-auto">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-sky-700 text-white font-semibold text-sm rounded-lg pointer-events-auto">
         Skip to Content
       </a>
       <Toaster
@@ -134,7 +135,7 @@ function App() {
         richColors
         toastOptions={{
           classNames: {
-            toast: 'font-mono text-xs uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+            toast: 'font-sans text-sm rounded-xl border border-slate-200 shadow-soft',
           },
         }}
       />

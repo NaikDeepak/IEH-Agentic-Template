@@ -41,29 +41,26 @@ export const Register: React.FC = () => {
         }
     };
 
+    const inputClasses = "w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all text-sm text-slate-900 placeholder:text-slate-400";
+    const labelClasses = "text-xs font-medium text-slate-500 uppercase tracking-widest flex items-center gap-1.5";
+
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4 bg-white font-sans">
-            <div className="max-w-md w-full bg-white border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 md:p-12 relative">
+        <div className="min-h-[80vh] flex items-center justify-center p-4 bg-sky-50 font-sans">
+            <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-soft p-8 md:p-10">
 
-                {/* Decorative Elements */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                    <div className="w-2 h-2 bg-black"></div>
-                    <div className="w-2 h-2 bg-black/50"></div>
-                </div>
-
-                <div className="text-center space-y-6 mb-10">
-                    <div className="w-16 h-16 bg-black text-white flex items-center justify-center mx-auto shadow-[4px_4px_0px_0px_rgba(128,128,128,1)] border-2 border-black">
-                        <UserPlus className="w-8 h-8" />
+                <div className="text-center space-y-4 mb-8">
+                    <div className="w-14 h-14 bg-sky-700 text-white rounded-xl flex items-center justify-center mx-auto shadow-sm">
+                        <UserPlus className="w-7 h-7" />
                     </div>
                     <div>
-                        <h2 className="text-4xl font-black text-black uppercase tracking-tighter leading-none mb-2">Join The Hub</h2>
-                        <p className="text-xs font-mono font-bold uppercase tracking-widest text-gray-500">Create your professional identity</p>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-1">Join WorkMila</h2>
+                        <p className="text-sm text-slate-400">Create your professional identity</p>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                        <label htmlFor="name" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="space-y-1.5">
+                        <label htmlFor="name" className={labelClasses}>
                             <User className="w-3 h-3" /> Full Name
                         </label>
                         <input
@@ -73,13 +70,13 @@ export const Register: React.FC = () => {
                             required
                             value={formData.name}
                             onChange={handleChange}
-                            placeholder="JOHN DOE"
-                            className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                            placeholder="John Doe"
+                            className={inputClasses}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="email" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                    <div className="space-y-1.5">
+                        <label htmlFor="email" className={labelClasses}>
                             <Mail className="w-3 h-3" /> Email Address
                         </label>
                         <input
@@ -89,13 +86,13 @@ export const Register: React.FC = () => {
                             required
                             value={formData.email}
                             onChange={handleChange}
-                            placeholder="USER@EXAMPLE.COM"
-                            className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                            placeholder="you@example.com"
+                            className={inputClasses}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="password" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                    <div className="space-y-1.5">
+                        <label htmlFor="password" className={labelClasses}>
                             <Lock className="w-3 h-3" /> Password
                         </label>
                         <input
@@ -106,12 +103,12 @@ export const Register: React.FC = () => {
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                            className={inputClasses}
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="confirmPassword" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
+                    <div className="space-y-1.5">
+                        <label htmlFor="confirmPassword" className={labelClasses}>
                             <Lock className="w-3 h-3" /> Confirm Password
                         </label>
                         <input
@@ -122,16 +119,16 @@ export const Register: React.FC = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            className={`w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400 ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-600' : ''}`}
+                            className={`${inputClasses} ${formData.confirmPassword && formData.password !== formData.confirmPassword ? 'border-red-400 focus:ring-red-400' : ''}`}
                         />
                         {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                            <p className="text-xs font-mono text-red-600 font-bold uppercase mt-1">Passwords do not match</p>
+                            <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="referralCode" className="text-xs font-mono font-bold text-black uppercase tracking-widest flex items-center gap-2">
-                            <Gift className="w-3 h-3" /> Referral Code (Optional)
+                    <div className="space-y-1.5">
+                        <label htmlFor="referralCode" className={labelClasses}>
+                            <Gift className="w-3 h-3" /> Referral Code <span className="text-slate-300 font-normal normal-case">(optional)</span>
                         </label>
                         <input
                             id="referralCode"
@@ -139,74 +136,59 @@ export const Register: React.FC = () => {
                             name="referralCode"
                             value={formData.referralCode}
                             onChange={handleChange}
-                            placeholder="IEH-XXXXXX"
-                            className="w-full px-4 py-3 bg-white border-2 border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-y-0.5 transition-all outline-none text-sm font-mono placeholder:text-gray-400"
+                            placeholder="WM-XXXXXX"
+                            className={inputClasses}
                         />
                     </div>
 
                     {(error ?? validationError) && (
-                        <div className="p-3 bg-red-50 text-red-600 text-xs font-mono font-bold uppercase tracking-wide border-2 border-red-600">
-                            Error: {error ?? validationError}
+                        <div className="p-3 bg-red-50 text-red-600 text-xs font-medium rounded-lg border border-red-100">
+                            {error ?? validationError}
                         </div>
                     )}
 
                     <button
                         type="submit"
                         disabled={isLoading || (formData.confirmPassword !== '' && formData.password !== formData.confirmPassword)}
-                        className="w-full flex items-center justify-center gap-2 py-4 px-6 text-sm font-black uppercase tracking-widest text-white bg-black border-2 border-black hover:bg-white hover:text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-6 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isLoading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
                             <>
                                 <span>Create Account</span>
-                                <ArrowRight className="w-5 h-5" />
+                                <ArrowRight className="w-4 h-4" />
                             </>
                         )}
                     </button>
                 </form>
 
-                <div className="relative py-8">
+                <div className="relative py-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t-2 border-gray-100"></div>
+                        <div className="w-full border-t border-slate-100"></div>
                     </div>
                     <div className="relative flex justify-center">
-                        <span className="bg-white px-4 text-xs font-mono font-bold text-gray-400 uppercase tracking-widest">Or</span>
+                        <span className="bg-white px-4 text-xs text-slate-400">or</span>
                     </div>
                 </div>
 
                 <button
                     onClick={() => loginWithGoogle(formData.referralCode)}
-                    className="w-full flex items-center justify-center gap-3 py-3 px-6 text-xs font-bold font-mono uppercase tracking-wider text-black bg-white border-2 border-black hover:bg-gray-50 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] transition-all mb-8"
+                    className="w-full flex items-center justify-center gap-3 py-3 px-6 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors mb-6"
                 >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4"
-                        />
-                        <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853"
-                        />
-                        <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                            fill="#FBBC05"
-                        />
-                        <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            fill="#EA4335"
-                        />
+                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    Register with Google
+                    Continue with Google
                 </button>
 
-                <div className="text-center pt-8 border-t-2 border-gray-100 mt-0">
-                    <p className="text-gray-500 text-xs font-mono uppercase tracking-wide">
+                <div className="text-center pt-6 border-t border-slate-100">
+                    <p className="text-slate-500 text-sm">
                         Already have an account?{' '}
-                        <Link
-                            to="/login"
-                            className="text-black font-bold hover:underline decoration-2 underline-offset-4"
-                        >
+                        <Link to="/login" className="text-sky-700 font-semibold hover:text-sky-800 transition-colors">
                             Sign In
                         </Link>
                     </p>

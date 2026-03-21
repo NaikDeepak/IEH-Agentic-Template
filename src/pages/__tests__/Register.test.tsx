@@ -35,9 +35,9 @@ describe('Register Component', () => {
     it('rendering of registration form elements', () => {
         renderRegister();
 
-        expect(screen.getByRole('heading', { level: 2, name: /Join The Hub/i })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 2, name: /Join WorkMila/i })).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/john doe/i)).toBeInTheDocument(); // Name
-        expect(screen.getByPlaceholderText(/USER@EXAMPLE.COM/i)).toBeInTheDocument(); // Email
+        expect(screen.getByPlaceholderText(/you@example.com/i)).toBeInTheDocument(); // Email
         expect(screen.getAllByPlaceholderText(/••••••••/i)).toHaveLength(2); // Password and Confirm
         expect(screen.getByRole('button', { name: /Create Account/i })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('Register Component', () => {
         renderRegister();
 
         const nameInput = screen.getByPlaceholderText(/john doe/i);
-        const emailInput = screen.getByPlaceholderText(/USER@EXAMPLE.COM/i);
+        const emailInput = screen.getByPlaceholderText(/you@example.com/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
         const [passwordInput, confirmInput] = passwordInputs;
 
@@ -85,7 +85,7 @@ describe('Register Component', () => {
         renderRegister();
 
         const nameInput = screen.getByPlaceholderText(/john doe/i);
-        const emailInput = screen.getByPlaceholderText(/USER@EXAMPLE.COM/i);
+        const emailInput = screen.getByPlaceholderText(/you@example.com/i);
         const passwordInputs = screen.getAllByPlaceholderText(/••••••••/i);
         const [passwordInput, confirmInput] = passwordInputs;
         const submitButton = screen.getByRole('button', { name: /Create Account/i });
@@ -110,6 +110,6 @@ describe('Register Component', () => {
 
         renderRegister();
 
-        expect(screen.getByText('Error: Email already in use')).toBeInTheDocument();
+        expect(screen.getByText('Email already in use')).toBeInTheDocument();
     });
 });
