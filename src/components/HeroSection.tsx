@@ -104,14 +104,14 @@ export const HeroSection: React.FC = () => {
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                             </picture>
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/10"></div>
 
                             {/* Employer Value Overlay */}
                             <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 text-white">
-                                <h2 className="text-3xl font-bold leading-tight mb-2">
-                                    Hire Smarter.<br />Hire Faster.
+                                <h2 className="text-3xl font-bold leading-tight mb-2 drop-shadow-lg">
+                                    Right Job,<br /><span className="text-emerald-400">Right Candidate.</span>
                                 </h2>
-                                <p className="text-sm text-white/70 leading-relaxed max-w-sm mb-5">
+                                <p className="text-sm text-white/90 leading-relaxed max-w-sm mb-5 drop-shadow">
                                     AI-powered talent matching. Post jobs. Find candidates. Zero friction.
                                 </p>
 
