@@ -48,11 +48,11 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
 
     if (error) {
         return (
-            <div className="bg-white p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-center">
-                <p className="text-black font-bold mb-4 uppercase tracking-tight">{error}</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6 text-center">
+                <p className="text-slate-700 font-semibold mb-4">{error}</p>
                 <button
                     onClick={() => { void fetchShortlist(); }}
-                    className="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-colors border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                    className="bg-sky-700 text-white px-4 py-2 text-sm font-semibold rounded-xl hover:bg-sky-800 transition-colors"
                 >
                     Try Again
                 </button>
@@ -63,28 +63,20 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
     // Cold Start Handling
     if (shortlist?.isColdStart) {
         return (
-            <div className="bg-white p-8 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:24px_24px] opacity-10 -z-10"></div>
-
-                <div className="inline-flex items-center justify-center p-4 bg-black text-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] mb-8">
-                    <Sparkles className="h-8 w-8 text-yellow-400" />
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-8 text-center">
+                <div className="w-14 h-14 bg-sky-700 text-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                    <Sparkles className="h-7 w-7" />
                 </div>
-
-                <h3 className="text-3xl font-black uppercase tracking-tighter text-black mb-4">
-                    Unlock Your AI Feed
-                </h3>
-
-                <p className="text-gray-600 font-medium max-w-md mx-auto mb-10 leading-relaxed border-l-4 border-black pl-6">
-                    We can't recommend jobs yet because we don't know your skills.
-                    Upload your resume to get 5 curated job matches every day.
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Unlock Your AI Feed</h3>
+                <p className="text-sm text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">
+                    Upload your resume to get 5 AI-curated job matches every day tailored to your skills.
                 </p>
-
                 <button
                     onClick={() => navigate('/seeker/resume')}
-                    className="inline-flex items-center px-8 py-4 bg-black text-white text-sm font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:translate-x-0 active:shadow-none transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-sky-700 text-white text-sm font-semibold rounded-xl hover:bg-sky-800 transition-colors"
                 >
                     Complete your profile
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <ArrowRight className="h-4 w-4" />
                 </button>
             </div>
         );
@@ -92,24 +84,23 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
 
     if (!shortlist || shortlist.jobs.length === 0) {
         return (
-            <div className="bg-white p-12 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e5e5_1px,transparent_1px),linear-gradient(to_bottom,#e5e5e5_1px,transparent_1px)] bg-[size:24px_24px] opacity-10 -z-10"></div>
-                <p className="text-black font-black uppercase tracking-tighter text-xl mb-2">No recommendations today</p>
-                <p className="text-gray-500 font-mono text-xs uppercase tracking-widest">Check back tomorrow for fresh matches</p>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-10 text-center">
+                <p className="text-slate-700 font-semibold mb-1">No recommendations today</p>
+                <p className="text-sm text-slate-400">Check back tomorrow for fresh matches</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between border-b-4 border-black pb-4 mb-8">
+        <div className="space-y-4">
+            <div className="flex items-center justify-between pb-4 mb-2 border-b border-slate-200">
                 <div>
-                    <h2 className="text-4xl font-black text-black uppercase tracking-tighter flex items-center gap-3">
-                        <Sparkles className="h-8 w-8 text-yellow-400 fill-yellow-400" />
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-sky-600" />
                         Daily Top 5
                     </h2>
-                    <p className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400 mt-1">
-                        UPDATED {shortlist.lastUpdated ? new Date(shortlist.lastUpdated).toLocaleDateString().toUpperCase() : 'TODAY'}
+                    <p className="text-xs text-slate-400 mt-0.5">
+                        Updated {shortlist.lastUpdated ? new Date(shortlist.lastUpdated).toLocaleDateString() : 'today'}
                     </p>
                 </div>
             </div>
@@ -172,74 +163,61 @@ const ShortlistCard: React.FC<ShortlistCardProps> = ({ job }) => {
             onKeyDown={handleKeyDown}
             role="button"
             tabIndex={0}
-            className="group relative bg-white border-2 border-black p-6 flex flex-col gap-6 transition-all duration-200 hover:-translate-y-1 hover:translate-x-1 hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer overflow-hidden"
+            className="group bg-white rounded-2xl border border-slate-200 shadow-soft p-5 flex flex-col gap-4 hover:shadow-soft-md hover:border-slate-300 transition-all cursor-pointer overflow-hidden"
         >
-            {/* Match Score Badge */}
-            <div className={`absolute top-0 right-0 px-4 py-2 border-b-2 border-l-2 border-black font-mono font-black uppercase text-xs tracking-widest transition-colors ${job.matchScore >= 0.8 ? 'bg-black text-white' : 'bg-gray-100 text-black'}`}>
-                {Math.round(job.matchScore * 100)}% Match
-            </div>
-
             <div className="flex flex-col sm:flex-row gap-4">
                 {/* Company Logo / Placeholder */}
                 <div className="flex-shrink-0">
-                    <div className="h-16 w-16 border-2 border-black bg-white flex items-center justify-center text-black font-black text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:bg-yellow-400 transition-colors">
-                        {job.company_bio ? job.company_bio.substring(0, 1).toUpperCase() : <Building className="h-8 w-8" />}
+                    <div className="h-12 w-12 rounded-xl bg-sky-50 border border-slate-200 flex items-center justify-center text-sky-700 font-bold text-lg">
+                        {job.company_bio ? job.company_bio.substring(0, 1).toUpperCase() : <Building className="h-5 w-5" />}
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">Active Hiring</span>
-                        </div>
-                        <h3 className="text-2xl font-black text-black uppercase tracking-tighter group-hover:text-[#003366] transition-colors leading-none mb-2">
+                    <div className="flex items-start justify-between gap-3 mb-1">
+                        <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-700 transition-colors leading-tight">
                             {job.title}
                         </h3>
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400">
-                            <span className="flex items-center gap-1.5 border-b-2 border-transparent group-hover:border-black transition-all">
-                                <Building className="h-3 w-3" />
-                                {job.company_bio?.split(' ')[0] ?? 'Company'}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <MapPin className="h-3 w-3" />
-                                {job.location} ({job.work_mode})
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <Briefcase className="h-3 w-3" />
-                                {job.type.replace('_', ' ')}
-                            </span>
-                        </div>
+                        <span className={`shrink-0 px-2.5 py-0.5 text-xs font-semibold rounded-full ${job.matchScore >= 0.8 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                            {Math.round(job.matchScore * 100)}% match
+                        </span>
                     </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
+                        <span className="flex items-center gap-1">
+                            <Building className="h-3 w-3" />
+                            {job.company_bio?.split(' ')[0] ?? 'Company'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {job.location} · {job.work_mode}
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <Briefcase className="h-3 w-3" />
+                            {job.type.replace('_', ' ')}
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-                    {/* AI Match Reason */}
-                    <div className="mt-6 border-2 border-black bg-gray-50 p-4 relative">
-                        <div className="absolute -top-3 left-4 bg-black text-white px-2 py-0.5 text-[10px] font-mono font-black uppercase tracking-widest border-2 border-black">
-                            AI REASONING
-                        </div>
-                        <div className="flex items-start">
-                            <Sparkles className="h-4 w-4 text-black mt-0.5 mr-3 flex-shrink-0" />
-                            <p className="text-sm font-medium text-black leading-relaxed">
-                                {job.matchReason}
-                            </p>
-                        </div>
-                    </div>
+            {/* AI Match Reason */}
+            <div className="bg-sky-50 rounded-xl p-3.5 border border-sky-100 flex items-start gap-2.5">
+                <Sparkles className="h-4 w-4 text-sky-600 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-slate-600 leading-relaxed">{job.matchReason}</p>
+            </div>
 
-                    {/* Footer Info */}
-                    <div className="mt-6 pt-4 border-t-2 border-black flex items-center justify-between">
-                        <div className="flex flex-wrap items-center gap-6 text-[10px] font-mono font-black uppercase tracking-widest text-gray-400">
-                            <span className="text-black">{salaryString}</span>
-                            <span className="flex items-center gap-1.5">
-                                <Clock className="h-3 w-3" />
-                                POSTED {getJobDate(job.created_at).toLocaleDateString().toUpperCase()}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-black group-hover:underline decoration-2 underline-offset-4">
-                            Details
-                            <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </div>
-                    </div>
+            {/* Footer Info */}
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+                    <span className="font-medium text-slate-600">{salaryString}</span>
+                    <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {getJobDate(job.created_at).toLocaleDateString()}
+                    </span>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-semibold text-sky-700 group-hover:text-sky-800">
+                    View
+                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
             </div>
         </div>

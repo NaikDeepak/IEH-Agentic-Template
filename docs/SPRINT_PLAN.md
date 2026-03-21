@@ -1,7 +1,7 @@
 # WorkMila — Sprint Plan
 
 Sourced from real user feedback + internal review sessions.
-Last updated: 2026-03-22
+Last updated: 2026-03-22 (Sprint 1 completed)
 
 ---
 
@@ -21,8 +21,8 @@ Goal: Fix every issue a first-time user hits before they even reach a feature.
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S1-UI-01 | `[ ]` Restyle Login card variant | `src/components/Login.tsx` | Card still has `border-2 border-black`, "Access Portal" heading, brutalist inputs, "Authenticate" / "Terminate Session" buttons. Match Register.tsx new style. |
-| S1-UI-02 | `[ ]` Restyle Seeker Dashboard sub-components | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx`, `src/features/seeker/components/Market/MarketTrends.tsx` | Dashboard shell is already new; inner components still brutalist |
+| S1-UI-01 | `[x]` Restyle Login card variant | `src/components/Login.tsx` | Fixed — modern SaaS style matching Register.tsx |
+| S1-UI-02 | `[x]` Restyle Seeker Dashboard sub-components | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx`, `src/features/seeker/components/Market/MarketTrends.tsx` | Fixed — both components restyled to modern SaaS |
 | S1-UI-03 | `[x]` ProtectedRoute black spinner | `src/components/ProtectedRoute.tsx` | Fixed — now matches WorkMila PageLoader |
 | S1-UI-04 | `[x]` RoleSelection modal brutalist | `src/components/RoleSelection.tsx` | Fixed |
 | S1-UI-05 | `[x]` JobCard / JobSearchBar / StatusBadge | multiple | Fixed |
@@ -33,29 +33,29 @@ Goal: Fix every issue a first-time user hits before they even reach a feature.
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S1-AUTH-01 | `[ ]` Email login not working for candidates | `src/context/AuthProvider.tsx`, Firebase console | Investigate `loginWithEmail` — likely Firebase Email provider not enabled or misconfigured |
-| S1-AUTH-02 | `[ ]` After login → redirect to dashboard (both roles) | `src/App.tsx` `DashboardRedirect` | Verify seeker → `/seeker/dashboard`, employer → `/employer/jobs`. Currently works in code but confirm with real login flow |
-| S1-AUTH-03 | `[ ]` "Terminate Session" box on `/login` when already logged in | `src/components/Login.tsx` card variant | When user is already logged in and visits `/login`, redirect instead of showing the card |
-| S1-AUTH-04 | `[ ]` Top-right name → dropdown (Profile / Logout) | `src/components/Login.tsx` navbar variant | Replace direct logout button with a small dropdown menu |
+| S1-AUTH-01 | `[x]` Email login not working for candidates | `src/context/AuthProvider.tsx`, Firebase console | Code is correct — Firebase Email provider must be enabled in Firebase Console. Friendly error messages added for all common error codes. |
+| S1-AUTH-02 | `[x]` After login → redirect to dashboard (both roles) | `src/App.tsx` `DashboardRedirect` | Already handled at route level — confirmed. |
+| S1-AUTH-03 | `[x]` "Terminate Session" box on `/login` when already logged in | `src/components/Login.tsx` card variant | Fixed — route redirects logged-in users; dead code removed from card |
+| S1-AUTH-04 | `[x]` Top-right name → dropdown (Profile / Logout) | `src/components/Login.tsx` navbar variant | Fixed — dropdown with Profile / Settings / Sign Out |
 
 ### Navigation Broken
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S1-NAV-01 | `[ ]` "AI Prep" nav button not working | `src/components/Header.tsx` | Currently links to `#ai-prep` anchor. Either scroll to a landing section or route to `/seeker/interview` for authenticated seekers |
-| S1-NAV-02 | `[ ]` "Pricing" nav button not working | `src/components/Header.tsx` | Currently links to `#pricing` anchor. Add a pricing section to landing or link to a `/pricing` stub page |
+| S1-NAV-01 | `[x]` "AI Prep" nav button not working | `src/components/Header.tsx` | Fixed — routes to `/seeker/interview` for seekers, `/login` for unauthenticated |
+| S1-NAV-02 | `[x]` "Pricing" nav button not working | `src/components/Header.tsx` | Fixed — routes to `/pricing` |
 
 ### Job Detail Error
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S1-JOB-01 | `[ ]` Job detail page shows error on click | `src/pages/JobDetailPage.tsx`, `src/features/jobs/services/jobService.ts` | Reproduce error, check Firestore read permissions and field mapping. Likely a missing `company_name` field or Firestore rules blocking unauthenticated reads |
+| S1-JOB-01 | `[x]` Job detail page shows error on click | `src/pages/JobDetailPage.tsx` | Fixed — two root causes: (1) Firestore rules require auth for job reads; unauthenticated users now redirected to `/login`. (2) `job.skills.map()` and `job.type.replace()` crash if fields missing — fixed with `?? []` / `?.` guards |
 
 ### Apply Button in Search Results
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S1-APPLY-01 | `[ ]` Add Apply button to JobCard in search results | `src/components/JobCard.tsx`, `src/pages/JobsPage.tsx` | Show "Apply Now" CTA on card footer when user is logged-in seeker. Clicking opens `ApplyModal` inline or navigates to job detail |
+| S1-APPLY-01 | `[x]` Add Apply button to JobCard in search results | `src/components/JobCard.tsx`, `src/pages/JobsPage.tsx` | Fixed — "Apply Now" CTA visible on card footer for seekers. Fetches full JobPosting on click and opens ApplyModal inline |
 
 ---
 

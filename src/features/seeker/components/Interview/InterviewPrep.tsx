@@ -75,14 +75,15 @@ export const InterviewPrep: React.FC = () => {
 
     if (step === 'setup') {
         return (
-            <div className="max-w-2xl mx-auto p-12 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
-                <h2 className="text-4xl font-black text-black uppercase tracking-tighter mb-8 border-b-4 border-black pb-4">
-                    AI Interview Prep
-                </h2>
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-soft p-8">
+                <div className="mb-7 pb-5 border-b border-slate-100">
+                    <h2 className="text-xl font-bold text-slate-900">AI Interview Prep</h2>
+                    <p className="text-sm text-slate-400 mt-1">Generate practice questions tailored to your target role</p>
+                </div>
 
-                <form onSubmit={handleStart} className="space-y-8">
-                    <div className="space-y-2">
-                        <label htmlFor="target-role" className="block text-sm font-bold uppercase tracking-widest text-black">
+                <form onSubmit={handleStart} className="space-y-5">
+                    <div className="space-y-1.5">
+                        <label htmlFor="target-role" className="block text-xs font-medium text-slate-500 uppercase tracking-widest">
                             Target Role
                         </label>
                         <input
@@ -91,27 +92,27 @@ export const InterviewPrep: React.FC = () => {
                             value={role}
                             onChange={(e) => { setRole(e.target.value); }}
                             placeholder="e.g. Senior Frontend Developer"
-                            className="w-full px-4 py-3 bg-white border-2 border-black font-mono focus:bg-yellow-50 outline-none transition-colors"
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all text-sm text-slate-900 placeholder:text-slate-400"
                             required
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="resume-context" className="block text-sm font-bold uppercase tracking-widest text-black">
-                            Resume Context (Optional)
+                    <div className="space-y-1.5">
+                        <label htmlFor="resume-context" className="block text-xs font-medium text-slate-500 uppercase tracking-widest">
+                            Resume Context <span className="text-slate-300 normal-case font-normal">(optional)</span>
                         </label>
                         <textarea
                             id="resume-context"
                             value={resumeContext}
                             onChange={(e) => { setResumeContext(e.target.value); }}
-                            placeholder="Paste your resume summary or key experiences here to get personalized questions..."
-                            className="w-full px-4 py-3 bg-white border-2 border-black font-mono focus:bg-yellow-50 outline-none transition-colors h-40 resize-none"
+                            placeholder="Paste your resume summary or key experiences to get personalized questions..."
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all text-sm text-slate-900 placeholder:text-slate-400 h-36 resize-none"
                         />
                     </div>
 
                     {error && (
-                        <div className="p-4 bg-red-50 border-2 border-red-600 text-red-700 font-bold flex items-center gap-3">
-                            <AlertCircle className="w-5 h-5" />
+                        <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 flex items-center gap-2.5">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             {error}
                         </div>
                     )}
@@ -119,21 +120,19 @@ export const InterviewPrep: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loading || !role.trim()}
-                        className="group relative w-full py-4 bg-black text-white font-black uppercase tracking-widest hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
+                        className="w-full flex items-center justify-center gap-2 py-3 px-6 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <span className="flex items-center justify-center gap-3">
-                            {loading ? (
-                                <>
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                    Calibrating System...
-                                </>
-                            ) : (
-                                <>
-                                    Initialize Practice
-                                    <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
-                        </span>
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Generating questions...
+                            </>
+                        ) : (
+                            <>
+                                Start Practice
+                                <ChevronRight className="w-4 h-4" />
+                            </>
+                        )}
                     </button>
                 </form>
             </div>
@@ -142,25 +141,21 @@ export const InterviewPrep: React.FC = () => {
 
     if (step === 'summary') {
         return (
-            <div className="max-w-2xl mx-auto p-12 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(34,197,94,1)] text-center animate-in zoom-in duration-300">
-                <div className="w-24 h-24 bg-green-100 border-4 border-green-600 rounded-none flex items-center justify-center mx-auto mb-8 rotate-3 shadow-[4px_4px_0px_0px_rgba(22,101,52,1)]">
-                    <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-soft p-10 text-center animate-in zoom-in duration-300">
+                <div className="w-14 h-14 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="w-7 h-7 text-emerald-600" />
                 </div>
-                <h2 className="text-5xl font-black text-black uppercase tracking-tighter mb-4">
-                    Session Terminated
-                </h2>
-                <p className="text-xl font-medium text-gray-500 mb-10 uppercase tracking-tight">
-                    You've completed <span className="text-black font-black underline decoration-4 decoration-green-500">5 modules</span> for the {role} role.
+                <h2 className="text-2xl font-bold text-slate-900 mb-2">Practice Complete</h2>
+                <p className="text-sm text-slate-500 mb-8">
+                    You completed {questions.length} questions for <span className="font-semibold text-slate-700">{role}</span>.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button
-                        onClick={resetSession}
-                        className="px-10 py-5 bg-black text-white font-black uppercase tracking-widest hover:bg-black/90 flex items-center justify-center gap-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)] transition-all active:translate-x-1 active:translate-y-1 active:shadow-none"
-                    >
-                        <RefreshCw className="w-5 h-5" />
-                        Re-Initialize
-                    </button>
-                </div>
+                <button
+                    onClick={resetSession}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors"
+                >
+                    <RefreshCw className="w-4 h-4" />
+                    Start New Session
+                </button>
             </div>
         );
     }
@@ -169,171 +164,154 @@ export const InterviewPrep: React.FC = () => {
     if (!currentQuestion) return null;
 
     return (
-        <div className="max-w-4xl mx-auto px-6 pb-24">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b-4 border-black pb-8">
+        <div className="max-w-3xl mx-auto space-y-5">
+            {/* Session Header */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft px-6 py-4 flex items-center justify-between">
                 <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="bg-black text-white px-3 py-1 text-xs font-mono font-bold uppercase tracking-widest">
-                            Active Session
-                        </span>
-                        <span className="text-xs font-mono font-bold uppercase tracking-widest text-gray-400">
-                            Protocol 03-A
-                        </span>
-                    </div>
-                    <h2 className="text-5xl font-black text-black uppercase tracking-tighter leading-none">
-                        {role}
-                    </h2>
-                    <p className="mt-4 font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
-                        Module <span className="text-black">{currentQuestionIndex + 1}</span> / {questions.length}
-                    </p>
+                    <p className="text-xs text-slate-400 mb-0.5">Practising for</p>
+                    <h2 className="text-base font-bold text-slate-900">{role}</h2>
                 </div>
-                <button
-                    onClick={resetSession}
-                    className="font-mono text-xs font-black uppercase tracking-widest text-gray-400 hover:text-black hover:underline transition-all"
-                >
-                    [ Abort Session ]
-                </button>
+                <div className="flex items-center gap-4">
+                    <span className="text-sm text-slate-400">
+                        Question <span className="font-semibold text-slate-700">{currentQuestionIndex + 1}</span> / {questions.length}
+                    </span>
+                    <button
+                        onClick={resetSession}
+                        className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                    >
+                        End Session
+                    </button>
+                </div>
             </div>
 
             {/* Question Card */}
-            <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 mb-12 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500" />
-                <div className="flex items-center justify-between mb-6">
-                    <div className={`px-4 py-1 border-2 border-black font-mono text-xs font-black uppercase tracking-widest
-                        ${currentQuestion.difficulty === 'easy' ? 'bg-green-400 text-black' :
-                            currentQuestion.difficulty === 'medium' ? 'bg-yellow-400 text-black' :
-                                'bg-red-500 text-white'}`}>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-7">
+                <div className="flex items-center justify-between mb-5">
+                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full
+                        ${currentQuestion.difficulty === 'easy' ? 'bg-emerald-100 text-emerald-700' :
+                            currentQuestion.difficulty === 'medium' ? 'bg-amber-100 text-amber-700' :
+                                'bg-red-100 text-red-700'}`}>
                         {currentQuestion.difficulty}
-                    </div>
-                    <span className="font-mono text-xs font-bold uppercase tracking-widest text-gray-400">{currentQuestion.type}</span>
+                    </span>
+                    <span className="text-xs text-slate-400">{currentQuestion.type}</span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-black leading-tight">
+                <h3 className="text-lg font-semibold text-slate-900 leading-snug">
                     {currentQuestion.question}
                 </h3>
             </div>
 
-            {/* Answer Section */}
-            <div className="space-y-8">
-                {!evaluation ? (
-                    <div className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(59,130,246,1)]">
-                        <label htmlFor="answer-input" className="block font-mono text-xs font-black uppercase tracking-widest text-black mb-4">
-                            Input Buffer
-                        </label>
-                        <textarea
-                            id="answer-input"
-                            value={answer}
-                            onChange={(e) => { setAnswer(e.target.value); }}
-                            placeholder="Construct your response protocol..."
-                            className="w-full p-6 bg-gray-50 border-2 border-black font-mono text-lg focus:bg-white outline-none transition-colors h-64 resize-none mb-8 placeholder:text-gray-300"
-                        />
-                        <div className="flex justify-end">
+            {/* Answer / Evaluation */}
+            {!evaluation ? (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-7">
+                    <label htmlFor="answer-input" className="block text-xs font-medium text-slate-500 uppercase tracking-widest mb-2">
+                        Your Answer
+                    </label>
+                    <textarea
+                        id="answer-input"
+                        value={answer}
+                        onChange={(e) => { setAnswer(e.target.value); }}
+                        placeholder="Type your answer here..."
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all text-sm text-slate-900 placeholder:text-slate-400 h-44 resize-none mb-5"
+                    />
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleSubmitAnswer}
+                            disabled={evaluating || !answer.trim()}
+                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {evaluating ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Evaluating...
+                                </>
+                            ) : (
+                                <>
+                                    Submit Answer
+                                    <Send className="w-4 h-4" />
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Your Answer */}
+                    <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                        <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-3">Your Answer</p>
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed italic border-l-2 border-slate-300 pl-4">{answer}</p>
+                    </div>
+
+                    {/* Score + Feedback */}
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-soft overflow-hidden">
+                        {/* Score header */}
+                        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h4 className="text-sm font-bold text-slate-900">AI Feedback</h4>
+                            <span className={`px-3 py-1 text-sm font-bold rounded-full
+                                ${evaluation.score >= 80 ? 'bg-emerald-100 text-emerald-700' :
+                                    evaluation.score >= 60 ? 'bg-amber-100 text-amber-700' :
+                                        'bg-red-100 text-red-700'}`}>
+                                {evaluation.score}%
+                            </span>
+                        </div>
+
+                        <div className="p-6 space-y-5">
+                            {/* Strengths & Weaknesses */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="bg-emerald-50 rounded-xl border border-emerald-100 p-5">
+                                    <h5 className="text-sm font-semibold text-emerald-800 mb-3 flex items-center gap-2">
+                                        <CheckCircle className="w-4 h-4" /> Strengths
+                                    </h5>
+                                    <ul className="space-y-2">
+                                        {evaluation.strengths.map((s, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                                <span className="w-1 h-1 rounded-full bg-emerald-500 mt-2 flex-shrink-0" />
+                                                {s}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="bg-red-50 rounded-xl border border-red-100 p-5">
+                                    <h5 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" /> Areas to Improve
+                                    </h5>
+                                    <ul className="space-y-2">
+                                        {evaluation.weaknesses.map((w, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                                <span className="w-1 h-1 rounded-full bg-red-500 mt-2 flex-shrink-0" />
+                                                {w}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {/* Suggestion */}
+                            <div className="bg-amber-50 rounded-xl border border-amber-100 p-5">
+                                <p className="text-xs font-medium text-amber-700 uppercase tracking-wider mb-2">Tip</p>
+                                <p className="text-sm text-amber-900 leading-relaxed">{evaluation.suggestion}</p>
+                            </div>
+
+                            {/* Model Answer */}
+                            <div>
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Model Answer</p>
+                                <div className="bg-slate-900 text-slate-100 rounded-xl p-5 text-sm leading-relaxed italic">
+                                    {evaluation.betterAnswer}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
                             <button
-                                onClick={handleSubmitAnswer}
-                                disabled={evaluating || !answer.trim()}
-                                className="group px-10 py-5 bg-blue-600 text-white border-4 border-black font-black uppercase tracking-widest hover:-translate-x-1 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-3 active:translate-x-0 active:translate-y-0 active:shadow-none"
+                                onClick={handleNextQuestion}
+                                className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors"
                             >
-                                {evaluating ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        Analyzing...
-                                    </>
-                                ) : (
-                                    <>
-                                        Execute Transmission
-                                        <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                    </>
-                                )}
+                                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Finish Session'}
+                                <ChevronRight className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
-                ) : (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                        {/* Your Answer */}
-                        <div className="bg-gray-100 border-4 border-black p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                            <h4 className="font-mono text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Initial Transmission</h4>
-                            <p className="text-xl font-medium text-black whitespace-pre-wrap leading-relaxed italic border-l-4 border-gray-300 pl-6">{answer}</p>
-                        </div>
-
-                        {/* AI Feedback */}
-                        <div className="bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(147,51,234,1)] overflow-hidden">
-                            <div className="bg-purple-600 px-8 py-5 border-b-4 border-black flex items-center justify-between">
-                                <h4 className="font-black text-2xl text-white uppercase tracking-tighter flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-white border-2 border-black text-black flex items-center justify-center font-black">
-                                        AI
-                                    </div>
-                                    Analysis Phase
-                                </h4>
-                                <div className={`flex items-center gap-3 px-6 py-2 border-4 border-black font-mono font-black text-xl
-                                    ${evaluation.score >= 80 ? 'bg-green-400 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' :
-                                        evaluation.score >= 60 ? 'bg-yellow-400 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' :
-                                            'bg-red-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}`}>
-                                    {evaluation.score}%
-                                </div>
-                            </div>
-
-                            <div className="p-8 space-y-10">
-                                {/* Strengths & Weaknesses */}
-                                <div className="grid md:grid-cols-2 gap-8">
-                                    <div className="bg-green-50 border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(34,197,94,1)]">
-                                        <h5 className="text-lg font-black text-green-800 uppercase tracking-widest mb-4 flex items-center gap-3">
-                                            <CheckCircle className="w-6 h-6" /> Optimized
-                                        </h5>
-                                        <ul className="space-y-3">
-                                            {evaluation.strengths.map((s, i) => (
-                                                <li key={i} className="flex items-start gap-3 group">
-                                                    <span className="w-1.5 h-6 bg-green-500 border-2 border-black flex-shrink-0 group-hover:scale-y-125 transition-transform" />
-                                                    <span className="text-base font-bold text-gray-700 leading-tight">{s}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    <div className="bg-red-50 border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(239,68,68,1)]">
-                                        <h5 className="text-lg font-black text-red-800 uppercase tracking-widest mb-4 flex items-center gap-3">
-                                            <AlertCircle className="w-6 h-6" /> Anomalies
-                                        </h5>
-                                        <ul className="space-y-3">
-                                            {evaluation.weaknesses.map((w, i) => (
-                                                <li key={i} className="flex items-start gap-3 group">
-                                                    <span className="w-1.5 h-6 bg-red-500 border-2 border-black flex-shrink-0 group-hover:scale-y-125 transition-transform" />
-                                                    <span className="text-base font-bold text-gray-700 leading-tight">{w}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                {/* Suggestion */}
-                                <div className="bg-yellow-100 border-4 border-black p-6 shadow-[4px_4px_0px_0px_rgba(234,179,8,1)] relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 bg-yellow-400 border-b-2 border-l-2 border-black px-4 py-1 font-mono text-[10px] font-black uppercase tracking-[0.2em]">
-                                        Key Directive
-                                    </div>
-                                    <p className="text-lg font-bold text-yellow-900 leading-relaxed mt-2">{evaluation.suggestion}</p>
-                                </div>
-
-                                {/* Better Answer */}
-                                <div>
-                                    <h5 className="font-mono text-xs font-black uppercase tracking-widest text-black mb-4">Golden Protocol / Reference Answer</h5>
-                                    <div className="bg-black text-white border-4 border-black p-8 font-mono text-base leading-relaxed relative italic overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                        <div className="absolute top-2 left-2 text-white/10 text-6xl font-black">"</div>
-                                        <span className="relative z-10">{evaluation.betterAnswer}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="p-8 bg-gray-50 border-t-4 border-black flex justify-end">
-                                <button
-                                    onClick={handleNextQuestion}
-                                    className="group px-10 py-5 bg-black text-white font-black uppercase tracking-widest hover:bg-black/90 flex items-center gap-4 transition-all hover:scale-105 active:scale-95"
-                                >
-                                    {currentQuestionIndex < questions.length - 1 ? 'Proceed to Next Module' : 'End Session'}
-                                    <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

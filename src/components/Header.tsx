@@ -9,29 +9,34 @@ export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { userData } = useAuth();
 
-    const navItems = [
-        { label: 'Find Jobs', path: '/jobs' },
-        { label: 'Post a Job', path: '/post-job' },
-        { label: 'AI Prep', path: '#ai-prep' },
-        { label: 'Pricing', path: '#pricing' },
-    ];
+    const role = userData?.role;
 
-    if (userData?.role === 'seeker') {
-        // Add Dashboard for seekers at the beginning
-        navItems.unshift({ label: 'Dashboard', path: '/seeker/dashboard' });
-    }
-
-    if (userData?.role === 'employer') {
-        const employerNavItems = [
-            { label: 'Find Talent', path: '/employer/search' },
-            { label: 'Manage Jobs', path: '/employer/jobs' }
+    const navItems = (() => {
+        if (role === 'seeker') {
+            return [
+                { label: 'Dashboard', path: '/seeker/dashboard' },
+                { label: 'Find Jobs', path: '/jobs' },
+                { label: 'AI Prep', path: '/seeker/interview' },
+                { label: 'Pricing', path: '/pricing' },
+            ];
+        }
+        if (role === 'employer') {
+            return [
+                { label: 'Find Jobs', path: '/jobs' },
+                { label: 'Find Talent', path: '/employer/search' },
+                { label: 'Manage Jobs', path: '/employer/jobs' },
+                { label: 'Post a Job', path: '/post-job' },
+                { label: 'My Company', path: '/employer/company' },
+            ];
+        }
+        // Unauthenticated / admin
+        return [
+            { label: 'Find Jobs', path: '/jobs' },
+            { label: 'Post a Job', path: '/post-job' },
+            { label: 'AI Prep', path: '/login' },
+            { label: 'Pricing', path: '/pricing' },
         ];
-        // Insert "Find Talent" and "Manage Jobs" after "Find Jobs" (at index 1)
-        navItems.splice(1, 0, ...employerNavItems);
-        // Insert "My Company" after "Post a Job".
-        // The index is now 4 (original 3 + 2 inserted items - 1 for 'Post a Job' itself)
-        navItems.splice(4, 0, { label: 'My Company', path: '/employer/company' });
-    }
+    })();
 
     return (
         <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-soft">

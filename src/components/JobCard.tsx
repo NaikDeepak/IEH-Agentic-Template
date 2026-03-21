@@ -11,9 +11,10 @@ interface JobCardProps {
   className?: string;
   onClick?: () => void;
   onViewApplicants?: (e: React.MouseEvent) => void;
+  onApply?: (e: React.MouseEvent) => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants, onApply }) => {
   const { id, title, location, type, salaryRange, status, expiresAt, createdAt } = job;
   const navigate = useNavigate();
 
@@ -134,6 +135,17 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
             >
               <Users className="w-3 h-3" />
               Applicants
+            </button>
+          )}
+          {onApply && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onApply(e);
+              }}
+              className="flex items-center gap-1.5 text-xs font-semibold bg-sky-700 hover:bg-sky-800 text-white px-3 py-1.5 rounded-lg transition-colors"
+            >
+              Apply Now
             </button>
           )}
           <div className="flex items-center gap-1 text-xs font-semibold text-sky-700 group-hover:text-sky-800 transition-colors">

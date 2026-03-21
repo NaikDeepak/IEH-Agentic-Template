@@ -5,16 +5,21 @@ import type { JobPosting } from '../features/jobs/types';
 import type { Job } from '../types';
 import { JobCard } from '../components/JobCard';
 import { JobSearchBar } from '../components/JobSearchBar';
+import { ApplyModal } from '../components/ApplyModal';
 import { Header } from '../components/Header';
 import { SkeletonJobCard } from '../components/ui/Skeleton';
 import { X } from 'lucide-react';
 import * as Sentry from '@sentry/react';
 import { searchJobs } from '../lib/ai/search';
+import { useAuth } from '../hooks/useAuth';
 
 type JobWithMatch = Job & { matchScore?: number };
 
 export const JobsPage: React.FC = () => {
     const navigate = useNavigate();
+    const { userData } = useAuth();
+    const isSeeker = userData?.role === 'seeker';
+
     // browseJobs holds the default list (Active First) to restore after search
     const [browseJobs, setBrowseJobs] = useState<Job[]>([]);
     // displayedJobs is what's currently shown on screen
@@ -24,6 +29,7 @@ export const JobsPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [currentSearchQuery, setCurrentSearchQuery] = useState('');
+    const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -92,6 +98,19 @@ export const JobsPage: React.FC = () => {
         setCurrentSearchQuery('');
         setDisplayedJobs(browseJobs);
         setError(null);
+    };
+
+    const handleApply = async (jobId: string) => {
+        try {
+            const posting = await JobService.getJobById(jobId);
+            if (posting) {
+                setApplyingJob(posting);
+            } else {
+                void navigate(`/jobs/${jobId}`);
+            }
+        } catch {
+            void navigate(`/jobs/${jobId}`);
+        }
     };
 
     // Helper to map backend type to frontend type
@@ -216,12 +235,21 @@ export const JobsPage: React.FC = () => {
                                     job={job}
                                     matchScore={job.matchScore}
                                     onClick={() => navigate(`/jobs/${job.id}`)}
+                                    onApply={isSeeker ? (e) => { e.stopPropagation(); void handleApply(job.id); } : undefined}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
             </main>
+
+            {applyingJob && (
+                <ApplyModal
+                    job={applyingJob}
+                    isOpen={true}
+                    onClose={() => { setApplyingJob(null); }}
+                />
+            )}
         </div>
     );
 };

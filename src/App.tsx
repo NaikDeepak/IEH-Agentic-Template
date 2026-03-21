@@ -95,7 +95,7 @@ function SeekerTrackerPage() {
   };
 
   if (loading) return (
-    <div className="space-y-4 p-8" aria-label="Loading application tracker" role="status">
+    <div className="space-y-3" aria-label="Loading application tracker" role="status">
       {[0, 1, 2, 3].map(i => (
         <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 animate-pulse">
           <div className="h-4 w-1/3 bg-slate-100 rounded-lg mb-3" />
@@ -109,8 +109,11 @@ function SeekerTrackerPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-slate-900 mb-8">Application Tracker</h1>
+    <div>
+      <div className="mb-6 border-b border-slate-200 pb-6">
+        <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">My Applications</span>
+        <h1 className="text-2xl font-bold text-slate-900 mt-1">Application Tracker</h1>
+      </div>
       <ApplicationBoard applications={applications} onStatusChange={handleStatusChange} />
     </div>
   );
@@ -221,9 +224,9 @@ function App() {
             path="/seeker/resume"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
                   <Header />
-                  <main className="flex-grow p-8">
+                  <main className="flex-grow container mx-auto px-4 md:px-8 py-10 max-w-4xl">
                     <ResumeAnalyzer />
                   </main>
                 </div>
@@ -249,9 +252,9 @@ function App() {
             path="/seeker/interview"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
                   <Header />
-                  <main className="flex-grow p-8">
+                  <main className="flex-grow container mx-auto px-4 md:px-8 py-10 max-w-4xl">
                     <InterviewPrep />
                   </main>
                 </div>
@@ -291,9 +294,9 @@ function App() {
             path="/seeker/tracker"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
-                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
                   <Header />
-                  <main className="flex-grow p-8">
+                  <main className="flex-grow container mx-auto px-4 md:px-8 py-10 max-w-7xl">
                     <SeekerTrackerPage />
                   </main>
                 </div>

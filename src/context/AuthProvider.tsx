@@ -176,11 +176,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err: unknown) {
             const error = err as { code?: string; message?: string };
             console.error("Email Login Error:", error);
-            if (error.code === 'auth/operation-not-allowed') {
-                setError("Email/Password login is not enabled in the Firebase Console. Please enable it.");
-            } else {
-                setError(error.message ?? "Failed to sign in with email.");
-            }
+            const friendlyMessages: Record<string, string> = {
+                'auth/operation-not-allowed': 'Email/Password login is not enabled. Please contact support.',
+                'auth/user-not-found': 'No account found with this email address.',
+                'auth/wrong-password': 'Incorrect password. Please try again.',
+                'auth/invalid-credential': 'Invalid email or password.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+            };
+            setError((error.code && friendlyMessages[error.code]) ?? "Failed to sign in. Please check your credentials.");
             throw err;
         }
     }, []);

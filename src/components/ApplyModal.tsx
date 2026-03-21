@@ -97,80 +97,81 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
             role="presentation"
             onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         >
             <FocusTrap active={isOpen}>
                 <div
-                    className="bg-white border-4 border-black w-full max-w-2xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col max-h-[90vh]"
+                    className="bg-white rounded-2xl border border-slate-200 shadow-soft-md w-full max-w-2xl flex flex-col max-h-[90vh]"
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="apply-modal-title"
                     tabIndex={-1}
                 >
                     {/* Header */}
-                    <div className="border-b-4 border-black p-6 flex justify-between items-center bg-black text-white">
+                    <div className="border-b border-slate-200 px-6 py-5 flex justify-between items-center">
                         <div>
-                            <h2 id="apply-modal-title" className="text-2xl font-black uppercase tracking-tighter">Apply for Role</h2>
-                            <p className="text-xs font-mono text-gray-400 uppercase tracking-widest mt-1">
-                                {job.title}
-                            </p>
+                            <h2 id="apply-modal-title" className="text-lg font-bold text-slate-900">Apply for Role</h2>
+                            <p className="text-sm text-slate-400 mt-0.5">{job.title}</p>
                         </div>
                         <button
                             onClick={() => { onClose(); }}
-                            className="p-2 hover:bg-white hover:text-black transition-colors"
+                            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="flex-grow overflow-y-auto p-8">
+                    <div className="flex-grow overflow-y-auto p-6">
                         {checkingStatus ? (
-                            <div className="flex flex-col items-center justify-center py-12 gap-4">
-                                <Loader2 className="w-12 h-12 animate-spin text-black" />
-                                <p className="font-mono text-xs font-bold uppercase tracking-widest">Validating Status...</p>
+                            <div className="flex flex-col items-center justify-center py-12 gap-3">
+                                <div className="w-6 h-6 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+                                <p className="text-sm text-slate-400">Checking application status...</p>
                             </div>
                         ) : hasApplied ? (
-                            <div className="text-center py-12">
-                                <div className="inline-flex items-center justify-center w-20 h-20 border-4 border-black bg-blue-50 mb-6">
-                                    <AlertCircle className="w-10 h-10 text-black" />
+                            <div className="text-center py-10">
+                                <div className="w-14 h-14 bg-sky-50 rounded-xl border border-sky-100 flex items-center justify-center mx-auto mb-5">
+                                    <AlertCircle className="w-7 h-7 text-sky-600" />
                                 </div>
-                                <h3 className="text-3xl font-black uppercase mb-4 tracking-tighter">Already Applied</h3>
-                                <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-8 max-w-sm mx-auto">
-                                    You have already submitted an application for this position. Track your progress in the dashboard.
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Already Applied</h3>
+                                <p className="text-sm text-slate-500 mb-8 max-w-sm mx-auto leading-relaxed">
+                                    You've already submitted an application for this position. Track your progress in the dashboard.
                                 </p>
-                                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <button
                                         onClick={() => { onClose(); }}
-                                        className="px-8 py-3 bg-white text-black border-2 border-black font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                                        className="px-6 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
-                                        Close Window
+                                        Close
                                     </button>
                                     <button
                                         onClick={() => { window.location.href = '/seeker/tracker'; }}
-                                        className="px-8 py-3 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors"
+                                        className="px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors"
                                     >
                                         View Tracker
                                     </button>
                                 </div>
                             </div>
                         ) : step === 'questions' ? (
-                            <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-8">
+                            <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-6">
                                 {job.screening_questions && job.screening_questions.length > 0 ? (
                                     <div>
-                                        <h3 className="text-xl font-black uppercase mb-6 border-l-4 border-black pl-4">Screening Questions</h3>
-                                        <div className="space-y-6">
+                                        <h3 className="text-sm font-semibold text-slate-700 mb-4">Screening Questions</h3>
+                                        <div className="space-y-5">
                                             {job.screening_questions.map((q, idx) => (
-                                                <div key={idx} className="space-y-2">
-                                                    <label className="block text-sm font-black uppercase tracking-tight">
-                                                        {q.question}
+                                                <div key={idx} className="space-y-1.5">
+                                                    <label className="block text-sm font-medium text-slate-700">
+                                                        {idx + 1}. {q.question}
                                                     </label>
+                                                    {q.hint && (
+                                                        <p className="text-xs text-slate-400">{q.hint}</p>
+                                                    )}
                                                     <textarea
                                                         required
-                                                        className="w-full border-2 border-black p-4 font-mono text-sm focus:bg-gray-50 focus:outline-none transition-colors min-h-[100px]"
-                                                        placeholder="Enter your response here..."
+                                                        className="w-full border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all min-h-[100px] resize-none"
+                                                        placeholder="Your answer..."
                                                         value={answers[q.question] ?? ''}
                                                         onChange={e => { handleAnswerChange(q.question, e.target.value); }}
                                                     />
@@ -179,61 +180,62 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8">
-                                        <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">
-                                            No screening questions required. <br /> Ready to submit your profile?
+                                    <div className="text-center py-8 bg-slate-50 rounded-xl border border-slate-200">
+                                        <p className="text-sm text-slate-500">
+                                            No screening questions required.<br />
+                                            <span className="font-medium text-slate-700">Ready to submit your profile?</span>
                                         </p>
                                     </div>
                                 )}
 
                                 {error && (
-                                    <div className="bg-red-50 border-2 border-red-600 p-4 font-mono text-xs text-red-600 flex items-center gap-3">
+                                    <div className="bg-red-50 border border-red-100 rounded-lg p-3 text-sm text-red-600 flex items-center gap-2.5">
                                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                         {error}
                                     </div>
                                 )}
 
-                                <div className="pt-4 border-t-2 border-dashed border-gray-200 flex justify-end gap-4">
+                                <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
                                     <button
                                         type="button"
                                         onClick={() => { onClose(); }}
-                                        className="px-6 py-3 font-bold uppercase tracking-widest text-xs border-2 border-black hover:bg-gray-100 transition-colors"
+                                        className="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting || !!(userData?.role && userData.role !== 'seeker')}
-                                        className="px-10 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Submission'}
+                                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit Application'}
                                     </button>
                                 </div>
                             </form>
                         ) : step === 'submitting' ? (
-                            <div className="flex flex-col items-center justify-center py-24 gap-4">
-                                <Loader2 className="w-16 h-16 animate-spin text-black" />
-                                <p className="font-black uppercase tracking-[0.2em] text-xl">Processing Application</p>
+                            <div className="flex flex-col items-center justify-center py-16 gap-4">
+                                <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+                                <p className="text-sm font-medium text-slate-500">Submitting your application...</p>
                             </div>
                         ) : (
-                            <div className="text-center py-12 flex flex-col items-center">
-                                <div className="w-24 h-24 bg-green-50 border-4 border-black flex items-center justify-center mb-8 animate-in zoom-in duration-300">
-                                    <CheckCircle2 className="w-12 h-12 text-black" />
+                            <div className="text-center py-10 flex flex-col items-center">
+                                <div className="w-14 h-14 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center mb-5 animate-in zoom-in duration-300">
+                                    <CheckCircle2 className="w-7 h-7 text-emerald-600" />
                                 </div>
-                                <h3 className="text-4xl font-black uppercase mb-4 tracking-tighter leading-none">Application Sent</h3>
-                                <p className="font-mono text-gray-500 uppercase tracking-tight text-sm mb-12 max-w-md mx-auto">
-                                    Your profile and answers have been successfully transmitted to the employer. You can monitor the status on your tracker.
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Application Submitted</h3>
+                                <p className="text-sm text-slate-500 mb-8 max-w-sm mx-auto leading-relaxed">
+                                    Your profile and answers have been sent to the employer. You can track the status in your dashboard.
                                 </p>
-                                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <button
                                         onClick={() => { onClose(); }}
-                                        className="px-8 py-3 bg-black text-white font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors"
+                                        className="px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors"
                                     >
                                         Done
                                     </button>
                                     <button
                                         onClick={() => { window.location.href = '/seeker/tracker'; }}
-                                        className="px-8 py-3 border-2 border-black text-black font-black uppercase tracking-widest text-xs hover:bg-gray-100 transition-colors"
+                                        className="px-6 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors"
                                     >
                                         View Tracker
                                     </button>

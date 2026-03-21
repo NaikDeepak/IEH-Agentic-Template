@@ -10,11 +10,11 @@ const AdminLayout: FC<AdminLayoutProps> = ({ children }) => {
     <div className="flex min-h-screen bg-white font-sans text-black">
       <AdminSidebar />
       <div className="flex-1 flex flex-col">
-        <header className="h-20 bg-white border-b-2 border-black flex items-center justify-between px-8">
-          <h1 className="text-2xl font-black uppercase tracking-tighter">Super Admin Panel</h1>
-          <div className="flex items-center space-x-4">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-gray-500">Welcome, Admin</span>
-            <div className="w-10 h-10 bg-black text-white border-2 border-black flex items-center justify-center font-bold font-mono">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+          <h1 className="text-base font-bold text-slate-900">Admin Panel</h1>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-400">Welcome, Admin</span>
+            <div className="w-8 h-8 bg-sky-700 text-white rounded-lg flex items-center justify-center text-sm font-bold">
               A
             </div>
           </div>

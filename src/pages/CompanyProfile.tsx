@@ -6,7 +6,7 @@ import type { Company } from '../features/companies/types';
 import type { JobPosting } from '../features/jobs/types';
 import { Header } from '../components/Header';
 import { JobCard } from '../components/JobCard';
-import { Loader2, ArrowLeft, Globe, MapPin, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Globe, MapPin, ExternalLink } from 'lucide-react';
 import type { Job } from '../types';
 
 export const CompanyProfile: React.FC = () => {
@@ -85,11 +85,11 @@ export const CompanyProfile: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
                 <Header />
-                <div className="flex-grow flex flex-col items-center justify-center py-24">
-                    <Loader2 className="w-12 h-12 animate-spin text-black mb-6" />
-                    <p className="font-mono text-sm font-bold uppercase tracking-widest text-gray-500">Loading Profile...</p>
+                <div className="flex-grow flex flex-col items-center justify-center gap-3">
+                    <div className="w-8 h-8 border-2 border-sky-700 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-slate-500">Loading company profile...</p>
                 </div>
             </div>
         );
@@ -97,16 +97,16 @@ export const CompanyProfile: React.FC = () => {
 
     if (error || !company) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
                 <Header />
-                <div className="flex-grow container mx-auto px-4 py-24 text-center">
-                    <h1 className="text-4xl font-black uppercase mb-4">404 // Profile Not Found</h1>
-                    <p className="font-mono text-gray-500 mb-8">{error ?? "The company you're looking for doesn't exist."}</p>
+                <div className="flex-grow container mx-auto px-4 py-24 text-center max-w-lg">
+                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Company Not Found</h1>
+                    <p className="text-sm text-slate-500 mb-8">{error ?? "The company you're looking for doesn't exist."}</p>
                     <button
                         onClick={() => navigate('/jobs')}
-                        className="bg-black text-white px-8 py-3 font-bold uppercase tracking-widest"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-sky-700 hover:bg-sky-800 text-white text-sm font-semibold rounded-xl transition-colors"
                     >
-                        Return to Jobs
+                        Browse Jobs
                     </button>
                 </div>
             </div>
@@ -116,32 +116,30 @@ export const CompanyProfile: React.FC = () => {
     const videoEmbedUrl = company.video_url ? getEmbedUrl(company.video_url) : null;
 
     return (
-        <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+        <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
             <Header />
 
-            <main className="flex-grow container mx-auto px-4 md:px-8 py-12 max-w-6xl">
+            <main className="flex-grow container mx-auto px-4 md:px-8 py-10 max-w-6xl">
                 <button
                     onClick={() => navigate(-1)}
-                    className="group flex items-center gap-2 mb-8 font-mono text-xs uppercase tracking-widest hover:translate-x-[-4px] transition-transform"
+                    className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
                 {/* Hero Section */}
-                <div className="border-b-4 border-black pb-12 mb-16">
-                    <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6 md:p-8 mb-6">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                         <div className="flex-1">
-                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-none mb-4">
+                            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight mb-2">
                                 {company.name}
                             </h1>
                             {company.tagline && (
-                                <p className="text-2xl md:text-3xl font-light text-gray-500 tracking-tight mb-6">
-                                    {company.tagline}
-                                </p>
+                                <p className="text-base text-slate-500 mb-4">{company.tagline}</p>
                             )}
-                            <div className="flex flex-wrap gap-6 font-mono text-xs font-bold uppercase tracking-widest">
+                            <div className="flex flex-wrap gap-4 text-sm text-slate-500">
                                 {company.location && (
-                                    <span className="flex items-center gap-2">
+                                    <span className="flex items-center gap-1.5">
                                         <MapPin className="w-4 h-4" /> {company.location}
                                     </span>
                                 )}
@@ -150,7 +148,7 @@ export const CompanyProfile: React.FC = () => {
                                         href={company.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center gap-2 hover:underline decoration-2"
+                                        className="flex items-center gap-1.5 text-sky-600 hover:text-sky-800 transition-colors"
                                     >
                                         <Globe className="w-4 h-4" /> Website <ExternalLink className="w-3 h-3" />
                                     </a>
@@ -158,33 +156,29 @@ export const CompanyProfile: React.FC = () => {
                             </div>
                         </div>
                         {company.logo && (
-                            <div className="w-32 h-32 md:w-48 md:h-48 border-4 border-black bg-white flex items-center justify-center p-4">
+                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl border border-slate-200 bg-white flex items-center justify-center p-3 shrink-0">
                                 <img src={company.logo} alt={company.name} loading="lazy" className="max-w-full max-h-full object-contain" />
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-16">
+                    <div className="lg:col-span-2 space-y-6">
                         {/* Bio */}
-                        <section>
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6 flex items-center gap-4">
-                                <span className="w-8 h-[2px] bg-gray-200"></span> About {company.name}
-                            </h2>
-                            <div className="prose prose-xl font-light text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
+                            <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">About {company.name}</h2>
+                            <div className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
                                 {company.bio}
                             </div>
-                        </section>
+                        </div>
 
                         {/* Video */}
                         {videoEmbedUrl && (
-                            <section>
-                                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6 flex items-center gap-4">
-                                    <span className="w-8 h-[2px] bg-gray-200"></span> Culture & Mission
-                                </h2>
-                                <div className="aspect-video border-4 border-black bg-gray-100 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
+                                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Culture & Mission</h2>
+                                <div className="aspect-video rounded-xl overflow-hidden bg-slate-100">
                                     <iframe
                                         src={videoEmbedUrl}
                                         className="w-full h-full"
@@ -193,42 +187,40 @@ export const CompanyProfile: React.FC = () => {
                                         title="Company Introduction"
                                     ></iframe>
                                 </div>
-                            </section>
+                            </div>
                         )}
 
                         {/* Job Library */}
-                        <section>
-                            <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-4">
-                                    <span className="w-8 h-[2px] bg-gray-200"></span> Open Positions
-                                </h2>
-                                <span className="font-mono text-xs font-bold uppercase tracking-widest bg-black text-white px-3 py-1">
-                                    {jobs.length} Active
+                        <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
+                            <div className="flex items-center justify-between mb-5">
+                                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Open Positions</h2>
+                                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                                    {jobs.length} active
                                 </span>
                             </div>
 
                             {jobs.length === 0 ? (
-                                <div className="border-2 border-dashed border-gray-200 p-12 text-center">
-                                    <p className="font-mono text-sm text-gray-400 uppercase tracking-widest">No open roles at the moment.</p>
+                                <div className="border-2 border-dashed border-slate-100 rounded-xl p-10 text-center">
+                                    <p className="text-sm text-slate-400">No open roles at the moment.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {jobs.map(job => (
                                         <JobCard key={job.id} job={mapJobPostingToJob(job)} />
                                     ))}
                                 </div>
                             )}
-                        </section>
+                        </div>
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-12">
+                    <div className="space-y-5">
                         {company.tech_stack && company.tech_stack.length > 0 && (
-                            <div className="border-2 border-black p-8 bg-gray-50">
-                                <h3 className="text-sm font-black uppercase tracking-widest mb-6 border-b-2 border-black pb-2">Tech Stack</h3>
+                            <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-5">
+                                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Tech Stack</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {company.tech_stack.map(tech => (
-                                        <span key={tech} className="bg-white border border-black px-3 py-1 font-mono text-xs font-bold">
+                                        <span key={tech} className="px-3 py-1 bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 rounded-full">
                                             {tech}
                                         </span>
                                     ))}
@@ -236,12 +228,11 @@ export const CompanyProfile: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="bg-black text-white p-8">
-                            <h3 className="text-sm font-black uppercase tracking-widest mb-4">Want to work here?</h3>
-                            <p className="font-mono text-xs text-gray-400 mb-6 leading-relaxed">
+                        <div className="bg-sky-700 text-white rounded-2xl p-5">
+                            <h3 className="text-sm font-semibold mb-2">Want to work here?</h3>
+                            <p className="text-xs text-sky-200 leading-relaxed">
                                 Join {company.name} and help build the future. All roles are evaluated via our semantic matching engine.
                             </p>
-                            <div className="h-1 w-12 bg-white"></div>
                         </div>
                     </div>
                 </div>

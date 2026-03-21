@@ -68,31 +68,32 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
             role="button"
             tabIndex={0}
             className={`
-                bg-white border-2 border-black p-4 mb-4 ${isReadOnly ? 'cursor-default' : 'cursor-pointer'}
-                hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all
-                ${isDragging ? 'opacity-50 shadow-none z-50' : 'opacity-100'}
+                bg-white rounded-xl border border-slate-200 p-4 shadow-soft
+                ${isReadOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}
+                hover:shadow-soft-md hover:border-slate-300 transition-all
+                ${isDragging ? 'opacity-40 scale-[0.98]' : 'opacity-100'}
             `}
         >
-            <div className="flex justify-between items-start mb-2">
-                <div>
-                    <h4 className="font-black text-sm uppercase tracking-tight">
+            <div className="flex justify-between items-start mb-3">
+                <div className="min-w-0 flex-1 pr-2">
+                    <h4 className="font-semibold text-sm text-slate-900 leading-tight truncate">
                         {application.candidate_role ?? 'Position Applied'}
                     </h4>
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500 uppercase">
+                    <div className="flex items-center gap-1 text-xs text-slate-400 mt-0.5">
                         <Building2 className="w-3 h-3" />
-                        Company Name
+                        Company
                     </div>
                 </div>
-                <div className="bg-black text-white px-1.5 py-0.5 text-[9px] font-black uppercase">
-                    {Math.round(application.match_score)}% Match
-                </div>
+                {application.match_score > 0 && (
+                    <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                        {Math.round(application.match_score)}%
+                    </span>
+                )}
             </div>
 
-            <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
-                <div className="flex items-center gap-1 text-[9px] font-mono text-gray-400 uppercase">
-                    <Calendar className="w-2.5 h-2.5" />
-                    Applied: {formatDate(application.applied_at)}
-                </div>
+            <div className="flex items-center gap-1 text-[11px] text-slate-400 pt-3 border-t border-slate-100">
+                <Calendar className="w-3 h-3" />
+                Applied {formatDate(application.applied_at)}
             </div>
 
             {application.needsFollowUp && (

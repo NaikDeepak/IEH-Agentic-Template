@@ -36,7 +36,7 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
       <FocusTrap active={isOpen}>
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <div
-          className="bg-white border-4 border-black w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] relative animate-in zoom-in-95 duration-200"
+          className="bg-white rounded-2xl border border-slate-200 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-soft-md relative animate-in zoom-in-95 duration-200"
           onClick={(e) => { e.stopPropagation(); }}
           onKeyDown={(e) => { if (e.key === 'Escape') onClose(); e.stopPropagation(); }}
           role="dialog"
@@ -47,123 +47,84 @@ export const JobDetailModal: React.FC<JobDetailModalProps> = ({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-black hover:text-white transition-colors border-2 border-transparent hover:border-black"
+            className="absolute top-4 right-4 p-2 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
 
-          <div className="p-8 md:p-12">
+          <div className="p-6 md:p-8">
             {/* Header */}
-            <div className="mb-8 border-b-4 border-black pb-8">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="mb-6 pb-6 border-b border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
                 <StatusBadge status={job.status === 'active' ? 'active' : 'closed'} />
-                <span className="font-mono text-xs font-bold uppercase tracking-widest text-gray-500">
-                  {job.type.replace('_', ' ')} • {job.work_mode}
+                <span className="text-xs text-slate-500">
+                  {job.type.replace('_', ' ')} · {job.work_mode}
                 </span>
               </div>
-              <h2 id="job-detail-title" className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-tight mb-2">
+              <h2 id="job-detail-title" className="text-2xl font-bold text-slate-900 leading-tight mb-1">
                 {job.title}
               </h2>
-              <p className="text-xl font-bold text-gray-500 uppercase tracking-tight">
-                Company Name
-              </p>
+              <p className="text-sm text-slate-500">Company</p>
             </div>
 
             {/* Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center shrink-0">
-                    <MapPin className="w-6 h-6" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {[
+                { icon: MapPin, label: 'Location', value: job.location },
+                { icon: Briefcase, label: 'Experience', value: job.experience },
+                { icon: DollarSign, label: 'Salary', value: job.salary_range ? formatSalary(job.salary_range) : 'Competitive' },
+                { icon: Clock, label: 'Posted', value: 'Recently' },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="bg-slate-50 rounded-xl border border-slate-200 p-3">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
                   </div>
-                  <div>
-                    <p className="text-[10px] font-mono font-bold uppercase text-gray-500">Location</p>
-                    <p className="font-bold">{job.location}</p>
-                  </div>
+                  <p className="text-sm font-semibold text-slate-900">{value}</p>
                 </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center shrink-0">
-                    <Briefcase className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-mono font-bold uppercase text-gray-500">Experience</p>
-                    <p className="font-bold">{job.experience}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center shrink-0">
-                    <DollarSign className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-mono font-bold uppercase text-gray-500">Salary Range</p>
-                    <p className="font-mono font-bold">{job.salary_range ? formatSalary(job.salary_range) : 'Competitive'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 border-2 border-black flex items-center justify-center shrink-0">
-                    <Clock className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-mono font-bold uppercase text-gray-500">Posted</p>
-                    <p className="font-bold">Recently</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Description */}
-            <div className="mb-12">
-              <h3 className="text-xl font-black uppercase tracking-tight mb-4 border-l-4 border-black pl-4">
-                Job Description
-              </h3>
-              <div className="prose prose-sm max-w-none text-gray-600 font-medium leading-relaxed">
+            <div className="mb-8">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">Job Description</h3>
+              <div className="text-sm text-slate-600 leading-relaxed space-y-3">
                 {job.description.split('\n').map((para, i) => (
-                  <p key={i} className="mb-4">{para}</p>
+                  <p key={i}>{para}</p>
                 ))}
               </div>
             </div>
 
             {/* Skills */}
-            <div className="mb-12">
-              <h3 className="text-xl font-black uppercase tracking-tight mb-4 border-l-4 border-black pl-4">
-                Required Skills
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {job.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="bg-gray-100 border-2 border-black px-3 py-1 text-xs font-bold uppercase tracking-tight"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {job.skills.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-slate-900 mb-3">Required Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1 text-xs font-medium text-sky-700 bg-sky-50 border border-sky-100 rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Footer Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t-4 border-black">
+            <div className="pt-6 border-t border-slate-100">
               {alreadyApplied ? (
-                <div className="flex-grow bg-gray-100 border-2 border-black p-4 text-center font-bold uppercase tracking-widest text-gray-500">
+                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-center text-sm font-semibold text-slate-400">
                   Already Applied
                 </div>
               ) : (
                 <button
                   onClick={onApply}
                   disabled={isApplying}
-                  className="flex-grow flex items-center justify-center gap-3 bg-black text-white p-6 text-xl font-black uppercase tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-800 text-white py-3 px-6 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
                 >
-                  {isApplying ? (
-                    <>Processing...</>
-                  ) : (
-                    <>
-                      Apply Now <Send className="w-6 h-6" />
-                    </>
-                  )}
+                  {isApplying ? 'Processing...' : <><Send className="w-4 h-4" /> Apply Now</>}
                 </button>
               )}
             </div>
