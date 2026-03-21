@@ -50,9 +50,9 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     }
   }
 
-  const baseClasses = "inline-flex items-center gap-1.5 px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-widest border-2 transition-colors";
-  const activeClasses = "bg-black text-white border-black";
-  const passiveClasses = "bg-white text-gray-400 border-gray-200";
+  const baseClasses = "inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold rounded-full border transition-colors";
+  const activeClasses = "bg-emerald-50 text-emerald-700 border-emerald-200";
+  const passiveClasses = "bg-slate-100 text-slate-400 border-slate-200";
   const closedClasses = "bg-red-50 text-red-600 border-red-200";
 
   return (
@@ -60,7 +60,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
       className={`${baseClasses} ${isActive ? activeClasses : isPassive ? passiveClasses : closedClasses} ${className}`}
       title={tooltipText}
     >
-      <span className={`w-2 h-2 ${isActive ? 'bg-emerald-400' : isPassive ? 'bg-gray-300' : 'bg-red-500'}`} aria-hidden="true" />
+      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : isPassive ? 'bg-slate-400' : 'bg-red-500'}`} aria-hidden="true" />
       {showLabel && (
         <span>{status}</span>
       )}
