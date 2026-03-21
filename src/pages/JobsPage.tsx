@@ -8,6 +8,7 @@ import { JobSearchBar } from '../components/JobSearchBar';
 import { Header } from '../components/Header';
 import { SkeletonJobCard } from '../components/ui/Skeleton';
 import { X } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 import { searchJobs } from '../lib/ai/search';
 
 type JobWithMatch = Job & { matchScore?: number };
@@ -33,6 +34,7 @@ export const JobsPage: React.FC = () => {
                 setBrowseJobs(mappedJobs);
                 setDisplayedJobs(mappedJobs);
             } catch (err) {
+                Sentry.captureException(err);
                 console.error("Failed to fetch jobs:", err);
                 setError("Failed to load jobs. Please try again later.");
             } finally {
@@ -76,6 +78,7 @@ export const JobsPage: React.FC = () => {
 
             setDisplayedJobs(mappedResults);
         } catch (err) {
+            Sentry.captureException(err);
             console.error("Search failed:", err);
             setError("Search failed. Please try again.");
             setDisplayedJobs([]);

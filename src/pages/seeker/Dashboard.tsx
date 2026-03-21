@@ -70,7 +70,7 @@ export const SeekerDashboard: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+            <div className="min-h-screen bg-white flex flex-col font-sans text-black" data-testid="dashboard-skeleton">
                 <Header />
                 <main className="flex-grow p-6 md:p-12">
                     <div className="max-w-7xl mx-auto">
