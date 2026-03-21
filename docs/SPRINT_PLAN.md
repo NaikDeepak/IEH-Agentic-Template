@@ -65,10 +65,10 @@ Goal: Make job discovery actually useful.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S2-SEARCH-01 | `[ ]` More filters on Find Jobs | Add city/location text input, job type (remote/hybrid/office) multi-select, salary range slider, experience level to `JobSearchBar`. Update `searchJobs` to pass filters to backend |
+| S2-SEARCH-01 | `[x]` More filters on Find Jobs | `JobSearchBar` now has expandable filter panel: city text input, job type select (full-time/part-time/contract/internship), experience level (entry/mid/senior), min salary (₹ LPA). Work mode dropdown retained. All filters passed to backend. |
 | S2-SEARCH-02 | `[ ]` Spell-check / "did you mean" suggestions | On search with 0 results, suggest alternative queries. Backend: fuzzy match against job titles index |
-| S2-SEARCH-03 | `[ ]` Search result relevance improvement | Review embedding + cosine similarity tuning in `src/server/features/ai/`. Low-match results should be filtered below threshold |
-| S2-SEARCH-04 | `[ ]` Mobile layout — search bar and jobs grid | Responsive audit: JobSearchBar collapses cleanly on mobile, grid switches to single column, filter controls accessible |
+| S2-SEARCH-03 | `[x]` Search result relevance improvement | Results with matchScore < 30 filtered out in `jobs.service.js`. Also fixed `job.skills.join()` crash when skills is not an array. |
+| S2-SEARCH-04 | `[x]` Mobile layout — search bar and jobs grid | Filter panel uses `flex-wrap` + `min-w` so controls stack cleanly on mobile. Grid already single-column on small screens. |
 
 ---
 

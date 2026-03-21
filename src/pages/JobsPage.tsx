@@ -5,6 +5,7 @@ import type { JobPosting } from '../features/jobs/types';
 import type { Job } from '../types';
 import { JobCard } from '../components/JobCard';
 import { JobSearchBar } from '../components/JobSearchBar';
+import type { JobSearchFilters } from '../components/JobSearchBar';
 import { ApplyModal } from '../components/ApplyModal';
 import { Header } from '../components/Header';
 import { SkeletonJobCard } from '../components/ui/Skeleton';
@@ -51,7 +52,7 @@ export const JobsPage: React.FC = () => {
         void fetchJobs();
     }, []);
 
-    const handleSearch = async (term: string, location: string) => {
+    const handleSearch = async (term: string, filters: JobSearchFilters) => {
         const query = term;
 
         if (!query.trim()) {
@@ -65,9 +66,7 @@ export const JobsPage: React.FC = () => {
             setIsSearching(true);
             setCurrentSearchQuery(query);
 
-            // If location is 'All', don't pass it as a filter
-            const locationFilter = location === 'All' ? '' : location;
-            const results = await searchJobs(query, locationFilter);
+            const results = await searchJobs(query, filters);
 
             const mappedResults: JobWithMatch[] = results.map((result) => {
                 const posting = result as unknown as JobPosting;

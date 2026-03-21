@@ -1,6 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { z } from "zod";
 import { callAIProxy } from './proxy';
+import type { JobSearchFilters } from '../../components/JobSearchBar';
 
 
 
@@ -64,7 +65,7 @@ async function getAuthToken(): Promise<string | null> {
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching job documents
  */
-export async function searchJobs(searchQuery: string, locationFilter = '', limitCount = 10): Promise<Record<string, unknown>[]> {
+export async function searchJobs(searchQuery: string, filters: Partial<JobSearchFilters> = {}, limitCount = 10): Promise<Record<string, unknown>[]> {
     try {
         const token = await getAuthToken();
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -75,7 +76,15 @@ export async function searchJobs(searchQuery: string, locationFilter = '', limit
         const response = await fetch('/api/jobs/search', {
             method: 'POST',
             headers,
-            body: JSON.stringify({ query: searchQuery, location: locationFilter, limit: limitCount })
+            body: JSON.stringify({
+                query: searchQuery,
+                location: filters.workMode && filters.workMode !== 'All' ? filters.workMode : '',
+                city: filters.city ?? '',
+                jobType: filters.jobType && filters.jobType !== 'All' ? filters.jobType.toLowerCase() : '',
+                experienceLevel: filters.experienceLevel && filters.experienceLevel !== 'All' ? filters.experienceLevel.toLowerCase() : '',
+                salaryMin: filters.salaryMin ? Number(filters.salaryMin) : 0,
+                limit: limitCount,
+            })
         });
 
         if (!response.ok) {
