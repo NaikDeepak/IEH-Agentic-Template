@@ -109,7 +109,7 @@ export const HeroSection: React.FC = () => {
                             {/* Employer Value Overlay */}
                             <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 text-white">
                                 <h2 className="text-3xl font-bold leading-tight mb-2 drop-shadow-lg">
-                                    Right Job,<br /><span className="text-emerald-400">Right Candidate.</span>
+                                    <span className="text-white">Right Job,</span><br /><span className="text-emerald-400">Right Candidate.</span>
                                 </h2>
                                 <p className="text-sm text-white/90 leading-relaxed max-w-sm mb-5 drop-shadow">
                                     AI-powered talent matching. Post jobs. Find candidates. Zero friction.
