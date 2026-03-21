@@ -199,7 +199,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             // onAuthStateChanged fires before updateProfile finishes, leaving the firestore doc with null displayName.
             // We ensure it gets written by manually merging the displayName here.
-            await setDoc(doc(db, 'users', userCredential.user.uid), { displayName }, { merge: true });
+            await setDoc(doc(db, 'users', userCredential.user.uid), { 
+                displayName,
+                uid: userCredential.user.uid,
+                email: userCredential.user.email 
+            }, { merge: true });
         } catch (err: unknown) {
             const error = err as { code?: string; message?: string };
             console.error("Email Signup Error:", error);
