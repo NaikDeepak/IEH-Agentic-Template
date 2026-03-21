@@ -13,8 +13,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-black"></div>
+            <div className="min-h-screen flex items-center justify-center bg-sky-50 flex-col gap-4">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 bg-sky-700 rounded-lg flex items-center justify-center shadow-sm">
+                        <span className="text-white font-bold text-sm tracking-tight">WM</span>
+                    </div>
+                    <span className="text-lg font-bold text-slate-900">WorkMila</span>
+                </div>
+                <div className="w-8 h-8 border-2 border-sky-700 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }

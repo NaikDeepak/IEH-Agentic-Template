@@ -36,44 +36,46 @@ export const RoleSelection: React.FC = () => {
     if (!userData || userData.role) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 font-sans">
-            <div className="bg-white w-full max-w-3xl border-2 border-black shadow-[16px_16px_0px_0px_rgba(255,255,255,0.2)] p-8 md:p-12 relative animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
+            <div className="bg-white w-full max-w-2xl rounded-2xl border border-slate-200 shadow-soft-md p-8 md:p-12 relative animate-in fade-in zoom-in-95 duration-200">
 
                 {isUpdating && (
-                    <div className="absolute inset-0 bg-white/90 z-20 flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="w-12 h-12 text-black animate-spin" />
-                        <p className="font-mono font-bold uppercase tracking-widest text-sm">Configuring Workspace...</p>
+                    <div className="absolute inset-0 bg-white/90 z-20 rounded-2xl flex flex-col items-center justify-center gap-4">
+                        <Loader2 className="w-8 h-8 text-sky-700 animate-spin" />
+                        <p className="text-sm font-medium text-slate-500">Setting up your workspace...</p>
                     </div>
                 )}
 
-                <div className="text-center mb-12">
-                    <div className="inline-block px-3 py-1 bg-black text-white font-mono text-xs font-bold uppercase tracking-widest mb-4">
-                        Step 1 of 1
-                    </div>
-                    <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-4">
-                        Select Your Path
+                <div className="text-center mb-10">
+                    <span className="inline-block px-3 py-1 bg-sky-50 text-sky-700 text-xs font-semibold rounded-full border border-sky-200 mb-4">
+                        One-time setup
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+                        How will you use WorkMila?
                     </h2>
-                    <p className="font-mono text-gray-500 uppercase tracking-wide text-sm max-w-md mx-auto">
-                        Choose how you will interact with the platform. This cannot be changed later.
+                    <p className="text-slate-400 text-sm max-w-sm mx-auto">
+                        Choose your role to personalise your experience. This cannot be changed later.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid md:grid-cols-2 gap-5">
                     {/* Seeker Option */}
                     <button
                         onClick={() => handleRoleSelect('seeker')}
                         disabled={isUpdating}
-                        className={`group relative p-8 border-2 border-black text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${selectedRole === 'seeker' ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'}`}
+                        className={`group relative p-8 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-soft-md ${selectedRole === 'seeker' ? 'border-sky-600 bg-sky-700 text-white' : 'border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50'}`}
                     >
-                        <div className="flex justify-between items-start mb-6">
-                            <UserCheck className={`w-8 h-8 ${selectedRole === 'seeker' ? 'text-white' : 'text-black'}`} strokeWidth={1.5} />
-                            <ArrowRight className={`w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity ${selectedRole === 'seeker' ? 'text-white' : 'text-black'}`} />
+                        <div className="flex justify-between items-start mb-5">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedRole === 'seeker' ? 'bg-white/20' : 'bg-sky-50'}`}>
+                                <UserCheck className={`w-6 h-6 ${selectedRole === 'seeker' ? 'text-white' : 'text-sky-700'}`} strokeWidth={1.5} />
+                            </div>
+                            <ArrowRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity ${selectedRole === 'seeker' ? 'text-white' : 'text-sky-600'}`} />
                         </div>
-                        <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 ${selectedRole === 'seeker' ? 'text-white' : 'text-black'}`}>
-                            Candidate
+                        <h3 className={`text-xl font-bold mb-1.5 ${selectedRole === 'seeker' ? 'text-white' : 'text-slate-900'}`}>
+                            I'm a Candidate
                         </h3>
-                        <p className={`font-mono text-xs font-bold uppercase tracking-wider leading-relaxed ${selectedRole === 'seeker' ? 'text-gray-400' : 'text-gray-500'}`}>
-                            I want to find jobs, track applications, and access career tools.
+                        <p className={`text-sm leading-relaxed ${selectedRole === 'seeker' ? 'text-sky-200' : 'text-slate-400'}`}>
+                            Find jobs, track applications, and access AI career tools.
                         </p>
                     </button>
 
@@ -81,17 +83,19 @@ export const RoleSelection: React.FC = () => {
                     <button
                         onClick={() => handleRoleSelect('employer')}
                         disabled={isUpdating}
-                        className={`group relative p-8 border-2 border-black text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${selectedRole === 'employer' ? 'bg-black text-white' : 'bg-white hover:bg-gray-50'}`}
+                        className={`group relative p-8 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-soft-md ${selectedRole === 'employer' ? 'border-sky-600 bg-sky-700 text-white' : 'border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50'}`}
                     >
-                        <div className="flex justify-between items-start mb-6">
-                            <Building2 className={`w-8 h-8 ${selectedRole === 'employer' ? 'text-white' : 'text-black'}`} strokeWidth={1.5} />
-                            <ArrowRight className={`w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity ${selectedRole === 'employer' ? 'text-white' : 'text-black'}`} />
+                        <div className="flex justify-between items-start mb-5">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedRole === 'employer' ? 'bg-white/20' : 'bg-sky-50'}`}>
+                                <Building2 className={`w-6 h-6 ${selectedRole === 'employer' ? 'text-white' : 'text-sky-700'}`} strokeWidth={1.5} />
+                            </div>
+                            <ArrowRight className={`w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity ${selectedRole === 'employer' ? 'text-white' : 'text-sky-600'}`} />
                         </div>
-                        <h3 className={`text-2xl font-black uppercase tracking-tight mb-2 ${selectedRole === 'employer' ? 'text-white' : 'text-black'}`}>
-                            Employer
+                        <h3 className={`text-xl font-bold mb-1.5 ${selectedRole === 'employer' ? 'text-white' : 'text-slate-900'}`}>
+                            I'm Hiring
                         </h3>
-                        <p className={`font-mono text-xs font-bold uppercase tracking-wider leading-relaxed ${selectedRole === 'employer' ? 'text-gray-400' : 'text-gray-500'}`}>
-                            I want to post jobs, search talent, and manage hiring pipelines.
+                        <p className={`text-sm leading-relaxed ${selectedRole === 'employer' ? 'text-sky-200' : 'text-slate-400'}`}>
+                            Post jobs, search talent, and manage hiring pipelines.
                         </p>
                     </button>
                 </div>
