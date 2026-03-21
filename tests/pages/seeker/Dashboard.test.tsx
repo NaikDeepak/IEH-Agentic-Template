@@ -69,7 +69,7 @@ describe('SeekerDashboard', () => {
                 <SeekerDashboard />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Initializing Command Center/i)).toBeDefined();
+        expect(screen.getByTestId('dashboard-skeleton')).toBeDefined();
     });
 
     it('fetches and displays dashboard data', async () => {

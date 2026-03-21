@@ -32,7 +32,7 @@ describe('JobsPage', () => {
                 <JobsPage />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Processing Data/i)).toBeDefined();
+        expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
     });
 
     it('fetches and displays jobs', async () => {
