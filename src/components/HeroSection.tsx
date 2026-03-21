@@ -107,7 +107,7 @@ export const HeroSection: React.FC = () => {
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-transparent"></div>
 
                             {/* Employer Value Overlay */}
-                            <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                            <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 text-white">
                                 <h2 className="text-3xl font-bold leading-tight mb-2">
                                     Hire Smarter.<br />Hire Faster.
                                 </h2>

@@ -37,7 +37,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     if (loading) {
         return (
             <div className={variant === 'navbar' ? 'h-9 w-9 flex items-center justify-center' : 'flex items-center justify-center min-h-[200px]'}>
-                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -47,7 +47,7 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
             return (
                 <Link
                     to="/login"
-                    className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 text-xs font-mono font-bold uppercase tracking-widest text-black border-2 border-black bg-white hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl transition-colors"
                 >
                     <LogIn className="w-4 h-4" />
                     <span>Sign In</span>
@@ -56,14 +56,14 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
         }
 
         return (
-            <div className="flex items-center gap-3 bg-white pl-4 pr-1 py-1 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                <span className="text-xs font-mono font-bold uppercase tracking-widest text-black max-w-[120px] truncate">
+            <div className="flex items-center gap-2 bg-white pl-3 pr-1 py-1 border border-slate-200 rounded-xl shadow-soft">
+                <span className="text-xs font-medium text-slate-700 max-w-[120px] truncate">
                     {user.displayName?.split(' ')[0]}
                 </span>
                 <button
                     onClick={logout}
                     title="Sign Out"
-                    className="h-8 w-8 flex items-center justify-center bg-black text-white hover:bg-gray-800 transition-colors"
+                    className="h-8 w-8 flex items-center justify-center bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-500 rounded-lg transition-colors"
                 >
                     <LogOut className="w-4 h-4" />
                 </button>
