@@ -26,16 +26,16 @@ export function KanbanColumn<T extends { id?: string }>({
 
   return (
     <div className="flex flex-col w-72 flex-shrink-0">
-      <div className="flex items-center justify-between mb-4 border-b-4 border-black pb-2 px-2">
-        <h3 className="font-black uppercase tracking-tighter text-lg">{title}</h3>
-        <span className="bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <h3 className="font-semibold text-sm text-slate-700">{title}</h3>
+        <span className="bg-slate-100 text-slate-500 px-2 py-0.5 text-[10px] font-semibold rounded-full">
           {items.length}
         </span>
       </div>
 
       <div
         ref={setNodeRef}
-        className="flex-grow min-h-[500px] bg-gray-50 border-2 border-dashed border-gray-200 p-3 flex flex-col gap-3 transition-colors hover:border-black"
+        className="flex-grow min-h-[500px] bg-slate-100/60 border border-dashed border-slate-200 rounded-xl p-3 flex flex-col gap-2.5 transition-colors hover:border-sky-300 hover:bg-sky-50/40"
       >
         <SortableContext
           items={validItems.map(item => item.id)}
@@ -49,8 +49,8 @@ export function KanbanColumn<T extends { id?: string }>({
         </SortableContext>
 
         {items.length === 0 && (
-          <div className="flex-grow flex items-center justify-center py-12 opacity-20">
-            <p className="font-mono text-[10px] uppercase font-bold text-center">Empty</p>
+          <div className="flex-grow flex items-center justify-center py-12">
+            <p className="text-xs text-slate-300 font-medium">Drop here</p>
           </div>
         )}
       </div>

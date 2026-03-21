@@ -32,36 +32,34 @@ export const ApplicantCard: React.FC<ApplicantCardProps> = ({ application }) => 
             {...listeners}
             {...attributes}
             className={`
-                bg-white border-2 border-black p-4 mb-3 cursor-grab active:cursor-grabbing
-                hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all
-                ${isDragging ? 'opacity-50 shadow-none z-50' : 'opacity-100'}
+                bg-white rounded-xl border border-slate-200 p-4 cursor-grab active:cursor-grabbing
+                shadow-soft hover:shadow-soft-md hover:border-sky-200 transition-all
+                ${isDragging ? 'opacity-40 scale-95' : 'opacity-100'}
             `}
         >
             <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gray-100 border border-black flex items-center justify-center">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-sky-50 rounded-lg flex items-center justify-center text-sky-600 flex-shrink-0">
                         <User className="w-4 h-4" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-sm leading-tight uppercase truncate max-w-[120px]">
+                        <h4 className="font-semibold text-sm leading-tight text-slate-900 truncate max-w-[120px]">
                             {application.candidate_name ?? 'Anonymous'}
                         </h4>
-                        <div className="flex items-center gap-1 text-[10px] text-gray-500 font-mono uppercase">
-                            <Briefcase className="w-2 h-2" />
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                            <Briefcase className="w-2.5 h-2.5" />
                             {application.candidate_role ?? 'Developer'}
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 bg-black text-white px-1.5 py-0.5 text-[9px] font-black uppercase tracking-tighter">
-                        <Zap className="w-2 h-2 fill-yellow-400 text-yellow-400" />
-                        {Math.round(application.match_score)}%
-                    </div>
+                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-[10px] font-semibold rounded-full">
+                    <Zap className="w-2.5 h-2.5" />
+                    {Math.round(application.match_score)}%
                 </div>
             </div>
 
-            <div className="pt-2 border-t border-gray-100">
-                <p className="text-[9px] font-mono text-gray-400 uppercase tracking-widest leading-none">
+            <div className="pt-2 border-t border-slate-100">
+                <p className="text-[10px] text-slate-400 font-medium">
                     Applied Recently
                 </p>
             </div>
