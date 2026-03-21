@@ -12,8 +12,8 @@ describe('LandingPage', () => {
         );
 
         // Hero Section — dual-persona headlines
-        expect(screen.getAllByText(/India Employment Hub/i).length).toBeGreaterThan(0);
-        expect(screen.getByText(/Hire Smarter/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/WorkMila/i).length).toBeGreaterThan(0);
+        expect(screen.getByText(/India's Smartest/i)).toBeInTheDocument();
 
         // How It Works section
         expect(screen.getByText(/How It/i)).toBeInTheDocument();

@@ -4,7 +4,7 @@ import { generateReferralCode } from '../../src/lib/utils/codes';
 describe('generateReferralCode', () => {
     it('should generate a code with the correct format', () => {
         const code = generateReferralCode();
-        expect(code).toMatch(/^IEH-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
+        expect(code).toMatch(/^WM-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
     });
 
     it('should generate unique codes on subsequent calls', () => {
@@ -17,16 +17,16 @@ describe('generateReferralCode', () => {
         const cryptoSpy = vi.spyOn(globalThis, 'crypto', 'get').mockReturnValue(undefined as any);
 
         const code = generateReferralCode();
-        expect(code).toMatch(/^IEH-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
+        expect(code).toMatch(/^WM-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/);
 
         cryptoSpy.mockRestore();
     });
 
     it('should correctly map random values to the charset', () => {
-        // Mock crypto to return predictable values if needed, 
+        // Mock crypto to return predictable values if needed,
         // but the characters are basically (val % chars.length).
         // We just verify it doesn't crash and returns valid length.
         const code = generateReferralCode();
-        expect(code.length).toBe(10); // "IEH-" (4) + 6 chars
+        expect(code.length).toBe(9); // "WM-" (3) + 6 chars
     });
 });

@@ -38,7 +38,7 @@ const FinancialDashboard: React.FC = () => {
 
     const handleExport = () => {
         const rows = [
-            ["IEH Seed Funding - Financial Projections", ""],
+            ["WorkMila Seed Funding - Financial Projections", ""],
             ["Generated on", new Date().toLocaleDateString()],
             ["", ""],
             ["--- KEY METRICS ---", ""],
@@ -68,7 +68,7 @@ const FinancialDashboard: React.FC = () => {
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `IEH_Financials_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute("download", `WorkMila_Financials_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -103,7 +103,7 @@ const FinancialDashboard: React.FC = () => {
                             {isPitchMode ? "Scalability" : "Seed Economics"}
                         </motion.h1>
                         <p className="text-xs font-medium text-slate-400">
-                            IEH // Startup Unit Economics
+                            WorkMila // Startup Unit Economics
                         </p>
                     </div>
                     {!isPitchMode && (
@@ -304,7 +304,7 @@ const FinancialDashboard: React.FC = () => {
                             The AI-Native Advantage
                         </h3>
                         <p className={`${isPitchMode ? 'text-lg max-w-4xl mx-auto' : 'text-sm max-w-2xl'} text-sky-200 leading-relaxed relative z-10`}>
-                            While legacy competitors scale burn rate linearly with headcount, IEH scales revenue exponentially with token efficiency.
+                            While legacy competitors scale burn rate linearly with headcount, WorkMila scales revenue exponentially with token efficiency.
                             Our "Agent-First" workforce model ensures high-velocity feature deployment with ultra-low CapEx overhead.
                         </p>
                         {isPitchMode && (

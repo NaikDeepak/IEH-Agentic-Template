@@ -187,7 +187,7 @@ export const ReferralDashboard: React.FC = () => {
                                 onClick={() => {
                                     if (userData?.referralCode) {
                                         const url = `${window.location.origin}/register?ref=${userData.referralCode}`;
-                                        const text = encodeURIComponent(`Hey! Join me on IEH to accelerate your career. Use my link to register and we both earn rewards: ${url}`);
+                                        const text = encodeURIComponent(`Hey! Join me on WorkMila to accelerate your career. Use my link to register and we both earn rewards: ${url}`);
                                         window.open(`https://wa.me/?text=${text}`, '_blank');
                                     }
                                 }}

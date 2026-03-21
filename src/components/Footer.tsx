@@ -10,9 +10,9 @@ export const Footer: React.FC = () => (
                 <div className="md:col-span-4 flex flex-col gap-6">
                     <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 bg-sky-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">IEH</span>
+                            <span className="text-white font-bold text-sm">WM</span>
                         </div>
-                        <span className="font-bold text-white text-lg leading-tight">India Employment Hub</span>
+                        <span className="font-bold text-white text-lg leading-tight">WorkMila</span>
                     </div>
                     <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
                         The definitive ecosystem for elite talent and verified employers across India.
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => (
             </div>
 
             <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-                <span>© {new Date().getFullYear()} India Employment Hub. <span className="text-slate-600">v{__APP_VERSION__}</span></span>
+                <span>© {new Date().getFullYear()} WorkMila. <span className="text-slate-600">v{__APP_VERSION__}</span></span>
                 <div className="flex gap-6">
                     <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
                     <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>

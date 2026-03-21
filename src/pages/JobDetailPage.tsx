@@ -234,7 +234,7 @@ export const JobDetailPage: React.FC = () => {
                                 )}
 
                                 <p className="text-center font-mono text-[10px] uppercase text-gray-400 font-bold tracking-[0.2em]">
-                                    Processed by India Employment Hub
+                                    Processed by WorkMila
                                 </p>
                             </div>
 

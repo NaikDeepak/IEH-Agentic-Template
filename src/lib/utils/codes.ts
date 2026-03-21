@@ -1,6 +1,6 @@
 /**
  * Generates a unique, static alphanumeric referral code.
- * Format: IEH-[6-CHAR-ALPHANUMERIC]
+ * Format: WM-[6-CHAR-ALPHANUMERIC]
  */
 export const generateReferralCode = (): string => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars like 0, O, I, 1, L
@@ -22,5 +22,5 @@ export const generateReferralCode = (): string => {
     result += chars.charAt(val % chars.length);
   }
 
-  return `IEH-${result}`;
+  return `WM-${result}`;
 };

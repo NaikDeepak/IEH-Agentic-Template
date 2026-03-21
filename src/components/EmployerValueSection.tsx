@@ -63,7 +63,7 @@ export const EmployerValueSection: React.FC = () => {
                             <span className="text-xs font-semibold text-sky-700 tracking-wide">For Employers</span>
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                            Why Employers Choose IEH
+                            Why Employers Choose WorkMila
                         </h2>
                     </div>
                     <p className="text-slate-500 max-w-sm text-sm leading-relaxed">

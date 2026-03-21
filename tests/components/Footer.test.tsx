@@ -10,8 +10,7 @@ describe('Footer', () => {
                 <Footer />
             </MemoryRouter>
         );
-        expect(container.textContent).toContain('India');
-        expect(container.textContent).toContain('Employment Hub');
+        expect(container.textContent).toContain('WorkMila');
     });
 
     it('renders legal links', () => {

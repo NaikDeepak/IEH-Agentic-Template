@@ -24,7 +24,7 @@ describe('Header', () => {
                 <Header />
             </MemoryRouter>
         );
-        expect(container.textContent).toContain('IEH');
+        expect(container.textContent).toContain('WorkMila');
         expect(container.textContent).toContain('Find Jobs');
     });
 });

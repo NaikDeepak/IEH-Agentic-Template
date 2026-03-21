@@ -38,11 +38,10 @@ export const Header: React.FC = () => {
             <div className="container mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2.5 cursor-pointer">
                     <div className="w-9 h-9 bg-sky-700 rounded-lg flex items-center justify-center shadow-sm">
-                        <span className="text-white font-bold text-sm tracking-tight">IEH</span>
+                        <span className="text-white font-bold text-sm tracking-tight">WM</span>
                     </div>
                     <div className="flex flex-col leading-none">
-                        <span className="font-bold text-slate-900 text-base leading-tight">India</span>
-                        <span className="text-[10px] text-slate-400 font-medium tracking-wide leading-tight">Employment Hub</span>
+                        <span className="font-bold text-slate-900 text-base leading-tight">WorkMila</span>
                     </div>
                 </Link>
 
