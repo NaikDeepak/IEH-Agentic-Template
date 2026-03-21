@@ -174,9 +174,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             await signInWithEmailAndPassword(auth, email, password);
         } catch (err: unknown) {
-            const error = err as { message?: string };
+            const error = err as { code?: string; message?: string };
             console.error("Email Login Error:", error);
-            setError(error.message ?? "Failed to sign in with email.");
+            if (error.code === 'auth/operation-not-allowed') {
+                setError("Email/Password login is not enabled in the Firebase Console. Please enable it.");
+            } else {
+                setError(error.message ?? "Failed to sign in with email.");
+            }
             throw err;
         }
     }, []);
@@ -192,10 +196,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName });
+            
+            // onAuthStateChanged fires before updateProfile finishes, leaving the firestore doc with null displayName.
+            // We ensure it gets written by manually merging the displayName here.
+            await setDoc(doc(db, 'users', userCredential.user.uid), { 
+                displayName,
+                uid: userCredential.user.uid,
+                email: userCredential.user.email 
+            }, { merge: true });
         } catch (err: unknown) {
-            const error = err as { message?: string };
+            const error = err as { code?: string; message?: string };
             console.error("Email Signup Error:", error);
-            setError(error.message ?? "Failed to sign up with email.");
+            if (error.code === 'auth/operation-not-allowed') {
+                setError("Email/Password sign-in is not enabled in the Firebase Console. Please enable it.");
+            } else {
+                setError(error.message ?? "Failed to sign up with email.");
+            }
             throw err;
         }
     }, []);

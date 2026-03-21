@@ -63,8 +63,8 @@ describe('Seeker Dashboard', () => {
             </MemoryRouter>
         );
 
-        // Check for loader
-        expect(screen.getByText(/Initializing Command Center/i)).toBeInTheDocument();
+        // Check for skeleton loading state
+        expect(screen.getByTestId('dashboard-skeleton')).toBeInTheDocument();
 
         // Wait for data load
         await waitFor(() => {

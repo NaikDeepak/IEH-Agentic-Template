@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "india-emp-hub"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

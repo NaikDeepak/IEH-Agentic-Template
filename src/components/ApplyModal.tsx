@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FocusTrap } from 'focus-trap-react';
+import { toast } from 'sonner';
+import * as Sentry from '@sentry/react';
 import { ApplicationService } from '../features/applications/services/applicationService';
 import { ProfileService } from '../features/seeker/services/profileService';
 import { useAuth } from '../hooks/useAuth';
@@ -37,6 +39,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
                         setSeekerHeadline(profile.headline);
                     }
                 } catch (err) {
+                    Sentry.captureException(err);
                     console.error("Error loading application status/profile:", err);
                 } finally {
                     setCheckingStatus(false);
@@ -75,9 +78,13 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
             });
 
             setStep('success');
+            toast.success('Application submitted! We\'ll notify you of updates.');
         } catch (err) {
+            Sentry.captureException(err);
             console.error("Submission failed:", err);
-            setError("Failed to submit application. Please try again.");
+            const msg = "Failed to submit application. Please try again.";
+            setError(msg);
+            toast.error(msg);
             setStep('questions');
         } finally {
             setIsSubmitting(false);
@@ -92,6 +99,7 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
         <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
             role="presentation"
+            onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
         >
             <FocusTrap active={isOpen}>
                 <div
@@ -99,7 +107,6 @@ export const ApplyModal: React.FC<ApplyModalProps> = ({ job, isOpen, onClose }) 
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="apply-modal-title"
-                    onKeyDown={(e) => { if (e.key === 'Escape') onClose(); }}
                     tabIndex={-1}
                 >
                     {/* Header */}

@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import { Toaster } from 'sonner';
+import * as Sentry from '@sentry/react';
 import { useAuth } from './hooks/useAuth';
 import { trackUserActivity } from './lib/activity';
 import { Header } from './components/Header'
@@ -37,13 +39,20 @@ const RoleSelection = lazy(() => import('./components/RoleSelection').then(modul
 
 // Loading fallback component
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-white">
-    <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+  <div className="min-h-screen flex items-center justify-center bg-white flex-col gap-6">
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 bg-black border-2 border-black"></div>
+      <span className="text-2xl font-black uppercase tracking-tighter">IEH</span>
+    </div>
+    <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+    <p className="font-mono text-xs font-bold uppercase tracking-widest text-gray-400">Loading...</p>
   </div>
 );
 
 function DashboardRedirect() {
-  const { userData } = useAuth();
+  const { userData, loading } = useAuth();
+  
+  if (loading) return <PageLoader />;
   if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
   if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
   return <Navigate to="/seeker/dashboard" replace />;
@@ -61,6 +70,7 @@ function SeekerTrackerPage() {
       const data = await TrackerService.getSeekerApplications(user.uid);
       setApplications(data);
     } catch (error) {
+      Sentry.captureException(error);
       console.error('Failed to load applications:', error);
     } finally {
       setLoading(false);
@@ -78,11 +88,24 @@ function SeekerTrackerPage() {
         prev.map(app => (app.id === itemId ? { ...app, status: newStatus } : app))
       );
     } catch (error) {
+      Sentry.captureException(error);
       console.error('Failed to update status:', error);
     }
   };
 
-  if (loading) return <div className="p-12 text-center font-mono font-bold uppercase">Loading Tracker...</div>;
+  if (loading) return (
+    <div className="space-y-4 p-8" aria-label="Loading application tracker" role="status">
+      {[0, 1, 2, 3].map(i => (
+        <div key={i} className="border-2 border-gray-200 p-4 animate-pulse">
+          <div className="h-5 w-1/3 bg-gray-200 mb-3" />
+          <div className="flex gap-4">
+            <div className="h-3 w-1/4 bg-gray-100" />
+            <div className="h-3 w-1/4 bg-gray-100" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -106,6 +129,15 @@ function App() {
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-black text-white font-mono font-bold uppercase tracking-widest border-2 border-white pointer-events-auto">
         Skip to Content
       </a>
+      <Toaster
+        position="bottom-right"
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: 'font-mono text-xs uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+          },
+        }}
+      />
       <Suspense fallback={<PageLoader />}>
         <RoleSelection />
         <Routes>
@@ -140,24 +172,28 @@ function App() {
           <Route
             path="/register"
             element={
-              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
-                <Header />
-                <main id="main-content" className="flex-grow">
-                  <Register />
-                </main>
-              </div>
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main id="main-content" className="flex-grow">
+                    <Register />
+                  </main>
+                </div>
+              )
             }
           />
 
           <Route
             path="/login"
             element={
-              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
-                <Header />
-                <main className="flex-grow flex items-center justify-center p-4">
-                  <Login variant="card" />
-                </main>
-              </div>
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main className="flex-grow flex items-center justify-center p-4">
+                    <Login variant="card" />
+                  </main>
+                </div>
+              )
             }
           />
 

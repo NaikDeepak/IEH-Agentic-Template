@@ -6,7 +6,9 @@ import type { Job } from '../types';
 import { JobCard } from '../components/JobCard';
 import { JobSearchBar } from '../components/JobSearchBar';
 import { Header } from '../components/Header';
-import { Loader2, X } from 'lucide-react';
+import { SkeletonJobCard } from '../components/ui/Skeleton';
+import { X } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 import { searchJobs } from '../lib/ai/search';
 
 type JobWithMatch = Job & { matchScore?: number };
@@ -32,6 +34,7 @@ export const JobsPage: React.FC = () => {
                 setBrowseJobs(mappedJobs);
                 setDisplayedJobs(mappedJobs);
             } catch (err) {
+                Sentry.captureException(err);
                 console.error("Failed to fetch jobs:", err);
                 setError("Failed to load jobs. Please try again later.");
             } finally {
@@ -75,6 +78,7 @@ export const JobsPage: React.FC = () => {
 
             setDisplayedJobs(mappedResults);
         } catch (err) {
+            Sentry.captureException(err);
             console.error("Search failed:", err);
             setError("Search failed. Please try again.");
             setDisplayedJobs([]);
@@ -168,9 +172,10 @@ export const JobsPage: React.FC = () => {
 
                     {/* Content Section */}
                     {loading ? (
-                        <div className="flex flex-col justify-center items-center h-64 gap-6">
-                            <Loader2 className="w-12 h-12 animate-spin text-black" />
-                            <span className="font-mono text-sm uppercase tracking-widest animate-pulse font-bold">Processing Data...</span>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <SkeletonJobCard key={i} />
+                            ))}
                         </div>
                     ) : error ? (
                         <div className="border-4 border-black p-12 text-center bg-gray-50">
