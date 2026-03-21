@@ -76,7 +76,7 @@ export const Footer: React.FC = () => (
             </div>
 
             <div className="mt-20 pt-8 border-t-2 border-black flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-mono font-bold uppercase tracking-widest text-gray-500">
-                <span>© {new Date().getFullYear()} India Employment Hub.</span>
+                <span>© {new Date().getFullYear()} India Employment Hub. <span className="text-gray-400">v{__APP_VERSION__}</span></span>
                 <div className="flex gap-8">
                     <a href="#" className="hover:text-black transition-colors">Privacy Policy</a>
                     <a href="#" className="hover:text-black transition-colors">Terms of Service</a>
