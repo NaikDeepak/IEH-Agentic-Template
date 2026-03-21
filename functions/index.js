@@ -22,14 +22,6 @@ dotenv.config();
 
 // Unified Constants for AI (Single Source of Truth) - Moved to src/lib/ai/generation.js
 
-// Debug: Check Environment Variables (only in non-production)
-if (process.env.NODE_ENV !== 'production') {
-    console.log("Server Startup: Checking Environment Variables...");
-    console.log("API_KEY present:", !!(process.env.API_KEY || process.env.GEMINI_API_KEY));
-    console.log("SENTRY_DSN present:", !!process.env.SENTRY_DSN);
-    console.log("FIREBASE_CONFIG present:", !!process.env.FIREBASE_CONFIG);
-}
-
 
 // Initialize Firebase Admin SDK
 initializeApp();
