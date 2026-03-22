@@ -1,5 +1,5 @@
 import { db } from "../../../lib/firebase";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import type { SeekerProfile, ResumeAnalysisResult } from "../types";
 
 const PROFILE_COLLECTION = "seeker_profiles";
@@ -37,6 +37,21 @@ export const ProfileService = {
             }, { merge: true });
         } catch (error) {
             console.error("Error upserting seeker profile:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Updates a single dot-path field without touching other nested fields.
+     * Use this instead of upsertProfile when you need to update one field
+     * inside a nested object (e.g. 'preferences.roles') to avoid shallow-merge overwrite.
+     */
+    async updateProfileField(userId: string, fieldPath: string, value: unknown): Promise<void> {
+        try {
+            const profileRef = doc(db, PROFILE_COLLECTION, userId);
+            await updateDoc(profileRef, { [fieldPath]: value, updated_at: serverTimestamp() });
+        } catch (error) {
+            console.error("Error updating profile field:", error);
             throw error;
         }
     },

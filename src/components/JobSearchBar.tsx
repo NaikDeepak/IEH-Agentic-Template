@@ -1,22 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, ChevronDown, X, SlidersHorizontal } from 'lucide-react';
+import type { JobSearchFilters } from '../features/jobs/types';
+import { DEFAULT_JOB_SEARCH_FILTERS } from '../features/jobs/types';
 
-export interface JobSearchFilters {
-    workMode: string;
-    jobType: string;
-    city: string;
-    experienceLevel: string;
-    salaryMin: string;
-}
+export type { JobSearchFilters };
 
-const DEFAULT_FILTERS: JobSearchFilters = {
-    workMode: 'All',
-    jobType: 'All',
-    city: '',
-    experienceLevel: 'All',
-    salaryMin: '',
-};
+const DEFAULT_FILTERS: JobSearchFilters = DEFAULT_JOB_SEARCH_FILTERS;
 
 interface JobSearchBarProps {
     onSearch?: (query: string, filters: JobSearchFilters) => void;

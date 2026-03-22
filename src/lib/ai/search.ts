@@ -1,7 +1,7 @@
 import { getAuth } from "firebase/auth";
 import { z } from "zod";
 import { callAIProxy } from './proxy';
-import type { JobSearchFilters } from '../../components/JobSearchBar';
+import type { JobSearchFilters } from '../../features/jobs/types';
 
 
 

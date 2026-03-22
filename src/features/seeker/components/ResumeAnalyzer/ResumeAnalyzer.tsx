@@ -21,7 +21,10 @@ export const ResumeAnalyzer: React.FC = () => {
     // On mount, load the most recent analysis if one exists
     useEffect(() => {
         const loadExisting = async () => {
-            if (!user) return;
+            if (!user) {
+                setLoadingExisting(false);
+                return;
+            }
             try {
                 const existing = await getLatestResume(user.uid);
                 if (existing) {

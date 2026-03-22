@@ -1,5 +1,21 @@
 import type { Timestamp, FieldValue } from "firebase/firestore";
 
+export interface JobSearchFilters {
+    workMode: string;
+    jobType: string;
+    city: string;
+    experienceLevel: string;
+    salaryMin: string;
+}
+
+export const DEFAULT_JOB_SEARCH_FILTERS: JobSearchFilters = {
+    workMode: 'All',
+    jobType: 'All',
+    city: '',
+    experienceLevel: 'All',
+    salaryMin: '',
+};
+
 export type JobStatus = 'active' | 'passive' | 'closed';
 export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
 export type WorkMode = 'REMOTE' | 'HYBRID' | 'ONSITE';

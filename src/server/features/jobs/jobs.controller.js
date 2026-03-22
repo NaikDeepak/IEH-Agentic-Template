@@ -23,7 +23,9 @@ export const searchJobs = async (req, res, next) => {
             throw error;
         }
 
-        const jobs = await jobsService.searchJobs(searchQuery, location, limit, req.authToken, { city, jobType, experienceLevel, salaryMin });
+        const parsedSalaryMin = salaryMin != null ? Number(salaryMin) : 0;
+        const parsedLimit = Number(limit) || 10;
+        const jobs = await jobsService.searchJobs(searchQuery, location, parsedLimit, req.authToken, { city, jobType, experienceLevel, salaryMin: parsedSalaryMin });
         res.json({ jobs });
     } catch (error) {
         next(error);

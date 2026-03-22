@@ -72,31 +72,31 @@ export const ProfileEditor: React.FC = () => {
             if (!user) return;
             try {
                 setLoading(true);
-                const data = await ProfileService.getProfile(user.uid);
+                // Fetch profile and resume in parallel — single resume read
+                const [data, latestResume] = await Promise.all([
+                    ProfileService.getProfile(user.uid),
+                    getLatestResume(user.uid),
+                ]);
+
                 if (data) {
                     setProfile(data);
-                } else {
-                    const latestResume = await getLatestResume(user.uid);
-                    if (latestResume) {
-                        setStatus({ type: 'success', message: 'Pre-populated from your latest resume!' });
-                        setResumeKeywords(latestResume.keywords.found);
-                        setProfile({
-                            parsed_data: latestResume.parsed_data,
-                            skills: latestResume.keywords.found,
-                            headline: latestResume.parsed_data.experience?.[0]?.role ?? '',
-                            work_preferences: [],
-                            preferences: {
-                                roles: latestResume.parsed_data.experience?.[0]?.role
-                                    ? [latestResume.parsed_data.experience[0].role]
-                                    : [],
-                                locations: [],
-                                remote: false,
-                            }
-                        });
-                    }
+                } else if (latestResume) {
+                    setStatus({ type: 'success', message: 'Pre-populated from your latest resume!' });
+                    setProfile({
+                        parsed_data: latestResume.parsed_data,
+                        skills: latestResume.keywords.found,
+                        headline: latestResume.parsed_data.experience?.[0]?.role ?? '',
+                        work_preferences: [],
+                        preferences: {
+                            roles: latestResume.parsed_data.experience?.[0]?.role
+                                ? [latestResume.parsed_data.experience[0].role]
+                                : [],
+                            locations: [],
+                            remote: false,
+                        }
+                    });
                 }
-                // Also grab resume keywords for skill suggestions even if profile exists
-                const latestResume = await getLatestResume(user.uid);
+
                 if (latestResume) setResumeKeywords(latestResume.keywords.found);
             } catch (error) {
                 console.error('Error fetching profile:', error);
@@ -394,16 +394,19 @@ export const ProfileEditor: React.FC = () => {
                         <div className="flex flex-col gap-3">
                             {WORK_MODE_OPTIONS.map(mode => {
                                 const checked = (profile.work_preferences ?? []).includes(mode);
+                                const id = `work-pref-${mode.toLowerCase()}`;
                                 return (
-                                    <label key={mode} className="flex items-center gap-3 cursor-pointer group">
-                                        <button
-                                            type="button"
-                                            onClick={() => { toggleWorkMode(mode); }}
-                                            aria-pressed={checked}
-                                            className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all cursor-pointer ${checked ? 'bg-sky-700 border-sky-700' : 'border-slate-300 group-hover:border-sky-400'}`}
-                                        >
+                                    <label key={mode} htmlFor={id} className="flex items-center gap-3 cursor-pointer group">
+                                        <input
+                                            id={id}
+                                            type="checkbox"
+                                            checked={checked}
+                                            onChange={() => { toggleWorkMode(mode); }}
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${checked ? 'bg-sky-700 border-sky-700' : 'border-slate-300 group-hover:border-sky-400'}`}>
                                             {checked && <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                                        </button>
+                                        </div>
                                         <span className="text-sm text-slate-700">{mode}</span>
                                     </label>
                                 );

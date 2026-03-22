@@ -32,7 +32,7 @@ export const getJobSuggestions = async (query, limit = 5) => {
     const snapshot = await db.collection(CONSTANTS.FIREBASE.COLLECTIONS.JOBS)
         .where('status', '==', CONSTANTS.FILTERS.STATUS.ACTIVE)
         .select('title', 'skills')
-        .limit(150)
+        .limit(CONSTANTS.SEARCH.SUGGEST_SCAN_LIMIT)
         .get();
 
     const q = query.toLowerCase();
@@ -42,11 +42,11 @@ export const getJobSuggestions = async (query, limit = 5) => {
         .map(doc => {
             const { title = '', skills = [] } = doc.data();
             const skillText = Array.isArray(skills) ? skills.join(' ') : String(skills);
-            const score = trigramSimilarity(q, title) + trigramSimilarity(q, skillText) * 0.4;
+            const score = trigramSimilarity(q, title) + trigramSimilarity(q, skillText) * CONSTANTS.SEARCH.SUGGEST_SKILL_WEIGHT;
             return { title, score };
         })
         .filter(({ title, score }) => {
-            if (score < 0.1 || seen.has(title.toLowerCase())) return false;
+            if (score < CONSTANTS.SEARCH.SUGGEST_MIN_SCORE || seen.has(title.toLowerCase())) return false;
             seen.add(title.toLowerCase());
             return true;
         })
@@ -108,9 +108,9 @@ export const searchJobs = async (searchQuery, location, limit = CONSTANTS.DEFAUL
         jobs = jobs.filter(job => job.type && job.type.toLowerCase().replace(/_/g, '-') === effectiveJobType.toLowerCase().replace(/_/g, '-'));
     }
 
-    // Experience level
+    // Experience level — only include jobs with a matching experience_level field
     if (experienceLevel) {
-        jobs = jobs.filter(job => !job.experience_level || job.experience_level.toLowerCase().startsWith(experienceLevel.toLowerCase()));
+        jobs = jobs.filter(job => job.experience_level && job.experience_level.toLowerCase().startsWith(experienceLevel.toLowerCase()));
     }
 
     // Salary — prefer explicit UI value, fall back to AI-extracted
@@ -132,14 +132,14 @@ export const searchJobs = async (searchQuery, location, limit = CONSTANTS.DEFAUL
         keywords.forEach(kw => { if (textToMatch.includes(kw)) matchedCount++; });
 
         const keywordScore = keywords.length > 0 ? (matchedCount / keywords.length) * 100 : 0;
-        const finalScore = Math.round((job.matchScore * 0.7) + (keywordScore * 0.3));
+        const finalScore = Math.round((job.matchScore * CONSTANTS.SEARCH.RANKING_VECTOR_WEIGHT) + (keywordScore * CONSTANTS.SEARCH.RANKING_KEYWORD_WEIGHT));
         return { ...job, matchScore: finalScore, originalScore: job.matchScore };
     });
 
     jobs.sort((a, b) => b.matchScore - a.matchScore);
 
-    // Filter out low-relevance results (threshold: 30)
-    jobs = jobs.filter(job => job.matchScore >= 30);
+    // Filter out low-relevance results
+    jobs = jobs.filter(job => job.matchScore >= CONSTANTS.SEARCH.MIN_MATCH_SCORE);
 
     return jobs.slice(0, limit);
 };

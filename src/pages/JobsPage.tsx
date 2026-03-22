@@ -5,7 +5,8 @@ import type { JobPosting } from '../features/jobs/types';
 import type { Job } from '../types';
 import { JobCard } from '../components/JobCard';
 import { JobSearchBar } from '../components/JobSearchBar';
-import type { JobSearchFilters } from '../components/JobSearchBar';
+import type { JobSearchFilters } from '../features/jobs/types';
+import { DEFAULT_JOB_SEARCH_FILTERS } from '../features/jobs/types';
 import { ApplyModal } from '../components/ApplyModal';
 import { Header } from '../components/Header';
 import { SkeletonJobCard } from '../components/ui/Skeleton';
@@ -53,7 +54,7 @@ export const JobsPage: React.FC = () => {
         void fetchJobs();
     }, []);
 
-    const handleSearch = async (term: string, filters: JobSearchFilters) => {
+    const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
 
         if (!query.trim()) {
@@ -61,13 +62,15 @@ export const JobsPage: React.FC = () => {
             return;
         }
 
+        const mergedFilters: JobSearchFilters = { ...DEFAULT_JOB_SEARCH_FILTERS, ...filters };
+
         try {
             setLoading(true);
             setError(null);
             setIsSearching(true);
             setCurrentSearchQuery(query);
 
-            const results = await searchJobs(query, filters);
+            const results = await searchJobs(query, mergedFilters);
 
             const mappedResults: JobWithMatch[] = results.map((result) => {
                 const posting = result as unknown as JobPosting;
@@ -78,9 +81,15 @@ export const JobsPage: React.FC = () => {
             setDisplayedJobs(mappedResults);
             setSuggestions([]);
 
-            // If no results, fetch fuzzy suggestions in background
+            // If no results, fetch fuzzy suggestions — guard against stale responses
             if (mappedResults.length === 0) {
-                void getJobSuggestions(query).then(setSuggestions);
+                const thisQuery = query;
+                void getJobSuggestions(thisQuery).then(s => {
+                    setCurrentSearchQuery(cq => {
+                        if (cq === thisQuery) setSuggestions(s);
+                        return cq;
+                    });
+                });
             }
         } catch (err) {
             Sentry.captureException(err);

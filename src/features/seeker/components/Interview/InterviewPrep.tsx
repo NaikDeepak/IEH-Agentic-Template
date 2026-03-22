@@ -29,11 +29,14 @@ export const InterviewPrep: React.FC = () => {
                     ProfileService.getProfile(user.uid),
                     getLatestResume(user.uid)
                 ]);
-                if (profile?.preferences.roles[0]) {
-                    setRole(prev => prev || profile.preferences.roles[0]);
+                // preferences.roles is typed as non-optional when profile exists
+                const firstRole = profile?.preferences.roles[0];
+                if (firstRole) {
+                    setRole(prev => prev || firstRole);
                 }
                 if (resume?.parsed_data) {
                     const exp = resume.parsed_data.experience ?? [];
+                    // keywords.found is typed as non-optional when resume exists
                     const skills = resume.keywords.found.slice(0, 10).join(', ');
                     const context = [
                         exp[0] ? `Recent role: ${exp[0].role} at ${exp[0].company}` : '',
