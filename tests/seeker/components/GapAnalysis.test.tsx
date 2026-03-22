@@ -18,7 +18,8 @@ vi.mock('../../../src/features/seeker/services/skillService', () => ({
 
 vi.mock('../../../src/features/seeker/services/profileService', () => ({
     ProfileService: {
-        getProfile: vi.fn()
+        getProfile: vi.fn(),
+        updateProfileField: vi.fn().mockResolvedValue(undefined)
     }
 }));
 
@@ -74,16 +75,16 @@ describe('GapAnalysis', () => {
 
         render(<GapAnalysis />);
 
-        const input = screen.getByLabelText(/Target Career Path/i);
+        const input = screen.getByLabelText(/Target Role/i);
         fireEvent.change(input, { target: { value: 'Architect' } });
 
-        const analyzeButton = screen.getByRole('button', { name: /Calculate Delta/i });
+        const analyzeButton = screen.getByRole('button', { name: /Analyse Gap/i });
         fireEvent.click(analyzeButton);
 
-        expect(screen.getByText(/Analyzing/i)).toBeDefined();
+        expect(screen.getByText(/Analysing/i)).toBeDefined();
 
         await waitFor(() => {
-            expect(screen.getByText('GraphQL')).toBeDefined();
+            expect(screen.getAllByText('GraphQL').length).toBeGreaterThan(0);
             expect(screen.getByText('GraphQL Docs')).toBeDefined();
         });
     });
@@ -93,8 +94,8 @@ describe('GapAnalysis', () => {
 
         render(<GapAnalysis />);
 
-        fireEvent.change(screen.getByLabelText(/Target Career Path/i), { target: { value: 'Dev' } });
-        fireEvent.click(screen.getByRole('button', { name: /Calculate Delta/i }));
+        fireEvent.change(screen.getByLabelText(/Target Role/i), { target: { value: 'Dev' } });
+        fireEvent.click(screen.getByRole('button', { name: /Analyse Gap/i }));
 
         await waitFor(() => {
             const errorMsg = screen.getByText(/Failed to analyze skill gap/i);

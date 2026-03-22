@@ -65,10 +65,10 @@ Goal: Make job discovery actually useful.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S2-SEARCH-01 | `[ ]` More filters on Find Jobs | Add city/location text input, job type (remote/hybrid/office) multi-select, salary range slider, experience level to `JobSearchBar`. Update `searchJobs` to pass filters to backend |
-| S2-SEARCH-02 | `[ ]` Spell-check / "did you mean" suggestions | On search with 0 results, suggest alternative queries. Backend: fuzzy match against job titles index |
-| S2-SEARCH-03 | `[ ]` Search result relevance improvement | Review embedding + cosine similarity tuning in `src/server/features/ai/`. Low-match results should be filtered below threshold |
-| S2-SEARCH-04 | `[ ]` Mobile layout — search bar and jobs grid | Responsive audit: JobSearchBar collapses cleanly on mobile, grid switches to single column, filter controls accessible |
+| S2-SEARCH-01 | `[x]` More filters on Find Jobs | `JobSearchBar` now has expandable filter panel: city text input, job type select (full-time/part-time/contract/internship), experience level (entry/mid/senior), min salary (₹ LPA). Work mode dropdown retained. All filters passed to backend. |
+| S2-SEARCH-02 | `[x]` Spell-check / "did you mean" suggestions | On search with 0 results, suggest alternative queries. Backend: fuzzy match against job titles index |
+| S2-SEARCH-03 | `[x]` Search result relevance improvement | Results with matchScore < 30 filtered out in `jobs.service.js`. Also fixed `job.skills.join()` crash when skills is not an array. |
+| S2-SEARCH-04 | `[x]` Mobile layout — search bar and jobs grid | Filter panel uses `flex-wrap` + `min-w` so controls stack cleanly on mobile. Grid already single-column on small screens. |
 
 ---
 
@@ -78,19 +78,19 @@ Goal: Make the candidate profile actually reflect the person.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S3-PROFILE-01 | `[ ]` Candidate location = city name (not work mode) | Profile location field should be free-text city (e.g. "Mumbai") not remote/hybrid/office enum |
-| S3-PROFILE-02 | `[ ]` Work preference = separate remote/hybrid/office multi-select | Add `work_preference` field to `SeekerProfile` type; show as multi-select checkboxes in profile editor |
-| S3-PROFILE-03 | `[ ]` Targeted role — editable with suggestions | Pre-fill from resume, show suggestions dropdown, allow manual override |
-| S3-PROFILE-04 | `[ ]` Skills in profile editor — autocomplete suggestions | On skill input, suggest from CV parsed keywords + curated skills list |
+| S3-PROFILE-01 | `[x]``[ ]` Candidate location = city name (not work mode) | Profile location field should be free-text city (e.g. "Mumbai") not remote/hybrid/office enum |
+| S3-PROFILE-02 | `[x]``[ ]` Work preference = separate remote/hybrid/office multi-select | Add `work_preference` field to `SeekerProfile` type; show as multi-select checkboxes in profile editor |
+| S3-PROFILE-03 | `[x]``[ ]` Targeted role — editable with suggestions | Pre-fill from resume, show suggestions dropdown, allow manual override |
+| S3-PROFILE-04 | `[x]``[ ]` Skills in profile editor — autocomplete suggestions | On skill input, suggest from CV parsed keywords + curated skills list |
 | S3-PROFILE-05 | `[ ]` Filter irrelevant skills from extraction | Resume parse: only include explicitly listed skills, not incidental words from job descriptions |
-| S3-RESUME-01 | `[ ]` Resume Intelligence — show current CV analysis first | Reorder flow: show existing analysis → then offer Upload New / Optimize with AI |
-| S3-RESUME-02 | `[ ]` Resume Intelligence — add action buttons after analysis | "Back to Dashboard" + "Optimize with AI" CTAs on result screen |
+| S3-RESUME-01 | `[x]``[ ]` Resume Intelligence — show current CV analysis first | Reorder flow: show existing analysis → then offer Upload New / Optimize with AI |
+| S3-RESUME-02 | `[x]``[ ]` Resume Intelligence — add action buttons after analysis | "Back to Dashboard" + "Optimize with AI" CTAs on result screen |
 | S3-RESUME-03 | `[ ]` AI CV builder — structured sections | Template: Summary / Skills / Experience / Education. Currently flat output |
 | S3-SKILL-01 | `[ ]` Rename "bridge assets" → "Skill Upgrade Path" | `src/features/seeker/components/SkillGap/` — rename labels throughout |
 | S3-SKILL-02 | `[ ]` Rename "skill void" → "Missing Skills" | Same files |
 | S3-SKILL-03 | `[ ]` "Targeted semantic void" — plain English copy | Replace with something like "Skills gap for your target role" |
-| S3-SKILL-04 | `[ ]` Targeted career path — make editable | Field is currently read-only; unlock edit |
-| S3-INTERVIEW-01 | `[ ]` Interview prep — auto-fill from resume | Pre-populate role + skills from latest resume parse; editable before session |
+| S3-SKILL-04 | `[x]``[ ]` Targeted career path — make editable | Field is currently read-only; unlock edit |
+| S3-INTERVIEW-01 | `[x]``[ ]` Interview prep — auto-fill from resume | Pre-populate role + skills from latest resume parse; editable before session |
 
 ---
 

@@ -47,7 +47,7 @@ describe('ProfileEditor', () => {
                 <ProfileEditor />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Loading Profile/i)).toBeDefined();
+        expect(screen.getByText(/Loading your profile/i)).toBeDefined();
     });
 
     it('pre-populates from resume if profile is missing', async () => {
@@ -117,7 +117,7 @@ describe('ProfileEditor', () => {
 
         await waitFor(() => screen.getByDisplayValue('Dev'));
 
-        const saveButton = screen.getByRole('button', { name: /Update Professional Profile/i });
+        const saveButton = screen.getByRole('button', { name: /Save Profile/i });
         fireEvent.click(saveButton);
 
         await waitFor(() => {

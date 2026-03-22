@@ -24,9 +24,9 @@ describe('Login', () => {
             </MemoryRouter>
         );
         // Use more flexible text matchers
-        expect(screen.getByText(/Email Identity/i)).toBeDefined();
-        expect(screen.getByText(/Passcode/i)).toBeDefined();
-        expect(screen.getByRole('button', { name: /Authenticate/i })).toBeDefined();
+        expect(screen.getByText(/Email Address/i)).toBeDefined();
+        expect(screen.getByText(/Password/i)).toBeDefined();
+        expect(screen.getByRole('button', { name: /Sign In/i })).toBeDefined();
     });
 
     it('updates input values on change', () => {
@@ -36,7 +36,7 @@ describe('Login', () => {
             </MemoryRouter>
         );
         // Find by label text or placeholder
-        const emailInput = screen.getByPlaceholderText(/USER@EXAMPLE.COM/i) as HTMLInputElement;
+        const emailInput = screen.getByPlaceholderText(/you@example.com/i) as HTMLInputElement;
         fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
         expect(emailInput.value).toBe('test@example.com');
     });

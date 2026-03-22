@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateQuestions, evaluateAnswer, type InterviewQuestion, type EvaluationResult } from '../../services/interviewService';
+import { ProfileService } from '../../services/profileService';
+import { getLatestResume } from '../../services/resumeService';
+import { useAuth } from '../../../../hooks/useAuth';
 import { Loader2, Send, CheckCircle, AlertCircle, RefreshCw, ChevronRight } from 'lucide-react';
 
 export const InterviewPrep: React.FC = () => {
+    const { user } = useAuth();
+
     // State
     const [step, setStep] = useState<'setup' | 'practice' | 'summary'>('setup');
     const [role, setRole] = useState('');
@@ -14,6 +19,45 @@ export const InterviewPrep: React.FC = () => {
     const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
     const [evaluating, setEvaluating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // S3-INTERVIEW-01: auto-fill role + context from profile/resume
+    useEffect(() => {
+        const prefill = async () => {
+            if (!user) return;
+            try {
+                const [profile, resume] = await Promise.all([
+                    ProfileService.getProfile(user.uid),
+                    getLatestResume(user.uid)
+                ]);
+                // Prefill role from profile preferences
+                const firstRole = profile?.preferences.roles[0];
+                if (typeof firstRole === 'string' && firstRole.trim()) {
+                    setRole(prev => prev || firstRole);
+                }
+
+                // Prefill context from latest resume
+                const exp = resume?.parsed_data.experience ?? [];
+                const skillsList = resume?.keywords.found ?? [];
+                const skills = Array.isArray(skillsList) ? skillsList.slice(0, 10).join(', ') : '';
+
+                if (exp.length > 0 || skills) {
+                    const firstExp = exp[0];
+                    const expContext = firstExp?.role && firstExp.company 
+                        ? `Recent role: ${firstExp.role} at ${firstExp.company}` 
+                        : '';
+                    
+                    const context = [
+                        expContext,
+                        skills ? `Key skills: ${skills}` : '',
+                    ].filter(Boolean).join('\n');
+                    setResumeContext(prev => prev || context);
+                }
+            } catch {
+                // silently ignore — user can fill manually
+            }
+        };
+        void prefill();
+    }, [user]);
 
     const handleStart = async (e: React.FormEvent) => {
         e.preventDefault();

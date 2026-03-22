@@ -1,12 +1,26 @@
 import { db } from "../../../lib/firebase";
-import { doc, setDoc, collection, limit, getDocs, orderBy, Timestamp, query } from "firebase/firestore";
+import { doc, setDoc, collection, query, orderBy, limit, getDocs, Timestamp } from "firebase/firestore";
 import type { ResumeAnalysisResult } from "../types";
 import { callAIProxy } from "../../../lib/ai/proxy";
 import { parseDocx, preparePdf } from "./documentService";
 import { ProfileService } from "./profileService";
-
 import * as Sentry from "@sentry/react";
 import { ResumeMapper } from "./resumeMapper";
+
+/**
+ * Robust helper to extract a nested object property safely.
+ */
+function getNestedValue<T>(data: Record<string, unknown>, parentKey: string, childKey: string, fallback: T): T {
+    const parent = data[parentKey];
+    if (parent && typeof parent === "object") {
+        const val = (parent as Record<string, unknown>)[childKey];
+        if (val !== undefined && val !== null) {
+            if (Array.isArray(fallback) && Array.isArray(val)) return val as unknown as T;
+            if (typeof fallback === typeof val) return val as unknown as T;
+        }
+    }
+    return fallback;
+}
 
 // Helper Type for GenAI Parts
 type PromptPart = { text: string } | { inlineData: { data: string; mimeType: string } };
@@ -125,7 +139,28 @@ export const getLatestResume = async (userId: string): Promise<ResumeAnalysisRes
         if (score > 0 && score <= 1) score = Math.round(score * 100);
         else score = Math.round(score);
 
-        return { id: validDoc.id, ...data, score } as ResumeAnalysisResult;
+        return {
+            id: validDoc.id,
+            user_id: userId,
+            ...data,
+            score,
+            sections: {
+                contact: getNestedValue<boolean>(data, 'sections', 'contact', false),
+                summary: getNestedValue<boolean>(data, 'sections', 'summary', false),
+                experience: getNestedValue<boolean>(data, 'sections', 'experience', false),
+                education: getNestedValue<boolean>(data, 'sections', 'education', false),
+                skills: getNestedValue<boolean>(data, 'sections', 'skills', false),
+            },
+            keywords: {
+                found: getNestedValue<string[]>(data, 'keywords', 'found', []),
+                missing: getNestedValue<string[]>(data, 'keywords', 'missing', []),
+            },
+            parsed_data: {
+                experience: getNestedValue<NonNullable<ResumeAnalysisResult['parsed_data']>['experience']>(data, 'parsed_data', 'experience', []),
+                education: getNestedValue<NonNullable<ResumeAnalysisResult['parsed_data']>['education']>(data, 'parsed_data', 'education', []),
+            },
+            suggestions: Array.isArray(data['suggestions']) ? data['suggestions'] : []
+        } as unknown as ResumeAnalysisResult;
     } catch (error) {
         console.error("Error fetching latest resume:", error);
         return null;

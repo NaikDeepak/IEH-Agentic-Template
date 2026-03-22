@@ -88,6 +88,8 @@ export const GapAnalysis: React.FC = () => {
         try {
             const gapAnalysis = await analyzeSkillGap(user.uid, currentSkills, targetRole);
             setResult(gapAnalysis);
+            // Persist only the roles field — dot-path update avoids overwriting minSalary/locations/remote
+            void ProfileService.updateProfileField(user.uid, 'preferences.roles', [targetRole]);
         } catch (err) {
             console.error(err);
             setError("Failed to analyze skill gap. Please try again.");

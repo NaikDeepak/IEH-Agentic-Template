@@ -17,11 +17,12 @@ export interface SeekerProfile {
     bio?: string;
     skills: string[];
     headline?: string;
-    currentLocation?: string;
+    currentLocation?: string;       // free-text city, e.g. "Mumbai"
+    work_preferences?: string[];    // 'Remote' | 'Hybrid' | 'Office' — multi-select
     preferences: {
         roles: string[];
         locations: string[];
-        remote: boolean;
+        remote: boolean;            // kept for backward compat
         minSalary?: number;
     };
     saved_resources?: {

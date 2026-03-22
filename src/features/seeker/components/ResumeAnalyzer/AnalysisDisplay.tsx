@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { ResumeAnalysisResult } from '../../types';
-import { CheckCircle, XCircle, AlertTriangle, Lightbulb, RefreshCw, FileText } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Lightbulb, FileText, ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface AnalysisDisplayProps {
@@ -60,6 +61,7 @@ const CircularProgress = ({ value }: { value: number }) => {
 };
 
 export const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({ result, onReset }) => {
+    const navigate = useNavigate();
     const { score, sections, keywords, suggestions, parsed_data } = result;
 
     const scoreStyle = getScoreStyle(Math.round(score));
@@ -82,13 +84,22 @@ export const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({ result, onRese
                                 ? "Great ATS compatibility. Your resume is well-optimised for automated screening."
                                 : "Some improvements can boost your ATS score. Review the suggestions below."}
                         </p>
-                        <button
-                            onClick={onReset}
-                            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
-                        >
-                            <RefreshCw size={14} />
-                            Analyse Another Resume
-                        </button>
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                onClick={() => { void navigate('/seeker/dashboard'); }}
+                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
+                            >
+                                <ArrowLeft size={14} />
+                                Back to Dashboard
+                            </button>
+                            <button
+                                onClick={onReset}
+                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-sky-700 bg-sky-50 border border-sky-200 rounded-xl hover:bg-sky-100 transition-colors"
+                            >
+                                <Sparkles size={14} />
+                                Optimise with AI
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

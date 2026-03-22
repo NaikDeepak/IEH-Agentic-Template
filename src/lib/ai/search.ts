@@ -1,6 +1,6 @@
-import { getAuth } from "firebase/auth";
 import { z } from "zod";
 import { callAIProxy } from './proxy';
+import type { JobSearchFilters } from '../../features/jobs/types';
 
 
 
@@ -48,42 +48,23 @@ const CandidateSearchResponseSchema = z.object({
 });
 
 /**
- * Get the current user's Firebase ID token for authenticated API calls.
- */
-async function getAuthToken(): Promise<string | null> {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) return null;
-    return user.getIdToken();
-}
-
-/**
  * Performs a semantic search on the 'jobs' collection via the backend API.
  *
  * @param searchQuery - The user's natural language query (e.g., "Remote React developer jobs")
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching job documents
  */
-export async function searchJobs(searchQuery: string, locationFilter = '', limitCount = 10): Promise<Record<string, unknown>[]> {
+export async function searchJobs(searchQuery: string, filters: Partial<JobSearchFilters> = {}, limitCount = 10): Promise<Record<string, unknown>[]> {
     try {
-        const token = await getAuthToken();
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await fetch('/api/jobs/search', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ query: searchQuery, location: locationFilter, limit: limitCount })
+        const rawData = await callAIProxy('/api/jobs/search', {
+            query: searchQuery,
+            location: filters.workMode && filters.workMode !== 'All' ? filters.workMode : '',
+            city: filters.city ?? '',
+            jobType: filters.jobType && filters.jobType !== 'All' ? filters.jobType.toLowerCase() : '',
+            experienceLevel: filters.experienceLevel && filters.experienceLevel !== 'All' ? filters.experienceLevel.toLowerCase() : '',
+            salaryMin: filters.salaryMin ? Number(filters.salaryMin) : 0,
+            limit: limitCount,
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Search failed: ${response.status.toString()} ${errorText}`);
-        }
-
-        const rawData = (await response.json()) as unknown;
 
         // Validate with Zod
         const data = JobSearchResponseSchema.parse(rawData);
@@ -102,6 +83,22 @@ export async function searchJobs(searchQuery: string, locationFilter = '', limit
  * @param limitCount - Number of results to return (default 10)
  * @returns Array of matching candidate profiles
  */
+const SuggestResponseSchema = z.object({
+    suggestions: z.array(z.string()).optional().default([])
+});
+
+export async function getJobSuggestions(query: string): Promise<string[]> {
+    try {
+        const response = await fetch(`/api/jobs/suggest?q=${encodeURIComponent(query)}`);
+        if (!response.ok) return [];
+        const rawData = (await response.json()) as unknown;
+        const data = SuggestResponseSchema.parse(rawData);
+        return data.suggestions;
+    } catch {
+        return [];
+    }
+}
+
 export async function searchCandidates(searchQuery: string, limitCount = 10): Promise<CandidateSearchResult[]> {
     try {
         const rawData = await callAIProxy('/api/candidates/search', { query: searchQuery, limit: limitCount });
