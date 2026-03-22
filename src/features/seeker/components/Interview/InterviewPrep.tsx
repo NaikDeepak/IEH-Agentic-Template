@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateQuestions, evaluateAnswer, type InterviewQuestion, type EvaluationResult } from '../../services/interviewService';
+import { ProfileService } from '../../services/profileService';
+import { getLatestResume } from '../../services/resumeService';
+import { useAuth } from '../../../../hooks/useAuth';
 import { Loader2, Send, CheckCircle, AlertCircle, RefreshCw, ChevronRight } from 'lucide-react';
 
 export const InterviewPrep: React.FC = () => {
+    const { user } = useAuth();
+
     // State
     const [step, setStep] = useState<'setup' | 'practice' | 'summary'>('setup');
     const [role, setRole] = useState('');
@@ -14,6 +19,34 @@ export const InterviewPrep: React.FC = () => {
     const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
     const [evaluating, setEvaluating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // S3-INTERVIEW-01: auto-fill role + context from profile/resume
+    useEffect(() => {
+        const prefill = async () => {
+            if (!user) return;
+            try {
+                const [profile, resume] = await Promise.all([
+                    ProfileService.getProfile(user.uid),
+                    getLatestResume(user.uid)
+                ]);
+                if (profile?.preferences.roles[0]) {
+                    setRole(prev => prev || profile.preferences.roles[0]);
+                }
+                if (resume?.parsed_data) {
+                    const exp = resume.parsed_data.experience ?? [];
+                    const skills = resume.keywords.found.slice(0, 10).join(', ');
+                    const context = [
+                        exp[0] ? `Recent role: ${exp[0].role} at ${exp[0].company}` : '',
+                        skills ? `Key skills: ${skills}` : '',
+                    ].filter(Boolean).join('\n');
+                    setResumeContext(prev => prev || context);
+                }
+            } catch {
+                // silently ignore — user can fill manually
+            }
+        };
+        void prefill();
+    }, [user]);
 
     const handleStart = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -1,18 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResumeInput } from './ResumeInput';
 import { AnalysisDisplay } from './AnalysisDisplay';
-import { analyzeResume } from '../../services/resumeService';
+import { analyzeResume, getLatestResume } from '../../services/resumeService';
 import type { ResumeAnalysisResult } from '../../types';
 import { useAuth } from '../../../../hooks/useAuth';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, UploadCloud } from 'lucide-react';
 import { toast } from 'sonner';
 import * as Sentry from '@sentry/react';
+
+type View = 'existing' | 'upload' | 'result';
 
 export const ResumeAnalyzer: React.FC = () => {
     const { user } = useAuth();
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [loadingExisting, setLoadingExisting] = useState(true);
     const [result, setResult] = useState<ResumeAnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [view, setView] = useState<View>('upload');
+
+    // On mount, load the most recent analysis if one exists
+    useEffect(() => {
+        const loadExisting = async () => {
+            if (!user) return;
+            try {
+                const existing = await getLatestResume(user.uid);
+                if (existing) {
+                    setResult(existing);
+                    setView('existing');
+                }
+            } catch {
+                // silently ignore — fall through to upload view
+            } finally {
+                setLoadingExisting(false);
+            }
+        };
+        void loadExisting();
+    }, [user]);
 
     const handleAnalyze = async (data: { type: 'file' | 'text' | 'linkedin'; content: File | string }) => {
         if (!user) return;
@@ -23,6 +46,7 @@ export const ResumeAnalyzer: React.FC = () => {
         try {
             const analysisResult = await analyzeResume(user.uid, data.content, data.type);
             setResult(analysisResult);
+            setView('result');
             toast.success('Resume analyzed! Scroll down to view your report.');
         } catch (err) {
             Sentry.captureException(err);
@@ -36,16 +60,36 @@ export const ResumeAnalyzer: React.FC = () => {
     };
 
     const handleReset = () => {
-        setResult(null);
+        setView('upload');
         setError(null);
     };
 
+    if (loadingExisting) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 gap-3">
+                <div className="w-7 h-7 border-2 border-sky-700 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm text-slate-400">Loading your resume...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
-            <div className="border-b border-slate-200 pb-6">
-                <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">AI-Powered</span>
-                <h2 className="text-2xl font-bold text-slate-900 mt-1">Resume Intelligence</h2>
-                <p className="text-sm text-slate-400 mt-1">Upload your CV to get an ATS score, keyword analysis, and improvement suggestions.</p>
+            <div className="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span className="text-xs font-semibold text-sky-600 uppercase tracking-widest">AI-Powered</span>
+                    <h2 className="text-2xl font-bold text-slate-900 mt-1">Resume Intelligence</h2>
+                    <p className="text-sm text-slate-400 mt-1">Upload your CV to get an ATS score, keyword analysis, and improvement suggestions.</p>
+                </div>
+                {(view === 'existing' || view === 'result') && (
+                    <button
+                        onClick={() => { setView('upload'); }}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors shrink-0"
+                    >
+                        <UploadCloud size={15} />
+                        Upload New CV
+                    </button>
+                )}
             </div>
 
             {error && (
@@ -55,10 +99,10 @@ export const ResumeAnalyzer: React.FC = () => {
                 </div>
             )}
 
-            {!result ? (
+            {view === 'upload' ? (
                 <ResumeInput onSubmit={handleAnalyze} isLoading={isAnalyzing} />
             ) : (
-                <AnalysisDisplay result={result} onReset={handleReset} />
+                result && <AnalysisDisplay result={result} onReset={handleReset} />
             )}
         </div>
     );

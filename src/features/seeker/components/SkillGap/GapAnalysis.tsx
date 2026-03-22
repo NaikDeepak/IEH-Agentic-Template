@@ -88,6 +88,10 @@ export const GapAnalysis: React.FC = () => {
         try {
             const gapAnalysis = await analyzeSkillGap(user.uid, currentSkills, targetRole);
             setResult(gapAnalysis);
+            // Persist the target role back to the seeker profile so other features can use it
+            void ProfileService.upsertProfile(user.uid, {
+                preferences: { roles: [targetRole], locations: [], remote: false }
+            });
         } catch (err) {
             console.error(err);
             setError("Failed to analyze skill gap. Please try again.");
