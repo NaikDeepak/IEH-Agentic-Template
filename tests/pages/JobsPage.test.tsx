@@ -8,16 +8,30 @@ import { MemoryRouter } from 'react-router-dom';
 // Mock Dependencies
 vi.mock('../../src/features/jobs/services/jobService', () => ({
     JobService: {
-        getJobs: vi.fn()
+        getJobs: vi.fn(),
+        getJobById: vi.fn()
     }
 }));
 
 vi.mock('../../src/lib/ai/search', () => ({
-    searchJobs: vi.fn()
+    searchJobs: vi.fn(),
+    getJobSuggestions: vi.fn().mockResolvedValue([])
 }));
 
 vi.mock('../../src/components/Header', () => ({
     Header: () => <div data-testid="header">Header</div>
+}));
+
+vi.mock('../../src/hooks/useAuth', () => ({
+    useAuth: () => ({ user: null, userData: null })
+}));
+
+vi.mock('@sentry/react', () => ({
+    captureException: vi.fn()
+}));
+
+vi.mock('../../src/components/ApplyModal', () => ({
+    ApplyModal: () => null
 }));
 
 describe('JobsPage', () => {

@@ -56,14 +56,32 @@ export const JobsPage: React.FC = () => {
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
+        const mergedFilters: JobSearchFilters = { ...DEFAULT_JOB_SEARCH_FILTERS, ...filters };
 
-        if (!query.trim()) {
+        const hasActiveFilters =
+            mergedFilters.workMode !== 'All' ||
+            mergedFilters.jobType !== 'All' ||
+            mergedFilters.city.trim() !== '' ||
+            mergedFilters.experienceLevel !== 'All' ||
+            mergedFilters.salaryMin !== '';
+
+        // No query AND no filters → reset to browse list
+        if (!query.trim() && !hasActiveFilters) {
             handleClearSearch();
             return;
         }
 
-        const mergedFilters: JobSearchFilters = { ...DEFAULT_JOB_SEARCH_FILTERS, ...filters };
+        // No query but filters active → apply client-side filtering on browse list
+        if (!query.trim() && hasActiveFilters) {
+            setIsSearching(true);
+            setCurrentSearchQuery('');
+            const filtered = applyLocalFilters(browseJobs, mergedFilters);
+            setDisplayedJobs(filtered);
+            setSuggestions([]);
+            return;
+        }
 
+        // Query present → run backend semantic search with filters
         try {
             setLoading(true);
             setError(null);
@@ -122,6 +140,53 @@ export const JobsPage: React.FC = () => {
         }
     };
 
+    /**
+     * Apply search filters locally against the browse job list.
+     * Used when filters are active but no search query is entered.
+     */
+    const applyLocalFilters = (jobs: Job[], f: JobSearchFilters): JobWithMatch[] => {
+        return jobs.filter(job => {
+            // Work mode — match against location field (backend stores work_mode, frontend Job doesn't expose it directly)
+            // Fall back to checking the raw posting data via the browse list
+            if (f.workMode !== 'All') {
+                const raw = job as unknown as Record<string, unknown>;
+                const workMode = (raw['work_mode'] as string | undefined) ?? '';
+                const modeMap: Record<string, string> = { 'Remote': 'remote', 'Hybrid': 'hybrid', 'Office': 'onsite' };
+                const expected = modeMap[f.workMode] ?? f.workMode.toLowerCase();
+                if (workMode.toLowerCase() !== expected) return false;
+            }
+
+            // Job type
+            if (f.jobType !== 'All') {
+                const typeStr = (job.type ?? '').toLowerCase().replace(/_/g, '-');
+                if (typeStr !== f.jobType.toLowerCase()) return false;
+            }
+
+            // City
+            if (f.city.trim()) {
+                const loc = (job.location ?? '').toLowerCase();
+                if (!loc.includes(f.city.trim().toLowerCase())) return false;
+            }
+
+            // Experience level
+            if (f.experienceLevel !== 'All') {
+                const raw = job as unknown as Record<string, unknown>;
+                const exp = ((raw['experience_level'] as string | undefined) ?? (raw['experience'] as string | undefined) ?? '').toLowerCase();
+                if (!exp.startsWith(f.experienceLevel.toLowerCase())) return false;
+            }
+
+            // Salary
+            if (f.salaryMin) {
+                const min = Number(f.salaryMin);
+                if (min > 0 && job.salaryRange) {
+                    if (job.salaryRange.max < min) return false;
+                }
+            }
+
+            return true;
+        });
+    };
+
     // Helper to map backend type to frontend type
     const mapJobPostingToJob = (posting: JobPosting): Job => {
         // Map backend enum to frontend union type safely
@@ -135,15 +200,16 @@ export const JobsPage: React.FC = () => {
             }
         }
 
+        // Spread raw posting data first to preserve fields like work_mode,
+        // experience, experience_level for local filter matching
         return {
+            ...(posting as unknown as Record<string, unknown>),
             id: posting.id ?? '',
             employerId: posting.employer_id,
             title: posting.title,
             description: posting.description,
-            // Map JobStatus to ActivityStatus explicitly
             status: posting.status === 'active' ? 'active' :
                 posting.status === 'passive' ? 'passive' : 'closed',
-            // Fallback to created_at if activity timestamps are missing
             lastActiveAt: posting.lastActiveAt ?? posting.created_at,
             expiresAt: posting.expiresAt ?? posting.created_at,
             createdAt: posting.created_at,

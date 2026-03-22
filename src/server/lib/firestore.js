@@ -36,7 +36,7 @@ export const runVectorSearch = async (collectionName, queryVector, filters = [],
 
         // Perform vector search
         const vectorQuery = collRef.findNearest('embedding', vectorValue, {
-            limit: Number(limit) * CONSTANTS.DEFAULTS.SEARCH_LIMIT_MULTIPLIER,
+            limit: Number(limit),
             distanceMeasure: 'COSINE'
         });
 

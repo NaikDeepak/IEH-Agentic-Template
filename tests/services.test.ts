@@ -158,12 +158,12 @@ describe('Frontend Services Logic', () => {
             });
 
             // Pass undefined/null for location to use default, or empty string
-            const results = await searchJobs('engineer', '', 5);
+            const results = await searchJobs('engineer', {}, 5);
 
             expect(results).toHaveLength(1);
             expect(global.fetch).toHaveBeenCalledWith('/api/jobs/search', expect.objectContaining({
                 method: 'POST',
-                body: JSON.stringify({ query: 'engineer', location: '', limit: 5 })
+                body: JSON.stringify({ query: 'engineer', location: '', city: '', jobType: '', experienceLevel: '', salaryMin: 0, limit: 5 })
             }));
         });
     });

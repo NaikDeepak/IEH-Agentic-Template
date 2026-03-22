@@ -9,6 +9,32 @@ vi.mock('../../../src/features/seeker/services/interviewService', () => ({
     evaluateAnswer: vi.fn()
 }));
 
+vi.mock('../../../src/hooks/useAuth', () => ({
+    useAuth: () => ({ user: { uid: 'test-user' } })
+}));
+
+vi.mock('../../../src/features/seeker/services/profileService', () => ({
+    ProfileService: {
+        getProfile: vi.fn().mockResolvedValue(null)
+    }
+}));
+
+vi.mock('../../../src/features/seeker/services/resumeService', () => ({
+    getLatestResume: vi.fn().mockResolvedValue(null)
+}));
+
+vi.mock('firebase/firestore', () => ({
+    getFirestore: vi.fn(() => ({})),
+    collection: vi.fn(),
+    doc: vi.fn(),
+    getDoc: vi.fn(),
+    getDocs: vi.fn(),
+    query: vi.fn(),
+    where: vi.fn(),
+}));
+
+vi.mock('../../../src/lib/firebase', () => ({ db: {}, auth: {} }));
+
 describe('InterviewPrep', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -31,11 +57,11 @@ describe('InterviewPrep', () => {
         const roleInput = screen.getByLabelText(/Target Role/i);
         fireEvent.change(roleInput, { target: { value: 'Frontend Developer' } });
 
-        const startButton = screen.getByRole('button', { name: /Initialize Practice/i });
+        const startButton = screen.getByRole('button', { name: /Start Practice/i });
         fireEvent.click(startButton);
 
         await waitFor(() => {
-            expect(screen.getByText(/Active Session/i)).toBeDefined();
+            expect(screen.getByText(/Practising for/i)).toBeDefined();
             expect(screen.getByText('Question 1')).toBeDefined();
         });
     });
@@ -58,18 +84,18 @@ describe('InterviewPrep', () => {
 
         // Setup
         fireEvent.change(screen.getByLabelText(/Target Role/i), { target: { value: 'Developer' } });
-        fireEvent.click(screen.getByRole('button', { name: /Initialize Practice/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start Practice/i }));
 
         // Practice
-        const answerInput = await screen.findByLabelText(/Input Buffer/i);
+        const answerInput = await screen.findByLabelText(/Your Answer/i);
         fireEvent.change(answerInput, { target: { value: 'My answer...' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /Execute Transmission/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Submit Answer/i }));
 
         await waitFor(() => {
             expect(screen.getByText('85%')).toBeDefined();
             expect(screen.getByText('Clear explanation')).toBeDefined();
-            expect(screen.getByText(/Golden Protocol/i)).toBeDefined();
+            expect(screen.getByText(/Model Answer/i)).toBeDefined();
         });
     });
 
@@ -86,20 +112,20 @@ describe('InterviewPrep', () => {
 
         // Setup
         fireEvent.change(screen.getByLabelText(/Target Role/i), { target: { value: 'Dev' } });
-        fireEvent.click(screen.getByRole('button', { name: /Initialize Practice/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start Practice/i }));
 
         // Practice
-        const answerInput = await screen.findByLabelText(/Input Buffer/i);
+        const answerInput = await screen.findByLabelText(/Your Answer/i);
         fireEvent.change(answerInput, { target: { value: '...' } });
-        fireEvent.click(screen.getByRole('button', { name: /Execute Transmission/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Submit Answer/i }));
 
-        // Next/End
-        const endButton = await screen.findByRole('button', { name: /End Session/i });
-        fireEvent.click(endButton);
+        // Finish session (only 1 question)
+        const finishButton = await screen.findByRole('button', { name: /Finish Session/i });
+        fireEvent.click(finishButton);
 
         await waitFor(() => {
-            expect(screen.getByText(/Session Terminated/i)).toBeDefined();
-            expect(screen.getByRole('button', { name: /Re-Initialize/i })).toBeDefined();
+            expect(screen.getByText(/Practice Complete/i)).toBeDefined();
+            expect(screen.getByRole('button', { name: /Start New Session/i })).toBeDefined();
         });
     });
 });

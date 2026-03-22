@@ -22,13 +22,49 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
     const [filters, setFilters] = useState<JobSearchFilters>(DEFAULT_FILTERS);
     const [workModeDropdownOpen, setWorkModeDropdownOpen] = useState(false);
     const workModeRef = useRef<HTMLDivElement>(null);
+    // Track whether an active search has been run so filter changes re-trigger it
+    const hasSearched = useRef(false);
+    const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleSearch = () => {
+        hasSearched.current = true;
         onSearch?.(searchTerm, filters);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') handleSearch();
+    };
+
+    // Auto-re-run search when dropdown filters change (work mode, job type, experience)
+    const handleSelectFilterChange = (updated: JobSearchFilters) => {
+        setFilters(updated);
+        if (hasSearched.current) {
+            onSearch?.(searchTerm, updated);
+        }
+    };
+
+    // Auto-re-run search for city with a 600ms debounce
+    const handleCityChange = (value: string) => {
+        const updated = { ...filters, city: value };
+        setFilters(updated);
+        if (hasSearched.current) {
+            if (cityDebounceRef.current) clearTimeout(cityDebounceRef.current);
+            cityDebounceRef.current = setTimeout(() => {
+                onSearch?.(searchTerm, updated);
+            }, 600);
+        }
+    };
+
+    // Salary min: debounced auto-search
+    const handleSalaryChange = (value: string) => {
+        const updated = { ...filters, salaryMin: value };
+        setFilters(updated);
+        if (hasSearched.current) {
+            if (cityDebounceRef.current) clearTimeout(cityDebounceRef.current);
+            cityDebounceRef.current = setTimeout(() => {
+                onSearch?.(searchTerm, updated);
+            }, 600);
+        }
     };
 
     const activeFilterCount = [
@@ -39,7 +75,12 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
         filters.salaryMin !== '',
     ].filter(Boolean).length;
 
-    const resetFilters = () => { setFilters(DEFAULT_FILTERS); };
+    const resetFilters = () => {
+        setFilters(DEFAULT_FILTERS);
+        if (hasSearched.current) {
+            onSearch?.(searchTerm, DEFAULT_FILTERS);
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -113,7 +154,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                         key={mode}
                                         role="option"
                                         aria-selected={filters.workMode === mode}
-                                        onClick={() => { setFilters((f) => ({ ...f, workMode: mode })); setWorkModeDropdownOpen(false); }}
+                                        onClick={() => { handleSelectFilterChange({ ...filters, workMode: mode }); setWorkModeDropdownOpen(false); }}
                                         className={`w-full text-left px-5 py-2.5 text-sm border-b border-slate-100 last:border-0 transition-colors ${filters.workMode === mode ? 'bg-sky-50 text-sky-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'}`}
                                     >
                                         {mode}
@@ -163,7 +204,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                     id="filter-city"
                                     type="text"
                                     value={filters.city}
-                                    onChange={(e) => { setFilters((f) => ({ ...f, city: e.target.value })); }}
+                                    onChange={(e) => { handleCityChange(e.target.value); }}
                                     placeholder="Mumbai, Delhi, Bangalore..."
                                     className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100 transition-all"
                                 />
@@ -175,7 +216,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                 <select
                                     id="filter-job-type"
                                     value={filters.jobType}
-                                    onChange={(e) => { setFilters((f) => ({ ...f, jobType: e.target.value })); }}
+                                    onChange={(e) => { handleSelectFilterChange({ ...filters, jobType: e.target.value }); }}
                                     className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100 transition-all"
                                 >
                                     {JOB_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -188,7 +229,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                 <select
                                     id="filter-experience"
                                     value={filters.experienceLevel}
-                                    onChange={(e) => { setFilters((f) => ({ ...f, experienceLevel: e.target.value })); }}
+                                    onChange={(e) => { handleSelectFilterChange({ ...filters, experienceLevel: e.target.value }); }}
                                     className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100 transition-all"
                                 >
                                     {EXPERIENCE_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
@@ -202,7 +243,7 @@ export const JobSearchBar: React.FC<JobSearchBarProps> = ({ onSearch }) => {
                                     id="filter-salary-min"
                                     type="number"
                                     value={filters.salaryMin}
-                                    onChange={(e) => { setFilters((f) => ({ ...f, salaryMin: e.target.value })); }}
+                                    onChange={(e) => { handleSalaryChange(e.target.value); }}
                                     placeholder="e.g. 6"
                                     min={0}
                                     className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100 transition-all"
