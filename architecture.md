@@ -32,6 +32,27 @@ The referral and rewards system uses a **Secure Backend + Atomic Ledger** patter
 - **Phone OTP**: Simulated in dev; production will use Firebase Phone Auth with `RecaptchaVerifier`.
 - **LinkedIn**: Simulated profile URL capture; production will use LinkedIn OAuth2 via Firebase Identity Platform.
 
+## Job Search & Ranking Architecture
+
+The job search uses a **Hybrid Semantic + Filtered Ranking** pattern to provide both relevance and precision.
+
+### Components
+- **Vector Search**: Uses `gemini-embedding-001` to generate a 768-dimension embedding of the search query. Firestore `findNearest` is used for the initial candidate retrieval.
+- **Multimodal Filtering**: Filters for `work_mode`, `city`, `job_type`, and `experience_level` are applied both server-side (for total accuracy) and client-side (for immediate feedback).
+- **Hybrid Ranking Algorithm**: Calculates a `matchScore` based on three weighted signals:
+    1.  **Semantic Vector Match (55%)**: Conceptual relevance of the query to the job description.
+    2.  **Keyword Match (20%)**: Literal overlap of search terms with job title and skills.
+    3.  **Explicit Filter Bonus (25%)**: A boost given to results that match user-selected filter criteria (City, Job Type, etc.), ensuring filtered results rank at the top.
+
+## Data Robustness & Validation
+
+The platform implements a **Safe Data Normalization** pattern at the service layer to handle "thin" or legacy Firestore documents.
+
+### Implementation
+- **Service-Level Defaults**: `ProfileService.getProfile` and `getLatestResume` (in `resumeService.ts`) inject default empty objects and arrays (e.g., `preferences.roles: []`, `keywords.found: []`) during the data fetch.
+- **Optional Chaining**: UI components like `InterviewPrep.tsx` use deep optional chaining and nullish coalescing for all nested properties, ensuring the app remains functional even if backend synchronization is partial.
+- **Type Safety**: Normalization is performed before casting to domain types, ensuring runtime reality matches TypeScript interface expectations.
+
 ## Technical Stack
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS.
 - **Backend**: Firebase Cloud Functions (Node.js/Express).

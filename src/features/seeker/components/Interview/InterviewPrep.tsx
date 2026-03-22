@@ -29,17 +29,25 @@ export const InterviewPrep: React.FC = () => {
                     ProfileService.getProfile(user.uid),
                     getLatestResume(user.uid)
                 ]);
-                // preferences.roles is typed as non-optional when profile exists
+                // Prefill role from profile preferences
                 const firstRole = profile?.preferences.roles[0];
-                if (firstRole) {
+                if (typeof firstRole === 'string' && firstRole.trim()) {
                     setRole(prev => prev || firstRole);
                 }
-                if (resume?.parsed_data) {
-                    const exp = resume.parsed_data.experience ?? [];
-                    // keywords.found is typed as non-optional when resume exists
-                    const skills = resume.keywords.found.slice(0, 10).join(', ');
+
+                // Prefill context from latest resume
+                const exp = resume?.parsed_data.experience ?? [];
+                const skillsList = resume?.keywords.found ?? [];
+                const skills = Array.isArray(skillsList) ? skillsList.slice(0, 10).join(', ') : '';
+
+                if (exp.length > 0 || skills) {
+                    const firstExp = exp[0];
+                    const expContext = firstExp?.role && firstExp.company 
+                        ? `Recent role: ${firstExp.role} at ${firstExp.company}` 
+                        : '';
+                    
                     const context = [
-                        exp[0] ? `Recent role: ${exp[0].role} at ${exp[0].company}` : '',
+                        expContext,
                         skills ? `Key skills: ${skills}` : '',
                     ].filter(Boolean).join('\n');
                     setResumeContext(prev => prev || context);

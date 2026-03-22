@@ -4,6 +4,37 @@ import type { SeekerProfile, ResumeAnalysisResult } from "../types";
 
 const PROFILE_COLLECTION = "seeker_profiles";
 
+/**
+ * Robust helper to extract a string from unknown data.
+ */
+function getSafeString(data: Record<string, unknown>, key: string, fallback = ""): string {
+    const val = data[key];
+    return typeof val === "string" ? val : fallback;
+}
+
+/**
+ * Robust helper to extract an array from unknown data.
+ */
+function getSafeArray<T>(data: Record<string, unknown>, key: string): T[] {
+    const val = data[key];
+    return Array.isArray(val) ? (val as T[]) : [];
+}
+
+/**
+ * Robust helper to extract a nested object property safely.
+ */
+function getNestedValue<T>(data: Record<string, unknown>, parentKey: string, childKey: string, fallback: T): T {
+    const parent = data[parentKey];
+    if (parent && typeof parent === "object") {
+        const val = (parent as Record<string, unknown>)[childKey];
+        if (val !== undefined && val !== null) {
+            if (Array.isArray(fallback) && Array.isArray(val)) return val as unknown as T;
+            if (typeof fallback === typeof val) return val as unknown as T;
+        }
+    }
+    return fallback;
+}
+
 export const ProfileService = {
     /**
      * Fetches the seeker's profile.
@@ -14,7 +45,29 @@ export const ProfileService = {
             const profileSnap = await getDoc(profileRef);
 
             if (profileSnap.exists()) {
-                return { uid: profileSnap.id, ...profileSnap.data() } as SeekerProfile;
+                const data = profileSnap.data() as Record<string, unknown>;
+                return {
+                    ...data,
+                    uid: userId,
+                    email: getSafeString(data, 'email'),
+                    displayName: getSafeString(data, 'displayName'),
+                    headline: getSafeString(data, 'headline'),
+                    bio: getSafeString(data, 'bio'),
+                    photoURL: getSafeString(data, 'photoURL'),
+                    currentLocation: getSafeString(data, 'currentLocation'),
+                    skills: getSafeArray<string>(data, 'skills'),
+                    work_preferences: getSafeArray<string>(data, 'work_preferences'),
+                    verified_skills: getSafeArray<string>(data, 'verified_skills'),
+                    preferences: {
+                        roles: getNestedValue<string[]>(data, 'preferences', 'roles', []),
+                        locations: getNestedValue<string[]>(data, 'preferences', 'locations', []),
+                        remote: getNestedValue<boolean>(data, 'preferences', 'remote', false),
+                    },
+                    parsed_data: {
+                        experience: getNestedValue<NonNullable<SeekerProfile['parsed_data']>['experience']>(data, 'parsed_data', 'experience', []),
+                        education: getNestedValue<NonNullable<SeekerProfile['parsed_data']>['education']>(data, 'parsed_data', 'education', []),
+                    }
+                } as unknown as SeekerProfile;
             }
             return null;
         } catch (error) {

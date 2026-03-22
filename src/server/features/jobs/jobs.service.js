@@ -57,7 +57,6 @@ export const getJobSuggestions = async (query, limit = 5) => {
 
 export const searchJobs = async (searchQuery, location, limit = CONSTANTS.DEFAULTS.PAGINATION_LIMIT, authToken = null, explicitFilters = {}) => {
     const { city = '', jobType = '', experienceLevel = '', salaryMin = 0 } = explicitFilters;
-    console.log(`[JobsService] searchJobs called — query="${searchQuery}", location="${location}", city="${city}", jobType="${jobType}", experienceLevel="${experienceLevel}", salaryMin=${salaryMin}`);
 
     // 1. Analyze Query
     const { semanticQuery, filters: extractedFilters } = await gemini.analyzeQuery(searchQuery, "finding a job");
