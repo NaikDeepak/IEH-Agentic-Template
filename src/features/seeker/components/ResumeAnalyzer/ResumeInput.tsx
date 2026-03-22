@@ -63,6 +63,16 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading, p
             </div>
 
             <div className="p-6 md:p-8">
+                {/* Build with AI tab renders its own form — kept outside to avoid nested forms */}
+                {mode === 'build' && (
+                    <CVBuilder
+                        prefillName={prefillName}
+                        prefillRole={prefillRole}
+                        prefillSkills={prefillSkills}
+                    />
+                )}
+
+                {mode !== 'build' && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {mode === 'upload' && (
                         <div className="relative group">
@@ -142,36 +152,27 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading, p
                         </div>
                     )}
 
-                    {mode === 'build' && (
-                        <CVBuilder
-                            prefillName={prefillName}
-                            prefillRole={prefillRole}
-                            prefillSkills={prefillSkills}
-                        />
-                    )}
-
-                    {mode !== 'build' && (
-                        <div className="flex justify-end pt-2">
-                            <button
-                                type="submit"
-                                disabled={isDisabled}
-                                className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Analysing...
-                                    </>
-                                ) : (
-                                    <>
-                                        <CheckCircle size={16} />
-                                        Analyse Resume
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    )}
+                    <div className="flex justify-end pt-2">
+                        <button
+                            type="submit"
+                            disabled={isDisabled}
+                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Analysing...
+                                </>
+                            ) : (
+                                <>
+                                    <CheckCircle size={16} />
+                                    Analyse Resume
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </form>
+                )}
             </div>
         </div>
     );

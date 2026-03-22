@@ -229,12 +229,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (err: unknown) {
             const error = err as { code?: string; message?: string };
             console.error("Password Reset Error:", error);
+            // Do NOT expose whether the email exists — return the same message for all cases
+            // to prevent account enumeration via the Forgot Password UI.
             const friendlyMessages: Record<string, string> = {
-                'auth/user-not-found': 'No account found with this email address.',
                 'auth/invalid-email': 'Please enter a valid email address.',
                 'auth/too-many-requests': 'Too many requests. Please try again later.',
             };
-            setError((error.code && friendlyMessages[error.code]) ?? "Failed to send reset email. Please try again.");
+            setError((error.code && friendlyMessages[error.code]) ?? "If an account exists for this email, a reset link has been sent.");
             throw err;
         }
     }, []);
