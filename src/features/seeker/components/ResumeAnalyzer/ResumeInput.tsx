@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Linkedin, CheckCircle, Info } from 'lucide-react';
+import { Upload, FileText, Linkedin, CheckCircle, Info, Sparkles } from 'lucide-react';
+import { CVBuilder } from './CVBuilder';
 
 interface ResumeInputProps {
     onSubmit: (data: { type: 'file' | 'text' | 'linkedin'; content: File | string }) => void;
     isLoading?: boolean;
+    prefillName?: string;
+    prefillRole?: string;
+    prefillSkills?: string[];
 }
 
-type InputMode = 'upload' | 'paste' | 'linkedin';
+type InputMode = 'upload' | 'paste' | 'linkedin' | 'build';
 
-export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading }) => {
+export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading, prefillName, prefillRole, prefillSkills }) => {
     const [mode, setMode] = useState<InputMode>('upload');
     const [rawText, setRawText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -34,6 +38,7 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading })
         { id: 'upload', label: 'Upload File', icon: Upload },
         { id: 'paste', label: 'Paste Text', icon: FileText },
         { id: 'linkedin', label: 'LinkedIn Import', icon: Linkedin },
+        { id: 'build', label: 'Build with AI', icon: Sparkles },
     ];
 
     const isDisabled = (isLoading ?? false) || (mode === 'upload' && !selectedFile) || (mode === 'paste' && !rawText.trim()) || (mode === 'linkedin' && !selectedFile);
@@ -137,25 +142,35 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading })
                         </div>
                     )}
 
-                    <div className="flex justify-end pt-2">
-                        <button
-                            type="submit"
-                            disabled={isDisabled}
-                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isLoading ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Analysing...
-                                </>
-                            ) : (
-                                <>
-                                    <CheckCircle size={16} />
-                                    Analyse Resume
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    {mode === 'build' && (
+                        <CVBuilder
+                            prefillName={prefillName}
+                            prefillRole={prefillRole}
+                            prefillSkills={prefillSkills}
+                        />
+                    )}
+
+                    {mode !== 'build' && (
+                        <div className="flex justify-end pt-2">
+                            <button
+                                type="submit"
+                                disabled={isDisabled}
+                                className="flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Analysing...
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle size={16} />
+                                        Analyse Resume
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
                 </form>
             </div>
         </div>

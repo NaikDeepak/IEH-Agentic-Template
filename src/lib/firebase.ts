@@ -34,7 +34,8 @@ export const googleProvider = new GoogleAuthProvider();
 export {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut
+    signOut,
+    sendPasswordResetEmail
 } from "firebase/auth";
 
 // Setting standard prompt for Google account shift as requested in auth.md

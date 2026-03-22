@@ -10,7 +10,8 @@ import {
     db,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut
+    signOut,
+    sendPasswordResetEmail
 } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
@@ -221,6 +222,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
+    const resetPassword = useCallback(async (email: string) => {
+        setError(null);
+        try {
+            await sendPasswordResetEmail(auth, email);
+        } catch (err: unknown) {
+            const error = err as { code?: string; message?: string };
+            console.error("Password Reset Error:", error);
+            const friendlyMessages: Record<string, string> = {
+                'auth/user-not-found': 'No account found with this email address.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/too-many-requests': 'Too many requests. Please try again later.',
+            };
+            setError((error.code && friendlyMessages[error.code]) ?? "Failed to send reset email. Please try again.");
+            throw err;
+        }
+    }, []);
+
     const logout = useCallback(async () => {
         setError(null);
         try {
@@ -260,10 +278,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         loginWithEmail,
         signupWithEmail,
+        resetPassword,
         logout,
         refreshUserData,
         clearError
-    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, logout, refreshUserData, clearError]);
+    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, resetPassword, logout, refreshUserData, clearError]);
 
     return (
         <AuthContext.Provider value={value}>

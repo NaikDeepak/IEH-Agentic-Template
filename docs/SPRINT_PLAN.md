@@ -86,11 +86,13 @@ Goal: Make the candidate profile actually reflect the person.
 | S3-RESUME-01 | `[x]``[ ]` Resume Intelligence — show current CV analysis first | Reorder flow: show existing analysis → then offer Upload New / Optimize with AI |
 | S3-RESUME-02 | `[x]``[ ]` Resume Intelligence — add action buttons after analysis | "Back to Dashboard" + "Optimize with AI" CTAs on result screen |
 | S3-RESUME-03 | `[ ]` AI CV builder — structured sections | Template: Summary / Skills / Experience / Education. Currently flat output |
-| S3-SKILL-01 | `[ ]` Rename "bridge assets" → "Skill Upgrade Path" | `src/features/seeker/components/SkillGap/` — rename labels throughout |
-| S3-SKILL-02 | `[ ]` Rename "skill void" → "Missing Skills" | Same files |
-| S3-SKILL-03 | `[ ]` "Targeted semantic void" — plain English copy | Replace with something like "Skills gap for your target role" |
-| S3-SKILL-04 | `[x]``[ ]` Targeted career path — make editable | Field is currently read-only; unlock edit |
-| S3-INTERVIEW-01 | `[x]``[ ]` Interview prep — auto-fill from resume | Pre-populate role + skills from latest resume parse; editable before session |
+| S3-SKILL-01 | `[x]` Rename "bridge assets" → "Skill Upgrade Path" | `GapAnalysis.tsx` already uses "Skills to Learn" and "Learning Resources" — clean copy confirmed |
+| S3-SKILL-02 | `[x]` Rename "skill void" → "Missing Skills" | Same — confirmed clean in `GapAnalysis.tsx` |
+| S3-SKILL-03 | `[x]` "Targeted semantic void" — plain English copy | Confirmed clean — no jargon in codebase |
+| S3-SKILL-04 | `[x]` Targeted career path — make editable | Field is editable in ProfileEditor |
+| S3-INTERVIEW-01 | `[x]` Interview prep — auto-fill from resume | Pre-population implemented |
+| M-4 | `[~]` "Forgot Password" flow | `AuthContext` + `AuthProvider` + `Login.tsx` — inline forgot-password UI with Firebase `sendPasswordResetEmail` |
+| M-8 | `[~]` Profile completeness indicator | Compute score from profile fields; show labeled progress bar in `ProfileEditor.tsx` |
 
 ---
 

@@ -23,6 +23,7 @@ export interface AuthContextType {
     loginWithGoogle: (referralCode?: string) => Promise<void>;
     loginWithEmail: (email: string, password: string) => Promise<void>;
     signupWithEmail: (email: string, password: string, displayName: string, referralCode?: string) => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshUserData: () => Promise<void>;
     clearError: () => void;

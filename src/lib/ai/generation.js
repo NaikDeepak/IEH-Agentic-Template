@@ -166,6 +166,40 @@ const SKILL_GAP_SCHEMA = {
     required: ["target_role", "missing_skills", "resources"]
 };
 
+const CV_BUILD_SCHEMA = {
+    type: Type.OBJECT,
+    properties: {
+        summary: { type: Type.STRING },
+        skills: { type: Type.ARRAY, items: { type: Type.STRING } },
+        experience: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    company: { type: Type.STRING },
+                    role: { type: Type.STRING },
+                    duration: { type: Type.STRING },
+                    highlights: { type: Type.ARRAY, items: { type: Type.STRING } }
+                },
+                required: ["company", "role", "duration", "highlights"]
+            }
+        },
+        education: {
+            type: Type.ARRAY,
+            items: {
+                type: Type.OBJECT,
+                properties: {
+                    institution: { type: Type.STRING },
+                    degree: { type: Type.STRING },
+                    year: { type: Type.STRING }
+                },
+                required: ["institution", "degree", "year"]
+            }
+        }
+    },
+    required: ["summary", "skills", "experience", "education"]
+};
+
 /**
  * Get AI Client instance
  * @param {string} apiKey 
@@ -539,5 +573,58 @@ export const analyzeSkillGap = async (prompt, apiKey) => {
     } catch (error) {
         console.error("Error analyzing skill gap:", error);
         throw new Error("Failed to analyze skill gap: " + error.message);
+    }
+};
+
+/**
+ * Build a structured CV from user-provided inputs
+ * @param {object} params
+ * @param {string} params.name
+ * @param {string} params.targetRole
+ * @param {string[]} params.skills
+ * @param {string} params.experienceBullets  - raw text describing work history
+ * @param {string} params.educationBullets   - raw text describing education
+ * @param {string} [params.extraContext]     - any extra notes / certifications
+ * @param {string} apiKey
+ * @returns {Promise<{summary: string, skills: string[], experience: object[], education: object[]}>}
+ */
+export const buildCV = async ({ name, targetRole, skills, experienceBullets, educationBullets, extraContext }, apiKey) => {
+    const ai = getClient(apiKey);
+    const prompt = `
+You are an expert resume writer for the Indian tech job market. Based on the raw information provided, craft a polished, ATS-optimised CV with four structured sections.
+
+CANDIDATE: ${name || 'Candidate'}
+TARGET ROLE: ${targetRole || 'Software Professional'}
+SKILLS PROVIDED: ${Array.isArray(skills) ? skills.join(', ') : skills || 'Not specified'}
+WORK HISTORY (raw notes): ${experienceBullets || 'Not provided'}
+EDUCATION (raw notes): ${educationBullets || 'Not provided'}
+ADDITIONAL CONTEXT: ${extraContext || 'None'}
+
+INSTRUCTIONS:
+- summary: 3–4 sentence professional summary tailored to ${targetRole}. Use first-person implicit style (no "I"). Mention key skills, years of experience, and value proposition.
+- skills: Deduplicate and expand the provided skills list. Include both technical and soft skills relevant to the role. Return as a flat string array.
+- experience: Parse the raw work history into structured entries. For each role, generate 3–5 strong action-oriented bullet points (highlights) using the STAR or CAR framework. Use quantifiable impact where possible.
+- education: Parse the raw education text into structured entries.
+
+Keep the tone professional, specific, and free of filler phrases.
+`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: DEFAULT_MODELS.FAST,
+            systemInstruction: "You are a senior resume writer specialising in Indian tech talent. You write concise, ATS-friendly CVs that get past filters and impress hiring managers. Never use clichés. Quantify achievements wherever possible.",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: CV_BUILD_SCHEMA,
+                temperature: 0.5
+            }
+        });
+        const text = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text;
+        const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(jsonStr);
+    } catch (error) {
+        console.error("Error building CV:", error);
+        throw new Error("Failed to build CV: " + error.message);
     }
 };

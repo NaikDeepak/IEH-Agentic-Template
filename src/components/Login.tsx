@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { LogIn, LogOut, Mail, Lock, Loader2, ArrowRight, ChevronDown, User, Settings } from 'lucide-react';
+import { LogIn, LogOut, Mail, Lock, Loader2, ArrowRight, ChevronDown, User, Settings, CheckCircle } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 interface LoginProps {
@@ -8,10 +8,14 @@ interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
-    const { loginWithGoogle, loginWithEmail, user, loading, logout, error, clearError } = useAuth();
+    const { loginWithGoogle, loginWithEmail, resetPassword, user, loading, logout, error, clearError } = useAuth();
     const [searchParams] = useSearchParams();
     const referralCode = searchParams.get('ref') ?? undefined;
     const [isEmailLoading, setIsEmailLoading] = useState(false);
+    const [forgotMode, setForgotMode] = useState(false);
+    const [forgotEmail, setForgotEmail] = useState('');
+    const [forgotSent, setForgotSent] = useState(false);
+    const [isForgotLoading, setIsForgotLoading] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -33,6 +37,19 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
         if (error) clearError();
+    };
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsForgotLoading(true);
+        try {
+            await resetPassword(forgotEmail);
+            setForgotSent(true);
+        } catch {
+            // error set in AuthProvider
+        } finally {
+            setIsForgotLoading(false);
+        }
     };
 
     const handleEmailLogin = async (e: React.FormEvent) => {
@@ -113,6 +130,80 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
     const inputClasses = "w-full px-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-400 transition-all text-sm text-slate-900 placeholder:text-slate-400";
     const labelClasses = "text-xs font-medium text-slate-500 uppercase tracking-widest flex items-center gap-1.5";
 
+    // Card Variant — Forgot Password mode
+    if (forgotMode) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center p-4 bg-sky-50 w-full font-sans">
+                <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-soft p-8 md:p-10">
+                    <div className="text-center space-y-4 mb-8">
+                        <div className="w-14 h-14 bg-sky-700 text-white rounded-xl flex items-center justify-center mx-auto shadow-sm">
+                            <Mail className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-slate-900 mb-1">Reset Password</h2>
+                            <p className="text-sm text-slate-400">We'll send a reset link to your email</p>
+                        </div>
+                    </div>
+
+                    {forgotSent ? (
+                        <div className="space-y-6">
+                            <div className="flex flex-col items-center gap-3 p-5 bg-emerald-50 border border-emerald-100 rounded-xl text-center">
+                                <CheckCircle className="w-8 h-8 text-emerald-600" />
+                                <p className="text-sm font-medium text-emerald-800">Reset link sent to <span className="font-bold">{forgotEmail}</span></p>
+                                <p className="text-xs text-emerald-600">Check your inbox and follow the link to reset your password.</p>
+                            </div>
+                            <button
+                                onClick={() => { setForgotMode(false); setForgotSent(false); setForgotEmail(''); }}
+                                className="w-full py-3 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-xl transition-colors"
+                            >
+                                Back to Sign In
+                            </button>
+                        </div>
+                    ) : (
+                        <form onSubmit={handleForgotPassword} className="space-y-5">
+                            <div className="space-y-1.5">
+                                <label htmlFor="forgot-email" className={labelClasses}>
+                                    <Mail className="w-3 h-3" /> Email Address
+                                </label>
+                                <input
+                                    id="forgot-email"
+                                    type="email"
+                                    required
+                                    value={forgotEmail}
+                                    onChange={(e) => { setForgotEmail(e.target.value); }}
+                                    placeholder="you@example.com"
+                                    className={inputClasses}
+                                />
+                            </div>
+
+                            {error && (
+                                <div className="p-3 bg-red-50 text-red-600 text-xs font-medium rounded-lg border border-red-100">
+                                    {error}
+                                </div>
+                            )}
+
+                            <button
+                                type="submit"
+                                disabled={isForgotLoading}
+                                className="w-full flex items-center justify-center gap-2 py-3 px-6 text-sm font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isForgotLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Send Reset Link'}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => { setForgotMode(false); clearError(); }}
+                                className="w-full py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                            >
+                                Back to Sign In
+                            </button>
+                        </form>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     // Card Variant
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-4 bg-sky-50 w-full font-sans">
@@ -146,9 +237,18 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                     </div>
 
                     <div className="space-y-1.5">
-                        <label htmlFor="login-password" className={labelClasses}>
-                            <Lock className="w-3 h-3" /> Password
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="login-password" className={labelClasses}>
+                                <Lock className="w-3 h-3" /> Password
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => { setForgotMode(true); clearError(); }}
+                                className="text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"
+                            >
+                                Forgot password?
+                            </button>
+                        </div>
                         <input
                             id="login-password"
                             type="password"

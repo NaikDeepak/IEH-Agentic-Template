@@ -8,7 +8,8 @@ import {
     evaluateInterviewAnswer as genEvaluate,
     generateSkillAssessment as genAssessment,
     generateOutreachMessage as genOutreach,
-    analyzeSkillGap as genSkillGap
+    analyzeSkillGap as genSkillGap,
+    buildCV as genBuildCV
 } from '../../../lib/ai/generation.js';
 
 export const generateJD = async (job, companyContext) => {
@@ -45,4 +46,8 @@ export const generateOutreach = async (prompt) => {
 
 export const analyzeSkillGap = async (prompt) => {
     return await genSkillGap(prompt, config.apiKey);
+};
+
+export const buildCV = async (params) => {
+    return await genBuildCV(params, config.apiKey);
 };

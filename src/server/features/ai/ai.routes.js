@@ -12,5 +12,6 @@ router.post('/evaluate-answer', aiController.evaluateInterviewAnswer);
 router.post('/assessment', aiController.generateAssessment);
 router.post('/outreach', aiController.generateOutreach);
 router.post('/skill-gap', aiController.analyzeSkillGap);
+router.post('/build-cv', aiController.buildCV);
 
 export default router;

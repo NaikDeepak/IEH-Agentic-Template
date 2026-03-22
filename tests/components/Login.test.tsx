@@ -8,6 +8,7 @@ vi.mock('../../src/hooks/useAuth', () => ({
     useAuth: () => ({
         loginWithGoogle: vi.fn(),
         loginWithEmail: vi.fn(),
+        resetPassword: vi.fn(),
         user: null,
         loading: false,
         logout: vi.fn(),
@@ -25,7 +26,7 @@ describe('Login', () => {
         );
         // Use more flexible text matchers
         expect(screen.getByText(/Email Address/i)).toBeDefined();
-        expect(screen.getByText(/Password/i)).toBeDefined();
+        expect(screen.getByLabelText(/Password/i)).toBeDefined();
         expect(screen.getByRole('button', { name: /Sign In/i })).toBeDefined();
     });
 

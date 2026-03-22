@@ -157,3 +157,18 @@ export const analyzeSkillGap = async (req, res, next) => {
         next(error);
     }
 };
+
+export const buildCV = async (req, res, next) => {
+    try {
+        const { name, targetRole, skills, experienceBullets, educationBullets, extraContext } = req.body;
+        if (!targetRole) {
+            const error = new Error("Target role is required");
+            error.statusCode = 400;
+            throw error;
+        }
+        const result = await aiService.buildCV({ name, targetRole, skills, experienceBullets, educationBullets, extraContext });
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
