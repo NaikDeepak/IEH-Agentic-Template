@@ -70,7 +70,7 @@ export const JobDetailPage: React.FC = () => {
 
         void fetchJob();
         void checkApplicationStatus();
-    }, [id, user]);
+    }, [id, user, navigate]);
 
     const handleApply = () => {
         if (!user) {

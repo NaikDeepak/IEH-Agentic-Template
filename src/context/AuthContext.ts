@@ -13,6 +13,7 @@ export interface UserData {
     browniePoints?: number;
     phoneVerified?: boolean;
     linkedinVerified?: boolean;
+    onboarding_complete?: boolean;
 }
 
 export interface AuthContextType {
@@ -24,6 +25,8 @@ export interface AuthContextType {
     loginWithEmail: (email: string, password: string) => Promise<void>;
     signupWithEmail: (email: string, password: string, displayName: string, referralCode?: string) => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
+    sendVerificationEmail: () => Promise<void>;
+    completeOnboarding: (extraData?: Record<string, string>) => Promise<void>;
     logout: () => Promise<void>;
     refreshUserData: () => Promise<void>;
     clearError: () => void;

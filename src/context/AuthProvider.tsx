@@ -11,7 +11,8 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendEmailVerification
 } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
@@ -202,6 +203,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(userCredential.user, { displayName });
+            await sendEmailVerification(userCredential.user);
             
             // onAuthStateChanged fires before updateProfile finishes, leaving the firestore doc with null displayName.
             // We ensure it gets written by manually merging the displayName here.
@@ -240,6 +242,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
+    const sendVerificationEmail = useCallback(async () => {
+        if (!auth.currentUser) return;
+        setError(null);
+        try {
+            await sendEmailVerification(auth.currentUser);
+        } catch (err: unknown) {
+            const error = err as { code?: string; message?: string };
+            const friendlyMessages: Record<string, string> = {
+                'auth/too-many-requests': 'Too many requests. Please wait a few minutes before trying again.',
+            };
+            setError((error.code && friendlyMessages[error.code]) ?? 'Failed to resend verification email.');
+            throw err;
+        }
+    }, []);
+
     const logout = useCallback(async () => {
         setError(null);
         try {
@@ -267,6 +284,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [user]);
 
+    const completeOnboarding = useCallback(async (extraData?: Record<string, string>) => {
+        if (!user) return;
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+            onboarding_complete: true,
+            ...(extraData ?? {})
+        });
+        await refreshUserData();
+    }, [user, refreshUserData]);
+
     const clearError = useCallback(() => {
         setError(null);
     }, []);
@@ -280,10 +307,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithEmail,
         signupWithEmail,
         resetPassword,
+        sendVerificationEmail,
+        completeOnboarding,
         logout,
         refreshUserData,
         clearError
-    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, resetPassword, logout, refreshUserData, clearError]);
+    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, resetPassword, sendVerificationEmail, completeOnboarding, logout, refreshUserData, clearError]);
 
     return (
         <AuthContext.Provider value={value}>

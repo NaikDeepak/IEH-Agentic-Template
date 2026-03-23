@@ -35,7 +35,8 @@ export {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendEmailVerification
 } from "firebase/auth";
 
 // Setting standard prompt for Google account shift as requested in auth.md
