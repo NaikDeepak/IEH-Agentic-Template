@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Linkedin, CheckCircle, Info } from 'lucide-react';
+import { Upload, FileText, Linkedin, CheckCircle, Info, Sparkles } from 'lucide-react';
+import { CVBuilder } from './CVBuilder';
 
 interface ResumeInputProps {
     onSubmit: (data: { type: 'file' | 'text' | 'linkedin'; content: File | string }) => void;
     isLoading?: boolean;
+    prefillName?: string;
+    prefillRole?: string;
+    prefillSkills?: string[];
 }
 
-type InputMode = 'upload' | 'paste' | 'linkedin';
+type InputMode = 'upload' | 'paste' | 'linkedin' | 'build';
 
-export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading }) => {
+export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading, prefillName, prefillRole, prefillSkills }) => {
     const [mode, setMode] = useState<InputMode>('upload');
     const [rawText, setRawText] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -34,6 +38,7 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading })
         { id: 'upload', label: 'Upload File', icon: Upload },
         { id: 'paste', label: 'Paste Text', icon: FileText },
         { id: 'linkedin', label: 'LinkedIn Import', icon: Linkedin },
+        { id: 'build', label: 'Build with AI', icon: Sparkles },
     ];
 
     const isDisabled = (isLoading ?? false) || (mode === 'upload' && !selectedFile) || (mode === 'paste' && !rawText.trim()) || (mode === 'linkedin' && !selectedFile);
@@ -58,6 +63,16 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading })
             </div>
 
             <div className="p-6 md:p-8">
+                {/* Build with AI tab renders its own form — kept outside to avoid nested forms */}
+                {mode === 'build' && (
+                    <CVBuilder
+                        prefillName={prefillName}
+                        prefillRole={prefillRole}
+                        prefillSkills={prefillSkills}
+                    />
+                )}
+
+                {mode !== 'build' && (
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {mode === 'upload' && (
                         <div className="relative group">
@@ -157,6 +172,7 @@ export const ResumeInput: React.FC<ResumeInputProps> = ({ onSubmit, isLoading })
                         </button>
                     </div>
                 </form>
+                )}
             </div>
         </div>
     );

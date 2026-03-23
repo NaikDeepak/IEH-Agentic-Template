@@ -202,6 +202,23 @@ export const ProfileEditor: React.FC = () => {
         return ROLE_SUGGESTIONS.filter(r => r.toLowerCase().includes(q) && !existing.includes(r.toLowerCase())).slice(0, 6);
     })();
 
+    // Profile completeness score (0–100)
+    const completenessScore = (() => {
+        let score = 0;
+        if (profile.headline?.trim()) score += 15;
+        if (profile.bio?.trim()) score += 15;
+        if ((profile.skills ?? []).length >= 3) score += 20;
+        else if ((profile.skills ?? []).length > 0) score += 10;
+        if (profile.currentLocation?.trim()) score += 10;
+        if ((profile.work_preferences ?? []).length > 0) score += 10;
+        if ((profile.preferences?.roles ?? []).length > 0) score += 20;
+        if (profile.parsed_data) score += 10;
+        return score;
+    })();
+
+    const completenessLabel = completenessScore >= 90 ? 'Complete' : completenessScore >= 60 ? 'Looking good' : completenessScore >= 30 ? 'Getting there' : 'Just started';
+    const completenessColor = completenessScore >= 90 ? 'bg-emerald-500' : completenessScore >= 60 ? 'bg-sky-500' : completenessScore >= 30 ? 'bg-amber-400' : 'bg-slate-300';
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -225,6 +242,33 @@ export const ProfileEditor: React.FC = () => {
                 >
                     <X className="w-5 h-5" />
                 </button>
+            </div>
+
+            {/* Profile Completeness Indicator */}
+            <div className="mb-6 bg-white rounded-2xl border border-slate-200 shadow-soft p-5">
+                <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-slate-700">Profile Strength</span>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${completenessScore >= 90 ? 'bg-emerald-50 text-emerald-700' : completenessScore >= 60 ? 'bg-sky-50 text-sky-700' : completenessScore >= 30 ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {completenessLabel} · {completenessScore}%
+                    </span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div
+                        className={`h-2 rounded-full transition-all duration-500 ${completenessColor}`}
+                        style={{ width: `${completenessScore}%` }}
+                    />
+                </div>
+                {completenessScore < 90 && (
+                    <p className="mt-2.5 text-xs text-slate-400">
+                        {!profile.headline?.trim() && 'Add a headline · '}
+                        {!profile.bio?.trim() && 'Write a bio · '}
+                        {(profile.skills ?? []).length < 3 && 'Add at least 3 skills · '}
+                        {!profile.currentLocation?.trim() && 'Set your city · '}
+                        {(profile.work_preferences ?? []).length === 0 && 'Set work preference · '}
+                        {(profile.preferences?.roles ?? []).length === 0 && 'Add target role · '}
+                        {!profile.parsed_data && 'Upload a resume'}
+                    </p>
+                )}
             </div>
 
             {status && (

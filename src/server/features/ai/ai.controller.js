@@ -157,3 +157,60 @@ export const analyzeSkillGap = async (req, res, next) => {
         next(error);
     }
 };
+
+export const buildCV = async (req, res, next) => {
+    try {
+        const { name, targetRole, skills, experienceBullets, educationBullets, extraContext } = req.body;
+
+        if (!targetRole || typeof targetRole !== 'string' || !targetRole.trim()) {
+            const error = new Error("Target role is required");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        // Validate shapes and enforce size limits to prevent oversized prompts / cost abuse
+        const MAX_SHORT = 200;
+        const MAX_LONG = 3000;
+
+        if (name && (typeof name !== 'string' || name.length > MAX_SHORT)) {
+            const error = new Error(`name must be a string under ${MAX_SHORT} characters`);
+            error.statusCode = 400;
+            throw error;
+        }
+        if (targetRole.length > MAX_SHORT) {
+            const error = new Error(`targetRole must be under ${MAX_SHORT} characters`);
+            error.statusCode = 400;
+            throw error;
+        }
+        if (skills !== undefined && !Array.isArray(skills)) {
+            const error = new Error("skills must be an array of strings");
+            error.statusCode = 400;
+            throw error;
+        }
+        if (Array.isArray(skills) && (skills.length > 50 || skills.some(s => typeof s !== 'string' || s.length > 100))) {
+            const error = new Error("skills must be an array of up to 50 strings, each under 100 characters");
+            error.statusCode = 400;
+            throw error;
+        }
+        if (experienceBullets && (typeof experienceBullets !== 'string' || experienceBullets.length > MAX_LONG)) {
+            const error = new Error(`experienceBullets must be a string under ${MAX_LONG} characters`);
+            error.statusCode = 400;
+            throw error;
+        }
+        if (educationBullets && (typeof educationBullets !== 'string' || educationBullets.length > MAX_LONG)) {
+            const error = new Error(`educationBullets must be a string under ${MAX_LONG} characters`);
+            error.statusCode = 400;
+            throw error;
+        }
+        if (extraContext && (typeof extraContext !== 'string' || extraContext.length > MAX_LONG)) {
+            const error = new Error(`extraContext must be a string under ${MAX_LONG} characters`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const result = await aiService.buildCV({ name, targetRole, skills, experienceBullets, educationBullets, extraContext });
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
