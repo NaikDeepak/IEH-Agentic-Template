@@ -9,7 +9,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "predeploy": ["npm version minor --no-git-tag-version"],
+    "predeploy": ["node scripts/check-deploy-guard.js", "npm version minor --no-git-tag-version"],
     "public": "dist",
     "ignore": [
       "firebase.json",

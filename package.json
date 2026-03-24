@@ -1,7 +1,7 @@
 {
   "name": "ieh-webapp",
   "private": true,
-  "version": "1.13.0",
+  "version": "1.14.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -19,8 +19,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
-    "deploy:staging": "npm run build:staging && firebase deploy --project india-emp-hub-dev --only hosting,functions,firestore",
-    "deploy:prod": "npm run build && firebase deploy --project default"
+    "deploy:staging": "npm run build:staging && node scripts/validate-dist.js staging && cross-env DEPLOY_GUARD=true firebase deploy --project india-emp-hub-dev --only hosting,functions,firestore",
+    "deploy:prod": "npm run build && node scripts/validate-dist.js prod && cross-env DEPLOY_GUARD=true firebase deploy --project india-emp-hub"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
