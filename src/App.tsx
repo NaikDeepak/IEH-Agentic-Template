@@ -66,7 +66,10 @@ function DashboardRedirect() {
   }
 
   if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
-  return <Navigate to="/seeker/dashboard" replace />;
+  if (userData?.role === 'seeker') return <Navigate to="/seeker/dashboard" replace />;
+
+  // If role is missing, render nothing (RoleSelection overlay will show)
+  return null;
 }
 
 function SeekerTrackerPage() {
@@ -170,12 +173,12 @@ function App() {
 
           <Route
             path="/jobs"
-            element={<JobsPage />}
+            element={<ProtectedRoute><JobsPage /></ProtectedRoute>}
           />
 
           <Route
             path="/jobs/:id"
-            element={<JobDetailPage />}
+            element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>}
           />
 
           <Route

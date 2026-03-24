@@ -83,10 +83,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             onboarding_complete: false
                         };
                         setUserData(newUserData);
+
+                        // Firestore Rules Compliance:
+                        // Only send fields allowed by 'allow create' in firestore.rules.
+                        // 'role' and 'onboarding_complete' are restricted and must be set by backend.
+                        // 'browniePoints' must be 0 or absent.
+                        // 'referredBy' is allowed.
+                        const { role: _role, onboarding_complete: _oc, ...allowedFirestoreData } = newUserData;
+                        
+                        // Prevent unused variable warning
+                        void _role;
+                        void _oc;
+
                         await setDoc(
                             userDocRef,
                             {
-                                ...newUserData,
+                                ...allowedFirestoreData,
                                 last_login: serverTimestamp(),
                                 created_at: serverTimestamp()
                             },

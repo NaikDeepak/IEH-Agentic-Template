@@ -7,5 +7,6 @@ const router = express.Router();
 router.post('/onboard', requireAuth, userController.onboardUser);
 router.post('/verify-phone', requireAuth, userController.verifyPhone);
 router.post('/verify-linkedin', requireAuth, userController.verifyLinkedin);
+router.post('/e2e-seed-user', userController.seedE2EUser);
 
 export default router;

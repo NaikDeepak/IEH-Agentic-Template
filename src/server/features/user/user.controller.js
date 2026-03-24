@@ -159,3 +159,75 @@ export const verifyLinkedin = async (req, res) => {
         res.status(500).json({ error: "Failed to verify LinkedIn", details: error.message });
     }
 };
+
+/**
+ * E2E-only helper to seed deterministic users in emulator.
+ * Guarded so it never runs outside emulator environments.
+ */
+export const seedE2EUser = async (req, res) => {
+    const isEmulator =
+        !!process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+        !!process.env.FIRESTORE_EMULATOR_HOST ||
+        process.env.VITE_USE_FIREBASE_EMULATOR === 'true';
+
+    if (!isEmulator) {
+        return res.status(403).json({ error: "E2E seed endpoint is emulator-only" });
+    }
+
+    const { email, password, displayName, role } = req.body ?? {};
+    if (!email || !password || !displayName || !['seeker', 'employer', 'admin'].includes(role)) {
+        return res.status(400).json({ error: "Invalid payload" });
+    }
+
+    try {
+        const auth = getAuth();
+        let authUser;
+        try {
+            authUser = await auth.getUserByEmail(email);
+            authUser = await auth.updateUser(authUser.uid, {
+                email,
+                password,
+                displayName,
+                emailVerified: true
+            });
+        } catch (error) {
+            if (error.code === 'auth/user-not-found') {
+                authUser = await auth.createUser({
+                    email,
+                    password,
+                    displayName,
+                    emailVerified: true
+                });
+            } else {
+                throw error;
+            }
+        }
+
+        const uid = authUser.uid;
+
+        await auth.setCustomUserClaims(uid, { role });
+
+        const userRef = db.collection('users').doc(uid);
+        const updateData = {
+            uid,
+            email,
+            displayName,
+            role,
+            onboarding_complete: true,
+            browniePoints: 0,
+            updated_at: FieldValue.serverTimestamp(),
+            created_at: FieldValue.serverTimestamp(),
+            last_login: FieldValue.serverTimestamp()
+        };
+
+        if (role === 'employer') {
+            updateData.employerRole = 'owner';
+        }
+
+        await userRef.set(updateData, { merge: true });
+        return res.json({ success: true, uid, role });
+    } catch (error) {
+        console.error("E2E seed error:", error);
+        return res.status(500).json({ error: "Failed to seed e2e user", details: error.message });
+    }
+};
