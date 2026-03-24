@@ -12,8 +12,8 @@ test.describe('Seeker Critical Path', () => {
 
         try {
             // 1. Register
-            console.log('Navigating to /register...');
-            await page.goto('/register');
+            console.log('Navigating to /register/seeker...');
+            await page.goto('/register/seeker');
             await page.fill('input[name="name"]', testName);
             await page.fill('input[name="email"]', testEmail);
             await page.fill('input[name="password"]', testPassword);
@@ -31,14 +31,14 @@ test.describe('Seeker Critical Path', () => {
             try {
                 // Wait for either the role overlay OR a URL that isn't /register
                 await page.waitForFunction(() => {
-                    const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('Select Your Path'));
+                    const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('How will you use WorkMila?'));
                     return overlay || !window.location.pathname.includes('/register');
                 }, { timeout: 15000 });
 
-                const roleOverlay = page.locator('text=Select Your Path');
+                const roleOverlay = page.locator('text=How will you use WorkMila?');
                 if (await roleOverlay.isVisible({ timeout: 2000 })) {
                     console.log('Role Selection overlay found. Selecting "Candidate"...');
-                    await page.click('text=Candidate');
+                    await page.click('text=I\'m a Candidate');
                 } else {
                     console.log('Role Selection overlay not seen. Checking URL...');
                 }

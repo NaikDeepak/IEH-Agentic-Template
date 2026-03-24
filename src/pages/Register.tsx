@@ -3,7 +3,25 @@ import { useAuth } from '../hooks/useAuth';
 import { Link, useSearchParams } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, ArrowRight, Loader2, Gift } from 'lucide-react';
 
-export const Register: React.FC = () => {
+interface RegisterProps {
+    role?: 'seeker' | 'employer';
+}
+
+const ROLE_COPY = {
+    seeker: {
+        heading: 'Start your job search',
+        subheading: 'Create your seeker profile and find your next role',
+        backTo: '/register',
+    },
+    employer: {
+        heading: 'Start hiring today',
+        subheading: 'Post jobs and connect with top talent',
+        backTo: '/register',
+    },
+};
+
+export const Register: React.FC<RegisterProps> = ({ role }) => {
+    const copy = role ? ROLE_COPY[role] : { heading: 'Join WorkMila', subheading: 'Create your professional identity', backTo: null };
     const { signupWithEmail, loginWithGoogle, error, clearError } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [searchParams] = useSearchParams();
@@ -53,8 +71,8 @@ export const Register: React.FC = () => {
                         <UserPlus className="w-7 h-7" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-1">Join WorkMila</h2>
-                        <p className="text-sm text-slate-400">Create your professional identity</p>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-1">{copy.heading}</h2>
+                        <p className="text-sm text-slate-400">{copy.subheading}</p>
                     </div>
                 </div>
 
@@ -185,13 +203,23 @@ export const Register: React.FC = () => {
                     Continue with Google
                 </button>
 
-                <div className="text-center pt-6 border-t border-slate-100">
+                <div className="text-center pt-6 border-t border-slate-100 space-y-2">
                     <p className="text-slate-500 text-sm">
                         Already have an account?{' '}
-                        <Link to="/login" className="text-sky-700 font-semibold hover:text-sky-800 transition-colors">
+                        <Link
+                            to={role ? `/login/${role}` : '/login'}
+                            className="text-sky-700 font-semibold hover:text-sky-800 transition-colors"
+                        >
                             Sign In
                         </Link>
                     </p>
+                    {copy.backTo && (
+                        <p className="text-xs">
+                            <Link to={copy.backTo} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                &larr; Back
+                            </Link>
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

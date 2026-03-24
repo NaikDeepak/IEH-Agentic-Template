@@ -5,9 +5,26 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 interface LoginProps {
     variant?: 'card' | 'navbar';
+    role?: 'seeker' | 'employer';
 }
 
-export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
+const ROLE_COPY = {
+    seeker: {
+        heading: 'Welcome back',
+        subheading: 'Sign in to find your next opportunity',
+        backLabel: 'Back',
+        backTo: '/login',
+    },
+    employer: {
+        heading: 'Welcome back',
+        subheading: 'Sign in to find top talent',
+        backLabel: 'Back',
+        backTo: '/login',
+    },
+};
+
+export const Login: React.FC<LoginProps> = ({ variant = 'card', role }) => {
+    const copy = role ? ROLE_COPY[role] : { heading: 'Welcome back', subheading: 'Sign in to your WorkMila account', backLabel: null, backTo: null };
     const { loginWithGoogle, loginWithEmail, resetPassword, user, loading, logout, error, clearError } = useAuth();
     const [searchParams] = useSearchParams();
     const referralCode = searchParams.get('ref') ?? undefined;
@@ -214,8 +231,8 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                         <LogIn className="w-7 h-7" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
-                        <p className="text-sm text-slate-400">Sign in to your WorkMila account</p>
+                        <h2 className="text-2xl font-bold text-slate-900 mb-1">{copy.heading}</h2>
+                        <p className="text-sm text-slate-400">{copy.subheading}</p>
                     </div>
                 </div>
 
@@ -305,13 +322,23 @@ export const Login: React.FC<LoginProps> = ({ variant = 'card' }) => {
                     Continue with Google
                 </button>
 
-                <div className="text-center pt-6 border-t border-slate-100">
+                <div className="text-center pt-6 border-t border-slate-100 space-y-2">
                     <p className="text-slate-500 text-sm">
                         Don't have an account?{' '}
-                        <Link to="/register" className="text-sky-700 font-semibold hover:text-sky-800 transition-colors">
+                        <Link
+                            to={role ? `/register/${role}` : '/register'}
+                            className="text-sky-700 font-semibold hover:text-sky-800 transition-colors"
+                        >
                             Create Account
                         </Link>
                     </p>
+                    {copy.backTo && (
+                        <p className="text-xs">
+                            <Link to={copy.backTo} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                &larr; {copy.backLabel}
+                            </Link>
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

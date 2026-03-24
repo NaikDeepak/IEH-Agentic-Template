@@ -20,12 +20,24 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+// Use long polling for emulator to avoid WebSocket issues in testing environments
+if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
+    // @ts-expect-error - internal property but necessary for some emulator environments
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (db as any)._settings.experimentalForceLongPolling = true; 
+}
+
+const authEmulatorHost = import.meta.env['VITE_FIREBASE_AUTH_EMULATOR_HOST'] as string | undefined;
+const authEmulatorPort = Number(import.meta.env['VITE_FIREBASE_AUTH_EMULATOR_PORT'] as string | undefined) || 9099;
+const firestoreEmulatorHost = import.meta.env['VITE_FIREBASE_FIRESTORE_EMULATOR_HOST'] as string | undefined;
+const firestoreEmulatorPort = Number(import.meta.env['VITE_FIREBASE_FIRESTORE_EMULATOR_PORT'] as string | undefined) || 8080;
+
 // Connect to emulators ONLY when explicitly opted in via VITE_USE_FIREBASE_EMULATOR=true.
 // Do NOT use import.meta.env.DEV here — that would break local dev against the live DB
 // and cause connection errors when emulators aren't running.
 if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
-    connectFirestoreEmulator(db, "127.0.0.1", 8080);
+    connectAuthEmulator(auth, `http://${authEmulatorHost ?? '127.0.0.1'}:${authEmulatorPort}`);
+    connectFirestoreEmulator(db, firestoreEmulatorHost ?? '127.0.0.1', firestoreEmulatorPort);
 }
 
 export const googleProvider = new GoogleAuthProvider();
@@ -35,7 +47,8 @@ export {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signOut,
-    sendPasswordResetEmail
+    sendPasswordResetEmail,
+    sendEmailVerification
 } from "firebase/auth";
 
 // Setting standard prompt for Google account shift as requested in auth.md

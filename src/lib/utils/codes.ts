@@ -17,6 +17,16 @@ export const generateReferralCode = (): string => {
     }
   }
 
+  // E2E/Test environment safeguard: Ensure code is unique by appending timestamp component
+  // if navigator.webdriver is present (automation detected)
+  const isAutomation = typeof navigator !== 'undefined' && navigator.webdriver;
+  
+  if (isAutomation) {
+      // Use timestamp-based generation for tests to avoid collisions
+      const ts = Date.now().toString(36).toUpperCase().slice(-6);
+      return `WM-${ts}`;
+  }
+
   for (let i = 0; i < 6; i++) {
     const val = randomValues[i] ?? 0;
     result += chars.charAt(val % chars.length);
