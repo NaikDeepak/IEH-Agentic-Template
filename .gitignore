@@ -18,8 +18,13 @@ dist-ssr
 # Environment Variables
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.staging
+.env.staging.local
+.env.production
 .env.production.local
 india-emp-hub-firebase-*.json
 *.local
@@ -64,6 +69,10 @@ next.config.ts
 # E2E Screenshots
 e2e-seeker*.png
 
+
+# Firebase emulator export (auto-generated on exit — commit only curated seed data)
+# firebase-export/firestore_export/
+# firebase-export/auth_export/
 
 # GSD session files
 .gsd/STATE.md

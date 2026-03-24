@@ -33,6 +33,8 @@ const app = express();
 const allowedOrigins = [
     "https://india-emp-hub.web.app",
     "https://india-emp-hub.firebaseapp.com",
+    "https://india-emp-hub-dev.web.app",
+    "https://india-emp-hub-dev.firebaseapp.com",
     "https://ieh.vercel.app" // Placeholder for Vercel domain
 ];
 

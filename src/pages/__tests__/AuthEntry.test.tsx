@@ -57,15 +57,15 @@ describe('AuthEntry', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/register/employer');
     });
 
-    it('shows "Create Account" link in login mode that navigates to /register', () => {
+    it('shows "Create Account" link in login mode pointing to /register', () => {
         render(<MemoryRouter><AuthEntry mode="login" /></MemoryRouter>);
-        fireEvent.click(screen.getByText(/create account/i));
-        expect(mockNavigate).toHaveBeenCalledWith('/register');
+        const link = screen.getByText(/create account/i).closest('a');
+        expect(link).toHaveAttribute('href', '/register');
     });
 
-    it('shows "Sign In" link in register mode that navigates to /login', () => {
+    it('shows "Sign In" link in register mode pointing to /login', () => {
         render(<MemoryRouter><AuthEntry mode="register" /></MemoryRouter>);
-        fireEvent.click(screen.getByText(/sign in/i));
-        expect(mockNavigate).toHaveBeenCalledWith('/login');
+        const link = screen.getByText(/^sign in$/i).closest('a');
+        expect(link).toHaveAttribute('href', '/login');
     });
 });
