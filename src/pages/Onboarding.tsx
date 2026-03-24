@@ -20,6 +20,7 @@ export const Onboarding: React.FC = () => {
     const [targetRole, setTargetRole] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [finishError, setFinishError] = useState<string | null>(null);
 
     const steps = isEmployer ? EMPLOYER_STEPS : SEEKER_STEPS;
     const currentIndex = steps.indexOf(step as never);
@@ -27,9 +28,13 @@ export const Onboarding: React.FC = () => {
 
     const finish = async (extra: Record<string, string> = {}) => {
         setIsSaving(true);
+        setFinishError(null);
         try {
             await completeOnboarding(extra);
             void navigate(isEmployer ? '/employer/jobs' : '/seeker/dashboard');
+        } catch (err) {
+            console.error('Failed to complete onboarding:', err);
+            setFinishError('Failed to save your profile. Please try again.');
         } finally {
             setIsSaving(false);
         }
@@ -148,6 +153,10 @@ export const Onboarding: React.FC = () => {
                         />
                     </div>
 
+                    {finishError && (
+                        <p className="text-sm text-red-600">{finishError}</p>
+                    )}
+
                     <button
                         onClick={() => void finish(targetRole.trim() ? { target_role: targetRole.trim() } : {})}
                         disabled={isSaving}
@@ -216,6 +225,10 @@ export const Onboarding: React.FC = () => {
                             autoFocus
                         />
                     </div>
+
+                    {finishError && (
+                        <p className="text-sm text-red-600">{finishError}</p>
+                    )}
 
                     <button
                         onClick={() => void finish(companyName.trim() ? { onboarding_company_name: companyName.trim() } : {})}

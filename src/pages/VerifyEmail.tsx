@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Mail, CheckCircle, Loader2, RefreshCw, LogOut } from 'lucide-react';
 import * as Sentry from '@sentry/react';
 import { useAuth } from '../hooks/useAuth';
 
 export const VerifyEmail: React.FC = () => {
-    const { user, sendVerificationEmail, logout, error, clearError } = useAuth();
+    const { user, loading, sendVerificationEmail, logout, error, clearError } = useAuth();
     const navigate = useNavigate();
     const [resendLoading, setResendLoading] = useState(false);
     const [resendSent, setResendSent] = useState(false);
     const [checkLoading, setCheckLoading] = useState(false);
 
+    if (!loading && !user) {
+        return <Navigate to="/login" replace />;
+    }
+
     const handleResend = async () => {
         setResendLoading(true);
-        if (resendSent) clearError();
+        setResendSent(false);
+        clearError();
         try {
             await sendVerificationEmail();
             setResendSent(true);

@@ -79,7 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             photoURL: user.photoURL,
                             role: claimRole ?? null,
                             browniePoints: 0, // Initialize with 0 points
-                            referredBy: referredBy // Will be null if not referred
+                            referredBy: referredBy, // Will be null if not referred
+                            onboarding_complete: false
                         };
                         setUserData(newUserData);
                         await setDoc(
@@ -243,7 +244,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const sendVerificationEmail = useCallback(async () => {
-        if (!auth.currentUser) return;
+        if (!auth.currentUser) {
+            const noUserErr = new Error('No authenticated user to verify email for.');
+            console.error('Verification Email Error:', noUserErr);
+            setError('You must be signed in to verify your email.');
+            throw noUserErr;
+        }
         setError(null);
         try {
             await sendEmailVerification(auth.currentUser);

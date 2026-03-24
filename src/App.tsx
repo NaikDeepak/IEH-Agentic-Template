@@ -60,8 +60,8 @@ function DashboardRedirect() {
   if (loading) return <PageLoader />;
   if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
 
-  // New users with a role but no completed onboarding go to the wizard
-  if (userData?.role && !userData.onboarding_complete) {
+  // New users with a role but explicit incomplete onboarding go to the wizard
+  if (userData?.role && userData.onboarding_complete === false) {
     return <Navigate to="/onboarding" replace />;
   }
 

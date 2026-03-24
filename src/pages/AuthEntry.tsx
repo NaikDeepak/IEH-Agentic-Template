@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Briefcase, Search, ArrowRight } from 'lucide-react';
 
 interface AuthEntryProps {
@@ -68,22 +68,22 @@ export const AuthEntry: React.FC<AuthEntryProps> = ({ mode }) => {
                     {mode === 'login' ? (
                         <>
                             Don't have an account?{' '}
-                            <button
-                                onClick={() => void navigate('/register')}
+                            <Link
+                                to="/register"
                                 className="text-sky-700 font-semibold hover:text-sky-800 transition-colors"
                             >
                                 Create Account
-                            </button>
+                            </Link>
                         </>
                     ) : (
                         <>
                             Already have an account?{' '}
-                            <button
-                                onClick={() => void navigate('/login')}
+                            <Link
+                                to="/login"
                                 className="text-sky-700 font-semibold hover:text-sky-800 transition-colors"
                             >
                                 Sign In
-                            </button>
+                            </Link>
                         </>
                     )}
                 </p>
