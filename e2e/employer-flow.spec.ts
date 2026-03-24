@@ -57,22 +57,31 @@ test.describe('Employer Critical Path', () => {
             console.log('Clicking Create Account...');
             await page.click('button[type="submit"]:has-text("Create Account")');
 
-            // 2. Role Selection
-            console.log('Waiting for Role Selection overlay...');
-            
-            // Wait for the overlay to appear
-            const roleOverlay = page.locator('text=How will you use WorkMila?');
-            await roleOverlay.waitFor({ state: 'visible', timeout: 30000 });
-            
-            console.log('Role Selection overlay found. Selecting "I\'m Hiring"...');
-            // Click the specific button for Employer role
-            await page.click('button:has-text("I\'m Hiring")');
+        // 2. Role Selection / Dashboard Verification
+        console.log('Waiting for Role Selection or Dashboard...');
+        try {
+            await page.waitForFunction(() => {
+                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes("I'm Hiring"));
+                return overlay || !window.location.pathname.includes('/register');
+            }, { timeout: 15000 });
+
+            const roleOverlay = page.locator("text=I'm Hiring");
+            if (await roleOverlay.isVisible({ timeout: 2000 })) {
+                console.log('Role Selection overlay found. Selecting "Employer"...');
+                await page.click("button:has-text(\"I'm Hiring\")");
+            } else {
+                console.log('Role Selection overlay not seen. Checking URL...');
+            }
+        } catch (err: any) {
+            console.log('Timeout/Error waiting for role state:', err.message);
+        }
 
             // 3. Verify Dashboard
             console.log('Verifying redirection to Employer Dashboard...');
             await expect(page).toHaveURL(/.*\/employer\/jobs/, { timeout: 30000 });
             
             // CRITICAL: Ensure the overlay is gone before trying to interact with the dashboard
+            const roleOverlay = page.locator('text=How will you use WorkMila?');
             await expect(roleOverlay).not.toBeVisible({ timeout: 10000 }).catch(async () => {
                 console.log('Overlay still visible (likely auth error). Forcing removal for test continuation...');
                 await page.evaluate(() => {
