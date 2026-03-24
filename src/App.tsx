@@ -38,6 +38,7 @@ const AuthEntry = lazy(() => import('./pages/AuthEntry').then(module => ({ defau
 const VerifyEmail = lazy(() => import('./pages/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
 const Onboarding = lazy(() => import('./pages/Onboarding').then(module => ({ default: module.Onboarding })));
 const RoleSelection = lazy(() => import('./components/RoleSelection').then(module => ({ default: module.RoleSelection })));
+const PricingPage = lazy(() => import('./pages/PricingPage').then(module => ({ default: module.PricingPage })));
 
 
 // Loading fallback component
@@ -175,6 +176,18 @@ function App() {
           <Route
             path="/jobs/:id"
             element={<JobDetailPage />}
+          />
+
+          <Route
+            path="/pricing"
+            element={
+              <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
+                <Header />
+                <main id="main-content" className="flex-grow">
+                  <PricingPage />
+                </main>
+              </div>
+            }
           />
 
           <Route
