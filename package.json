@@ -1,13 +1,15 @@
 {
   "name": "ieh-webapp",
   "private": true,
-  "version": "1.10.0",
+  "version": "1.13.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:full": "concurrently \"npm start\" \"npm run dev\" ",
-    "dev:full:emulator": "cross-env VITE_USE_FIREBASE_EMULATOR=true FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 concurrently \"npm start\" \"npm run dev\" \"sleep 5 && node seed-jobs.js\"",
+    "dev:full:emulator": "cross-env VITE_USE_FIREBASE_EMULATOR=true FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 concurrently \"npm start\" \"npm run dev\" \"firebase emulators:start --import=./firebase-export --export-on-exit=./firebase-export\"",
+    "emulator:seed": "node seed-jobs.js",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "lighthouse": "npm run build && lhci autorun",
     "start": "node index.js",
     "lint": "eslint .",
@@ -16,7 +18,9 @@
     "coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy:staging": "firebase use staging && npm run build:staging && firebase deploy --project india-emp-hub-dev --only hosting,functions,firestore",
+    "deploy:prod": "firebase use default && npm run build && firebase deploy"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

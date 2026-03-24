@@ -20,13 +20,6 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Use long polling for emulator to avoid WebSocket issues in testing environments
-if (import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true') {
-    // @ts-expect-error - internal property but necessary for some emulator environments
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (db as any)._settings.experimentalForceLongPolling = true; 
-}
-
 const authEmulatorHost = import.meta.env['VITE_FIREBASE_AUTH_EMULATOR_HOST'] as string | undefined;
 const authEmulatorPort = Number(import.meta.env['VITE_FIREBASE_AUTH_EMULATOR_PORT'] as string | undefined) || 9099;
 const firestoreEmulatorHost = import.meta.env['VITE_FIREBASE_FIRESTORE_EMULATOR_HOST'] as string | undefined;

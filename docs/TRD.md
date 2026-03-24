@@ -69,7 +69,39 @@
 -   **Interaction:** Chat-based mock interview session.
 -   **Latency Strategy:** Streaming responses for real-time feel.
 
-## 5. Security & Compliance
+## 5. Environment Strategy
+
+### 5.1. Environment Matrix
+
+| Environment | Firebase Project | Activated by |
+|---|---|---|
+| Local dev | Firebase Emulator (no cloud) | `.env.local` with `VITE_USE_FIREBASE_EMULATOR=true` |
+| Staging (cloud) | `india-emp-hub-dev` | `.env.staging` + `firebase use staging` |
+| Production | `india-emp-hub` | `.env.production` + `firebase use default` |
+
+### 5.2. Local Development (Emulator)
+
+Run `npm run dev:full:emulator` to start the full stack against local emulators. The emulator auto-imports/exports seed data from `firebase-export/` so state persists between runs.
+
+`firebase-export/` is committed with curated seed data. Auto-generated subdirectories (`firestore_export/`, `auth_export/`) are gitignored — they are regenerated on each `--export-on-exit` run.
+
+### 5.3. Deployment
+
+```bash
+npm run deploy:staging   # firebase use staging → build → deploy to india-emp-hub-dev
+npm run deploy:prod      # firebase use default → build → deploy to india-emp-hub
+```
+
+Staging deploys on `feature/*` → `main` merges (CI). Production deploys are manual / release-gated.
+
+### 5.4. Environment Files (never commit)
+
+- `.env.local` — local overrides, typically just `VITE_USE_FIREBASE_EMULATOR=true`
+- `.env.staging` — staging Firebase project credentials
+- `.env.production` — production Firebase project credentials
+- `.env.example` — committed template documenting all required vars
+
+## 6. Security & Compliance
 -   **RBAC:** Strict access control via Firebase Security Rules / RLS.
 -   **AI Security:** All AI calls are proxied through server-side Cloud Functions. **Client-side API keys are strictly forbidden.**
 -   **Data Privacy:** User data isolated; explicit consent for AI processing.

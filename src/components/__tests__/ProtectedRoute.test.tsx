@@ -56,7 +56,7 @@ describe('ProtectedRoute', () => {
     it('renders children when authenticated and no roles defined', () => {
         (useAuth as Mock).mockReturnValue({
             ...defaultAuthContext,
-            user: { uid: '123' },
+            user: { uid: '123', emailVerified: true, providerData: [] },
             userData: { role: 'seeker' },
             loading: false
         });
@@ -67,7 +67,7 @@ describe('ProtectedRoute', () => {
     it('renders children when authenticated and role matches', () => {
         (useAuth as Mock).mockReturnValue({
             ...defaultAuthContext,
-            user: { uid: '123' },
+            user: { uid: '123', emailVerified: true, providerData: [] },
             userData: { role: 'employer' },
             loading: false
         });
@@ -78,7 +78,7 @@ describe('ProtectedRoute', () => {
     it('redirects to home when authenticated but role mismatches', () => {
         (useAuth as Mock).mockReturnValue({
             ...defaultAuthContext,
-            user: { uid: '123' },
+            user: { uid: '123', emailVerified: true, providerData: [] },
             userData: { role: 'seeker' },
             loading: false
         });

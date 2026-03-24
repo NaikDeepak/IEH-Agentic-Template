@@ -23,7 +23,7 @@ vi.mock('../../src/components/Header', () => ({
 }));
 
 vi.mock('../../src/hooks/useAuth', () => ({
-    useAuth: () => ({ user: null, userData: null })
+    useAuth: () => ({ user: { uid: 'test-user' }, userData: null, loading: false })
 }));
 
 vi.mock('@sentry/react', () => ({

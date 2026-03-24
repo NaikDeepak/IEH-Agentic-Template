@@ -54,7 +54,8 @@ export const JobsPage: React.FC = () => {
         };
 
         void fetchJobs();
-    }, [authLoading, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authLoading, user?.uid]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
