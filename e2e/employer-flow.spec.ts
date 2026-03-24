@@ -37,14 +37,14 @@ test.describe('Employer Critical Path', () => {
         console.log('Waiting for Role Selection or Dashboard...');
         try {
             await page.waitForFunction(() => {
-                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('Select Your Path'));
+                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes("I'm Hiring"));
                 return overlay || !window.location.pathname.includes('/register');
             }, { timeout: 15000 });
 
-            const roleOverlay = page.locator('text=Select Your Path');
+            const roleOverlay = page.locator("text=I'm Hiring");
             if (await roleOverlay.isVisible({ timeout: 2000 })) {
                 console.log('Role Selection overlay found. Selecting "Employer"...');
-                await page.click('button:has-text("Employer")');
+                await page.click("button:has-text(\"I'm Hiring\")");
             } else {
                 console.log('Role Selection overlay not seen. Checking URL...');
             }

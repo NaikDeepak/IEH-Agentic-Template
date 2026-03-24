@@ -31,14 +31,14 @@ test.describe('Seeker Critical Path', () => {
             try {
                 // Wait for either the role overlay OR a URL that isn't /register
                 await page.waitForFunction(() => {
-                    const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('Select Your Path'));
+                    const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes("I'm a Candidate"));
                     return overlay || !window.location.pathname.includes('/register');
                 }, { timeout: 15000 });
 
-                const roleOverlay = page.locator('text=Select Your Path');
+                const roleOverlay = page.locator("text=I'm a Candidate");
                 if (await roleOverlay.isVisible({ timeout: 2000 })) {
                     console.log('Role Selection overlay found. Selecting "Candidate"...');
-                    await page.click('text=Candidate');
+                    await page.click("text=I'm a Candidate");
                 } else {
                     console.log('Role Selection overlay not seen. Checking URL...');
                 }

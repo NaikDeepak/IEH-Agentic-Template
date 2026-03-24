@@ -26,14 +26,14 @@ test.describe('Referral Viral Loop', () => {
         console.log('User A: Waiting for Role Selection or Dashboard...');
         try {
             await page.waitForFunction(() => {
-                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('Select Your Path'));
+                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes("I'm a Candidate"));
                 return overlay || !window.location.pathname.includes('/register');
             }, { timeout: 10000 });
 
-            const roleOverlay = page.locator('text=Select Your Path');
+            const roleOverlay = page.locator("text=I'm a Candidate");
             if (await roleOverlay.isVisible({ timeout: 2000 })) {
                 console.log('User A: Role Selection overlay found. Selecting "Candidate"...');
-                await page.click('text=Candidate');
+                await page.click("text=I'm a Candidate");
             }
         } catch {
             console.log('User A: Timeout waiting for role state, checking redirect...');
@@ -117,14 +117,14 @@ test.describe('Referral Viral Loop', () => {
         console.log('User B: Waiting for Role Selection or Dashboard...');
         try {
             await pageB.waitForFunction(() => {
-                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes('Select Your Path'));
-                return overlay || !pageB.url().includes('/register');
+                const overlay = Array.from(document.querySelectorAll('*')).some(el => el.textContent?.includes("I'm a Candidate"));
+                return overlay || !window.location.pathname.includes('/register');
             }, { timeout: 10000 });
 
-            const roleOverlayB = pageB.locator('text=Select Your Path');
+            const roleOverlayB = pageB.locator("text=I'm a Candidate");
             if (await roleOverlayB.isVisible({ timeout: 2000 })) {
                 console.log('User B: Role Selection overlay found. Selecting "Candidate"...');
-                await pageB.click('text=Candidate');
+                await pageB.click("text=I'm a Candidate");
             }
         } catch {
             console.log('User B: Timeout waiting for role state, checking redirect...');
