@@ -34,7 +34,11 @@ const JobApplicants = lazy(() => import('./pages/employer/JobApplicants').then(m
 const EmployerJobs = lazy(() => import('./pages/employer/EmployerJobs').then(module => ({ default: module.EmployerJobs })));
 const JobDetailPage = lazy(() => import('./pages/JobDetailPage').then(module => ({ default: module.JobDetailPage })));
 const Login = lazy(() => import('./components/Login').then(module => ({ default: module.Login })));
+const AuthEntry = lazy(() => import('./pages/AuthEntry').then(module => ({ default: module.AuthEntry })));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail').then(module => ({ default: module.VerifyEmail })));
+const Onboarding = lazy(() => import('./pages/Onboarding').then(module => ({ default: module.Onboarding })));
 const RoleSelection = lazy(() => import('./components/RoleSelection').then(module => ({ default: module.RoleSelection })));
+const PricingPage = lazy(() => import('./pages/PricingPage').then(module => ({ default: module.PricingPage })));
 
 
 // Loading fallback component
@@ -52,11 +56,20 @@ const PageLoader = () => (
 
 function DashboardRedirect() {
   const { userData, loading } = useAuth();
-  
+
   if (loading) return <PageLoader />;
   if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
+
+  // New users with a role but explicit incomplete onboarding go to the wizard
+  if (userData?.role && userData.onboarding_complete === false) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
-  return <Navigate to="/seeker/dashboard" replace />;
+  if (userData?.role === 'seeker') return <Navigate to="/seeker/dashboard" replace />;
+
+  // If role is missing, render nothing (RoleSelection overlay will show)
+  return null;
 }
 
 function SeekerTrackerPage() {
@@ -160,12 +173,24 @@ function App() {
 
           <Route
             path="/jobs"
-            element={<JobsPage />}
+            element={<ProtectedRoute><JobsPage /></ProtectedRoute>}
           />
 
           <Route
             path="/jobs/:id"
-            element={<JobDetailPage />}
+            element={<ProtectedRoute><JobDetailPage /></ProtectedRoute>}
+          />
+
+          <Route
+            path="/pricing"
+            element={
+              <div className="min-h-screen bg-sky-50 flex flex-col font-sans">
+                <Header />
+                <main id="main-content" className="flex-grow">
+                  <PricingPage />
+                </main>
+              </div>
+            }
           />
 
           <Route
@@ -173,6 +198,7 @@ function App() {
             element={<CompanyProfile />}
           />
 
+          {/* Auth — role picker entry points */}
           <Route
             path="/register"
             element={
@@ -180,8 +206,38 @@ function App() {
                 <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                   <Header />
                   <main id="main-content" className="flex-grow">
-                    <Register />
+                    <AuthEntry mode="register" />
                   </main>
+                </div>
+              )
+            }
+          />
+
+          <Route
+            path="/register/seeker"
+            element={
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                    <main id="main-content" className="flex-grow">
+                      {/* eslint-disable-next-line jsx-a11y/aria-role */}
+                      <Register role="seeker" />
+                    </main>
+                </div>
+              )
+            }
+          />
+
+          <Route
+            path="/register/employer"
+            element={
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                    <main id="main-content" className="flex-grow">
+                      {/* eslint-disable-next-line jsx-a11y/aria-role */}
+                      <Register role="employer" />
+                    </main>
                 </div>
               )
             }
@@ -193,11 +249,67 @@ function App() {
               user ? <DashboardRedirect /> : (
                 <div className="min-h-screen bg-white flex flex-col font-sans text-black">
                   <Header />
-                  <main className="flex-grow flex items-center justify-center p-4">
-                    <Login variant="card" />
+                  <main className="flex-grow">
+                    <AuthEntry mode="login" />
                   </main>
                 </div>
               )
+            }
+          />
+
+          <Route
+            path="/login/seeker"
+            element={
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                    <main className="flex-grow flex items-center justify-center p-4">
+                      {/* eslint-disable-next-line jsx-a11y/aria-role */}
+                      <Login variant="card" role="seeker" />
+                    </main>
+                </div>
+              )
+            }
+          />
+
+          <Route
+            path="/login/employer"
+            element={
+              user ? <DashboardRedirect /> : (
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                    <main className="flex-grow flex items-center justify-center p-4">
+                      {/* eslint-disable-next-line jsx-a11y/aria-role */}
+                      <Login variant="card" role="employer" />
+                    </main>
+                </div>
+              )
+            }
+          />
+
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute allowedRoles={['seeker', 'employer']}>
+                <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                  <Header />
+                  <main className="flex-grow">
+                    <Onboarding />
+                  </main>
+                </div>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/verify-email"
+            element={
+              <div className="min-h-screen bg-white flex flex-col font-sans text-black">
+                <Header />
+                <main className="flex-grow">
+                  <VerifyEmail />
+                </main>
+              </div>
             }
           />
 

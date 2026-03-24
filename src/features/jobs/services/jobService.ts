@@ -75,7 +75,7 @@ export const JobService = {
 
             const jobData = {
                 ...restInput,
-                company_id: companyId,
+                company_id: companyId ?? null,
                 ...(company_bio && { company_bio }),
                 status: 'active',
                 created_at: serverTimestamp(),

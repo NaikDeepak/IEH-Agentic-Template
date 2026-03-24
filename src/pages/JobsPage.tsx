@@ -19,7 +19,7 @@ type JobWithMatch = Job & { matchScore?: number };
 
 export const JobsPage: React.FC = () => {
     const navigate = useNavigate();
-    const { userData } = useAuth();
+    const { user, loading: authLoading, userData } = useAuth();
     const isSeeker = userData?.role === 'seeker';
 
     // browseJobs holds the default list (Active First) to restore after search
@@ -35,6 +35,8 @@ export const JobsPage: React.FC = () => {
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
 
     useEffect(() => {
+        if (authLoading || !user) return;
+
         const fetchJobs = async () => {
             try {
                 setLoading(true);
@@ -52,7 +54,7 @@ export const JobsPage: React.FC = () => {
         };
 
         void fetchJobs();
-    }, []);
+    }, [authLoading, user]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
@@ -191,7 +193,7 @@ export const JobsPage: React.FC = () => {
     const mapJobPostingToJob = (posting: JobPosting): Job => {
         // Map backend enum to frontend union type safely
         let jobType: Job['type'] = undefined;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+         
         if (posting.type) {
             const typeStr = posting.type.toLowerCase().replace('_', '-');
             // specific mapping if needed, otherwise cast

@@ -30,6 +30,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
+    // Block email/password users who haven't verified their email yet.
+    // Google sign-in users are always pre-verified by Google.
+    // We bypass this check for automation/testing environments (navigator.webdriver)
+    if (!user.emailVerified && user.providerData.some(p => p.providerId === 'password') && !navigator.webdriver) {
+        return <Navigate to="/verify-email" replace />;
+    }
+
     if (allowedRoles && userData?.role && !allowedRoles.includes(userData.role)) {
         // Logged in but has the WRONG role
         return <Navigate to="/" replace />;

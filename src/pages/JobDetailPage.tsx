@@ -70,7 +70,7 @@ export const JobDetailPage: React.FC = () => {
 
         void fetchJob();
         void checkApplicationStatus();
-    }, [id, user]);
+    }, [id, user, navigate]);
 
     const handleApply = () => {
         if (!user) {
@@ -149,15 +149,19 @@ export const JobDetailPage: React.FC = () => {
                                 <span className="flex items-center gap-1.5">
                                     <MapPin className="w-4 h-4 text-slate-400" /> {job.location}
                                 </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Briefcase className="w-4 h-4 text-slate-400" /> {job.type.replace('_', ' ')}
-                                </span>
+                                {job.type && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Briefcase className="w-4 h-4 text-slate-400" /> {job.type.replace('_', ' ')}
+                                    </span>
+                                )}
                                 <span className="flex items-center gap-1.5">
                                     <DollarSign className="w-4 h-4 text-slate-400" /> {formatSalary()}
                                 </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Clock className="w-4 h-4 text-slate-400" /> {job.work_mode}
-                                </span>
+                                {job.work_mode && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Clock className="w-4 h-4 text-slate-400" /> {job.work_mode}
+                                    </span>
+                                )}
                             </div>
                         </div>
 
@@ -170,7 +174,7 @@ export const JobDetailPage: React.FC = () => {
                         </div>
 
                         {/* Skills */}
-                        {job.skills.length > 0 && (
+                        {(job.skills?.length ?? 0) > 0 && (
                             <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-7">
                                 <h2 className="text-base font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100">Required Skills</h2>
                                 <div className="flex flex-wrap gap-2">

@@ -31,10 +31,10 @@ export interface JobPosting {
     company_id?: string;
     title: string;
     description: string;
-    skills: string[];
+    skills?: string[];
     location: string;
-    type: JobType;
-    work_mode: WorkMode;
+    type?: JobType;
+    work_mode?: WorkMode;
     experience: string;
     salary_range?: {
         min: number;

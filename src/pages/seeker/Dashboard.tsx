@@ -36,7 +36,9 @@ export const SeekerDashboard: React.FC = () => {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
-            if (!user) return;
+            if (!user) {
+                return;
+            }
             try {
                 setLoading(true);
                 const [resumeData, profileData, gapData, appsData] = await Promise.all([

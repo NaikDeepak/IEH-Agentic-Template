@@ -1,7 +1,7 @@
 # WorkMila — Sprint Plan
 
 Sourced from real user feedback + internal review sessions.
-Last updated: 2026-03-22 (Sprint 1 completed)
+Last updated: 2026-03-24 (Sprint 4 largely complete)
 
 ---
 
@@ -43,7 +43,7 @@ Goal: Fix every issue a first-time user hits before they even reach a feature.
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
 | S1-NAV-01 | `[x]` "AI Prep" nav button not working | `src/components/Header.tsx` | Fixed — routes to `/seeker/interview` for seekers, `/login` for unauthenticated |
-| S1-NAV-02 | `[x]` "Pricing" nav button not working | `src/components/Header.tsx` | Fixed — routes to `/pricing` |
+| S1-NAV-02 | `[x]` "Pricing" nav button not working | `src/components/Header.tsx`, `src/pages/PricingPage.tsx` | Fixed — `PricingPage.tsx` created with seeker/employer tab toggle and 3 tiers each |
 
 ### Job Detail Error
 
@@ -102,12 +102,12 @@ Goal: First-time experience is complete and trustworthy.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S4-AUTH-01 | `[ ]` Separate Employer vs Candidate login/register entry | Landing CTAs split into two paths with tailored copy. Seeker: `/login?role=seeker`, Employer: `/login?role=employer`. RoleSelection still handles post-login assignment |
-| S4-AUTH-02 | `[ ]` LinkedIn login option | Firebase doesn't support LinkedIn natively — evaluate custom OAuth via LinkedIn SDK or Auth0 |
+| S4-AUTH-01 | `[x]` Separate Employer vs Candidate login/register entry | `AuthEntry.tsx` — role picker screen at `/login` and `/register`; navigates to `/{mode}/seeker` or `/{mode}/employer` paths |
+| S4-AUTH-02 | `[skip]` LinkedIn login option | Firebase limitation — deferred (D-02) |
 | S4-AUTH-03 | `[ ]` Mobile number mandatory at registration | Add `phone` field to Register form; Firebase phone auth for OTP on first entry |
-| S4-AUTH-04 | `[ ]` Contact OTP verification (email + mobile) | After registration, require OTP confirmation. Lock fields after verified; "Change with re-verification" flow for updates |
-| S4-ONBOARD-01 | `[ ]` First-time login → mandatory CV upload or AI-create | After role assignment, redirect to onboarding screen before dashboard. Options: Upload CV / Build with AI / Skip (limited access) |
-| S4-ONBOARD-02 | `[ ]` Education verification — define mechanism | Decide: document upload, LinkedIn sync, or self-declared-only. Document decision in PRD |
+| S4-AUTH-04 | `[x]` Email verification after registration | `VerifyEmail.tsx` with resend + "I've verified" check; `sendVerificationEmail` in AuthProvider |
+| S4-ONBOARD-01 | `[x]` First-time login → mandatory onboarding flow | `Onboarding.tsx` — guided welcome → CV upload → target role → done; employer variant → company name |
+| S4-ONBOARD-02 | `[skip]` Education verification — define mechanism | Product + legal decision needed (D-01) |
 
 ---
 
@@ -132,7 +132,80 @@ Goal: Power features that differentiate WorkMila.
 | D-01 | How is education verified? | Needs product + legal decision before building |
 | D-02 | LinkedIn login | Firebase limitation; needs infra evaluation |
 | D-03 | Voice interview prep | High effort; validate demand first |
-| D-04 | Pricing page content | Marketing/business decision needed |
+
+---
+
+## Sprint 5 — Employer Unblock & Seeker Power Features
+
+Goal: Unblock employers from core hiring workflows; add seeker convenience features.
+
+### Employer
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S5-EMP-01 | `[ ]` Employer dashboard home | `src/pages/employer/` | KPIs, recent activity, quick actions. Currently lands on `/employer/jobs` with no summary view |
+| S5-EMP-02 | `[ ]` Edit / Pause / Delete job posting | `src/pages/employer/EmployerJobs.tsx` | `EmployerJobs.tsx` shows list only — no inline edit, pause, or close action |
+| S5-EMP-03 | `[ ]` Applicant pipeline — Kanban | `src/pages/employer/JobApplicants.tsx` | Add Applied → Screening → Interview → Offer pipeline mirroring seeker's ApplicationBoard |
+| S5-EMP-04 | `[ ]` Candidate detail view from Talent Search | `src/pages/employer/TalentSearch.tsx` | `CandidateCard` onClick is a placeholder — employers can't view full profiles |
+| S5-EMP-05 | `[ ]` Save / shortlist candidates | `src/pages/employer/TalentSearch.tsx` | No way for employers to bookmark candidates from search for later follow-up |
+| S5-EMP-06 | `[ ]` Employer company profile completeness | `src/pages/employer/CompanyEditor.tsx` | No completeness indicator; incomplete profiles hurt candidate trust |
+| S5-EMP-07 | `[ ]` AI-assisted job description writing | `src/pages/PostJob.tsx` | "Generate JD" powered by Gemini when posting a job |
+
+### Seeker
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S5-SEEKER-01 | `[ ]` Apply directly from shortlist feed on dashboard | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | Currently must navigate to job detail to apply; high-friction for warm leads |
+| S5-SEEKER-02 | `[ ]` "Why this job matched" reasoning on shortlist cards | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | `ShortlistedJob.reason` field exists in types but not surfaced in UI |
+| S5-SEEKER-03 | `[ ]` Saved jobs | `src/features/seeker/` | No way to bookmark a job for later |
+| S5-SEEKER-04 | `[ ]` Application notes & reminders | `src/features/seeker/components/ApplicationBoard/` | `Application` type has `notes` and `reminder_date` but UI doesn't expose them |
+
+### Account
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S5-ACC-01 | `[ ]` Account settings page | `src/pages/` | No `/settings` route — password change, notification prefs, account deletion |
+| S5-ACC-02 | `[ ]` Change email/phone with re-verification | `src/context/AuthProvider.tsx` | Required for compliance and trust |
+
+### UX
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S5-UX-01 | `[ ]` Mobile responsiveness audit | all pages | Systematic pass at 375px, 390px, 430px — fix clipped UI, overflowing text, tap targets |
+
+---
+
+## Sprint 6 — Admin, Notifications & Platform Polish
+
+Goal: Complete admin functionality; add transactional notifications and platform-wide polish.
+
+### Admin
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S6-ADMIN-01 | `[ ]` Admin Users Management | `src/pages/admin/` | `/admin/users` is a placeholder div |
+| S6-ADMIN-02 | `[ ]` Admin Settings page | `src/pages/admin/` | `/admin/settings` is a placeholder — platform fee config, feature flags |
+| S6-ADMIN-03 | `[ ]` Admin stats from live Firestore data | `src/pages/admin/AdminDashboard.tsx` | Currently hardcoded values — needs live Firestore aggregations |
+| S6-ADMIN-04 | `[ ]` Job posting analytics for employers | `src/pages/employer/` | Views, applications per posting, conversion rate |
+
+### Notifications
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S6-NOTIF-01 | `[ ]` In-app notifications | `src/features/` | Seekers: employer viewed profile, application status change, new matched jobs |
+| S6-NOTIF-02 | `[ ]` Transactional email | `functions/` | Application updates, job matches, account events — Firebase Extensions + SendGrid |
+| S6-NOTIF-03 | `[ ]` Job alert subscriptions | `src/features/` | "Notify me when new React jobs in Bangalore are posted" |
+| S6-NOTIF-04 | `[ ]` Message / contact candidate | `src/features/` | Employers need a way to reach candidates from Talent Search / applicant list |
+
+### Platform
+
+| ID | Task | File(s) | Notes |
+|----|------|---------|-------|
+| S6-PLAT-01 | `[ ]` Multi-seat employer accounts | `src/context/`, `src/server/` | Currently one account per company; growing teams need member access |
+| S6-PLAT-02 | `[ ]` Phone number at registration + OTP | `src/pages/Register.tsx` | Partially deferred from S4-AUTH-03; required for fraud prevention |
+| S6-PLAT-03 | `[ ]` Brownie Points leaderboard | `src/features/growth/` | Referral gamification partially built; leaderboard drives viral loops |
+| S6-PLAT-04 | `[ ]` Dark mode | `src/index.css` | No theme switching; `index.css` has no dark mode vars |
+| S6-PLAT-05 | `[ ]` PWA (Progressive Web App) | `index.html`, `vite.config.ts` | Installable + offline capable; high value for mobile-first audience |
 
 ---
 

@@ -12,8 +12,8 @@ test.describe('Seeker Critical Path', () => {
 
         try {
             // 1. Register
-            console.log('Navigating to /register...');
-            await page.goto('/register');
+            console.log('Navigating to /register/seeker...');
+            await page.goto('/register/seeker');
             await page.fill('input[name="name"]', testName);
             await page.fill('input[name="email"]', testEmail);
             await page.fill('input[name="password"]', testPassword);
@@ -25,7 +25,6 @@ test.describe('Seeker Critical Path', () => {
                 // Optionally wait for a network request if we know what it is
             ]);
 
-            // 2. Dashboard Verification
             // 2. Dashboard Verification
             console.log('Waiting for Role Selection or Dashboard...');
             try {
