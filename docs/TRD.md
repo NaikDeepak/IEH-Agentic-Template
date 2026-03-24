@@ -83,7 +83,7 @@
 
 Run `npm run dev:full:emulator` to start the full stack against local emulators. The emulator auto-imports/exports seed data from `firebase-export/` so state persists between runs.
 
-`firebase-export/` is committed with curated seed data. Auto-generated subdirectories (`firestore_export/`, `auth_export/`) are gitignored — they are regenerated on each `--export-on-exit` run.
+`firebase-export/` contains committed seed data to ensure a consistent development state. The subdirectories (`firestore_export/`, `auth_export/`) are tracked in git.
 
 ### 5.3. Deployment
 
@@ -99,7 +99,7 @@ Staging deploys on `feature/*` → `main` merges (CI). Production deploys are ma
 - `.env.local` — local overrides, typically just `VITE_USE_FIREBASE_EMULATOR=true`
 - `.env.staging` — staging Firebase project credentials
 - `.env.production` — production Firebase project credentials
-- `.env.example` — committed template documenting all required vars
+- `.env.example` — committed template documenting all required vars (base Firebase config + emulator toggles/hosts/ports)
 
 ## 6. Security & Compliance
 -   **RBAC:** Strict access control via Firebase Security Rules / RLS.

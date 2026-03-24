@@ -17,6 +17,39 @@ import { useAuth } from '../hooks/useAuth';
 
 type JobWithMatch = Job & { matchScore?: number };
 
+// Helper to map backend type to frontend type
+const mapJobPostingToJob = (posting: JobPosting): Job => {
+    // Map backend enum to frontend union type safely
+    let jobType: Job['type'] = undefined;
+     
+    if (posting.type) {
+        const typeStr = posting.type.toLowerCase().replace('_', '-');
+        // specific mapping if needed, otherwise cast
+        if (['full-time', 'part-time', 'contract', 'freelance', 'internship'].includes(typeStr)) {
+            jobType = typeStr as Job['type'];
+        }
+    }
+
+    // Spread raw posting data first to preserve fields like work_mode,
+    // experience, experience_level for local filter matching
+    return {
+        ...(posting as unknown as Record<string, unknown>),
+        id: posting.id ?? '',
+        employerId: posting.employer_id,
+        title: posting.title,
+        description: posting.description,
+        status: posting.status === 'active' ? 'active' :
+            posting.status === 'passive' ? 'passive' : 'closed',
+        lastActiveAt: posting.lastActiveAt ?? posting.created_at,
+        expiresAt: posting.expiresAt ?? posting.created_at,
+        createdAt: posting.created_at,
+        updatedAt: posting.updated_at,
+        location: posting.location,
+        type: jobType,
+        salaryRange: posting.salary_range
+    };
+};
+
 export const JobsPage: React.FC = () => {
     const navigate = useNavigate();
     const { user, loading: authLoading, userData } = useAuth();
@@ -54,7 +87,6 @@ export const JobsPage: React.FC = () => {
         };
 
         void fetchJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authLoading, user?.uid]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
@@ -188,39 +220,6 @@ export const JobsPage: React.FC = () => {
 
             return true;
         });
-    };
-
-    // Helper to map backend type to frontend type
-    const mapJobPostingToJob = (posting: JobPosting): Job => {
-        // Map backend enum to frontend union type safely
-        let jobType: Job['type'] = undefined;
-         
-        if (posting.type) {
-            const typeStr = posting.type.toLowerCase().replace('_', '-');
-            // specific mapping if needed, otherwise cast
-            if (['full-time', 'part-time', 'contract', 'freelance', 'internship'].includes(typeStr)) {
-                jobType = typeStr as Job['type'];
-            }
-        }
-
-        // Spread raw posting data first to preserve fields like work_mode,
-        // experience, experience_level for local filter matching
-        return {
-            ...(posting as unknown as Record<string, unknown>),
-            id: posting.id ?? '',
-            employerId: posting.employer_id,
-            title: posting.title,
-            description: posting.description,
-            status: posting.status === 'active' ? 'active' :
-                posting.status === 'passive' ? 'passive' : 'closed',
-            lastActiveAt: posting.lastActiveAt ?? posting.created_at,
-            expiresAt: posting.expiresAt ?? posting.created_at,
-            createdAt: posting.created_at,
-            updatedAt: posting.updated_at,
-            location: posting.location,
-            type: jobType,
-            salaryRange: posting.salary_range
-        };
     };
 
     return (
