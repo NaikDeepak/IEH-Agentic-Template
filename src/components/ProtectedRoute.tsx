@@ -32,8 +32,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
 
     // Block email/password users who haven't verified their email yet.
     // Google sign-in users are always pre-verified by Google.
-    // We bypass this check for automation/testing environments (navigator.webdriver)
-    if (!user.emailVerified && user.providerData.some(p => p.providerId === 'password') && !navigator.webdriver) {
+    // Bypass in emulator mode (users are created unverified) and in automation (navigator.webdriver).
+    const isEmulator = import.meta.env['VITE_USE_FIREBASE_EMULATOR'] === 'true';
+    if (!user.emailVerified && user.providerData.some(p => p.providerId === 'password') && !navigator.webdriver && !isEmulator) {
         return <Navigate to="/verify-email" replace />;
     }
 

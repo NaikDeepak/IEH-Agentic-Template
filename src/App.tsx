@@ -39,6 +39,7 @@ const VerifyEmail = lazy(() => import('./pages/VerifyEmail').then(module => ({ d
 const Onboarding = lazy(() => import('./pages/Onboarding').then(module => ({ default: module.Onboarding })));
 const RoleSelection = lazy(() => import('./components/RoleSelection').then(module => ({ default: module.RoleSelection })));
 const PricingPage = lazy(() => import('./pages/PricingPage').then(module => ({ default: module.PricingPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(module => ({ default: module.SettingsPage })));
 
 
 // Loading fallback component
@@ -70,6 +71,15 @@ function DashboardRedirect() {
 
   // If role is missing, render nothing (RoleSelection overlay will show)
   return null;
+}
+
+function ProfileRedirect() {
+  const { userData, loading } = useAuth();
+  if (loading) return <PageLoader />;
+  if (userData?.role === 'seeker') return <Navigate to="/seeker/profile" replace />;
+  if (userData?.role === 'employer') return <Navigate to="/employer/company" replace />;
+  if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
+  return <Navigate to="/login" replace />;
 }
 
 function SeekerTrackerPage() {
@@ -495,6 +505,30 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['employer']}>
                 <JobApplicants />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Shared Account Routes */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={['seeker', 'employer', 'admin']}>
+                <ProfileRedirect />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={['seeker', 'employer', 'admin']}>
+                <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+                  <Header />
+                  <main id="main-content" className="flex-grow">
+                    <SettingsPage />
+                  </main>
+                </div>
               </ProtectedRoute>
             }
           />

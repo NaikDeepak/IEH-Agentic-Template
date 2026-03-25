@@ -87,7 +87,7 @@ export const JobsPage: React.FC = () => {
         };
 
         void fetchJobs();
-    }, [authLoading, user?.uid]);
+    }, [authLoading, user]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
