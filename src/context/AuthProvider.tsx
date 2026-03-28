@@ -331,11 +331,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!auth.currentUser) return;
         setError(null);
         try {
-            // Delete Firestore profile document first while the auth token is still valid.
-            // Subcollections (resumes, applications, etc.) require server-side cleanup via
-            // a Cloud Function onDelete trigger — tracked in docs/code-reviews/pr-26-review.md ISSUE-01.
-            await deleteDoc(doc(db, 'users', auth.currentUser.uid));
+            // Delete the Firebase Auth account first. If this fails (e.g.
+            // auth/requires-recent-login) the Firestore doc is left intact so the
+            // user can still sign in and retry.
+            // Subcollections (resumes, applications, etc.) require server-side cleanup —
+            // tracked in docs/code-reviews/pr-26-review.md ISSUE-01.
+            const uid = auth.currentUser.uid;
             await deleteUser(auth.currentUser);
+            // Auth deletion succeeded — now remove the Firestore profile document.
+            await deleteDoc(doc(db, 'users', uid));
         } catch (err: unknown) {
             const error = err as { code?: string; message?: string };
             if (error.code === 'auth/requires-recent-login') {

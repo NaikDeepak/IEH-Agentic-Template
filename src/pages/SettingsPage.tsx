@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import {
@@ -33,6 +33,8 @@ export const SettingsPage: React.FC = () => {
     }, [user?.displayName, editingName]);
     const [nameLoading, setNameLoading] = useState(false);
     const [nameSuccess, setNameSuccess] = useState(false);
+    const nameSuccessTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => () => { if (nameSuccessTimer.current) clearTimeout(nameSuccessTimer.current); }, []);
 
     const [resetLoading, setResetLoading] = useState(false);
     const [resetSent, setResetSent] = useState(false);
@@ -41,6 +43,11 @@ export const SettingsPage: React.FC = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
 
     const [localError, setLocalError] = useState<string | null>(null);
+    // Sync context-level auth errors (e.g. auth/requires-recent-login from deleteAccount)
+    // into localError so the catch block doesn't need to read stale closure state.
+    useEffect(() => {
+        if (authError) setLocalError(authError);
+    }, [authError]);
 
     const handleSaveName = async () => {
         const trimmed = nameValue.trim();
@@ -54,7 +61,7 @@ export const SettingsPage: React.FC = () => {
             await updateDisplayName(trimmed);
             setNameSuccess(true);
             setEditingName(false);
-            setTimeout(() => { setNameSuccess(false); }, 3000);
+            nameSuccessTimer.current = setTimeout(() => { setNameSuccess(false); }, 3000);
         } catch {
             setLocalError('Failed to update name. Please try again.');
         } finally {
@@ -85,9 +92,10 @@ export const SettingsPage: React.FC = () => {
             await logout();
             void navigate('/');
         } catch {
-            // deleteAccount sets a friendly message in AuthContext.error for known cases
-            // (e.g. auth/requires-recent-login). Fall back to a generic message.
-            setLocalError(authError ?? 'Failed to delete account. Please try again.');
+            // authError from context will be synced into localError via the useEffect above.
+            // Set the generic fallback now; if context provides a friendlier message it will
+            // overwrite this on the next render.
+            setLocalError(prev => prev ?? 'Failed to delete account. Please try again.');
             setDeletePhase('idle');
         } finally {
             setDeleteLoading(false);
