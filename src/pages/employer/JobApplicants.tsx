@@ -8,6 +8,7 @@ import { JobService } from '../../features/jobs/services/jobService';
 import type { JobPosting } from '../../features/jobs/types';
 import { Header } from '../../components/Header';
 import { Loader2, ArrowLeft, Users, ExternalLink } from 'lucide-react';
+import { NotificationsService } from '../../features/notifications/notificationsService';
 
 import { ApplicantCard } from '../../features/applications/components/ApplicantCard';
 
@@ -70,11 +71,25 @@ export const JobApplicants: React.FC = () => {
     const handleStatusChange = async (appId: string, newStatus: ApplicationStatus) => {
         try {
             // Optimistic update
-            setApplications(prev => prev.map(app =>
-                app.id === appId ? { ...app, status: newStatus } : app
+            const app = applications.find(a => a.id === appId);
+            setApplications(prev => prev.map(a =>
+                a.id === appId ? { ...a, status: newStatus } : a
             ));
 
             await ApplicationService.updateApplicationStatus(appId, newStatus);
+
+            // Notify the candidate about their application status change
+            if (app?.candidate_id) {
+                const jobTitle = job?.title ?? 'a job';
+                const statusLabel = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                void NotificationsService.create(
+                    app.candidate_id,
+                    'application_status',
+                    `Application ${statusLabel}`,
+                    `Your application for "${jobTitle}" has moved to ${statusLabel}.`,
+                    '/seeker/tracker'
+                );
+            }
         } catch (err) {
             console.error("[JobApplicants] Failed to update status:", err);
             Sentry.captureException(err, {

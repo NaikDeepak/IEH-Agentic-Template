@@ -14,6 +14,7 @@ import { X } from 'lucide-react';
 import * as Sentry from '@sentry/react';
 import { searchJobs, getJobSuggestions } from '../lib/ai/search';
 import { useAuth } from '../hooks/useAuth';
+import { SavedJobsService } from '../features/seeker/services/savedJobsService';
 
 type JobWithMatch = Job & { matchScore?: number };
 
@@ -66,6 +67,7 @@ export const JobsPage: React.FC = () => {
     const [currentSearchQuery, setCurrentSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
+    const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
 
     const userId = user?.uid ?? null;
 
@@ -90,6 +92,11 @@ export const JobsPage: React.FC = () => {
 
         void fetchJobs();
     }, [authLoading, userId]);
+
+    useEffect(() => {
+        if (!userId || !isSeeker) return;
+        void SavedJobsService.getSavedJobIds(userId).then(ids => { setSavedJobIds(ids); });
+    }, [userId, isSeeker]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
@@ -162,6 +169,21 @@ export const JobsPage: React.FC = () => {
         setDisplayedJobs(browseJobs);
         setSuggestions([]);
         setError(null);
+    };
+
+    const handleSaveJob = async (jobId: string) => {
+        if (!userId) return;
+        const isSaved = savedJobIds.has(jobId);
+        if (isSaved) {
+            await SavedJobsService.unsave(userId, jobId);
+            setSavedJobIds(prev => { const next = new Set(prev); next.delete(jobId); return next; });
+        } else {
+            const posting = await JobService.getJobById(jobId);
+            if (posting) {
+                await SavedJobsService.save(userId, posting);
+                setSavedJobIds(prev => new Set([...prev, jobId]));
+            }
+        }
     };
 
     const handleApply = async (jobId: string) => {
@@ -335,6 +357,8 @@ export const JobsPage: React.FC = () => {
                                     matchScore={job.matchScore}
                                     onClick={() => navigate(`/jobs/${job.id}`)}
                                     onApply={isSeeker ? (e) => { e.stopPropagation(); void handleApply(job.id); } : undefined}
+                                    onSave={isSeeker ? (e: React.MouseEvent) => { e.stopPropagation(); void handleSaveJob(job.id); } : undefined}
+                                    isSaved={savedJobIds.has(job.id)}
                                 />
                             ))}
                         </div>

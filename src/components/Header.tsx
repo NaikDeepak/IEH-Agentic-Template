@@ -1,13 +1,16 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../context/ThemeContext';
+import { NotificationBell } from './NotificationBell';
 
 const Login = lazy(() => import('./Login').then(module => ({ default: module.Login })));
 
 export const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { userData } = useAuth();
+    const { theme, toggleTheme } = useTheme();
 
     const role = userData?.role;
 
@@ -73,7 +76,15 @@ export const Header: React.FC = () => {
                     ))}
                 </nav>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                        className="p-2 text-slate-500 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors"
+                    >
+                        {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </button>
+                    {role && <NotificationBell />}
                     <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-slate-100 rounded-lg" />}>
                         <Login variant="navbar" />
                     </Suspense>

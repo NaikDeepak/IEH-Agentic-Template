@@ -10,7 +10,7 @@ service cloud.firestore {
       // (If you need public profiles later, expose a separate `publicUsers` collection
       // or a callable/HTTP endpoint that returns a curated subset.)
       allow get: if request.auth != null && request.auth.uid == userId;
-      allow list: if false; // No collection scanning
+      allow list: if request.auth != null && request.auth.token.role == 'admin'; // Admin-only collection scan
       // Users can delete their own top-level user document (account deletion flow).
       // NOTE: This only removes /users/{userId}. Subcollections (resumes, assessments,
       // skillGaps, shortlist, etc.) are NOT deleted by Firestore rules and currently have
@@ -232,10 +232,17 @@ service cloud.firestore {
                     // employer_id must match the job's employer_id
                     && request.resource.data.employer_id == get(/databases/$(database)/documents/jobs/$(request.resource.data.job_id)).data.employer_id;
 
+      // Employer can update application status
       allow update: if request.auth != null
                     && request.auth.token.role == 'employer'
                     && get(/databases/$(database)/documents/jobs/$(resource.data.job_id)).data.employer_id == request.auth.uid
                     && request.resource.data.diff(resource.data).changedKeys().hasOnly(['status', 'updated_at']);
+
+      // Seeker can update notes and reminder_date on their own applications
+      allow update: if request.auth != null
+                    && request.auth.token.role == 'seeker'
+                    && resource.data.candidate_id == request.auth.uid
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['notes', 'reminder_date', 'updated_at']);
 
       allow read: if request.auth != null && (resource.data.candidate_id == request.auth.uid || request.auth.token.role == 'employer');
     }
@@ -280,13 +287,13 @@ service cloud.firestore {
     match /ledger/{entryId} {
       // Users can only read their own ledger entries
       allow read: if request.auth != null && resource.data.uid == request.auth.uid;
-      
+
       // Strict Ledger Creation Rules:
       // 1. User can only create entries for themselves.
       // 2. Only 'redemption' is allowed from the client (spending points).
       // 3. Amount must be negative (spending).
       // 4. 'referral_bonus' and 'manual_adjustment' are BLOCKED (must come from Admin SDK/Backend).
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
                     && request.resource.data.keys().hasOnly(['uid', 'amount', 'type', 'metadata', 'timestamp'])
                     && request.resource.data.amount is number
@@ -294,6 +301,78 @@ service cloud.firestore {
                       // Allow redemption (spending points) check for negative amount
                       (request.resource.data.type == 'redemption' && request.resource.data.amount < 0)
                     );
+    }
+
+    // Notifications Collection
+    match /notifications/{notifId} {
+      // Only the recipient can read their notifications
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Authenticated users can create notifications (e.g. employer → seeker contact message)
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly([
+                      'userId', 'type', 'title', 'message', 'read', 'link', 'createdAt'
+                    ])
+                    && request.resource.data.read == false;
+      // Only the recipient can mark as read
+      allow update: if request.auth != null
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['read']);
+      allow delete: if false;
+    }
+
+    // Saved Jobs Collection (seeker bookmarks)
+    match /savedJobs/{docId} {
+      allow read: if request.auth != null && resource.data.seekerId == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.auth.token.role == 'seeker'
+                    && request.resource.data.seekerId == request.auth.uid
+                    && request.resource.data.keys().hasOnly(['seekerId', 'jobId', 'savedAt', 'snapshot']);
+      allow delete: if request.auth != null && resource.data.seekerId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // Saved Candidates Collection (employer bookmarks)
+    match /savedCandidates/{docId} {
+      allow read: if request.auth != null
+                  && request.auth.token.role == 'employer'
+                  && resource.data.employerId == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.auth.token.role == 'employer'
+                    && request.resource.data.employerId == request.auth.uid
+                    && request.resource.data.keys().hasOnly(['employerId', 'candidateId', 'savedAt', 'snapshot']);
+      allow delete: if request.auth != null
+                    && request.auth.token.role == 'employer'
+                    && resource.data.employerId == request.auth.uid;
+      allow update: if false;
+    }
+
+    // Job Alerts Collection (seeker alert subscriptions)
+    match /jobAlerts/{alertId} {
+      allow read: if request.auth != null && resource.data.seekerId == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.auth.token.role == 'seeker'
+                    && request.resource.data.seekerId == request.auth.uid
+                    && request.resource.data.keys().hasOnly([
+                      'seekerId', 'keywords', 'location', 'jobType', 'active', 'createdAt'
+                    ]);
+      // Only active toggle is allowed from client
+      allow update: if request.auth != null
+                    && resource.data.seekerId == request.auth.uid
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(['active']);
+      allow delete: if request.auth != null && resource.data.seekerId == request.auth.uid;
+    }
+
+    // Platform Config Collection (admin settings / feature flags)
+    match /config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // Leaderboard Collection (curated public view — only displayName + browniePoints + role)
+    // Written exclusively by Cloud Functions (Admin SDK). Clients cannot write.
+    match /leaderboard/{userId} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
   }
 }

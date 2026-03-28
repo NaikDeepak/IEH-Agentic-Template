@@ -50,6 +50,15 @@ export const ApplicationService = {
     }
   },
 
+  async updateApplicationNotes(appId: string, notes: string, reminderDate: string): Promise<void> {
+    const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
+    await updateDoc(docRef, {
+      notes,
+      reminder_date: reminderDate,
+      updated_at: serverTimestamp(),
+    });
+  },
+
   async submitApplication(data: SubmitApplicationInput): Promise<string> {
     const docRef = await addDoc(collection(db, APPLICATIONS_COLLECTION), {
       ...data,

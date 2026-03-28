@@ -78,21 +78,21 @@ Goal: Make the candidate profile actually reflect the person.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S3-PROFILE-01 | `[x]``[ ]` Candidate location = city name (not work mode) | Profile location field should be free-text city (e.g. "Mumbai") not remote/hybrid/office enum |
-| S3-PROFILE-02 | `[x]``[ ]` Work preference = separate remote/hybrid/office multi-select | Add `work_preference` field to `SeekerProfile` type; show as multi-select checkboxes in profile editor |
-| S3-PROFILE-03 | `[x]``[ ]` Targeted role — editable with suggestions | Pre-fill from resume, show suggestions dropdown, allow manual override |
-| S3-PROFILE-04 | `[x]``[ ]` Skills in profile editor — autocomplete suggestions | On skill input, suggest from CV parsed keywords + curated skills list |
-| S3-PROFILE-05 | `[ ]` Filter irrelevant skills from extraction | Resume parse: only include explicitly listed skills, not incidental words from job descriptions |
-| S3-RESUME-01 | `[x]``[ ]` Resume Intelligence — show current CV analysis first | Reorder flow: show existing analysis → then offer Upload New / Optimize with AI |
-| S3-RESUME-02 | `[x]``[ ]` Resume Intelligence — add action buttons after analysis | "Back to Dashboard" + "Optimize with AI" CTAs on result screen |
-| S3-RESUME-03 | `[ ]` AI CV builder — structured sections | Template: Summary / Skills / Experience / Education. Currently flat output |
+| S3-PROFILE-01 | `[x]` Candidate location = city name (not work mode) | `currentLocation` free-text field in ProfileEditor ✓ |
+| S3-PROFILE-02 | `[x]` Work preference = separate remote/hybrid/office multi-select | `work_preferences` multi-select checkboxes in ProfileEditor ✓ |
+| S3-PROFILE-03 | `[x]` Targeted role — editable with suggestions | Role suggestions dropdown + tag list in ProfileEditor ✓ |
+| S3-PROFILE-04 | `[x]` Skills in profile editor — autocomplete suggestions | Resume keyword suggestions + curated skill list in ProfileEditor ✓ |
+| S3-PROFILE-05 | `[x]` Filter irrelevant skills from extraction | System prompt tightened: only candidate-claimed skills; no incidental job-description mentions; max 25, normalised |
+| S3-RESUME-01 | `[x]` Resume Intelligence — show current CV analysis first | Reorder flow: show existing analysis → then offer Upload New / Optimize with AI |
+| S3-RESUME-02 | `[x]` Resume Intelligence — add action buttons after analysis | "Back to Dashboard" + "Optimize with AI" CTAs on result screen |
+| S3-RESUME-03 | `[x]` AI CV builder — structured sections | `CVBuilder.tsx` — Summary / Skills / Experience / Education with copy-all |
 | S3-SKILL-01 | `[x]` Rename "bridge assets" → "Skill Upgrade Path" | `GapAnalysis.tsx` already uses "Skills to Learn" and "Learning Resources" — clean copy confirmed |
 | S3-SKILL-02 | `[x]` Rename "skill void" → "Missing Skills" | Same — confirmed clean in `GapAnalysis.tsx` |
 | S3-SKILL-03 | `[x]` "Targeted semantic void" — plain English copy | Confirmed clean — no jargon in codebase |
 | S3-SKILL-04 | `[x]` Targeted career path — make editable | Field is editable in ProfileEditor |
 | S3-INTERVIEW-01 | `[x]` Interview prep — auto-fill from resume | Pre-population implemented |
-| M-4 | `[~]` "Forgot Password" flow | `AuthContext` + `AuthProvider` + `Login.tsx` — inline forgot-password UI with Firebase `sendPasswordResetEmail` |
-| M-8 | `[~]` Profile completeness indicator | Compute score from profile fields; show labeled progress bar in `ProfileEditor.tsx` |
+| M-4 | `[x]` "Forgot Password" flow | `AuthContext` + `AuthProvider` + `Login.tsx` — inline forgot-password UI with Firebase `sendPasswordResetEmail` |
+| M-8 | `[x]` Profile completeness indicator | Compute score from profile fields; show labeled progress bar in `ProfileEditor.tsx` |
 
 ---
 
@@ -104,7 +104,7 @@ Goal: First-time experience is complete and trustworthy.
 |----|------|-------|
 | S4-AUTH-01 | `[x]` Separate Employer vs Candidate login/register entry | `AuthEntry.tsx` — role picker screen at `/login` and `/register`; navigates to `/{mode}/seeker` or `/{mode}/employer` paths |
 | S4-AUTH-02 | `[skip]` LinkedIn login option | Firebase limitation — deferred (D-02) |
-| S4-AUTH-03 | `[ ]` Mobile number mandatory at registration | Add `phone` field to Register form; Firebase phone auth for OTP on first entry |
+| S4-AUTH-03 | `[~]` Mobile number mandatory at registration | Deferred to end — requires Firebase phone auth config + thorough testing |
 | S4-AUTH-04 | `[x]` Email verification after registration | `VerifyEmail.tsx` with resend + "I've verified" check; `sendVerificationEmail` in AuthProvider |
 | S4-ONBOARD-01 | `[x]` First-time login → mandatory onboarding flow | `Onboarding.tsx` — guided welcome → CV upload → target role → done; employer variant → company name |
 | S4-ONBOARD-02 | `[skip]` Education verification — define mechanism | Product + legal decision needed (D-01) |
@@ -117,11 +117,11 @@ Goal: Power features that differentiate WorkMila.
 
 | ID | Task | Notes |
 |----|------|-------|
-| S5-UX-01 | `[ ]` Top-right profile dropdown — show Logout inside | Move logout out of header into a dropdown with Profile / Settings / Logout |
-| S5-UX-02 | `[ ]` Mobile web — full responsive audit | Systematic pass: all pages at 375px, 390px, 430px. Fix clipped UI, overflowing text, tap targets |
-| S5-MATCH-01 | `[ ]` Show why a job matched — AI reasoning snippet | On JobCard / ShortlistFeed, show 1-line AI reasoning for the match score |
+| S5-UX-01 | `[x]` Top-right profile dropdown — show Logout inside | Already implemented via S1-AUTH-04 — dropdown with Profile / Settings / Sign Out in Login.tsx navbar variant |
+| S5-UX-02 | `[x]` Mobile web — full responsive audit | Completed via S5-UX-01 in the second Sprint 5 section |
+| S5-MATCH-01 | `[x]` Show why a job matched — AI reasoning snippet | Completed via S5-SEEKER-02 — sky-50 box with Sparkles icon in ShortlistFeed |
 | S5-INTERVIEW-01 | `[ ]` Voice-enabled interview prep | Web Speech API: narrate questions, record verbal responses, transcribe and score |
-| S5-SEARCH-01 | `[ ]` Shortlist feed — contextual apply from dashboard | "Apply" directly from the shortlist card without navigating to job detail |
+| S5-SEARCH-01 | `[x]` Shortlist feed — contextual apply from dashboard | Completed via S5-SEEKER-01 — "Apply Now" button in ShortlistFeed opens ApplyModal inline |
 
 ---
 
@@ -143,35 +143,35 @@ Goal: Unblock employers from core hiring workflows; add seeker convenience featu
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S5-EMP-01 | `[ ]` Employer dashboard home | `src/pages/employer/` | KPIs, recent activity, quick actions. Currently lands on `/employer/jobs` with no summary view |
-| S5-EMP-02 | `[ ]` Edit / Pause / Delete job posting | `src/pages/employer/EmployerJobs.tsx` | `EmployerJobs.tsx` shows list only — no inline edit, pause, or close action |
-| S5-EMP-03 | `[ ]` Applicant pipeline — Kanban | `src/pages/employer/JobApplicants.tsx` | Add Applied → Screening → Interview → Offer pipeline mirroring seeker's ApplicationBoard |
-| S5-EMP-04 | `[ ]` Candidate detail view from Talent Search | `src/pages/employer/TalentSearch.tsx` | `CandidateCard` onClick is a placeholder — employers can't view full profiles |
-| S5-EMP-05 | `[ ]` Save / shortlist candidates | `src/pages/employer/TalentSearch.tsx` | No way for employers to bookmark candidates from search for later follow-up |
-| S5-EMP-06 | `[ ]` Employer company profile completeness | `src/pages/employer/CompanyEditor.tsx` | No completeness indicator; incomplete profiles hurt candidate trust |
-| S5-EMP-07 | `[ ]` AI-assisted job description writing | `src/pages/PostJob.tsx` | "Generate JD" powered by Gemini when posting a job |
+| S5-EMP-01 | `[x]` Employer dashboard home | `src/pages/employer/EmployerDashboard.tsx` | KPIs (total/active/paused/closed), quick actions, recent postings list |
+| S5-EMP-02 | `[x]` Edit / Pause / Delete job posting | `src/pages/employer/EmployerJobs.tsx` | Filter tabs, inline edit/pause/unpause/delete with confirm dialog |
+| S5-EMP-03 | `[x]` Applicant pipeline — Kanban | `src/pages/employer/JobApplicants.tsx` | Applied → Screening → Interview → Offer → Hired → Rejected Kanban |
+| S5-EMP-04 | `[x]` Candidate detail view from Talent Search | `src/pages/employer/TalentSearch.tsx`, `src/features/candidates/components/CandidateDetailModal.tsx` | Full-profile slide-over modal with all candidate fields |
+| S5-EMP-05 | `[x]` Save / shortlist candidates | `src/features/candidates/services/savedCandidatesService.ts` | Save/unsave button in detail modal; persisted to Firestore `savedCandidates` collection |
+| S5-EMP-06 | `[x]` Employer company profile completeness | `src/pages/employer/CompanyEditor.tsx` | Progress bar showing % of 6 profile fields filled |
+| S5-EMP-07 | `[x]` AI-assisted job description writing | `src/pages/PostJob.tsx` | "Generate Description with AI" + "Review Draft & Get Tips" — both Gemini-powered |
 
 ### Seeker
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S5-SEEKER-01 | `[ ]` Apply directly from shortlist feed on dashboard | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | Currently must navigate to job detail to apply; high-friction for warm leads |
-| S5-SEEKER-02 | `[ ]` "Why this job matched" reasoning on shortlist cards | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | `ShortlistedJob.reason` field exists in types but not surfaced in UI |
-| S5-SEEKER-03 | `[ ]` Saved jobs | `src/features/seeker/` | No way to bookmark a job for later |
-| S5-SEEKER-04 | `[ ]` Application notes & reminders | `src/features/seeker/components/ApplicationBoard/` | `Application` type has `notes` and `reminder_date` but UI doesn't expose them |
+| S5-SEEKER-01 | `[x]` Apply directly from shortlist feed on dashboard | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | "Apply Now" button on each card opens ApplyModal inline |
+| S5-SEEKER-02 | `[x]` "Why this job matched" reasoning on shortlist cards | `src/features/seeker/components/Shortlist/ShortlistFeed.tsx` | Already surfaced — sky-50 box with Sparkles icon shows matchReason |
+| S5-SEEKER-03 | `[x]` Saved jobs | `src/features/seeker/services/savedJobsService.ts`, `src/pages/seeker/SavedJobsPage.tsx` | Bookmark icon on JobCard; `/seeker/saved` page with apply + remove; quick link in dashboard |
+| S5-SEEKER-04 | `[x]` Application notes & reminders | `src/features/seeker/components/ApplicationBoard/SeekerApplicationCard.tsx` | Inline notes toggle on each Kanban card with textarea + date picker; persisted to Firestore |
 
 ### Account
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
 | S5-ACC-01 | `[x]` Account settings page | `src/pages/SettingsPage.tsx` | `/settings` route — display name edit, password reset email, account deletion. `/profile` smart-redirects to role-specific profile page |
-| S5-ACC-02 | `[ ]` Change email/phone with re-verification | `src/context/AuthProvider.tsx` | Required for compliance and trust |
+| S5-ACC-02 | `[x]` Change email with re-verification | `src/context/AuthProvider.tsx`, `src/pages/SettingsPage.tsx` | `verifyBeforeUpdateEmail` — sends link to new address; email only changes when clicked |
 
 ### UX
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S5-UX-01 | `[ ]` Mobile responsiveness audit | all pages | Systematic pass at 375px, 390px, 430px — fix clipped UI, overflowing text, tap targets |
+| S5-UX-01 | `[x]` Mobile responsiveness audit | all pages | Fixed: Dashboard md:grid-cols-2 breakpoint; JobDetailPage sidebar sticky only on lg; PostJob title text-xl/md:text-2xl; ShortlistFeed footer flex-col sm:flex-row; EmployerDashboard job row flex-col sm:flex-row |
 
 ---
 
@@ -183,19 +183,19 @@ Goal: Complete admin functionality; add transactional notifications and platform
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S6-ADMIN-01 | `[ ]` Admin Users Management | `src/pages/admin/` | `/admin/users` is a placeholder div |
-| S6-ADMIN-02 | `[ ]` Admin Settings page | `src/pages/admin/` | `/admin/settings` is a placeholder — platform fee config, feature flags |
-| S6-ADMIN-03 | `[ ]` Admin stats from live Firestore data | `src/pages/admin/AdminDashboard.tsx` | Currently hardcoded values — needs live Firestore aggregations |
-| S6-ADMIN-04 | `[ ]` Job posting analytics for employers | `src/pages/employer/` | Views, applications per posting, conversion rate |
+| S6-ADMIN-01 | `[x]` Admin Users Management | `src/pages/admin/AdminUsersPage.tsx` | Searchable/filterable user table from live Firestore; role badge, phone verified status, join date |
+| S6-ADMIN-02 | `[x]` Admin Settings page | `src/pages/admin/AdminSettingsPage.tsx` | Platform fee % + 4 feature flags (referral, AI matching, Brownie Points, email verification); persisted to `config/platform` Firestore doc |
+| S6-ADMIN-03 | `[x]` Admin stats from live Firestore data | `src/pages/admin/AdminDashboard.tsx` | `getCountFromServer` for users/active jobs/applications; recent registrations feed |
+| S6-ADMIN-04 | `[x]` Job posting analytics for employers | `src/pages/employer/JobAnalyticsPage.tsx` | `/employer/analytics` — total apps KPIs, per-posting table with app count, days active, apps/day rate, visual rate bar; sortable columns; accessible from EmployerDashboard quick actions |
 
 ### Notifications
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S6-NOTIF-01 | `[ ]` In-app notifications | `src/features/` | Seekers: employer viewed profile, application status change, new matched jobs |
+| S6-NOTIF-01 | `[x]` In-app notifications | `src/features/notifications/`, `src/components/NotificationBell.tsx` | Real-time bell in Header (onSnapshot); types: application_status/new_match/profile_viewed; mark-read / mark-all-read; notification fired when employer moves applicant in Kanban |
 | S6-NOTIF-02 | `[ ]` Transactional email | `functions/` | Application updates, job matches, account events — Firebase Extensions + SendGrid |
-| S6-NOTIF-03 | `[ ]` Job alert subscriptions | `src/features/` | "Notify me when new React jobs in Bangalore are posted" |
-| S6-NOTIF-04 | `[ ]` Message / contact candidate | `src/features/` | Employers need a way to reach candidates from Talent Search / applicant list |
+| S6-NOTIF-03 | `[x]` Job alert subscriptions | `src/pages/seeker/JobAlertsPage.tsx`, `functions/src/triggers/onJobCreate.js` | `/seeker/alerts` — create/toggle/delete alerts by keywords+location+type; Cloud Function fires in-app notifications on job creation for matching alerts |
+| S6-NOTIF-04 | `[x]` Message / contact candidate | `src/features/candidates/components/CandidateDetailModal.tsx` | "Contact" button in detail modal opens compose panel; message delivered as in-app notification to candidate |
 
 ### Platform
 
@@ -203,9 +203,9 @@ Goal: Complete admin functionality; add transactional notifications and platform
 |----|------|---------|-------|
 | S6-PLAT-01 | `[ ]` Multi-seat employer accounts | `src/context/`, `src/server/` | Currently one account per company; growing teams need member access |
 | S6-PLAT-02 | `[ ]` Phone number at registration + OTP | `src/pages/Register.tsx` | Partially deferred from S4-AUTH-03; required for fraud prevention |
-| S6-PLAT-03 | `[ ]` Brownie Points leaderboard | `src/features/growth/` | Referral gamification partially built; leaderboard drives viral loops |
-| S6-PLAT-04 | `[ ]` Dark mode | `src/index.css` | No theme switching; `index.css` has no dark mode vars |
-| S6-PLAT-05 | `[ ]` PWA (Progressive Web App) | `index.html`, `vite.config.ts` | Installable + offline capable; high value for mobile-first audience |
+| S6-PLAT-03 | `[x]` Brownie Points leaderboard | `src/pages/BrownieLeaderboardPage.tsx` | `/leaderboard` — top 20 by browniePoints; medal icons for top 3; your-rank card with live position even outside top 20; how-to-earn section |
+| S6-PLAT-04 | `[x]` Dark mode | `src/index.css`, `src/context/ThemeContext.ts`, `src/context/ThemeProvider.tsx` | `@variant dark` CSS config; ThemeProvider with localStorage persistence + system preference detection; sun/moon toggle in Header; `dark:` base styles on body/headings; component coverage incremental |
+| S6-PLAT-05 | `[x]` PWA (Progressive Web App) | `index.html`, `vite.config.ts` | vite-plugin-pwa with autoUpdate; web manifest with name/icons/theme; Workbox NetworkFirst for Firestore, CacheFirst for fonts; Apple PWA meta tags |
 
 ---
 

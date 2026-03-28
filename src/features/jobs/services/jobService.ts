@@ -4,13 +4,15 @@ import {
     serverTimestamp,
     doc,
     updateDoc,
+    deleteDoc,
     getDoc,
     query,
     where,
     orderBy,
     getDocs,
     limit,
-    Timestamp
+    Timestamp,
+    vector
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
@@ -82,7 +84,7 @@ export const JobService = {
                 updated_at: serverTimestamp(),
                 lastActiveAt: serverTimestamp(),
                 expiresAt: Timestamp.fromDate(expirationDate),
-                embedding: embedding,
+                embedding: vector(embedding),
                 skills: input.skills.map(s => s.toLowerCase()) // Normalize skills
             };
 
@@ -130,7 +132,7 @@ export const JobService = {
 
                 const finalTitle = ('title' in updates) ? (updates.title ?? currentData.title) : currentData.title;
                 const finalDescription = ('description' in updates) ? (updates.description ?? currentData.description) : currentData.description;
-                const finalSkills = ('skills' in updates) ? (updates.skills ?? currentData.skills) : currentData.skills;
+                const finalSkills = (('skills' in updates) ? (updates.skills ?? currentData.skills) : currentData.skills) ?? [];
                 const finalLocation = ('location' in updates) ? (updates.location ?? currentData.location) : currentData.location;
                 const finalType = ('type' in updates) ? (updates.type ?? currentData.type) : currentData.type;
                 const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode;
@@ -144,7 +146,7 @@ export const JobService = {
                 `.trim();
 
                 const embedding = await fetchEmbedding(semanticText);
-                updateData.embedding = embedding;
+                updateData.embedding = vector(embedding) as unknown as number[];
 
                 if ('skills' in updates) {
                     updateData.skills = finalSkills.map(s => s.toLowerCase());
@@ -303,5 +305,31 @@ export const JobService = {
             // Sentry.captureException(error); // Ensure Sentry is imported if used here
             throw error;
         }
-    }
+    },
+
+    /**
+     * Set the status of a job posting (active | passive | closed).
+     */
+    async setJobStatus(jobId: string, status: 'active' | 'passive' | 'closed'): Promise<void> {
+        try {
+            const docRef = doc(db, JOBS_COLLECTION, jobId);
+            await updateDoc(docRef, { status, updated_at: serverTimestamp() });
+        } catch (error) {
+            console.error("Error setting job status:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Permanently delete a job posting.
+     */
+    async deleteJob(jobId: string): Promise<void> {
+        try {
+            const docRef = doc(db, JOBS_COLLECTION, jobId);
+            await deleteDoc(docRef);
+        } catch (error) {
+            console.error("Error deleting job:", error);
+            throw error;
+        }
+    },
 };

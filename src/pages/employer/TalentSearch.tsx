@@ -3,6 +3,7 @@ import { Search, Loader2, ArrowRight } from 'lucide-react';
 import { searchCandidates } from '../../lib/ai/search';
 import type { CandidateSearchResult } from '../../lib/ai/search';
 import { CandidateCard } from '../../features/candidates/components/CandidateCard';
+import { CandidateDetailModal } from '../../features/candidates/components/CandidateDetailModal';
 
 export const TalentSearch: React.FC = () => {
     const [query, setQuery] = useState('');
@@ -10,6 +11,7 @@ export const TalentSearch: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [hasSearched, setHasSearched] = useState(false);
+    const [selectedCandidate, setSelectedCandidate] = useState<CandidateSearchResult | null>(null);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,9 +108,7 @@ export const TalentSearch: React.FC = () => {
                                     <CandidateCard
                                         key={candidate.id}
                                         candidate={candidate}
-                                        onClick={() => {
-                                            // Placeholder for viewing candidate details
-                                        }}
+                                        onClick={() => { setSelectedCandidate(candidate); }}
                                     />
                                 ))}
                             </div>
@@ -123,6 +123,12 @@ export const TalentSearch: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            <CandidateDetailModal
+                candidate={selectedCandidate}
+                isOpen={selectedCandidate !== null}
+                onClose={() => { setSelectedCandidate(null); }}
+            />
         </div>
     );
 };

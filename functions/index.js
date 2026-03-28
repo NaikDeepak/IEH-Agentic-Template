@@ -4,11 +4,10 @@ import express from "express";
 import { generateJD, generateJobAssist, expandQuery, generateEmbedding } from "./lib/ai/generation.js";
 import * as Sentry from "@sentry/node";
 import { initializeApp } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import cors from "cors";
 import dotenv from "dotenv";
-import { GoogleAuth } from "google-auth-library";
 import nodemailer from "nodemailer";
 
 import { marketProxy } from "./src/marketProxy.js";
@@ -164,132 +163,64 @@ const handleError = (res, error, context) => {
 
 // Helper to generate embedding logic moved to src/lib/ai/generation.js
 
-// Helper to run vector search via Firestore REST API
+// Helper to run vector search via Firebase Admin SDK
 const runVectorSearch = async (collectionName, queryVector, filters = [], limit = 10) => {
-    const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || "india-emp-hub";
-    const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`;
-
-    // Using Web API Key for public access
-    const firebaseApiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_API_KEY;
-
-    let fetchUrl = url;
-    if (firebaseApiKey) {
-        fetchUrl += `?key=${firebaseApiKey}`;
+    if (!queryVector || !Array.isArray(queryVector)) {
+        throw new Error("Invalid queryVector: must be an array");
     }
 
-    const auth = new GoogleAuth({
-        scopes: "https://www.googleapis.com/auth/cloud-platform"
-    });
-    const client = await auth.getClient();
-    const accessToken = await client.getAccessToken();
-    const token = typeof accessToken === "string" ? accessToken : accessToken?.token;
+    console.log(`[VectorSearch] Running on ${collectionName}, vector length: ${queryVector.length}`);
 
-    if (!token) {
-        throw new Error("Failed to acquire access token for Firestore REST API");
-    }
+    const collRef = db.collection(collectionName);
+    const vectorValue = FieldValue.vector(queryVector);
 
-    // Construct structured query
-    const structuredQuery = {
-        from: [{ collectionId: collectionName }],
-        findNearest: {
-            vectorField: { fieldPath: "embedding" },
-            queryVector: {
-                mapValue: {
-                    fields: {
-                        __type__: { stringValue: "__vector__" },
-                        value: {
-                            arrayValue: {
-                                values: queryVector.map((v) => ({ doubleValue: v })),
-                            },
-                        },
-                    },
-                },
-            },
-            distanceMeasure: "COSINE",
-            limit: Number(limit),
-        },
-    };
-
-    // Add filters if present
-    if (filters.length > 0) {
-        if (filters.length === 1) {
-            structuredQuery.where = filters[0];
-        } else {
-            structuredQuery.where = {
-                compositeFilter: {
-                    op: "AND",
-                    filters: filters
-                }
-            };
-        }
-    }
-
-    const response = await fetch(fetchUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ structuredQuery }),
+    const vectorQuery = collRef.findNearest({
+        vectorField: 'embedding',
+        queryVector: vectorValue,
+        limit: Number(limit),
+        distanceMeasure: 'COSINE'
     });
 
-    if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Firestore REST API failed: ${response.status} ${errText}`);
-    }
+    const snapshot = await vectorQuery.get();
 
-    const data = await response.json();
+    const results = snapshot.docs.map(doc => {
+        const data = doc.data();
 
-    // Transform response
-    return data
-        .filter((item) => item.document)
-        .map((item) => {
-            const doc = item.document;
-            const id = doc.name.split("/").pop();
-            const fields = doc.fields || {};
+        // Unpack embedding — Admin SDK returns a VectorValue object
+        let vec = data.embedding;
+        if (vec && typeof vec.toArray === 'function') vec = vec.toArray();
 
-            // Helper to unwrap Firestore JSON syntax
-            const unwrap = (field) => {
-                const key = Object.keys(field)[0];
-                if (key === "stringValue") return field.stringValue;
-                if (key === "integerValue") return Number(field.integerValue);
-                if (key === "doubleValue") return Number(field.doubleValue);
-                if (key === "booleanValue") return field.booleanValue;
-                if (key === "timestampValue") return field.timestampValue;
-                if (key === "arrayValue") return (field.arrayValue.values || []).map(unwrap);
-                if (key === "mapValue")
-                    return Object.fromEntries(
-                        Object.entries(field.mapValue.fields || {}).map(([k, v]) => [
-                            k,
-                            unwrap(v),
-                        ])
-                    );
-                return null;
-            };
-
-            const unwrappedData = Object.fromEntries(
-                Object.entries(fields).map(([k, v]) => [k, unwrap(v)])
-            );
-
-            // Calculate Match Score
-            // Handle both plain array and VectorValue object structure
-            const vec = Array.isArray(unwrappedData.embedding)
-                ? unwrappedData.embedding
-                : unwrappedData.embedding?.value;
-
-            let matchScore = 0;
-            if (vec && Array.isArray(vec)) {
-                // Cosine Similarity = Dot Product (for normalized vectors)
-                const dotProduct = vec.reduce((sum, val, i) => sum + val * queryVector[i], 0);
-                // Clamp to 0-100
-                matchScore = Math.max(0, Math.min(100, Math.round(dotProduct * 100)));
+        let matchScore = 0;
+        if (Array.isArray(vec)) {
+            const len = Math.min(vec.length, queryVector.length);
+            const magA = Math.sqrt(vec.reduce((s, v) => s + v * v, 0));
+            const magB = Math.sqrt(queryVector.reduce((s, v) => s + v * v, 0));
+            if (magA && magB) {
+                let dot = 0;
+                for (let i = 0; i < len; i++) dot += vec[i] * queryVector[i];
+                matchScore = Math.max(0, Math.min(100, Math.round((dot / (magA * magB)) * 100)));
             }
+        }
 
-            // Remove large embedding vector from response
-            delete unwrappedData.embedding;
+        delete data.embedding;
+        return { id: doc.id, matchScore, ...data };
+    });
 
-            return { id, matchScore, ...unwrappedData };
-        });
+    // Apply post-filters (e.g. status === 'active')
+    if (filters.length > 0) {
+        return results.filter(item =>
+            filters.every(filter => {
+                if (filter.fieldFilter?.op === 'EQUAL') {
+                    const field = filter.fieldFilter.field.fieldPath;
+                    const val = filter.fieldFilter.value.stringValue;
+                    return item[field] === val;
+                }
+                return true;
+            })
+        );
+    }
+
+    return results;
 };
 
 // Helper to construct equality filter
@@ -408,6 +339,62 @@ export const searchJobsHandler = async (req, res) => {
     });
 };
 
+export const suggestJobsHandler = async (req, res) => {
+    try {
+        const query = req.query.q;
+        if (!query || typeof query !== 'string' || query.trim().length < 2) {
+            return res.json({ suggestions: [] });
+        }
+
+        const SUGGEST_SCAN_LIMIT = 150;
+        const SUGGEST_SKILL_WEIGHT = 0.4;
+        const SUGGEST_MIN_SCORE = 0.1;
+
+        const getTrigrams = (str) => {
+            const s = '  ' + str.toLowerCase() + '  ';
+            const trigrams = new Set();
+            for (let i = 0; i < s.length - 2; i++) trigrams.add(s.slice(i, i + 3));
+            return trigrams;
+        };
+
+        const trigramSimilarity = (a, b) => {
+            const ta = getTrigrams(a);
+            const tb = getTrigrams(b);
+            let intersection = 0;
+            ta.forEach(t => { if (tb.has(t)) intersection++; });
+            return (2 * intersection) / (ta.size + tb.size);
+        };
+
+        const snapshot = await db.collection('jobs')
+            .where('status', '==', 'active')
+            .select('title', 'skills')
+            .limit(SUGGEST_SCAN_LIMIT)
+            .get();
+
+        const q = query.toLowerCase();
+        const seen = new Set();
+        const suggestions = snapshot.docs
+            .map(doc => {
+                const { title = '', skills = [] } = doc.data();
+                const skillText = Array.isArray(skills) ? skills.join(' ') : String(skills);
+                const score = trigramSimilarity(q, title) + trigramSimilarity(q, skillText) * SUGGEST_SKILL_WEIGHT;
+                return { title, score };
+            })
+            .filter(({ title, score }) => {
+                if (score < SUGGEST_MIN_SCORE || seen.has(title.toLowerCase())) return false;
+                seen.add(title.toLowerCase());
+                return true;
+            })
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5)
+            .map(({ title }) => title);
+
+        res.json({ suggestions });
+    } catch (error) {
+        handleError(res, error, "suggest jobs");
+    }
+};
+
 export const searchCandidatesHandler = async (req, res) => {
     return Sentry.startSpan({
         op: "ai.search-candidates",
@@ -459,6 +446,7 @@ export const searchCandidatesHandler = async (req, res) => {
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
+app.get("/jobs/suggest", suggestJobsHandler);
 app.post("/jobs/search", searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
@@ -467,6 +455,7 @@ app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
+app.get("/api/jobs/suggest", suggestJobsHandler);
 app.post("/api/jobs/search", searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
@@ -633,4 +622,6 @@ export const reaper = onSchedule("every 24 hours", async (event) => {
 
 // --- Firestore Triggers ---
 export * from "./src/triggers/onApplicationCreate.js";
+export * from "./src/triggers/onJobCreate.js";
+export * from "./src/triggers/onUserUpdate.js";
 

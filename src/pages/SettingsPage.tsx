@@ -21,7 +21,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export const SettingsPage: React.FC = () => {
-    const { user, userData, updateDisplayName, deleteAccount, resetPassword, logout, clearError, error: authError } = useAuth();
+    const { user, userData, updateDisplayName, verifyEmailUpdate, deleteAccount, resetPassword, logout, clearError, error: authError } = useAuth();
     const navigate = useNavigate();
 
     const [editingName, setEditingName] = useState(false);
@@ -38,6 +38,11 @@ export const SettingsPage: React.FC = () => {
 
     const [resetLoading, setResetLoading] = useState(false);
     const [resetSent, setResetSent] = useState(false);
+
+    const [emailEditing, setEmailEditing] = useState(false);
+    const [newEmail, setNewEmail] = useState('');
+    const [emailLoading, setEmailLoading] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
 
     const [deletePhase, setDeletePhase] = useState<'idle' | 'confirm'>('idle');
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -66,6 +71,24 @@ export const SettingsPage: React.FC = () => {
             setLocalError('Failed to update name. Please try again.');
         } finally {
             setNameLoading(false);
+        }
+    };
+
+    const handleEmailUpdate = async () => {
+        const trimmed = newEmail.trim();
+        if (!trimmed || trimmed === user?.email) return;
+        setEmailLoading(true);
+        setLocalError(null);
+        clearError();
+        try {
+            await verifyEmailUpdate(trimmed);
+            setEmailSent(true);
+            setEmailEditing(false);
+            setNewEmail('');
+        } catch {
+            // authError synced via useEffect
+        } finally {
+            setEmailLoading(false);
         }
     };
 
@@ -180,7 +203,55 @@ export const SettingsPage: React.FC = () => {
                             <div className="block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                                 <Mail className="w-3 h-3" /> Email
                             </div>
-                            <span className="text-sm text-slate-800">{user?.email ?? '—'}</span>
+                            {emailSent ? (
+                                <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-sm text-emerald-700">
+                                    <Check className="w-4 h-4 shrink-0" />
+                                    Verification link sent to your new email. Click it to confirm the change.
+                                </div>
+                            ) : emailEditing ? (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="email"
+                                            value={newEmail}
+                                            onChange={(e) => { setNewEmail(e.target.value); }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') { void handleEmailUpdate(); }
+                                                if (e.key === 'Escape') { setEmailEditing(false); setNewEmail(''); }
+                                            }}
+                                            placeholder="New email address"
+                                            className="flex-grow px-4 py-2.5 border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+                                            // eslint-disable-next-line jsx-a11y/no-autofocus
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={() => { void handleEmailUpdate(); }}
+                                            disabled={emailLoading || !newEmail.trim()}
+                                            className="flex items-center justify-center w-9 h-9 bg-sky-700 hover:bg-sky-800 text-white rounded-lg transition-colors disabled:opacity-50"
+                                        >
+                                            {emailLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                        </button>
+                                        <button
+                                            onClick={() => { setEmailEditing(false); setNewEmail(''); }}
+                                            className="flex items-center justify-center w-9 h-9 border border-slate-200 text-slate-400 hover:text-slate-600 rounded-lg transition-colors"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-slate-400">A verification link will be sent to the new address. Your email won't change until you click it.</p>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-slate-800">{user?.email ?? '—'}</span>
+                                    <button
+                                        onClick={() => { setEmailEditing(true); }}
+                                        className="flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"
+                                    >
+                                        <Pencil className="w-3.5 h-3.5" />
+                                        Change
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Role */}

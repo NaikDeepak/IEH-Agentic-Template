@@ -9,7 +9,8 @@ import {
     Timestamp,
     doc,
     getDoc,
-    writeBatch
+    writeBatch,
+    VectorValue
 } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import * as Sentry from "@sentry/react";
@@ -221,11 +222,12 @@ export const ShortlistService = {
 
                 // 5. Score Candidates
                 const scoredJobs = candidates
-                    .filter((job): job is JobPosting & { embedding: number[] } =>
-                        Array.isArray(job.embedding) && job.embedding.length === userEmbedding.length
-                    )
+                    .filter((job): job is JobPosting & { embedding: number[] | VectorValue } => {
+                        if (job.embedding instanceof VectorValue) return job.embedding.toArray().length === userEmbedding.length;
+                        return Array.isArray(job.embedding) && job.embedding.length === userEmbedding.length;
+                    })
                     .map(job => {
-                        const embedding = job.embedding;
+                        const embedding = job.embedding instanceof VectorValue ? job.embedding.toArray() : job.embedding;
                         const score = cosineSimilarity(userEmbedding, embedding);
                         const matchContext = profileData ?? resumeData;
                         if (!matchContext) throw new Error("No user context for matching");
