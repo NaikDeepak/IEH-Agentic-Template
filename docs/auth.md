@@ -1,5 +1,10 @@
 # Authentication Documentation
 
+> [!WARNING]
+> **STUB — incomplete.** This file only covers a Google account-switching edge case.
+> The authoritative auth flow (AuthProvider, useAuth, ProtectedRoute, role-based routing)
+> is documented in the "Auth flow" section of `CLAUDE.md`.
+
 ## Overview
 India Employment Hub uses **Firebase Authentication** for user management. We primarily support **Google Sign-In** to ensure a seamless experience for both candidates and employers.
 

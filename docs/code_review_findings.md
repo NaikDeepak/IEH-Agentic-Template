@@ -1,5 +1,11 @@
 # Code Review Findings
 
+> [!WARNING]
+> **STALE — historical reference only.**
+> This review was written against an earlier version of the codebase. The `functions/index.js`
+> monolith and `App.tsx` monolith referenced here have since been refactored. Outstanding
+> items have been absorbed into `docs/SPRINT_PLAN.md` and `docs/feature_gap_analysis.md`.
+
 As a senior staff engineer, I have conducted a thorough review of the codebase. This document outlines my findings and provides recommendations for improvement. The review focuses on the backend (`functions/index.js`) and frontend (`src/App.tsx`) of the application.
 
 ## 1. Backend Code Review (`functions/index.js`)

@@ -1,5 +1,11 @@
 # Implementation Plan: India Employment Hub
 
+> [!WARNING]
+> **STALE — pre-pivot artifact. Do not use.**
+> This plan was written before the tech stack was finalised. It references Next.js (App Router)
+> but the project uses Vite + React 19. Phase tracking has moved to `docs/SPRINT_PLAN.md`
+> and `docs/feature_gap_analysis.md`.
+
 ## Goal Description
 Build a "Visionary" MVP of India Employment Hub, an AI-first recruitment platform replicating key features of Jobright.ai but tailored for the Indian market with a unique "Active" mechanics system.
 
