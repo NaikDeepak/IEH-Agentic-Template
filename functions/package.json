@@ -9,7 +9,7 @@
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
+    "deploy": "cd .. && npm run deploy:prod",
     "logs": "firebase functions:log"
   },
   "dependencies": {

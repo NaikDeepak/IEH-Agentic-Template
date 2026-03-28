@@ -16,16 +16,19 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const ASSETS_DIR = join(ROOT, 'dist', 'assets');
 
+const FIREBASE_RC_PATH = join(ROOT, '.firebaserc');
+const firebaseRc = JSON.parse(readFileSync(FIREBASE_RC_PATH, 'utf8'));
+
 const ENV_CONFIG = {
     staging: {
-        expectedProjectId: 'india-emp-hub-dev',
+        expectedProjectId: firebaseRc.projects.staging,
         forbiddenProjectId: null,
-        label: 'Staging (india-emp-hub-dev)',
+        get label() { return `Staging (${this.expectedProjectId})`; }
     },
     prod: {
-        expectedProjectId: 'india-emp-hub',
-        forbiddenProjectId: 'india-emp-hub-dev',
-        label: 'Production (india-emp-hub)',
+        expectedProjectId: firebaseRc.projects.default,
+        forbiddenProjectId: firebaseRc.projects.staging,
+        get label() { return `Production (${this.expectedProjectId})`; }
     },
 };
 
@@ -60,7 +63,15 @@ for (const file of jsFiles) {
     const content = readFileSync(join(ASSETS_DIR, file), 'utf8');
     if (content.includes(expectedProjectId)) foundExpected = true;
     if (forbiddenProjectId && content.includes(forbiddenProjectId)) foundForbidden = true;
-    if (content.includes('127.0.0.1:9099') || content.includes('127.0.0.1:8080')) foundEmulator = true;
+    if (
+        content.includes('127.0.0.1:9099') || content.includes('127.0.0.1:8080') ||
+        content.includes('localhost:9099') || content.includes('localhost:8080') ||
+        content.includes('::1:9099') || content.includes('::1:8080') ||
+        content.includes('0.0.0.0:9099') || content.includes('0.0.0.0:8080') ||
+        /"VITE_USE_FIREBASE_EMULATOR"\s*:\s*"true"/.test(content)
+    ) {
+        foundEmulator = true;
+    }
 }
 
 let failed = false;

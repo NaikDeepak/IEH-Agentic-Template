@@ -3,14 +3,13 @@
  * Predeploy guard — runs automatically via firebase.json predeploy hook.
  * Blocks bare `firebase deploy` commands that bypass the validated npm scripts.
  *
- * The DEPLOY_GUARD env var is set exclusively by:
- *   npm run deploy:staging
- *   npm run deploy:prod
- *
- * If it is not set, the deploy is rejected.
+ * It checks that the command is executed via one of the approved npm scripts.
  */
 
-if (process.env.DEPLOY_GUARD !== 'true') {
+const ALLOWED_LIFECYCLES = ['deploy:staging', 'deploy:prod'];
+const lifecycleEvent = process.env.npm_lifecycle_event;
+
+if (!ALLOWED_LIFECYCLES.includes(lifecycleEvent) || process.env.DEPLOY_GUARD !== 'true') {
     console.error('');
     console.error('🚫  Direct firebase deploy is blocked.');
     console.error('');
