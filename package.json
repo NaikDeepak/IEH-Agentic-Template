@@ -70,7 +70,6 @@
     "google-auth-library": "^10.5.0",
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
-    "json": "^11.0.0",
     "lint-staged": "^16.2.7",
     "lucide-react": "^0.562.0",
     "tailwindcss": "^4.0.0",

@@ -11,6 +11,9 @@ service cloud.firestore {
       // or a callable/HTTP endpoint that returns a curated subset.)
       allow get: if request.auth != null && request.auth.uid == userId;
       allow list: if false; // No collection scanning
+      // Users can delete their own document (account deletion flow).
+      // Subcollection cleanup is handled server-side via Cloud Function onDelete trigger.
+      allow delete: if request.auth != null && request.auth.uid == userId;
 
       // Allow creation of a user document with strict validation
       allow create: if request.auth != null

@@ -79,7 +79,8 @@ function ProfileRedirect() {
   if (userData?.role === 'seeker') return <Navigate to="/seeker/profile" replace />;
   if (userData?.role === 'employer') return <Navigate to="/employer/company" replace />;
   if (userData?.role === 'admin') return <Navigate to="/admin" replace />;
-  return <Navigate to="/login" replace />;
+  // Role not set yet — let RoleSelection overlay handle it (same pattern as DashboardRedirect)
+  return null;
 }
 
 function SeekerTrackerPage() {

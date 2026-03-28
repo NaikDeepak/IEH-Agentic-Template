@@ -15,7 +15,7 @@ import {
     sendPasswordResetEmail,
     sendEmailVerification
 } from '../lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
 import { updateProfile } from 'firebase/auth';
 import { ReferralService } from '../features/growth/services/referralService';
@@ -318,7 +318,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError(null);
         try {
             await updateProfile(user, { displayName: name });
-            await updateDoc(doc(db, 'users', user.uid), { displayName: name });
+            await setDoc(doc(db, 'users', user.uid), { displayName: name }, { merge: true });
             await refreshUserData();
         } catch (err: unknown) {
             const error = err as { message?: string };
@@ -331,6 +331,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!auth.currentUser) return;
         setError(null);
         try {
+            // Delete Firestore profile document first while the auth token is still valid.
+            // Subcollections (resumes, applications, etc.) require server-side cleanup via
+            // a Cloud Function onDelete trigger — tracked in docs/code-reviews/pr-26-review.md ISSUE-01.
+            await deleteDoc(doc(db, 'users', auth.currentUser.uid));
             await deleteUser(auth.currentUser);
         } catch (err: unknown) {
             const error = err as { code?: string; message?: string };

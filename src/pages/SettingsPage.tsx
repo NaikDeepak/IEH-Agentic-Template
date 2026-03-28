@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import {
@@ -21,11 +21,16 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export const SettingsPage: React.FC = () => {
-    const { user, userData, updateDisplayName, deleteAccount, resetPassword, logout, clearError } = useAuth();
+    const { user, userData, updateDisplayName, deleteAccount, resetPassword, logout, clearError, error: authError } = useAuth();
     const navigate = useNavigate();
 
     const [editingName, setEditingName] = useState(false);
     const [nameValue, setNameValue] = useState(user?.displayName ?? '');
+
+    // Keep nameValue in sync if user.displayName loads/changes after mount (e.g. late auth resolution)
+    useEffect(() => {
+        if (!editingName) setNameValue(user?.displayName ?? '');
+    }, [user?.displayName, editingName]);
     const [nameLoading, setNameLoading] = useState(false);
     const [nameSuccess, setNameSuccess] = useState(false);
 
@@ -79,9 +84,10 @@ export const SettingsPage: React.FC = () => {
             await deleteAccount();
             await logout();
             void navigate('/');
-        } catch (err: unknown) {
-            const e = err as { message?: string };
-            setLocalError(e.message ?? 'Failed to delete account.');
+        } catch {
+            // deleteAccount sets a friendly message in AuthContext.error for known cases
+            // (e.g. auth/requires-recent-login). Fall back to a generic message.
+            setLocalError(authError ?? 'Failed to delete account. Please try again.');
             setDeletePhase('idle');
         } finally {
             setDeleteLoading(false);
@@ -219,7 +225,7 @@ export const SettingsPage: React.FC = () => {
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="text-sm font-medium text-slate-800">Delete Account</p>
-                                <p className="text-xs text-slate-400 mt-0.5">Permanently remove your account and all associated data.</p>
+                                <p className="text-xs text-slate-400 mt-0.5">Permanently remove your account credentials and profile.</p>
                             </div>
                             <button
                                 onClick={() => { setDeletePhase('confirm'); }}
@@ -234,7 +240,7 @@ export const SettingsPage: React.FC = () => {
                             <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
                                 <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
                                 <p className="text-sm text-red-700">
-                                    This action is <span className="font-bold">permanent and irreversible</span>. All your data — profile, applications, and referrals — will be deleted.
+                                    This action is <span className="font-bold">permanent and irreversible</span>. Your account credentials and profile will be deleted. Application history may be retained for employer records.
                                 </p>
                             </div>
                             <div className="flex gap-3">

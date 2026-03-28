@@ -17,7 +17,19 @@ const ROOT = join(__dirname, '..');
 const ASSETS_DIR = join(ROOT, 'dist', 'assets');
 
 const FIREBASE_RC_PATH = join(ROOT, '.firebaserc');
+if (!existsSync(FIREBASE_RC_PATH)) {
+    console.error('❌  .firebaserc not found — cannot validate build target.');
+    process.exit(1);
+}
 const firebaseRc = JSON.parse(readFileSync(FIREBASE_RC_PATH, 'utf8'));
+if (!firebaseRc.projects?.default) {
+    console.error('❌  .firebaserc missing projects.default — cannot validate prod build.');
+    process.exit(1);
+}
+if (!firebaseRc.projects?.staging) {
+    console.error('❌  .firebaserc missing projects.staging — cannot validate staging build.');
+    process.exit(1);
+}
 
 const ENV_CONFIG = {
     staging: {
