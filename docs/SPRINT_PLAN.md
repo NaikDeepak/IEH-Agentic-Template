@@ -164,7 +164,7 @@ Goal: Unblock employers from core hiring workflows; add seeker convenience featu
 
 | ID | Task | File(s) | Notes |
 |----|------|---------|-------|
-| S5-ACC-01 | `[ ]` Account settings page | `src/pages/` | No `/settings` route — password change, notification prefs, account deletion |
+| S5-ACC-01 | `[x]` Account settings page | `src/pages/SettingsPage.tsx` | `/settings` route — display name edit, password reset email, account deletion. `/profile` smart-redirects to role-specific profile page |
 | S5-ACC-02 | `[ ]` Change email/phone with re-verification | `src/context/AuthProvider.tsx` | Required for compliance and trust |
 
 ### UX

@@ -20,10 +20,18 @@ vitest run --reporter=verbose src/path/to/file.test.tsx  # Single file
 # Quality
 npm run lint             # ESLint
 npm run typecheck        # tsc --noEmit
-npm run build            # Production build
+npm run build            # Production build (emulator always off)
 
-# Deploy
-firebase deploy
+# Deploy — ALWAYS use these scripts, never bare `firebase deploy`
+npm run deploy:staging   # build:staging → validate → deploy to india-emp-hub-dev
+npm run deploy:prod      # build → validate → deploy to india-emp-hub
+
+# The validate step (scripts/validate-dist.js) runs automatically between build
+# and deploy. It blocks the deploy if:
+#   - dist/ contains the wrong Firebase project ID
+#   - dist/ contains emulator URLs (127.0.0.1:9099 / 8080)
+# If you only changed functions/firestore rules (no frontend change), you still
+# must run the full deploy script so the build is validated before upload.
 ```
 
 Pre-commit hooks (husky + lint-staged) run ESLint and tsc on every `*.ts/*.tsx` commit.

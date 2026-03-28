@@ -9,7 +9,7 @@ import importPlugin from 'eslint-plugin-import'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', '.vite', 'node_modules', 'eslint.config.js']),
+  globalIgnores(['dist', 'coverage', '.vite', 'node_modules', 'eslint.config.js', '.claude']),
   {
     files: ['src/**/*.{ts,tsx}'],
     languageOptions: {

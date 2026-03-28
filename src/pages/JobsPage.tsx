@@ -67,8 +67,10 @@ export const JobsPage: React.FC = () => {
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
 
+    const userId = user?.uid ?? null;
+
     useEffect(() => {
-        if (authLoading || !user) return;
+        if (authLoading || !userId) return;
 
         const fetchJobs = async () => {
             try {
@@ -87,7 +89,7 @@ export const JobsPage: React.FC = () => {
         };
 
         void fetchJobs();
-    }, [authLoading, user?.uid]);
+    }, [authLoading, userId]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;

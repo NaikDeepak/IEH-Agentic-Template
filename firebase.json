@@ -1,15 +1,24 @@
 {
   "functions": {
-    "source": "functions"
+    "source": "functions",
+    "predeploy": [
+      "node scripts/check-deploy-guard.js"
+    ]
   },
   "firestore": {
     "database": "(default)",
     "location": "nam5",
     "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "indexes": "firestore.indexes.json",
+    "predeploy": [
+      "node scripts/check-deploy-guard.js"
+    ]
   },
   "hosting": {
-    "predeploy": ["npm version minor --no-git-tag-version"],
+    "predeploy": [
+      "node scripts/check-deploy-guard.js",
+      "npm version minor --no-git-tag-version"
+    ],
     "public": "dist",
     "ignore": [
       "firebase.json",
@@ -20,13 +29,19 @@
       {
         "source": "/index.html",
         "headers": [
-          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
         ]
       },
       {
         "source": "/assets/**",
         "headers": [
-          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
         ]
       }
     ],
