@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Users, Search, Loader2, ShieldCheck, Briefcase, User,
     RefreshCw, ChevronDown,
@@ -21,18 +21,18 @@ const ROLE_BADGE: Record<string, string> = {
     admin: 'bg-amber-50 text-amber-700 border-amber-100',
 };
 
+const PAGE_SIZE = 50;
+
 const AdminUsersPage: React.FC = () => {
     const [users, setUsers] = useState<UserRow[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState<'all' | 'seeker' | 'employer' | 'admin'>('all');
     const [loadError, setLoadError] = useState<string | null>(null);
-    const [lastVisibleDoc, setLastVisibleDoc] = useState<QueryDocumentSnapshot | null>(null);
+    const lastVisibleDocRef = useRef<QueryDocumentSnapshot | null>(null);
     const [isLastPage, setIsLastPage] = useState(false);
 
-    const PAGE_SIZE = 50;
-
-    const load = async (append = false) => {
+    const load = useCallback(async (append = false) => {
         setLoading(true);
         setLoadError(null);
         try {
@@ -41,11 +41,11 @@ const AdminUsersPage: React.FC = () => {
                 orderBy('createdAt', 'desc'),
                 limit(PAGE_SIZE),
             );
-            if (append && lastVisibleDoc) {
+            if (append && lastVisibleDocRef.current) {
                 usersQuery = query(
                     collection(db, 'users'),
                     orderBy('createdAt', 'desc'),
-                    startAfter(lastVisibleDoc),
+                    startAfter(lastVisibleDocRef.current),
                     limit(PAGE_SIZE),
                 );
             }
@@ -53,7 +53,7 @@ const AdminUsersPage: React.FC = () => {
             const snap = await getDocs(usersQuery);
             const newRows = snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserRow));
             setUsers(prev => append ? [...prev, ...newRows] : newRows);
-            setLastVisibleDoc(snap.docs[snap.docs.length - 1] ?? null);
+            lastVisibleDocRef.current = snap.docs[snap.docs.length - 1] ?? null;
             setIsLastPage(snap.docs.length < PAGE_SIZE);
         } catch (err) {
             console.error('[AdminUsersPage] load error:', err);
@@ -61,9 +61,9 @@ const AdminUsersPage: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    useEffect(() => { void load(false); }, []);
+    useEffect(() => { void load(false); }, [load]);
 
     const filtered = users.filter(u => {
         const matchRole = roleFilter === 'all' || u.role === roleFilter;

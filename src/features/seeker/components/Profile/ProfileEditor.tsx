@@ -345,6 +345,7 @@ export const ProfileEditor: React.FC = () => {
                                 />
                                 <button
                                     onClick={() => { addSkill(); }}
+                                    data-testid="add-skill-button"
                                     className="flex items-center justify-center w-10 h-10 bg-sky-700 hover:bg-sky-800 text-white rounded-lg transition-colors shrink-0"
                                 >
                                     <Plus className="w-4 h-4" />
@@ -398,6 +399,7 @@ export const ProfileEditor: React.FC = () => {
                                 />
                                 <button
                                     onClick={() => { addRole(); }}
+                                    data-testid="add-role-button"
                                     className="flex items-center justify-center w-10 h-10 bg-sky-700 hover:bg-sky-800 text-white rounded-lg transition-colors shrink-0"
                                 >
                                     <Plus className="w-4 h-4" />

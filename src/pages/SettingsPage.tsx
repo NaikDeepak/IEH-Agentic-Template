@@ -48,11 +48,7 @@ export const SettingsPage: React.FC = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
 
     const [localError, setLocalError] = useState<string | null>(null);
-    // Sync context-level auth errors (e.g. auth/requires-recent-login from deleteAccount)
-    // into localError so the catch block doesn't need to read stale closure state.
-    useEffect(() => {
-        if (authError) setLocalError(authError);
-    }, [authError]);
+    const displayError = localError ?? authError;
 
     const handleSaveName = async () => {
         const trimmed = nameValue.trim();
@@ -68,7 +64,7 @@ export const SettingsPage: React.FC = () => {
             setEditingName(false);
             nameSuccessTimer.current = setTimeout(() => { setNameSuccess(false); }, 3000);
         } catch {
-            setLocalError('Failed to update name. Please try again.');
+            // authError synced via useEffect
         } finally {
             setNameLoading(false);
         }
@@ -101,7 +97,7 @@ export const SettingsPage: React.FC = () => {
             await resetPassword(user.email);
             setResetSent(true);
         } catch {
-            setLocalError('Failed to send reset email. Please try again.');
+            // authError synced via useEffect
         } finally {
             setResetLoading(false);
         }
@@ -110,15 +106,13 @@ export const SettingsPage: React.FC = () => {
     const handleDelete = async () => {
         setDeleteLoading(true);
         setLocalError(null);
+        clearError();
         try {
             await deleteAccount();
             await logout();
             void navigate('/');
         } catch {
-            // authError from context will be synced into localError via the useEffect above.
-            // Set the generic fallback now; if context provides a friendlier message it will
-            // overwrite this on the next render.
-            setLocalError(prev => prev ?? 'Failed to delete account. Please try again.');
+            // authError synced via useEffect (e.g. auth/requires-recent-login)
             setDeletePhase('idle');
         } finally {
             setDeleteLoading(false);
@@ -133,10 +127,10 @@ export const SettingsPage: React.FC = () => {
                     <p className="text-sm text-slate-400 mt-0.5">Manage your account preferences</p>
                 </div>
 
-                {localError && (
+                {displayError && (
                     <div className="mb-6 p-4 rounded-xl border border-red-100 bg-red-50 flex items-center gap-3 text-sm text-red-600">
                         <AlertTriangle className="w-4 h-4 shrink-0" />
-                        {localError}
+                        {displayError}
                     </div>
                 )}
 

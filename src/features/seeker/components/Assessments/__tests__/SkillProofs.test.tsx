@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { SkillProofs } from '../../../src/features/seeker/components/Assessments/SkillProofs';
-import { useAuth } from '../../../src/hooks/useAuth';
-import { generateAssessment, submitAssessment } from '../../../src/features/seeker/services/assessmentService';
+import { SkillProofs } from '../SkillProofs';
+import { useAuth } from '../../../../../hooks/useAuth';
+import { generateAssessment, submitAssessment } from '../../../../../features/seeker/services/assessmentService';
 import { getDoc } from 'firebase/firestore';
 
 // Mock Dependencies
-vi.mock('../../../src/hooks/useAuth', () => ({
+vi.mock('../../../../../hooks/useAuth', () => ({
     useAuth: vi.fn()
 }));
 
-vi.mock('../../../src/features/seeker/services/assessmentService', () => ({
+vi.mock('../../../../../features/seeker/services/assessmentService', () => ({
     generateAssessment: vi.fn(),
     submitAssessment: vi.fn()
 }));
@@ -21,7 +21,7 @@ vi.mock('firebase/firestore', () => ({
     collection: vi.fn()
 }));
 
-vi.mock('../../../src/lib/firebase', () => ({
+vi.mock('../../../../../lib/firebase', () => ({
     db: {}
 }));
 

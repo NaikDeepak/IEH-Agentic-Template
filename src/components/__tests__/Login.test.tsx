@@ -1,13 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Login } from '../../src/components/Login';
+import { Login } from '../Login';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockResetPassword = vi.fn();
 const mockClearError = vi.fn();
 
 // Mock Auth
-vi.mock('../../src/hooks/useAuth', () => ({
+vi.mock('../../hooks/useAuth', () => ({
     useAuth: () => ({
         loginWithGoogle: vi.fn(),
         loginWithEmail: vi.fn(),
@@ -21,6 +21,9 @@ vi.mock('../../src/hooks/useAuth', () => ({
 }));
 
 describe('Login', () => {
+    afterEach(() => {
+        vi.unstubAllEnvs();
+    });
     it('renders correctly with form fields', () => {
         render(
             <MemoryRouter>
@@ -46,12 +49,13 @@ describe('Login', () => {
     });
 
     it('renders social login buttons', () => {
+        vi.stubEnv('VITE_USE_FIREBASE_EMULATOR', 'false');
         render(
             <MemoryRouter>
                 <Login />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Continue with Google/i)).toBeDefined();
+        expect(screen.getByText(/Continue with Google/i)).toBeInTheDocument();
     });
 
     it('shows "Forgot password?" link on the login card', () => {
