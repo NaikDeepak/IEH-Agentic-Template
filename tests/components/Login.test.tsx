@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Login } from '../../src/components/Login';
 import { MemoryRouter } from 'react-router-dom';
@@ -21,6 +21,9 @@ vi.mock('../../src/hooks/useAuth', () => ({
 }));
 
 describe('Login', () => {
+    afterEach(() => {
+        vi.unstubAllEnvs();
+    });
     it('renders correctly with form fields', () => {
         render(
             <MemoryRouter>
@@ -53,7 +56,6 @@ describe('Login', () => {
             </MemoryRouter>
         );
         expect(screen.getByText(/Continue with Google/i)).toBeInTheDocument();
-        vi.unstubAllEnvs();
     });
 
     it('shows "Forgot password?" link on the login card', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CandidateCard } from '../CandidateCard';
-import type { CandidateSearchResult } from '../../../lib/ai/search';
+import type { CandidateSearchResult } from '../../../../lib/ai/search';
 
 describe('CandidateCard', () => {
   const mockCandidate: CandidateSearchResult = {

@@ -82,3 +82,4 @@ e2e-seeker*.png
 # Claude local settings (machine-specific)
 .claude/settings.local.json
 .claude/skills/**/scripts/__pycache__/
+test_output.txt

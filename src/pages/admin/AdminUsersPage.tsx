@@ -21,6 +21,8 @@ const ROLE_BADGE: Record<string, string> = {
     admin: 'bg-amber-50 text-amber-700 border-amber-100',
 };
 
+const PAGE_SIZE = 50;
+
 const AdminUsersPage: React.FC = () => {
     const [users, setUsers] = useState<UserRow[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,8 +31,6 @@ const AdminUsersPage: React.FC = () => {
     const [loadError, setLoadError] = useState<string | null>(null);
     const lastVisibleDocRef = useRef<QueryDocumentSnapshot | null>(null);
     const [isLastPage, setIsLastPage] = useState(false);
-
-    const PAGE_SIZE = 50;
 
     const load = useCallback(async (append = false) => {
         setLoading(true);

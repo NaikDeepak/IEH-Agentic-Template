@@ -64,7 +64,7 @@ export default defineConfig({
                 '**/constants.ts',
                 'src/features/employer/**',
                 'src/features/admin/**',
-                'src/components/ui/**', 
+                'src/components/ui/**',
                 'src/lib/ai/generation.js', // Exclude massive prompt management logic
                 'src/App.tsx',
                 'src/main.tsx',
