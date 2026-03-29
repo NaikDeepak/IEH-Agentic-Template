@@ -1,335 +1,353 @@
 import {
-    collection,
-    addDoc,
-    serverTimestamp,
-    doc,
-    updateDoc,
-    deleteDoc,
-    getDoc,
-    query,
-    where,
-    orderBy,
-    getDocs,
-    limit,
-    Timestamp,
-    vector
-} from "firebase/firestore";
-import { db } from "../../../lib/firebase";
-import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding";
-import { trackJobActivity } from "../../../lib/activity";
-import type { CreateJobInput, JobPosting } from "../types";
-import { CompanyService } from "../../companies/services/companyService";
-import { callAIProxy } from "../../../lib/ai/proxy";
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  limit,
+  Timestamp,
+  vector,
+} from "firebase/firestore"
+import { db } from "../../../lib/firebase"
+import { EMBEDDING_DIMENSION } from "../../../lib/ai/embedding"
+import { trackJobActivity } from "../../../lib/activity"
+import type { CreateJobInput, JobPosting } from "../types"
+import { CompanyService } from "../../companies/services/companyService"
+import { callAIProxy } from "../../../lib/ai/proxy"
 
-
-const JOBS_COLLECTION = "jobs";
+const JOBS_COLLECTION = "jobs"
 
 interface EmbeddingResponse {
-    embedding?: number[];
+  embedding?: number[]
+}
+
+function isValidEmbeddingArray(value: unknown): value is number[] {
+  return (
+    Array.isArray(value) &&
+    value.length === EMBEDDING_DIMENSION &&
+    value.every((n) => typeof n === "number" && Number.isFinite(n))
+  )
+}
+
+function toVectorField(embedding: number[]) {
+  return vector(embedding)
 }
 
 async function fetchEmbedding(text: string): Promise<number[]> {
-    const data = await callAIProxy<EmbeddingResponse>("/api/ai/embedding", { text });
-    const embedding = data.embedding;
+  const data = await callAIProxy<EmbeddingResponse>("/api/ai/embedding", { text })
+  const embedding = data.embedding
+  const embeddingDebugSize = Array.isArray(embedding) ? embedding.length : "non-array"
 
-    if (!Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION || typeof embedding[0] !== "number" || typeof embedding[EMBEDDING_DIMENSION - 1] !== "number") {
-        console.error(`Invalid embedding received. Expected ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : typeof embedding}`);
-        throw new Error(`Embedding service returned invalid vector. Expected dimension ${EMBEDDING_DIMENSION}, got ${Array.isArray(embedding) ? embedding.length : 'non-array'}`);
-    }
+  if (!isValidEmbeddingArray(embedding)) {
+    console.error(`Invalid embedding received. Expected ${EMBEDDING_DIMENSION}, got ${embeddingDebugSize}`)
+    throw new Error(
+      `Embedding service returned invalid vector. Expected dimension ${EMBEDDING_DIMENSION}, got ${embeddingDebugSize}`,
+    )
+  }
 
-    return embedding;
+  return embedding
 }
 
-
 export const JobService = {
-    /**
-     * Creates a new job posting and automatically generates a vector embedding for it.
-     */
-    async createJob(input: CreateJobInput): Promise<string> {
-        try {
-            // 1. Fetch Company ID if not provided
-            let companyId = input.company_id;
-            if (!companyId) {
-                const company = await CompanyService.getCompanyByEmployerId(input.employer_id);
-                if (company) {
-                    companyId = company.id;
-                }
-            }
+  /**
+   * Creates a new job posting and automatically generates a vector embedding for it.
+   */
+  async createJob(input: CreateJobInput): Promise<string> {
+    try {
+      // 1. Fetch Company ID if not provided
+      let companyId = input.company_id
+      if (!companyId) {
+        const company = await CompanyService.getCompanyByEmployerId(input.employer_id)
+        if (company) {
+          companyId = company.id
+        }
+      }
 
-            // 2. Generate Embedding (Client-side for MVP)
-            // Combine relevant fields for semantic search: Title, Description, Skills, Location
-            const semanticText = `
+      // 2. Generate Embedding (Client-side for MVP)
+      // Combine relevant fields for semantic search: Title, Description, Skills, Location
+      const semanticText = `
         Title: ${input.title}
         Skills: ${input.skills.join(", ")}
         Location: ${input.location}
         Type: ${input.type} (${input.work_mode})
         Description: ${input.description}
-      `.trim();
+      `.trim()
 
-            const embedding = await fetchEmbedding(semanticText);
+      const embedding = await fetchEmbedding(semanticText)
 
-            // 3. Prepare Data
-            const now = new Date();
-            const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days from now
+      // 3. Prepare Data
+      const now = new Date()
+      const expirationDate = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000) // 4 days from now
 
-            // Destructure to separate company_bio for conditional inclusion
-            const { company_bio, ...restInput } = input;
+      // Destructure to separate company_bio for conditional inclusion
+      const { company_bio, ...restInput } = input
 
-            const jobData = {
-                ...restInput,
-                company_id: companyId ?? null,
-                ...(company_bio && { company_bio }),
-                status: 'active',
-                created_at: serverTimestamp(),
-                updated_at: serverTimestamp(),
-                lastActiveAt: serverTimestamp(),
-                expiresAt: Timestamp.fromDate(expirationDate),
-                embedding: vector(embedding),
-                skills: input.skills.map(s => s.toLowerCase()) // Normalize skills
-            };
+      const jobData = {
+        ...restInput,
+        company_id: companyId ?? null,
+        ...(company_bio && { company_bio }),
+        status: "active",
+        created_at: serverTimestamp(),
+        updated_at: serverTimestamp(),
+        lastActiveAt: serverTimestamp(),
+        expiresAt: Timestamp.fromDate(expirationDate),
+        embedding: toVectorField(embedding),
+        skills: input.skills.map((s) => s.toLowerCase()), // Normalize skills
+      }
 
-            // 4. Save to Firestore
-            const docRef = await addDoc(collection(db, JOBS_COLLECTION), jobData);
+      // 4. Save to Firestore
+      const docRef = await addDoc(collection(db, JOBS_COLLECTION), jobData)
 
-            return docRef.id;
-        } catch (error) {
-            console.error("Error creating job:", error);
-            throw error;
+      return docRef.id
+    } catch (error) {
+      console.error("Error creating job:", error)
+      throw error
+    }
+  },
+
+  /**
+   * Update an existing job. If title/description/skills changes, re-generate embedding.
+   */
+  async updateJob(jobId: string, updates: Partial<CreateJobInput>): Promise<void> {
+    try {
+      const docRef = doc(db, JOBS_COLLECTION, jobId)
+      const updateData: Partial<JobPosting> & { updated_at: ReturnType<typeof serverTimestamp> } = {
+        ...Object.fromEntries(Object.entries(updates).filter(([, v]) => (v as unknown) !== undefined)),
+        updated_at: serverTimestamp(),
+      }
+
+      // If semantic fields change, regenerate embedding (use key-presence, not truthiness)
+      const shouldRegenEmbedding =
+        "title" in updates ||
+        "description" in updates ||
+        "skills" in updates ||
+        "location" in updates ||
+        "type" in updates ||
+        "company_bio" in updates ||
+        "work_mode" in updates
+
+      if (shouldRegenEmbedding) {
+        const snap = await getDoc(docRef)
+
+        if (!snap.exists()) {
+          throw new Error(`Job ${jobId} not found`)
         }
-    },
 
-    /**
-     * Update an existing job. If title/description/skills changes, re-generate embedding.
-     */
-    async updateJob(jobId: string, updates: Partial<CreateJobInput>): Promise<void> {
-        try {
-            const docRef = doc(db, JOBS_COLLECTION, jobId);
-            const updateData: Partial<JobPosting> & { updated_at: ReturnType<typeof serverTimestamp> } = {
-                ...Object.fromEntries(
-                    Object.entries(updates).filter(([, v]) => (v as unknown) !== undefined)
-                ),
-                updated_at: serverTimestamp()
-            };
+        const currentData = snap.data() as JobPosting
 
-            // If semantic fields change, regenerate embedding (use key-presence, not truthiness)
-            const shouldRegenEmbedding =
-                ('title' in updates) ||
-                ('description' in updates) ||
-                ('skills' in updates) ||
-                ('location' in updates) ||
-                ('type' in updates) ||
-                ('company_bio' in updates) ||
-                ('work_mode' in updates);
+        const finalTitle = "title" in updates ? (updates.title ?? currentData.title) : currentData.title
+        const finalDescription =
+          "description" in updates ? (updates.description ?? currentData.description) : currentData.description
+        const finalSkills = ("skills" in updates ? (updates.skills ?? currentData.skills) : currentData.skills) ?? []
+        const finalLocation = "location" in updates ? (updates.location ?? currentData.location) : currentData.location
+        const finalType = "type" in updates ? (updates.type ?? currentData.type) : currentData.type
+        const finalWorkMode =
+          "work_mode" in updates ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode
 
-            if (shouldRegenEmbedding) {
-                const snap = await getDoc(docRef);
-
-                if (!snap.exists()) {
-                    throw new Error(`Job ${jobId} not found`);
-                }
-
-                const currentData = snap.data() as JobPosting;
-
-                const finalTitle = ('title' in updates) ? (updates.title ?? currentData.title) : currentData.title;
-                const finalDescription = ('description' in updates) ? (updates.description ?? currentData.description) : currentData.description;
-                const finalSkills = (('skills' in updates) ? (updates.skills ?? currentData.skills) : currentData.skills) ?? [];
-                const finalLocation = ('location' in updates) ? (updates.location ?? currentData.location) : currentData.location;
-                const finalType = ('type' in updates) ? (updates.type ?? currentData.type) : currentData.type;
-                const finalWorkMode = ('work_mode' in updates) ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode;
-
-                const semanticText = `
+        const semanticText = `
                     Title: ${finalTitle}
                     Skills: ${finalSkills.join(", ")}
                     Location: ${finalLocation}
                     Type: ${finalType} (${finalWorkMode})
                     Description: ${finalDescription}
-                `.trim();
+                `.trim()
 
-                const embedding = await fetchEmbedding(semanticText);
-                updateData.embedding = vector(embedding);
+        const embedding = await fetchEmbedding(semanticText)
+        updateData.embedding = toVectorField(embedding)
 
-                if ('skills' in updates) {
-                    updateData.skills = finalSkills.map(s => s.toLowerCase());
-                }
-            }
-
-            await updateDoc(docRef, updateData);
-
-            // Updating a job counts as activity
-            void trackJobActivity(jobId);
-        } catch (error) {
-            console.error("Error updating job:", error);
-            throw error;
+        if ("skills" in updates) {
+          updateData.skills = finalSkills.map((s) => s.toLowerCase())
         }
-    },
+      }
 
-    /**
-     * Fetch jobs with "Active First" sorting.
-     * Priority:
-     * 1. Status: ACTIVE (alphabetically before PASSIVE)
-     * 2. lastActiveAt: Descending (most recently active first)
-     */
-    async getJobs(limitCount = 20): Promise<JobPosting[]> {
-        try {
-            const jobsRef = collection(db, JOBS_COLLECTION);
+      await updateDoc(docRef, updateData)
 
-            // Filter for ACTIVE jobs only
-            // Sort by status and then recency
-            const q = query(
-                jobsRef,
-                where("status", "==", "active"),
-                orderBy("status", "asc"),
-                orderBy("lastActiveAt", "desc"),
-                limit(limitCount)
-            );
+      // Updating a job counts as activity
+      void trackJobActivity(jobId)
+    } catch (error) {
+      console.error("Error updating job:", error)
+      throw error
+    }
+  },
 
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as JobPosting));
-        } catch (error) {
-            console.error("Error fetching jobs:", error);
-            throw error;
-        }
-    },
+  /**
+   * Fetch jobs with "Active First" sorting.
+   * Priority:
+   * 1. Status: ACTIVE (alphabetically before PASSIVE)
+   * 2. lastActiveAt: Descending (most recently active first)
+   */
+  async getJobs(limitCount = 20): Promise<JobPosting[]> {
+    try {
+      const jobsRef = collection(db, JOBS_COLLECTION)
 
-    /**
-     * Get a specific job by ID.
-     * @param jobId The job ID
-     * @param isOwner If true, records activity for this job (keeps it active)
-     */
-    async getJobById(jobId: string, isOwner = false): Promise<JobPosting | null> {
-        try {
-            const docRef = doc(db, JOBS_COLLECTION, jobId);
-            const snap = await getDoc(docRef);
+      // Filter for ACTIVE jobs only
+      // Sort by status and then recency
+      const q = query(
+        jobsRef,
+        where("status", "==", "active"),
+        orderBy("status", "asc"),
+        orderBy("lastActiveAt", "desc"),
+        limit(limitCount),
+      )
 
-            if (!snap.exists()) {
-                return null;
-            }
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as JobPosting,
+      )
+    } catch (error) {
+      console.error("Error fetching jobs:", error)
+      throw error
+    }
+  },
 
-            if (isOwner) {
-                void trackJobActivity(jobId);
-            }
+  /**
+   * Get a specific job by ID.
+   * @param jobId The job ID
+   * @param isOwner If true, records activity for this job (keeps it active)
+   */
+  async getJobById(jobId: string, isOwner = false): Promise<JobPosting | null> {
+    try {
+      const docRef = doc(db, JOBS_COLLECTION, jobId)
+      const snap = await getDoc(docRef)
 
-            return { id: snap.id, ...snap.data() } as JobPosting;
-        } catch (error) {
-            console.error(`Error fetching job ${jobId}:`, error);
-            // Return null instead of throwing to prevent cascading UI failures
-            return null;
-        }
-    },
+      if (!snap.exists()) {
+        return null
+      }
 
-    /**
-     * Get all active jobs for a specific company.
-     */
-    async getJobsByCompanyId(companyId: string): Promise<JobPosting[]> {
-        try {
-            const jobsRef = collection(db, JOBS_COLLECTION);
-            const q = query(
-                jobsRef,
-                where("company_id", "==", companyId),
-                where("status", "==", "active"),
-                orderBy("created_at", "desc")
-            );
+      if (isOwner) {
+        void trackJobActivity(jobId)
+      }
 
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as JobPosting));
-        } catch (error) {
-            console.error("Error fetching jobs by company:", error);
-            throw error;
-        }
-    },
+      return { id: snap.id, ...snap.data() } as JobPosting
+    } catch (error) {
+      console.error(`Error fetching job ${jobId}:`, error)
+      // Return null instead of throwing to prevent cascading UI failures
+      return null
+    }
+  },
 
-    /**
-     * Get all jobs created by a specific employer.
-     */
-    async getJobsByEmployerId(employerId: string): Promise<JobPosting[]> {
-        try {
-            const jobsRef = collection(db, JOBS_COLLECTION);
-            const q = query(
-                jobsRef,
-                where("employer_id", "==", employerId),
-                orderBy("created_at", "desc")
-            );
+  /**
+   * Get all active jobs for a specific company.
+   */
+  async getJobsByCompanyId(companyId: string): Promise<JobPosting[]> {
+    try {
+      const jobsRef = collection(db, JOBS_COLLECTION)
+      const q = query(
+        jobsRef,
+        where("company_id", "==", companyId),
+        where("status", "==", "active"),
+        orderBy("created_at", "desc"),
+      )
 
-            const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            } as JobPosting));
-        } catch (error) {
-            console.error("Error fetching jobs by employer:", error);
-            throw error;
-        }
-    },
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as JobPosting,
+      )
+    } catch (error) {
+      console.error("Error fetching jobs by company:", error)
+      throw error
+    }
+  },
 
-    /**
-     * Get multiple jobs by their IDs (Batch Fetch).
-     * Handles Firestore 'in' query limit of 10 by chunking requests.
-     */
-    async getJobsByIds(jobIds: string[]): Promise<JobPosting[]> {
-        if (jobIds.length === 0) return [];
+  /**
+   * Get all jobs created by a specific employer.
+   */
+  async getJobsByEmployerId(employerId: string): Promise<JobPosting[]> {
+    try {
+      const jobsRef = collection(db, JOBS_COLLECTION)
+      const q = query(jobsRef, where("employer_id", "==", employerId), orderBy("created_at", "desc"))
 
-        try {
-            // Deduplicate IDs
-            const uniqueIds = [...new Set(jobIds)];
-            const jobsRef = collection(db, JOBS_COLLECTION);
-            const chunks: string[][] = [];
-            const chunkSize = 10; // Firestore 'in' limit
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data(),
+          }) as JobPosting,
+      )
+    } catch (error) {
+      console.error("Error fetching jobs by employer:", error)
+      throw error
+    }
+  },
 
-            for (let i = 0; i < uniqueIds.length; i += chunkSize) {
-                chunks.push(uniqueIds.slice(i, i + chunkSize));
-            }
+  /**
+   * Get multiple jobs by their IDs (Batch Fetch).
+   * Handles Firestore 'in' query limit of 10 by chunking requests.
+   */
+  async getJobsByIds(jobIds: string[]): Promise<JobPosting[]> {
+    if (jobIds.length === 0) return []
 
-            const promises = chunks.map(chunk => {
-                const q = query(jobsRef, where("__name__", "in", chunk));
-                return getDocs(q);
-            });
+    try {
+      // Deduplicate IDs
+      const uniqueIds = [...new Set(jobIds)]
+      const jobsRef = collection(db, JOBS_COLLECTION)
+      const chunks: string[][] = []
+      const chunkSize = 10 // Firestore 'in' limit
 
-            const snapshots = await Promise.all(promises);
-            const jobs: JobPosting[] = [];
+      for (let i = 0; i < uniqueIds.length; i += chunkSize) {
+        chunks.push(uniqueIds.slice(i, i + chunkSize))
+      }
 
-            snapshots.forEach(snap => {
-                snap.docs.forEach(doc => {
-                    jobs.push({ id: doc.id, ...doc.data() } as JobPosting);
-                });
-            });
+      const promises = chunks.map((chunk) => {
+        const q = query(jobsRef, where("__name__", "in", chunk))
+        return getDocs(q)
+      })
 
-            return jobs;
-        } catch (error) {
-            console.error("Error fetching jobs by IDs:", error);
-            // Sentry.captureException(error); // Ensure Sentry is imported if used here
-            throw error;
-        }
-    },
+      const snapshots = await Promise.all(promises)
+      const jobs: JobPosting[] = []
 
-    /**
-     * Set the status of a job posting (active | passive | closed).
-     */
-    async setJobStatus(jobId: string, status: 'active' | 'passive' | 'closed'): Promise<void> {
-        try {
-            const docRef = doc(db, JOBS_COLLECTION, jobId);
-            await updateDoc(docRef, { status, updated_at: serverTimestamp() });
-        } catch (error) {
-            console.error("Error setting job status:", error);
-            throw error;
-        }
-    },
+      snapshots.forEach((snap) => {
+        snap.docs.forEach((doc) => {
+          jobs.push({ id: doc.id, ...doc.data() } as JobPosting)
+        })
+      })
 
-    /**
-     * Permanently delete a job posting.
-     */
-    async deleteJob(jobId: string): Promise<void> {
-        try {
-            const docRef = doc(db, JOBS_COLLECTION, jobId);
-            await deleteDoc(docRef);
-        } catch (error) {
-            console.error("Error deleting job:", error);
-            throw error;
-        }
-    },
-};
+      return jobs
+    } catch (error) {
+      console.error("Error fetching jobs by IDs:", error)
+      // Sentry.captureException(error); // Ensure Sentry is imported if used here
+      throw error
+    }
+  },
+
+  /**
+   * Set the status of a job posting (active | passive | closed).
+   */
+  async setJobStatus(jobId: string, status: "active" | "passive" | "closed"): Promise<void> {
+    try {
+      const docRef = doc(db, JOBS_COLLECTION, jobId)
+      await updateDoc(docRef, { status, updated_at: serverTimestamp() })
+    } catch (error) {
+      console.error("Error setting job status:", error)
+      throw error
+    }
+  },
+
+  /**
+   * Permanently delete a job posting.
+   */
+  async deleteJob(jobId: string): Promise<void> {
+    try {
+      const docRef = doc(db, JOBS_COLLECTION, jobId)
+      await deleteDoc(docRef)
+    } catch (error) {
+      console.error("Error deleting job:", error)
+      throw error
+    }
+  },
+}

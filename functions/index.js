@@ -126,6 +126,14 @@ const aiLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+const suggestLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 120, // Suggestions are lightweight, but still bounded against scraping
+    message: { error: "Too many suggestion requests, please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Initialize Sentry
 if (process.env.SENTRY_DSN) {
     const isProd = process.env.NODE_ENV === 'production';
@@ -446,7 +454,7 @@ export const searchCandidatesHandler = async (req, res) => {
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
-app.get("/jobs/suggest", requireAuth, suggestJobsHandler);
+app.get("/jobs/suggest", requireAuth, suggestLimiter, suggestJobsHandler);
 app.post("/jobs/search", searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 

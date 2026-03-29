@@ -2,6 +2,40 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isLegacyEmbeddingArray(value) {
+      // Firestore Rules can't enforce every element type in a list, so we check
+      // shape and numeric sentinels at both ends.
+      return value is list
+             && value.size() == 768
+             && value[0] is number
+             && value[767] is number;
+    }
+
+    function isVectorLikeValue(value) {
+      // VectorValue is not exposed as a first-class rules type. During migration,
+      // treat values that are not any known primitive/container type as vectors.
+      return !(value is list)
+             && !(value is map)
+             && !(value is string)
+             && !(value is bool)
+             && !(value is number)
+             && !(value is timestamp)
+             && !(value is bytes)
+             && !(value is path)
+             && !(value is latlng);
+    }
+
+    function hasValidEmbedding(docData) {
+      return !('embedding' in docData)
+             || (
+               docData.embedding != null
+               && (
+                 isLegacyEmbeddingArray(docData.embedding)
+                 || isVectorLikeValue(docData.embedding)
+               )
+             );
+    }
+
     // Users can read and update their own user document.
     // They cannot change their role once it has been set.
     // Users Collection
@@ -153,8 +187,7 @@ service cloud.firestore {
                       'company_id',
                       'company_bio'
                     ])
-                    // Embedding: VectorValue type cannot be checked in rules; security is enforced by the
-                    // employer role check above. Allow any value (or absent).
+                    && hasValidEmbedding(request.resource.data)
                     // validate status values on creation
                     && request.resource.data.status in ['active', 'passive', 'closed'];
 
@@ -190,8 +223,10 @@ service cloud.firestore {
                     // optional: validate status values if you use them
                     && ( !('status' in request.resource.data)
                          || request.resource.data.status in ['active', 'passive', 'closed'] )
-                    // Embedding: VectorValue type cannot be checked in rules; security is enforced by the
-                    // employer role check above. Allow any value (or absent).
+                    // Validate embedding only when changed to avoid blocking edits
+                    // on legacy records while migration is in progress.
+                    && ( !request.resource.data.diff(resource.data).changedKeys().hasAny(['embedding'])
+                      || hasValidEmbedding(request.resource.data) )
                     // Validate expiresAt if present (max 4 days + 1 hour buffer)
                     && ( !('expiresAt' in request.resource.data)
                          || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
@@ -309,6 +344,16 @@ service cloud.firestore {
                     && request.resource.data.keys().hasOnly([
                       'userId', 'type', 'title', 'message', 'read', 'link', 'createdAt'
                     ])
+                    && request.resource.data.type in ['application_status', 'new_match', 'profile_viewed']
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 120
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() > 0
+                    && request.resource.data.message.size() <= 2000
+                    && ( !('link' in request.resource.data)
+                         || request.resource.data.link == null
+                         || request.resource.data.link is string )
                     && request.resource.data.read == false;
       // Only the recipient can mark as read
       allow update: if request.auth != null
