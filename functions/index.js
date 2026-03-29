@@ -21,6 +21,10 @@ dotenv.config();
 
 // Unified Constants for AI (Single Source of Truth) - Moved to src/lib/ai/generation.js
 
+// Suggest endpoint constants
+const MIN_QUERY_LENGTH = 2;
+const MAX_SUGGESTIONS = 5;
+const SUGGEST_SCAN_LIMIT = 150;
 
 // Initialize Firebase Admin SDK
 initializeApp();
@@ -134,6 +138,12 @@ const suggestLimiter = rateLimit({
     legacyHeaders: false,
 });
 
+const searchLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    max: 50,  // Lower than suggest since search is more expensive
+    message: { error: "Too many search requests, please try again later." },
+});
+
 // Initialize Sentry
 if (process.env.SENTRY_DSN) {
     const isProd = process.env.NODE_ENV === 'production';
@@ -182,10 +192,11 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
     const collRef = db.collection(collectionName);
     const vectorValue = FieldValue.vector(queryVector);
 
+    // Fetch 5x to account for post-filtering
     const vectorQuery = collRef.findNearest({
         vectorField: 'embedding',
         queryVector: vectorValue,
-        limit: Number(limit),
+        limit: Number(limit) * 5,
         distanceMeasure: 'COSINE'
     });
 
@@ -215,8 +226,9 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
     });
 
     // Apply post-filters (e.g. status === 'active')
+    let filteredResults = results;
     if (filters.length > 0) {
-        return results.filter(item =>
+        filteredResults = results.filter(item =>
             filters.every(filter => {
                 if (filter.fieldFilter?.op === 'EQUAL') {
                     const field = filter.fieldFilter.field.fieldPath;
@@ -227,8 +239,8 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
             })
         );
     }
-
-    return results;
+    
+    return filteredResults.slice(0, Number(limit));
 };
 
 // Helper to construct equality filter
@@ -350,11 +362,10 @@ export const searchJobsHandler = async (req, res) => {
 export const suggestJobsHandler = async (req, res) => {
     try {
         const query = req.query.q;
-        if (!query || typeof query !== 'string' || query.trim().length < 2) {
+        if (!query || typeof query !== 'string' || query.trim().length < MIN_QUERY_LENGTH) {
             return res.json({ suggestions: [] });
         }
 
-        const SUGGEST_SCAN_LIMIT = 150;
         const SUGGEST_SKILL_WEIGHT = 0.4;
         const SUGGEST_MIN_SCORE = 0.1;
 
@@ -394,7 +405,7 @@ export const suggestJobsHandler = async (req, res) => {
                 return true;
             })
             .sort((a, b) => b.score - a.score)
-            .slice(0, 5)
+            .slice(0, MAX_SUGGESTIONS)
             .map(({ title }) => title);
 
         res.json({ suggestions });
@@ -455,7 +466,7 @@ app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
 app.get("/jobs/suggest", requireAuth, suggestLimiter, suggestJobsHandler);
-app.post("/jobs/search", searchJobsHandler);
+app.post("/jobs/search", requireAuth, searchLimiter, searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 // Keep /api prefix routes for backward compatibility/rewrite logic
@@ -464,7 +475,7 @@ app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
 app.get("/api/jobs/suggest", requireAuth, suggestJobsHandler);
-app.post("/api/jobs/search", searchJobsHandler);
+app.post("/api/jobs/search", requireAuth, searchLimiter, searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
 // AI Proxy Routes (Authenticated)

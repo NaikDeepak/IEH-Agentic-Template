@@ -59,11 +59,11 @@ export const EmployerJobs: React.FC = () => {
     const handleDelete = async (jobId: string) => {
         setActionLoading(jobId);
         try {
-            await JobService.deleteJob(jobId);
-            setJobs(prev => prev.filter(j => j.id !== jobId));
+            await JobService.setJobStatus(jobId, 'closed');
+            setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'closed' } : j));
             setDeleteConfirm(null);
         } catch {
-            setError('Failed to delete job posting. Please try again.');
+            setError('Failed to close job posting. Please try again.');
         } finally {
             setActionLoading(null);
         }
@@ -185,7 +185,7 @@ const JobRow: React.FC<JobRowProps> = ({
         return (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <p className="text-sm font-medium text-red-700">
-                    Delete <span className="font-bold">"{job.title}"</span>? This cannot be undone.
+                    Close <span className="font-bold">"{job.title}"</span>? You can reactivate it later.
                 </p>
                 <div className="flex gap-3 shrink-0">
                     <button
@@ -200,7 +200,7 @@ const JobRow: React.FC<JobRowProps> = ({
                         className="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2"
                     >
                         {actionLoading && <Loader2 className="w-3 h-3 animate-spin" />}
-                        Delete
+                        Close Job
                     </button>
                 </div>
             </div>
@@ -259,10 +259,10 @@ const JobRow: React.FC<JobRowProps> = ({
                     </button>
                 )}
 
-                {/* Delete */}
+                {/* Close Job */}
                 <button
                     onClick={onRequestDelete}
-                    title="Delete posting"
+                    title="Close posting"
                     className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-transparent hover:border-red-100 transition-colors"
                 >
                     <Trash2 className="w-4 h-4" />

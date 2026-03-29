@@ -17,11 +17,12 @@ import { db } from "../../lib/firebase"
 import type { AppNotification, NotificationType } from "./types"
 
 const COL = "notifications"
+const MAX_NOTIFICATIONS_PER_FETCH = 30
 
 export const NotificationsService = {
   /** Subscribe to real-time notifications for a user (latest 30) */
   subscribe(userId: string, cb: (items: AppNotification[]) => void): Unsubscribe {
-    const q = query(collection(db, COL), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(30))
+    const q = query(collection(db, COL), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(MAX_NOTIFICATIONS_PER_FETCH))
     return onSnapshot(q, (snap) => {
       cb(snap.docs.map((d) => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }) as AppNotification))
     })

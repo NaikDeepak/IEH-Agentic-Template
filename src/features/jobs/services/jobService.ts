@@ -269,7 +269,12 @@ export const JobService = {
   async getJobsByEmployerId(employerId: string): Promise<JobPosting[]> {
     try {
       const jobsRef = collection(db, JOBS_COLLECTION)
-      const q = query(jobsRef, where("employer_id", "==", employerId), orderBy("created_at", "desc"))
+      const q = query(
+        jobsRef,
+        where("employer_id", "==", employerId),
+        where("status", "in", ["active", "passive"]),
+        orderBy("created_at", "desc")
+      )
 
       const querySnapshot = await getDocs(q)
       return querySnapshot.docs.map(

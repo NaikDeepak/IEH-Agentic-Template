@@ -26,14 +26,7 @@ service cloud.firestore {
     }
 
     function hasValidEmbedding(docData) {
-      return !('embedding' in docData)
-             || (
-               docData.embedding != null
-               && (
-                 isLegacyEmbeddingArray(docData.embedding)
-                 || isVectorLikeValue(docData.embedding)
-               )
-             );
+      return !('embedding' in docData) || docData.embedding != null;
     }
 
     // Users can read and update their own user document.
