@@ -8,6 +8,7 @@ vi.mock('firebase/firestore', () => ({
     collection: vi.fn(),
     addDoc: vi.fn(),
     serverTimestamp: vi.fn(() => 'mock-timestamp'),
+    vector: vi.fn((value: number[]) => value),
     doc: vi.fn(),
     updateDoc: vi.fn(),
     getDoc: vi.fn(),
@@ -90,7 +91,7 @@ describe('Frontend Services Logic', () => {
             );
             expect(addDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
                 title: 'Software Engineer',
-                embedding: expect.any(Array)
+                embedding: expect.anything()
             }));
         });
 
@@ -117,7 +118,7 @@ describe('Frontend Services Logic', () => {
 
             expect(updateDoc).toHaveBeenCalledWith(undefined, expect.objectContaining({
                 title: 'Senior Software Engineer',
-                embedding: expect.any(Array)
+                embedding: expect.anything()
             }));
         });
     });

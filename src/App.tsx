@@ -21,9 +21,12 @@ const SkillProofs = lazy(() => import('./features/seeker/components/Assessments/
 const InsiderConnections = lazy(() => import('./features/seeker/components/Networking/InsiderConnections').then(module => ({ default: module.InsiderConnections })));
 const ApplicationBoard = lazy(() => import('./features/seeker/components/ApplicationBoard/ApplicationBoard').then(module => ({ default: module.ApplicationBoard })));
 const ProfileEditor = lazy(() => import('./features/seeker/components/Profile/ProfileEditor').then(module => ({ default: module.ProfileEditor })));
+const SavedJobsPage = lazy(() => import('./pages/seeker/SavedJobsPage').then(module => ({ default: module.SavedJobsPage })));
 const ReferralDashboard = lazy(() => import('./features/growth/components/ReferralDashboard').then(module => ({ default: module.ReferralDashboard })));
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage'));
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'));
 const FinancialDashboard = lazy(() => import('./pages/admin/FinancialDashboard'));
 const JobsPage = lazy(() => import('./pages/JobsPage').then(module => ({ default: module.JobsPage })));
 const PostJob = lazy(() => import('./pages/PostJob').then(module => ({ default: module.PostJob })));
@@ -32,6 +35,10 @@ const CompanyEditor = lazy(() => import('./pages/employer/CompanyEditor').then(m
 const CompanyProfile = lazy(() => import('./pages/CompanyProfile').then(module => ({ default: module.CompanyProfile })));
 const JobApplicants = lazy(() => import('./pages/employer/JobApplicants').then(module => ({ default: module.JobApplicants })));
 const EmployerJobs = lazy(() => import('./pages/employer/EmployerJobs').then(module => ({ default: module.EmployerJobs })));
+const EmployerDashboard = lazy(() => import('./pages/employer/EmployerDashboard').then(module => ({ default: module.EmployerDashboard })));
+const JobAnalyticsPage = lazy(() => import('./pages/employer/JobAnalyticsPage'));
+const BrownieLeaderboardPage = lazy(() => import('./pages/BrownieLeaderboardPage'));
+const JobAlertsPage = lazy(() => import('./pages/seeker/JobAlertsPage'));
 const JobDetailPage = lazy(() => import('./pages/JobDetailPage').then(module => ({ default: module.JobDetailPage })));
 const Login = lazy(() => import('./components/Login').then(module => ({ default: module.Login })));
 const AuthEntry = lazy(() => import('./pages/AuthEntry').then(module => ({ default: module.AuthEntry })));
@@ -66,7 +73,7 @@ function DashboardRedirect() {
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (userData?.role === 'employer') return <Navigate to="/employer/jobs" replace />;
+  if (userData?.role === 'employer') return <Navigate to="/employer/dashboard" replace />;
   if (userData?.role === 'seeker') return <Navigate to="/seeker/dashboard" replace />;
 
   // If role is missing, render nothing (RoleSelection overlay will show)
@@ -442,6 +449,24 @@ function App() {
           />
 
           <Route
+            path="/seeker/alerts"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <JobAlertsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/seeker/saved"
+            element={
+              <ProtectedRoute allowedRoles={['seeker']}>
+                <SavedJobsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/seeker/referral"
             element={
               <ProtectedRoute allowedRoles={['seeker']}>
@@ -456,10 +481,24 @@ function App() {
           />
 
           <Route
+            path="/leaderboard"
+            element={<BrownieLeaderboardPage />}
+          />
+
+          <Route
             path="/post-job"
             element={
               <ProtectedRoute allowedRoles={['employer']}>
                 <PostJob />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <EmployerDashboard />
               </ProtectedRoute>
             }
           />
@@ -497,6 +536,15 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['employer']}>
                 <EmployerJobs />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/employer/analytics"
+            element={
+              <ProtectedRoute allowedRoles={['employer']}>
+                <JobAnalyticsPage />
               </ProtectedRoute>
             }
           />
@@ -542,10 +590,10 @@ function App() {
                 <AdminLayout>
                   <Routes>
                     <Route index element={<AdminDashboard />} />
-                    <Route path="users" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Users Management (Placeholder)</div>} />
+                    <Route path="users" element={<AdminUsersPage />} />
                     <Route path="jobs" element={<JobsPage />} />
                     <Route path="finance" element={<FinancialDashboard />} />
-                    <Route path="settings" element={<div className="font-mono text-xs font-bold uppercase tracking-widest">Admin Settings (Placeholder)</div>} />
+                    <Route path="settings" element={<AdminSettingsPage />} />
                   </Routes>
                 </AdminLayout>
               </ProtectedRoute>

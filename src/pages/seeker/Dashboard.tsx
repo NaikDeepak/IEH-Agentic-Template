@@ -9,7 +9,9 @@ import {
     Video,
     ShieldCheck,
     ChevronRight,
-    Gift
+    Gift,
+    Bookmark,
+    Bell,
 } from 'lucide-react';
 
 import { getLatestResume } from '../../features/seeker/services/resumeService';
@@ -155,7 +157,7 @@ export const SeekerDashboard: React.FC = () => {
                         </div>
                     </header>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {/* LEFT COLUMN: Core Insights */}
                         <div className="lg:col-span-2 space-y-8">
 
@@ -349,6 +351,20 @@ export const SeekerDashboard: React.FC = () => {
                                     title="App Tracker"
                                     description="Kanban Board"
                                     onClick={() => navigate('/seeker/tracker')}
+                                />
+
+                                <ToolLink
+                                    icon={<Bookmark className="w-5 h-5" />}
+                                    title="Saved Jobs"
+                                    description="Bookmarked for later"
+                                    onClick={() => navigate('/seeker/saved')}
+                                />
+
+                                <ToolLink
+                                    icon={<Bell className="w-5 h-5" />}
+                                    title="Job Alerts"
+                                    description="Get notified for new matches"
+                                    onClick={() => navigate('/seeker/alerts')}
                                 />
                             </section>
 

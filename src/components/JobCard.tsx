@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, Users } from 'lucide-react';
+import { ArrowUpRight, Users, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { StatusBadge } from './StatusBadge';
@@ -12,9 +12,11 @@ interface JobCardProps {
   onClick?: () => void;
   onViewApplicants?: (e: React.MouseEvent) => void;
   onApply?: (e: React.MouseEvent) => void;
+  onSave?: (e: React.MouseEvent) => void;
+  isSaved?: boolean;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants, onApply }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '', onClick, onViewApplicants, onApply, onSave, isSaved }) => {
   const { id, title, location, type, salaryRange, status, expiresAt, createdAt } = job;
   const navigate = useNavigate();
 
@@ -89,11 +91,26 @@ export const JobCard: React.FC<JobCardProps> = ({ job, matchScore, className = '
           <p className="text-sm text-slate-400 mt-1">Company Name</p>
         </div>
 
-        {matchScore !== undefined && (
-          <div className={`px-2.5 py-1 text-[10px] font-semibold rounded-full border ${getMatchScoreColor(matchScore)}`}>
-            {Math.round(matchScore)}% Match
-          </div>
-        )}
+        <div className="flex items-center gap-2 shrink-0">
+          {matchScore !== undefined && (
+            <div className={`px-2.5 py-1 text-[10px] font-semibold rounded-full border ${getMatchScoreColor(matchScore)}`}>
+              {Math.round(matchScore)}% Match
+            </div>
+          )}
+          {onSave && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onSave(e); }}
+              title={isSaved ? 'Remove from saved' : 'Save job'}
+              className={`p-1.5 rounded-lg border transition-colors ${
+                isSaved
+                  ? 'text-sky-700 bg-sky-50 border-sky-200 hover:bg-sky-100'
+                  : 'text-slate-400 bg-white border-slate-200 hover:text-sky-700 hover:border-sky-200 hover:bg-sky-50'
+              }`}
+            >
+              {isSaved ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Details Grid */}

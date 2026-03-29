@@ -2,9 +2,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShortlistService, type ShortlistResult } from '../../services/shortlistService';
 import type { JobPosting } from '../../../jobs/types';
-import { Briefcase, MapPin, Building, Clock, ArrowRight, ArrowUpRight, Sparkles } from 'lucide-react';
+import { Briefcase, MapPin, Building, Clock, ArrowRight, ArrowUpRight, Sparkles, Send } from 'lucide-react';
 import { Timestamp } from 'firebase/firestore';
 import { SkeletonShortlistCard } from '../../../../components/ui/Skeleton';
+import { ApplyModal } from '../../../../components/ApplyModal';
 
 interface ShortlistFeedProps {
     userId: string;
@@ -15,6 +16,7 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
     const [shortlist, setShortlist] = useState<ShortlistResult | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
 
     const fetchShortlist = useCallback(async () => {
         try {
@@ -108,18 +110,27 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
             <div className="space-y-4">
                 {/* Defensive deduplication of jobs to prevent duplicate keys */}
                 {Array.from(new Map(shortlist.jobs.map(job => [job.id, job])).values()).map((job) => (
-                    <ShortlistCard key={job.id} job={job} />
+                    <ShortlistCard key={job.id} job={job} onApply={() => { setApplyingJob(job); }} />
                 ))}
             </div>
+
+            {applyingJob && (
+                <ApplyModal
+                    job={applyingJob}
+                    isOpen={!!applyingJob}
+                    onClose={() => { setApplyingJob(null); }}
+                />
+            )}
         </div>
     );
 };
 
 interface ShortlistCardProps {
     job: JobPosting & { matchScore: number; matchReason: string };
+    onApply: () => void;
 }
 
-const ShortlistCard: React.FC<ShortlistCardProps> = ({ job }) => {
+const ShortlistCard: React.FC<ShortlistCardProps> = ({ job, onApply }) => {
     const navigate = useNavigate();
 
     // Format salary if available
@@ -207,17 +218,29 @@ const ShortlistCard: React.FC<ShortlistCardProps> = ({ job }) => {
             </div>
 
             {/* Footer Info */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
-                    <span className="font-medium text-slate-600">{salaryString}</span>
-                    <span className="flex items-center gap-1">
+            <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 min-w-0">
+                    <span className="font-medium text-slate-600 truncate">{salaryString}</span>
+                    <span className="flex items-center gap-1 shrink-0">
                         <Clock className="h-3 w-3" />
                         {getJobDate(job.created_at).toLocaleDateString()}
                     </span>
                 </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-sky-700 group-hover:text-sky-800">
-                    View
-                    <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <div className="flex items-center gap-2 shrink-0">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onApply(); }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-sky-700 hover:bg-sky-800 text-white rounded-lg transition-colors"
+                    >
+                        <Send className="w-3 h-3" /> Apply
+                    </button>
+                    <div
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500"
+                        role="img"
+                        aria-label="View details"
+                    >
+                        View
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                    </div>
                 </div>
             </div>
         </div>
