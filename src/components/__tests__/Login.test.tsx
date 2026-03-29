@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Login } from '../../src/components/Login';
+import { Login } from '../Login';
 import { MemoryRouter } from 'react-router-dom';
 
 const mockResetPassword = vi.fn();
 const mockClearError = vi.fn();
 
 // Mock Auth
-vi.mock('../../src/hooks/useAuth', () => ({
+vi.mock('../../hooks/useAuth', () => ({
     useAuth: () => ({
         loginWithGoogle: vi.fn(),
         loginWithEmail: vi.fn(),

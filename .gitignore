@@ -45,6 +45,11 @@ india-emp-hub-firebase-*.json
 coverage
 *coverage*.txt
 test-results/
+test-results.json
+*_test_output.txt
+test_output.txt
+baseline_failures.txt
+find_zero_coverage.cjs
 playwright-report/
 blob-report/
 playwright/.cache/
