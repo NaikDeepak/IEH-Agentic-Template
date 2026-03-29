@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { NotificationBell } from './NotificationBell';
 
 const Login = lazy(() => import('./Login').then(module => ({ default: module.Login })));
 
@@ -73,7 +74,8 @@ export const Header: React.FC = () => {
                     ))}
                 </nav>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                    {role && <NotificationBell />}
                     <Suspense fallback={<div className="w-20 h-8 animate-pulse bg-slate-100 rounded-lg" />}>
                         <Login variant="navbar" />
                     </Suspense>

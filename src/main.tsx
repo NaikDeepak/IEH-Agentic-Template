@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/react'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthProvider'
+import { ThemeProvider } from './context/ThemeProvider'
 import FallbackComponent from './components/ErrorBoundary/FallbackComponent'
 
 const rootElement = document.getElementById('root');
@@ -16,9 +17,11 @@ createRoot(rootElement).render(
       fallback={<FallbackComponent />}
       showDialog={import.meta.env.PROD}
     >
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ThemeProvider>
     </Sentry.ErrorBoundary>
   </StrictMode>,
 )

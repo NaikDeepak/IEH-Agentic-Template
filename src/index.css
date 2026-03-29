@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode: triggered by .dark class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-outfit: "Plus Jakarta Sans", "Outfit", sans-serif;
@@ -28,10 +31,12 @@
 @layer base {
   body {
     @apply bg-white text-slate-900 antialiased font-sans selection:bg-sky-700 selection:text-white;
+    @apply dark:bg-slate-950 dark:text-slate-100;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans tracking-tight text-slate-900;
+    @apply dark:text-slate-100;
   }
 }
 

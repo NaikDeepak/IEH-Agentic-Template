@@ -29,6 +29,7 @@ export interface AuthContextType {
     completeOnboarding: (extraData?: Record<string, string>) => Promise<void>;
     logout: () => Promise<void>;
     updateDisplayName: (name: string) => Promise<void>;
+    verifyEmailUpdate: (newEmail: string) => Promise<void>;
     deleteAccount: () => Promise<void>;
     refreshUserData: () => Promise<void>;
     clearError: () => void;

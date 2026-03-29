@@ -17,7 +17,7 @@ import {
 } from '../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { AuthContext, type AuthContextType, type UserData } from './AuthContext';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, verifyBeforeUpdateEmail } from 'firebase/auth';
 import { ReferralService } from '../features/growth/services/referralService';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -327,6 +327,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [user, refreshUserData]);
 
+    const verifyEmailUpdate = useCallback(async (newEmail: string) => {
+        if (!user) throw new Error('Not authenticated');
+        setError(null);
+        try {
+            await verifyBeforeUpdateEmail(user, newEmail);
+        } catch (err: unknown) {
+            const e = err as { code?: string; message?: string };
+            if (e.code === 'auth/requires-recent-login') {
+                setError('For security, please sign out and sign back in before changing your email.');
+            } else if (e.code === 'auth/email-already-in-use') {
+                setError('This email is already associated with another account.');
+            } else {
+                setError(e.message ?? 'Failed to send verification email.');
+            }
+            throw err;
+        }
+    }, [user]);
+
     const deleteAccount = useCallback(async () => {
         if (!auth.currentUser) return;
         setError(null);
@@ -368,10 +386,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         completeOnboarding,
         logout,
         updateDisplayName,
+        verifyEmailUpdate,
         deleteAccount,
         refreshUserData,
         clearError
-    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, resetPassword, sendVerificationEmail, completeOnboarding, logout, updateDisplayName, deleteAccount, refreshUserData, clearError]);
+    }), [user, userData, loading, error, loginWithGoogle, loginWithEmail, signupWithEmail, resetPassword, sendVerificationEmail, completeOnboarding, logout, updateDisplayName, verifyEmailUpdate, deleteAccount, refreshUserData, clearError]);
 
     return (
         <AuthContext.Provider value={value}>
