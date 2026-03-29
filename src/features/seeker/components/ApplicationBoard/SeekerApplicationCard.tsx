@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Application } from '../../../applications/types';
-import { Calendar, Building2 } from 'lucide-react';
+import { Calendar, Building2, ExternalLink } from 'lucide-react';
 import { FollowUpNudge } from './FollowUpNudge';
 
 interface SeekerApplicationCardProps {
@@ -31,25 +32,13 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
         transition,
     };
 
-    // Helper to format timestamp
     const formatDate = (date: unknown) => {
         if (!date) return 'Unknown';
-
-        // Type guard for Firestore Timestamp
         const isTimestamp = (val: unknown): val is { toDate: () => Date } => {
             return !!(val && typeof (val as { toDate?: unknown }).toDate === 'function');
         };
-
         const d = isTimestamp(date) ? date.toDate() : new Date(date as string | number | Date);
         return d instanceof Date && !isNaN(d.getTime()) ? d.toLocaleDateString() : 'Unknown';
-    };
-
-    const handleCardClick = (_e: React.MouseEvent) => {
-        // Prevent drag-and-drop from triggering navigation if we add drag handle later
-        // For now, it's fine as the whole card is draggable via listeners
-        if (application.job_id) {
-            window.location.href = `/jobs/${application.job_id}`;
-        }
     };
 
     return (
@@ -58,15 +47,6 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
             style={style}
             {...listeners}
             {...attributes}
-            onClick={handleCardClick}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleCardClick(e as unknown as React.MouseEvent);
-                }
-            }}
-            role="button"
-            tabIndex={0}
             className={`
                 bg-white rounded-xl border border-slate-200 p-4 shadow-soft
                 ${isReadOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}
@@ -84,11 +64,25 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
                         Company
                     </div>
                 </div>
-                {application.match_score > 0 && (
-                    <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-sky-50 text-sky-700 border border-sky-100">
-                        {Math.round(application.match_score)}%
-                    </span>
-                )}
+                <div className="flex items-center gap-1.5 shrink-0">
+                    {application.job_id && (
+                        <Link
+                            to={`/jobs/${application.job_id}`}
+                            onClick={(e) => { e.stopPropagation(); }}
+                            onPointerDown={(e) => { e.stopPropagation(); }}
+                            className="p-1 text-slate-300 hover:text-sky-600 rounded transition-colors"
+                            aria-label="View job posting"
+                            title="View job"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                    )}
+                    {application.match_score > 0 && (
+                        <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-sky-50 text-sky-700 border border-sky-100">
+                            {Math.round(application.match_score)}%
+                        </span>
+                    )}
+                </div>
             </div>
 
             <div className="flex items-center gap-1 text-[11px] text-slate-400 pt-3 border-t border-slate-100">

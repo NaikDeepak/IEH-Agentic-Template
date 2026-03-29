@@ -72,6 +72,13 @@ export const analyzeResume = async (
             4. Suggestions: 3-5 actionable tips to improve the resume.
             5. Parsed Data: Extract structured data including Name, Contact Info, Experience (Company, Role, Duration, Description), and Education.
 
+            SKILL EXTRACTION RULES (strictly enforced):
+            - Only extract skills the candidate explicitly claims as their own (Skills section, summary, or "proficient in / experienced with" statements).
+            - Do NOT include skills mentioned only in job requirement bullets, company descriptions, or project context where the candidate is describing their employer's stack rather than their personal expertise.
+            - Do NOT include soft skills like "communication", "teamwork", or "leadership" unless the candidate has listed them explicitly.
+            - Deduplicate and normalise (e.g. "ReactJS" → "React", "node" → "Node.js").
+            - Return a maximum of 25 skills ordered by relevance.
+
             Be strict but constructive. Return ONLY a valid JSON object.
             `;
 

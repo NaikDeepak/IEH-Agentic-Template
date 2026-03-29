@@ -206,7 +206,7 @@ export const JobDetailPage: React.FC = () => {
 
                     {/* Right Sidebar */}
                     <div className="lg:w-80 shrink-0">
-                        <div className="sticky top-24 space-y-4">
+                        <div className="lg:sticky lg:top-24 space-y-4">
                             {/* Apply Card */}
                             <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-6">
                                 {hasApplied ? (

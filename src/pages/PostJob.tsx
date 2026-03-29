@@ -217,7 +217,7 @@ export const PostJob: React.FC = () => {
     }));
   };
 
-  const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
+  const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
   const labelClasses = "text-xs font-medium text-slate-500 mb-1.5 block";
 
   return (
@@ -260,7 +260,7 @@ export const PostJob: React.FC = () => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. Senior Frontend Engineer"
-                className="w-full bg-transparent border-b-2 border-white/30 focus:border-white text-2xl font-bold focus:outline-none placeholder:text-white/30 py-2 transition-colors"
+                className="w-full bg-transparent border-b-2 border-white/30 focus:border-white text-xl md:text-2xl font-bold focus:outline-none placeholder:text-white/30 py-2 transition-colors"
               />
             </div>
           </div>

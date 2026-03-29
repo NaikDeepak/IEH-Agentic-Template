@@ -14,6 +14,7 @@ import { X } from 'lucide-react';
 import * as Sentry from '@sentry/react';
 import { searchJobs, getJobSuggestions } from '../lib/ai/search';
 import { useAuth } from '../hooks/useAuth';
+import { SavedJobsService } from '../features/seeker/services/savedJobsService';
 
 type JobWithMatch = Job & { matchScore?: number };
 
@@ -66,6 +67,8 @@ export const JobsPage: React.FC = () => {
     const [currentSearchQuery, setCurrentSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
+    const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
+    const [saveInFlightIds, setSaveInFlightIds] = useState<Set<string>>(new Set());
 
     const userId = user?.uid ?? null;
 
@@ -90,6 +93,11 @@ export const JobsPage: React.FC = () => {
 
         void fetchJobs();
     }, [authLoading, userId]);
+
+    useEffect(() => {
+        if (!userId || !isSeeker) return;
+        void SavedJobsService.getSavedJobIds(userId).then(ids => { setSavedJobIds(ids); }).catch(() => { /* non-critical, saved state unavailable */ });
+    }, [userId, isSeeker]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {
         const query = term;
@@ -162,6 +170,46 @@ export const JobsPage: React.FC = () => {
         setDisplayedJobs(browseJobs);
         setSuggestions([]);
         setError(null);
+    };
+
+    const handleSaveJob = async (jobId: string) => {
+        if (!userId) return;
+        if (saveInFlightIds.has(jobId)) return;
+
+        setSaveInFlightIds(prev => new Set([...prev, jobId]));
+        const wasSaved = savedJobIds.has(jobId);
+        if (wasSaved) {
+            setSavedJobIds(prev => { const next = new Set(prev); next.delete(jobId); return next; });
+        } else {
+            setSavedJobIds(prev => new Set([...prev, jobId]));
+        }
+
+        const isSaved = savedJobIds.has(jobId);
+        try {
+            if (isSaved) {
+                await SavedJobsService.unsave(userId, jobId);
+            } else {
+                const posting = await JobService.getJobById(jobId);
+                if (!posting) {
+                    throw new Error('Job not found while saving');
+                }
+                await SavedJobsService.save(userId, posting);
+            }
+        } catch (err) {
+            console.error('[JobsPage] save toggle failed:', err);
+            setSavedJobIds(prev => {
+                const next = new Set(prev);
+                if (wasSaved) next.add(jobId);
+                else next.delete(jobId);
+                return next;
+            });
+        } finally {
+            setSaveInFlightIds(prev => {
+                const next = new Set(prev);
+                next.delete(jobId);
+                return next;
+            });
+        }
     };
 
     const handleApply = async (jobId: string) => {
@@ -335,6 +383,8 @@ export const JobsPage: React.FC = () => {
                                     matchScore={job.matchScore}
                                     onClick={() => navigate(`/jobs/${job.id}`)}
                                     onApply={isSeeker ? (e) => { e.stopPropagation(); void handleApply(job.id); } : undefined}
+                                    onSave={isSeeker ? (e: React.MouseEvent) => { e.stopPropagation(); void handleSaveJob(job.id); } : undefined}
+                                    isSaved={savedJobIds.has(job.id)}
                                 />
                             ))}
                         </div>
@@ -345,7 +395,7 @@ export const JobsPage: React.FC = () => {
             {applyingJob && (
                 <ApplyModal
                     job={applyingJob}
-                    isOpen={true}
+                    isOpen={!!applyingJob}
                     onClose={() => { setApplyingJob(null); }}
                 />
             )}
