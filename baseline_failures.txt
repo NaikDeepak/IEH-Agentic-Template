@@ -1,0 +1,774 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/Users/deepaknaik/Downloads/1. AI Live/IEH[39m
+
+ [32m✓[39m tests/components/Login.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 268[2mms[22m[39m
+ [31m❯[39m src/pages/__tests__/SettingsPage.test.tsx [2m([22m[2m12 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1997[2mms[22m[39m
+     [32m✓[39m renders account info from auth context[32m 29[2mms[22m[39m
+     [32m✓[39m shows employer role label for employer users[32m 6[2mms[22m[39m
+     [32m✓[39m shows edit input when Edit button is clicked[32m 132[2mms[22m[39m
+     [32m✓[39m calls updateDisplayName with trimmed value on save[32m 53[2mms[22m[39m
+     [32m✓[39m cancels edit on Escape key[32m 135[2mms[22m[39m
+     [33m[2m✓[22m[39m shows error when updateDisplayName fails [33m 311[2mms[22m[39m
+     [32m✓[39m shows sent confirmation after password reset[32m 101[2mms[22m[39m
+     [32m✓[39m shows error when password reset fails[32m 42[2mms[22m[39m
+     [32m✓[39m shows confirmation panel when Delete is clicked[32m 63[2mms[22m[39m
+     [32m✓[39m cancels delete and returns to idle[32m 58[2mms[22m[39m
+     [32m✓[39m calls deleteAccount and navigates to / on success[32m 29[2mms[22m[39m
+[31m     [31m×[31m shows friendly error when deleteAccount fails with requires-recent-login[39m[33m 1037[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/pages/__tests__/SettingsPage.test.tsx[2m > [22mSettingsPage[2m > [22mshows friendly error when deleteAccount fails with requires-recent-login
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: For security, please sign out and sign back in before deleting your account.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"container mx-auto px-4 md:px-8 py-10 max-w-2xl"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mb-8 border-b border-slate-200 pb-6"[39m
+      [36m>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"text-xs font-semibold text-sky-600 uppercase tracking-widest"[39m
+        [36m>[39m
+          [0mMy Account[0m
+        [36m</span>[39m
+        [36m<h1[39m
+          [33mclass[39m=[32m"text-2xl font-bold text-slate-900 mt-1"[39m
+        [36m>[39m
+          [0mSettings[0m
+        [36m</h1>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-sm text-slate-400 mt-0.5"[39m
+        [36m>[39m
+          [0mManage your account preferences[0m
+        [36m</p>[39m
+      [36m</div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mb-6 p-4 rounded-xl border border-red-100 bg-red-50 flex items-center gap-3 text-sm text-red-600"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-triangle-alert w-4 h-4 shrink-0"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12 9v4"[39m
+          [36m/>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12 17h.01"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [0mFailed to delete account. Please try again.[0m
+      [36m</div>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl border border-slate-200 shadow-soft p-6 mb-5"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-user w-4 h-4 text-sky-600"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[39m
+            [36m/>[39m
+            [36m<circle[39m
+              [33mcx[39m=[32m"12"[39m
+              [33mcy[39m=[32m"7"[39m
+              [33mr[39m=[32m"4"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mAccount Info[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"space-y-4"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5"[39m
+              [33mfor[39m=[32m"displayName"[39m
+            [36m>[39m
+              [0mDisplay Name[0m
+            [36m</label>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-sm text-slate-800 font-medium"[39m
+              [36m>[39m
+                [0mTest User[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide lucide-pencil w-3.5 h-3.5"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m15 5 4 4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mEdit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-mail w-3 h-3"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"[39m
+                [36m/>[39m
+                [36m<rect[39m
+                  [33mheight[39m=[32m"16"[39m
+                  [33mrx[39m=[32m"2"[39m
+                  [33mwidth[39m=[32m"20"[39m
+                  [33mx[39m=[32m"2"[39m
+                  [33my[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0m Email[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"text-sm text-slate-800"[39m
+              [36m>[39m
+                [0mtest@example.com[0m
+              [36m</span>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide lucide-pencil w-3.5 h-3.5"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m15 5 4 4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mChange[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5"[39m
+            [36m>[39m
+              [0mRole[0m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"inline-flex items-center px-2.5 py-0.5 bg-sky-50 border border-sky-100 rounded-full text-xs font-semibold text-sky-700"[39m
+            [36m>[39m
+              [0mJob Seeker[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl border border-slate-200 shadow-soft p-6 mb-5"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-shield w-4 h-4 text-sky-600"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mSecurity[0m
+        [36m</h2>[39m
+        [36m<div>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-slate-500 mb-4"[39m
+          [36m>[39m
+            [0mWe'll send a password reset link to [0m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-medium text-slate-700"[39m
+            [36m>[39m
+              [0mtest@example.com[0m
+            [36m</span>[39m
+            [0m.[0m
+          [36m</p>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl transition-colors disabled:opacity-50"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-key-round w-4 h-4"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"16.5"[39m
+                [33mcy[39m=[32m"7.5"[39m
+                [33mfill[39m=[32m"currentColor"[39m
+                [33mr[39m=[32m".5"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mSend Password Reset Email[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+      [36m<section[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl border border-red-100 shadow-soft p-6"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-red-600 mb-4 flex items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-trash2 lucide-trash-2 w-4 h-4"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M10 11v6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M14 11v6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M3 6h18"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mDanger Zone[0m
+        [36m</h2>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center justify-between gap-4"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-sm font-medium text-slate-800"[39m
+            [36m>[39m
+              [0mDelete Account[0m
+            [36m</p>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-slate-400 mt-0.5"[39m
+            [36m>[39m
+              [0mPermanently remove your account credentials and profile.[0m
+            [36m</p>[39m
+          [36m</div>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-trash2 lucide-trash-2 w-4 h-4"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M10 11v6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 11v6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 6h18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mDelete[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</section>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"container mx-auto px-4 md:px-8 py-10 max-w-2xl"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-8 border-b border-slate-200 pb-6"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"text-xs font-semibold text-sky-600 uppercase tracking-widest"[39m
+          [36m>[39m
+            [0mMy Account[0m
+          [36m</span>[39m
+          [36m<h1[39m
+            [33mclass[39m=[32m"text-2xl font-bold text-slate-900 mt-1"[39m
+          [36m>[39m
+            [0mSettings[0m
+          [36m</h1>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-slate-400 mt-0.5"[39m
+          [36m>[39m
+            [0mManage your account preferences[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"mb-6 p-4 rounded-xl border border-red-100 bg-red-50 flex items-center gap-3 text-sm text-red-600"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-triangle-alert w-4 h-4 shrink-0"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 9v4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M12 17h.01"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [0mFailed to delete account. Please try again.[0m
+        [36m</div>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"bg-white rounded-2xl border border-slate-200 shadow-soft p-6 mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-user w-4 h-4 text-sky-600"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[39m
+              [36m/>[39m
+              [36m<circle[39m
+                [33mcx[39m=[32m"12"[39m
+                [33mcy[39m=[32m"7"[39m
+                [33mr[39m=[32m"4"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mAccount Info[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-4"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<label[39m
+                [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5"[39m
+                [33mfor[39m=[32m"displayName"[39m
+              [36m>[39m
+                [0mDisplay Name[0m
+              [36m</label>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm text-slate-800 font-medium"[39m
+                [36m>[39m
+                  [0mTest User[0m
+                [36m</span>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mclass[39m=[32m"lucide lucide-pencil w-3.5 h-3.5"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"m15 5 4 4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [0mEdit[0m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide lucide-mail w-3 h-3"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  [33mstroke[39m=[32m"currentColor"[39m
+                  [33mstroke-linecap[39m=[32m"round"[39m
+                  [33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"[39m
+                  [36m/>[39m
+                  [36m<rect[39m
+                    [33mheight[39m=[32m"16"[39m
+                    [33mrx[39m=[32m"2"[39m
+                    [33mwidth[39m=[32m"20"[39m
+                    [33mx[39m=[32m"2"[39m
+                    [33my[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0m Email[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm text-slate-800"[39m
+                [36m>[39m
+                  [0mtest@example.com[0m
+                [36m</span>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium transition-colors"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33maria-hidden[39m=[32m"true"[39m
+                    [33mclass[39m=[32m"lucide lucide-pencil w-3.5 h-3.5"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"m15 5 4 4"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                  [0mChange[0m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"block text-xs font-medium text-slate-500 uppercase tracking-widest mb-1.5"[39m
+              [36m>[39m
+                [0mRole[0m
+              [36m</div>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"inline-flex items-center px-2.5 py-0.5 bg-sky-50 border border-sky-100 rounded-full text-xs font-semibold text-sky-700"[39m
+              [36m>[39m
+                [0mJob Seeker[0m
+              [36m</span>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"bg-white rounded-2xl border border-slate-200 shadow-soft p-6 mb-5"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-shield w-4 h-4 text-sky-600"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mSecurity[0m
+          [36m</h2>[39m
+          [36m<div>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-sm text-slate-500 mb-4"[39m
+            [36m>[39m
+              [0mWe'll send a password reset link to [0m
+              [36m<span[39m
+                [33mclass[39m=[32m"font-medium text-slate-700"[39m
+              [36m>[39m
+                [0mtest@example.com[0m
+              [36m</span>[39m
+              [0m.[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl transition-colors disabled:opacity-50"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-key-round w-4 h-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"16.5"[39m
+                  [33mcy[39m=[32m"7.5"[39m
+                  [33mfill[39m=[32m"currentColor"[39m
+                  [33mr[39m=[32m".5"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mSend Password Reset Email[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+        [36m<section[39m
+          [33mclass[39m=[32m"bg-white rounded-2xl border border-red-100 shadow-soft p-6"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-sm font-semibold text-red-600 mb-4 flex items-center gap-2"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-trash2 lucide-trash-2 w-4 h-4"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M10 11v6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M14 11v6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M3 6h18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [0mDanger Zone[0m
+          [36m</h2>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center justify-between gap-4"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-sm font-medium text-slate-800"[39m
+              [36m>[39m
+                [0mDelete Account[0m
+              [36m</p>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-xs text-slate-400 mt-0.5"[39m
+              [36m>[39m
+                [0mPermanently remove your account credentials and profile.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"shrink-0 flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl transition-colors"[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-trash2 lucide-trash-2 w-4 h-4"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M10 11v6"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M14 11v6"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M3 6h18"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+              [0mDelete[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2m❯[22m Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:[2m163:27[22m[39m
+[36m [2m❯[22m src/pages/__tests__/SettingsPage.test.tsx:[2m169:15[22m[39m
+    [90m167| [39m        fireEvent.click(screen.getByRole('button', { name: /yes, delet…
+    [90m168| [39m
+    [90m169| [39m        [35mawait[39m [34mwaitFor[39m(() [33m=>[39m {
+    [90m   | [39m              [31m^[39m
+    [90m170| [39m            expect(screen.getByText(friendlyMessage)).toBeInTheDocumen…
+    [90m171| [39m        })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m18 passed[39m[22m[90m (19)[39m
+[2m   Start at [22m 14:59:15
+[2m   Duration [22m 2.99s[2m (transform 284ms, setup 337ms, import 496ms, tests 2.27s, environment 959ms)[22m
+

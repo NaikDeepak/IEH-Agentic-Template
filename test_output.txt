@@ -1,0 +1,35 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/Users/deepaknaik/Downloads/1. AI Live/IEH[39m
+
+ [31m❯[39m tests/components/ReferralDashboard.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 40[2mms[22m[39m
+[31m     [31m×[31m should render dashboard with stats[39m[32m 22[2mms[22m[39m
+[31m     [31m×[31m should call ensureReferralCode if missing[39m[32m 7[2mms[22m[39m
+[31m     [31m×[31m should handle point redemption[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should show empty state for referral history[39m[32m 5[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/components/ReferralDashboard.test.tsx[2m > [22mReferralDashboard[2m > [22mshould render dashboard with stats
+[41m[1m FAIL [22m[49m tests/components/ReferralDashboard.test.tsx[2m > [22mReferralDashboard[2m > [22mshould call ensureReferralCode if missing
+[41m[1m FAIL [22m[49m tests/components/ReferralDashboard.test.tsx[2m > [22mReferralDashboard[2m > [22mshould handle point redemption
+[41m[1m FAIL [22m[49m tests/components/ReferralDashboard.test.tsx[2m > [22mReferralDashboard[2m > [22mshould show empty state for referral history
+[31m[1mTypeError[22m: Cannot destructure property 'basename' of 'React10.useContext(...)' as it is null.[39m
+[90m [2m❯[22m LinkWithRef ../../1.%20AI%20Live/IEH/node_modules/react-router/dist/development/chunk-EPOLDU6W.mjs:[2m9941:11[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateForwardRef node_modules/react-dom/cjs/react-dom-client.development.js:[2m9724:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m12117:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+[90m [2m❯[22m performWorkOnRoot node_modules/react-dom/cjs/react-dom-client.development.js:[2m16583:35[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[90m (4)[39m
+[2m   Start at [22m 14:57:15
+[2m   Duration [22m 880ms[2m (transform 135ms, setup 93ms, import 182ms, tests 40ms, environment 472ms)[22m
+

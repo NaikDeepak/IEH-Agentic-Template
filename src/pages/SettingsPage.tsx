@@ -118,7 +118,7 @@ export const SettingsPage: React.FC = () => {
             // authError from context will be synced into localError via the useEffect above.
             // Set the generic fallback now; if context provides a friendlier message it will
             // overwrite this on the next render.
-            setLocalError(prev => prev ?? 'Failed to delete account. Please try again.');
+            setLocalError(authError ?? 'Failed to delete account. Please try again.');
             setDeletePhase('idle');
         } finally {
             setDeleteLoading(false);

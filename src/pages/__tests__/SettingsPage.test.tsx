@@ -170,4 +170,85 @@ describe('SettingsPage', () => {
             expect(screen.getByText(friendlyMessage)).toBeInTheDocument();
         });
     });
+
+    // --- Save button click & X cancel ---
+
+    it('saves name via checkmark button click', async () => {
+        updateDisplayNameMock.mockResolvedValue(undefined);
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+        const input = screen.getByDisplayValue('Test User');
+        fireEvent.change(input, { target: { value: 'Saved Name' } });
+        // Click the check/save button (aria-label not explicit; it's the button next to the input)
+        const saveBtn = screen.getAllByRole('button').find(b => b.querySelector('.lucide-check') || b.className.includes('bg-sky-700'));
+        if (saveBtn) fireEvent.click(saveBtn);
+        await waitFor(() => {
+            expect(updateDisplayNameMock).toHaveBeenCalledWith('Saved Name');
+        });
+    });
+
+    it('cancels name edit via X button', () => {
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+        expect(screen.getByDisplayValue('Test User')).toBeInTheDocument();
+        // Find the cancel X button (sibling of the check button)
+        const allButtons = screen.getAllByRole('button');
+        const cancelXBtn = allButtons.find(b => b.className.includes('border-slate-200') && b.className.includes('text-slate-400'));
+        if (cancelXBtn) fireEvent.click(cancelXBtn);
+        expect(screen.queryByDisplayValue('Test User')).not.toBeInTheDocument();
+    });
+
+    it('does not save when name unchanged (closes edit silently)', async () => {
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+        // Don't change the value - press Enter
+        const input = screen.getByDisplayValue('Test User');
+        fireEvent.keyDown(input, { key: 'Enter' });
+        await waitFor(() => {
+            expect(updateDisplayNameMock).not.toHaveBeenCalled();
+        });
+        expect(screen.queryByDisplayValue('Test User')).not.toBeInTheDocument();
+    });
+
+    it('shows admin role label for admin users', () => {
+        (useAuth as Mock).mockReturnValue({ ...baseAuth, userData: { role: 'admin' } });
+        renderPage();
+        expect(screen.getByText('Admin')).toBeInTheDocument();
+    });
+
+    // --- Email section ---
+
+    it('opens email edit mode when Change button is clicked', () => {
+        const verifyEmailUpdateMock = vi.fn();
+        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /change/i }));
+        expect(screen.getByPlaceholderText(/new email address/i)).toBeInTheDocument();
+    });
+
+    it('cancels email edit on Escape key', () => {
+        const verifyEmailUpdateMock = vi.fn();
+        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /change/i }));
+        const input = screen.getByPlaceholderText(/new email address/i);
+        fireEvent.keyDown(input, { key: 'Escape' });
+        expect(screen.queryByPlaceholderText(/new email address/i)).not.toBeInTheDocument();
+    });
+
+    it('submits email update and shows confirmation', async () => {
+        const verifyEmailUpdateMock = vi.fn().mockResolvedValue(undefined);
+        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        renderPage();
+        fireEvent.click(screen.getByRole('button', { name: /change/i }));
+        const input = screen.getByPlaceholderText(/new email address/i);
+        fireEvent.change(input, { target: { value: 'new@example.com' } });
+        fireEvent.keyDown(input, { key: 'Enter' });
+        await waitFor(() => {
+            expect(verifyEmailUpdateMock).toHaveBeenCalledWith('new@example.com');
+        });
+        await waitFor(() => {
+            expect(screen.getByText(/verification link sent/i)).toBeInTheDocument();
+        });
+    });
 });

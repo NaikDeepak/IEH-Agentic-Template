@@ -12,6 +12,7 @@ export default defineConfig([
   globalIgnores(['dist', 'coverage', '.vite', 'node_modules', 'eslint.config.js', '.claude']),
   {
     files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
@@ -69,10 +70,11 @@ export default defineConfig([
     },
   },
   {
-    files: ['tests/**/*.{ts,tsx}', 'e2e/**/*.{ts,tsx}', '*.config.{ts,js}'],
+    files: ['tests/**/*.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}', 'src/**/*.test.{ts,tsx}', 'e2e/**/*.{ts,tsx}', '*.config.{ts,js}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
+        ...globals.browser,
         ...globals.node,
         ...globals.es2020,
       },
@@ -94,6 +96,20 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/no-misused-spread': 'off',
+      '@typescript-eslint/no-unnecessary-condition': 'off',
+      '@typescript-eslint/no-inferrable-types': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/non-nullable-type-assertion-style': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': 'off',
       'no-console': 'off',
     },
   },

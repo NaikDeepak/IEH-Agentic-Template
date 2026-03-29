@@ -46,12 +46,14 @@ describe('Login', () => {
     });
 
     it('renders social login buttons', () => {
+        vi.stubEnv('VITE_USE_FIREBASE_EMULATOR', 'false');
         render(
             <MemoryRouter>
                 <Login />
             </MemoryRouter>
         );
-        expect(screen.getByText(/Continue with Google/i)).toBeDefined();
+        expect(screen.getByText(/Continue with Google/i)).toBeInTheDocument();
+        vi.unstubAllEnvs();
     });
 
     it('shows "Forgot password?" link on the login card', () => {

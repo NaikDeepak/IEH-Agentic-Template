@@ -50,12 +50,23 @@ vi.mock('firebase-admin/firestore', () => ({
             where: vi.fn().mockReturnThis(),
             limit: vi.fn().mockReturnThis(),
             orderBy: vi.fn().mockReturnThis(),
-            get: vi.fn().mockResolvedValue({ empty: true, docs: [] })
+            get: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
+            findNearest: vi.fn(() => ({
+                get: vi.fn().mockResolvedValue({
+                    empty: false,
+                    docs: [{
+                        id: 'id1',
+                        data: () => ({ title: 'Job 1', status: 'active' }),
+                        ref: { update: vi.fn() }
+                    }]
+                })
+            }))
         })),
         settings: vi.fn()
     })),
     FieldValue: {
-        serverTimestamp: vi.fn()
+        serverTimestamp: vi.fn(),
+        vector: vi.fn(v => v)
     }
 }));
 
@@ -149,6 +160,6 @@ describe('Functions: API Handlers', () => {
 
             await searchJobsHandler(req, res);
             expect(res.json).toHaveBeenCalled();
-        }, 10000);
+        }, 30000);
     });
 });

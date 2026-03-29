@@ -4,7 +4,7 @@ import { useAuth } from '../../src/hooks/useAuth';
 import { ReferralService } from '../../src/features/growth/services/referralService';
 import { LedgerService } from '../../src/features/growth/services/ledgerService';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-// import React from 'react'; // React is auto-imported in newer versions or unused here if we only use JSX
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock sub-components
 vi.mock('../../src/features/growth/components/Verification/PhoneVerification', () => ({
@@ -95,7 +95,11 @@ describe('ReferralDashboard', () => {
     });
 
     it('should render dashboard with stats', async () => {
-        render(<ReferralDashboard />);
+        render(
+            <MemoryRouter>
+                <ReferralDashboard />
+            </MemoryRouter>
+        );
         expect(screen.getByText(/Referral Hub/i)).toBeInTheDocument();
         expect(screen.getByTestId('points-badge')).toBeInTheDocument();
         expect(screen.getByText(/REF123/)).toBeInTheDocument();
@@ -111,7 +115,11 @@ describe('ReferralDashboard', () => {
             }
         });
 
-        render(<ReferralDashboard />);
+        render(
+            <MemoryRouter>
+                <ReferralDashboard />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(ReferralService.ensureReferralCode).toHaveBeenCalledWith('user123');
@@ -119,7 +127,11 @@ describe('ReferralDashboard', () => {
     });
 
     it('should handle point redemption', async () => {
-        render(<ReferralDashboard />);
+        render(
+            <MemoryRouter>
+                <ReferralDashboard />
+            </MemoryRouter>
+        );
 
         const redeemBtn = screen.getByRole('button', { name: /Redeem Now/i });
         fireEvent.click(redeemBtn);
@@ -135,12 +147,16 @@ describe('ReferralDashboard', () => {
     });
 
     it('should show empty state for referral history', async () => {
-        render(<ReferralDashboard />);
+        render(
+            <MemoryRouter>
+                <ReferralDashboard />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
             expect(global.fetch).toHaveBeenCalledWith('/api/growth/referrals', expect.any(Object));
         });
 
-        expect(await screen.findByText(/No referrals yet/i)).toBeInTheDocument();
+        expect(await screen.findByText(/No referrals yet. Start sharing!/i)).toBeInTheDocument();
     });
 });

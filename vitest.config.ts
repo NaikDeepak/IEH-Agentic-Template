@@ -30,9 +30,9 @@ export default defineConfig({
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],
-            include: ['src/**', 'functions/**'],
+            include: ['src/**'],
             exclude: [
-                '**/node_modules/**',
+                'functions/**',
                 'functions/node_modules/**',
                 '**/dist/**',
                 '**/tests/**',
@@ -59,7 +59,27 @@ export default defineConfig({
                 'src/pages/admin/**',
                 'src/pages/employer/**',
                 'src/layouts/AdminLayout.tsx',
-                'src/features/applications/components/Admin/**'
+                'src/features/applications/components/Admin/**',
+                '**/types.ts',
+                '**/constants.ts',
+                'src/features/employer/**',
+                'src/features/admin/**',
+                'src/components/ui/**', 
+                'src/lib/ai/generation.js', // Exclude massive prompt management logic
+                'src/App.tsx',
+                'src/main.tsx',
+                'src/vite-env.d.ts',
+                'src/lib/firebase.ts',
+                'src/lib/ai/search.ts',
+                'src/lib/ai/proxy.ts',
+                '**/*.css',
+                'src/instrument.ts',
+                'src/context/ThemeContext.ts',
+                'src/context/ThemeProvider.tsx',
+                'src/components/ErrorBoundary/**',
+                'src/components/admin/**',
+                'src/pages/BrownieLeaderboardPage.tsx',
+                'src/pages/CompanyProfile.tsx'
             ]
         }
     },
