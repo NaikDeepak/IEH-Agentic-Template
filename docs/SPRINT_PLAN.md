@@ -104,7 +104,7 @@ Goal: First-time experience is complete and trustworthy.
 |----|------|-------|
 | S4-AUTH-01 | `[x]` Separate Employer vs Candidate login/register entry | `AuthEntry.tsx` — role picker screen at `/login` and `/register`; navigates to `/{mode}/seeker` or `/{mode}/employer` paths |
 | S4-AUTH-02 | `[skip]` LinkedIn login option | Firebase limitation — deferred (D-02) |
-| S4-AUTH-03 | `[~]` Mobile number mandatory at registration | Deferred to end — requires Firebase phone auth config + thorough testing |
+| S4-AUTH-03 | `[skip]` Mobile number mandatory at registration | Deferred to end — requires Firebase phone auth config + thorough testing |
 | S4-AUTH-04 | `[x]` Email verification after registration | `VerifyEmail.tsx` with resend + "I've verified" check; `sendVerificationEmail` in AuthProvider |
 | S4-ONBOARD-01 | `[x]` First-time login → mandatory onboarding flow | `Onboarding.tsx` — guided welcome → CV upload → target role → done; employer variant → company name |
 | S4-ONBOARD-02 | `[skip]` Education verification — define mechanism | Product + legal decision needed (D-01) |
@@ -195,7 +195,7 @@ Goal: Complete admin functionality; add transactional notifications and platform
 | S6-NOTIF-01 | `[x]` In-app notifications | `src/features/notifications/`, `src/components/NotificationBell.tsx` | Real-time bell in Header (onSnapshot); types: application_status/new_match/profile_viewed; mark-read / mark-all-read; notification fired when employer moves applicant in Kanban |
 | S6-NOTIF-02 | `[ ]` Transactional email | `functions/` | Application updates, job matches, account events — Firebase Extensions + SendGrid |
 | S6-NOTIF-03 | `[x]` Job alert subscriptions | `src/pages/seeker/JobAlertsPage.tsx`, `functions/src/triggers/onJobCreate.js` | `/seeker/alerts` — create/toggle/delete alerts by keywords+location+type; Cloud Function fires in-app notifications on job creation for matching alerts |
-| S6-NOTIF-04 | `[x]` Message / contact candidate | `src/features/candidates/components/CandidateDetailModal.tsx` | "Contact" button in detail modal opens compose panel; message delivered as in-app notification to candidate |
+| S6-NOTIF-04 | `[~]` Message / contact candidate | `src/features/candidates/components/CandidateDetailModal.tsx` | Contact compose UI exists, but trusted backend delivery endpoint is pending (currently disabled) |
 
 ### Platform
 

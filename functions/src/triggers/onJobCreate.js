@@ -27,6 +27,7 @@ export const onJobCreate = onDocumentCreated("jobs/{jobId}", async (event) => {
 
     const db = getFirestore();
     const jobId = event.params.jobId;
+    const notificationCreatedAt = snapshot.createTime?.toDate?.() ?? new Date();
 
     try {
         const batch = db.batch();
@@ -61,9 +62,10 @@ export const onJobCreate = onDocumentCreated("jobs/{jobId}", async (event) => {
 
                     // Skip if alert belongs to the job poster (if employerId exists)
                     if (job.employerId && alert.seekerId === job.employerId) continue;
+                    if (!alertMatchesJob(alert, job)) continue;
 
-                    // Create notification for this seeker
-                    const notifRef = db.collection('notifications').doc();
+                    // Create/upsert deterministic notification for this seeker
+                    const notifRef = db.collection('notifications').doc(`${jobId}_${alertDoc.id}`);
                     batch.set(notifRef, {
                         userId: alert.seekerId,
                         type: 'new_match',
@@ -71,21 +73,21 @@ export const onJobCreate = onDocumentCreated("jobs/{jobId}", async (event) => {
                         message: `"${job.title}" at ${job.location} matches your alert for "${alert.keywords}".`,
                         read: false,
                         link: `/jobs/${jobId}`,
-                        createdAt: new Date(),
-                    });
+                        createdAt: notificationCreatedAt,
+                    }, { merge: true });
                     notificationsSent++;
 
                     if (notificationsSent >= MAX_NOTIFICATIONS) break;
                 }
             } else {
                 logger.info(`[onJobCreate] Token query returned 0 results for job ${jobId}, falling back to pagination`);
-                notificationsSent = await paginatedAlertScan(db, batch, job, jobId, startTime);
+                notificationsSent = await paginatedAlertScan(db, batch, job, jobId, startTime, notificationCreatedAt);
                 matchingPath = 'pagination-fallback';
             }
         } else {
             // No tokens available, use paginated scan
             logger.info(`[onJobCreate] No job tokens available for job ${jobId}, using paginated scan`);
-            notificationsSent = await paginatedAlertScan(db, batch, job, jobId, startTime);
+            notificationsSent = await paginatedAlertScan(db, batch, job, jobId, startTime, notificationCreatedAt);
             matchingPath = 'pagination-no-tokens';
         }
 
@@ -108,7 +110,7 @@ export const onJobCreate = onDocumentCreated("jobs/{jobId}", async (event) => {
  * Fallback: Paginated scan of all active alerts with manual matching
  * Used when token-based query returns no results or job has no tokens
  */
-async function paginatedAlertScan(db, batch, job, jobId, startTime) {
+async function paginatedAlertScan(db, batch, job, jobId, startTime, notificationCreatedAt) {
     const jobTitle = (job.title ?? '').toLowerCase();
     const jobSkills = Array.isArray(job.skills) ? job.skills.join(' ').toLowerCase() : '';
     const jobLocation = (job.location ?? '').toLowerCase();
@@ -164,7 +166,7 @@ async function paginatedAlertScan(db, batch, job, jobId, startTime) {
             if (alertJobType && alertJobType !== jobType) continue;
 
             // Create notification for this seeker
-            const notifRef = db.collection('notifications').doc();
+            const notifRef = db.collection('notifications').doc(`${jobId}_${alertDoc.id}`);
             batch.set(notifRef, {
                 userId: alert.seekerId,
                 type: 'new_match',
@@ -172,8 +174,8 @@ async function paginatedAlertScan(db, batch, job, jobId, startTime) {
                 message: `"${job.title}" at ${job.location} matches your alert for "${alert.keywords}".`,
                 read: false,
                 link: `/jobs/${jobId}`,
-                createdAt: new Date(),
-            });
+                createdAt: notificationCreatedAt,
+            }, { merge: true });
             notificationsSent++;
 
             // Exit if we've hit max notifications
@@ -194,4 +196,22 @@ async function paginatedAlertScan(db, batch, job, jobId, startTime) {
     });
 
     return notificationsSent;
+}
+
+function alertMatchesJob(alert, job) {
+    const jobTitle = (job.title ?? '').toLowerCase();
+    const jobSkills = Array.isArray(job.skills) ? job.skills.join(' ').toLowerCase() : '';
+    const jobLocation = (job.location ?? '').toLowerCase();
+    const jobType = (job.type ?? '').toUpperCase();
+    const alertKeywords = (alert.keywords ?? '').toLowerCase();
+    const alertLocation = (alert.location ?? '').toLowerCase();
+    const alertJobType = (alert.jobType ?? '').toUpperCase();
+    const keywordTokens = alertKeywords.split(/[,\s]+/).filter(Boolean);
+    const textToSearch = `${jobTitle} ${jobSkills}`;
+    const keywordMatch = keywordTokens.some((kw) => textToSearch.includes(kw));
+
+    if (!keywordMatch) return false;
+    if (alertLocation && !jobLocation.includes(alertLocation)) return false;
+    if (alertJobType && alertJobType !== jobType) return false;
+    return true;
 }

@@ -37,6 +37,7 @@ const JobAnalyticsPage: React.FC = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState<JobStats[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [sortKey, setSortKey] = useState<'title' | 'appCount' | 'daysActive' | 'appsPerDay'>('appCount');
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -44,6 +45,7 @@ const JobAnalyticsPage: React.FC = () => {
         const load = async () => {
             if (!user) return;
             try {
+                setLoadError(null);
                 const jobs = await JobService.getJobsByEmployerId(user.uid);
                 const validJobs = jobs.filter((j): j is JobPosting & { id: string } => !!j.id);
 
@@ -62,6 +64,7 @@ const JobAnalyticsPage: React.FC = () => {
                 setStats(results);
             } catch (err) {
                 console.error('[JobAnalyticsPage] load error:', err);
+                setLoadError('Failed to load analytics. Please refresh and try again.');
             } finally {
                 setLoading(false);
             }
@@ -133,6 +136,10 @@ const JobAnalyticsPage: React.FC = () => {
                     <div className="flex flex-col items-center justify-center py-24 gap-3">
                         <Loader2 className="w-8 h-8 animate-spin text-sky-600" />
                         <p className="text-sm text-slate-400">Loading analytics...</p>
+                    </div>
+                ) : loadError ? (
+                    <div className="bg-white rounded-2xl border border-red-200 p-12 text-center">
+                        <p className="text-red-600 font-semibold">{loadError}</p>
                     </div>
                 ) : stats.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-16 text-center">
@@ -212,6 +219,14 @@ const JobAnalyticsPage: React.FC = () => {
                                                 key={job.id}
                                                 className="border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors cursor-pointer"
                                                 onClick={() => { void navigate(`/employer/jobs/${job.id}/applicants`); }}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        void navigate(`/employer/jobs/${job.id}/applicants`);
+                                                    }
+                                                }}
                                             >
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">

@@ -13,6 +13,8 @@ export const SavedJobsPage: React.FC = () => {
     const [jobs, setJobs] = useState<JobPosting[]>([]);
     const [loading, setLoading] = useState(true);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
+    const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!user) return;
@@ -31,8 +33,18 @@ export const SavedJobsPage: React.FC = () => {
 
     const handleUnsave = async (jobId: string) => {
         if (!user) return;
-        await SavedJobsService.unsave(user.uid, jobId);
-        setJobs(prev => prev.filter(j => j.id !== jobId));
+        if (!jobId || actionLoadingId === jobId) return;
+        setActionLoadingId(jobId);
+        setActionError(null);
+        try {
+            await SavedJobsService.unsave(user.uid, jobId);
+            setJobs(prev => prev.filter(j => j.id !== jobId));
+        } catch (err) {
+            console.error('[SavedJobsPage] unsave failed:', err);
+            setActionError('Failed to remove saved job. Please try again.');
+        } finally {
+            setActionLoadingId(null);
+        }
     };
 
     return (
@@ -68,6 +80,11 @@ export const SavedJobsPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="space-y-3">
+                        {actionError && (
+                            <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                                {actionError}
+                            </div>
+                        )}
                         {jobs.map(job => (
                             <div
                                 key={job.id}
@@ -89,7 +106,7 @@ export const SavedJobsPage: React.FC = () => {
                                         )}
                                         {job.type && (
                                             <span className="flex items-center gap-1">
-                                                <Briefcase className="w-3 h-3" /> {job.type.replace('_', ' ')}
+                                                <Briefcase className="w-3 h-3" /> {job.type.replace(/_/g, ' ')}
                                             </span>
                                         )}
                                     </div>
@@ -105,9 +122,14 @@ export const SavedJobsPage: React.FC = () => {
                                     <button
                                         onClick={() => { void handleUnsave(job.id ?? ''); }}
                                         title="Remove from saved"
+                                        disabled={actionLoadingId === job.id}
                                         className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-transparent hover:border-red-100 transition-colors"
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        {actionLoadingId === job.id ? (
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Trash2 className="w-4 h-4" />
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -119,7 +141,7 @@ export const SavedJobsPage: React.FC = () => {
             {applyingJob && (
                 <ApplyModal
                     job={applyingJob}
-                    isOpen={true}
+                    isOpen={!!applyingJob}
                     onClose={() => { setApplyingJob(null); }}
                 />
             )}

@@ -117,20 +117,23 @@ export const JobService = {
   async updateJob(jobId: string, updates: Partial<CreateJobInput>): Promise<void> {
     try {
       const docRef = doc(db, JOBS_COLLECTION, jobId)
+      const sanitizedUpdates = Object.fromEntries(
+        Object.entries(updates).filter(([, v]) => (v as unknown) !== undefined),
+      ) as Partial<CreateJobInput>
       const updateData: Partial<JobPosting> & { updated_at: ReturnType<typeof serverTimestamp> } = {
-        ...Object.fromEntries(Object.entries(updates).filter(([, v]) => (v as unknown) !== undefined)),
+        ...sanitizedUpdates,
         updated_at: serverTimestamp(),
       }
 
       // If semantic fields change, regenerate embedding (use key-presence, not truthiness)
       const shouldRegenEmbedding =
-        "title" in updates ||
-        "description" in updates ||
-        "skills" in updates ||
-        "location" in updates ||
-        "type" in updates ||
-        "company_bio" in updates ||
-        "work_mode" in updates
+        "title" in sanitizedUpdates ||
+        "description" in sanitizedUpdates ||
+        "skills" in sanitizedUpdates ||
+        "location" in sanitizedUpdates ||
+        "type" in sanitizedUpdates ||
+        "company_bio" in sanitizedUpdates ||
+        "work_mode" in sanitizedUpdates
 
       if (shouldRegenEmbedding) {
         const snap = await getDoc(docRef)
@@ -141,14 +144,21 @@ export const JobService = {
 
         const currentData = snap.data() as JobPosting
 
-        const finalTitle = "title" in updates ? (updates.title ?? currentData.title) : currentData.title
+        const finalTitle =
+          "title" in sanitizedUpdates ? (sanitizedUpdates.title ?? currentData.title) : currentData.title
         const finalDescription =
-          "description" in updates ? (updates.description ?? currentData.description) : currentData.description
-        const finalSkills = ("skills" in updates ? (updates.skills ?? currentData.skills) : currentData.skills) ?? []
-        const finalLocation = "location" in updates ? (updates.location ?? currentData.location) : currentData.location
-        const finalType = "type" in updates ? (updates.type ?? currentData.type) : currentData.type
+          "description" in sanitizedUpdates
+            ? (sanitizedUpdates.description ?? currentData.description)
+            : currentData.description
+        const finalSkills =
+          ("skills" in sanitizedUpdates ? (sanitizedUpdates.skills ?? currentData.skills) : currentData.skills) ?? []
+        const finalLocation =
+          "location" in sanitizedUpdates ? (sanitizedUpdates.location ?? currentData.location) : currentData.location
+        const finalType = "type" in sanitizedUpdates ? (sanitizedUpdates.type ?? currentData.type) : currentData.type
         const finalWorkMode =
-          "work_mode" in updates ? (updates.work_mode ?? currentData.work_mode) : currentData.work_mode
+          "work_mode" in sanitizedUpdates
+            ? (sanitizedUpdates.work_mode ?? currentData.work_mode)
+            : currentData.work_mode
 
         const semanticText = `
                     Title: ${finalTitle}
@@ -161,7 +171,7 @@ export const JobService = {
         const embedding = await fetchEmbedding(semanticText)
         updateData.embedding = toVectorField(embedding)
 
-        if ("skills" in updates) {
+        if ("skills" in sanitizedUpdates) {
           updateData.skills = finalSkills.map((s) => s.toLowerCase())
         }
       }
@@ -272,7 +282,7 @@ export const JobService = {
       const q = query(
         jobsRef,
         where("employer_id", "==", employerId),
-        where("status", "in", ["active", "passive"]),
+        where("status", "in", ["active", "passive", "closed"]),
         orderBy("created_at", "desc")
       )
 

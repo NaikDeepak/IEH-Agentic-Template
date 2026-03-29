@@ -21,6 +21,7 @@ const JobAlertsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [showForm, setShowForm] = useState(false);
+    const [actionError, setActionError] = useState<string | null>(null);
 
     // Form state
     const [keywords, setKeywords] = useState('');
@@ -52,18 +53,11 @@ const JobAlertsPage: React.FC = () => {
         }
         setCreating(true);
         setFormError(null);
+        setActionError(null);
         try {
-            const id = await JobAlertsService.createAlert(user.uid, keywords, location, jobType);
-            const newAlert: JobAlert = {
-                id,
-                seekerId: user.uid,
-                keywords: keywords.trim(),
-                location: location.trim(),
-                jobType,
-                active: true,
-                createdAt: { toDate: () => new Date() } as JobAlert['createdAt'],
-            };
-            setAlerts(prev => [newAlert, ...prev]);
+            await JobAlertsService.createAlert(user.uid, keywords, location, jobType);
+            const latest = await JobAlertsService.getAlerts(user.uid);
+            setAlerts(latest);
             setKeywords('');
             setLocation('');
             setJobType('');
@@ -77,20 +71,28 @@ const JobAlertsPage: React.FC = () => {
     };
 
     const handleToggle = async (alert: JobAlert) => {
+        const originalActive = alert.active;
+        setActionError(null);
+        setAlerts(prev => prev.map(a => a.id === alert.id ? { ...a, active: !originalActive } : a));
         try {
-            await JobAlertsService.toggleAlert(alert.id, !alert.active);
-            setAlerts(prev => prev.map(a => a.id === alert.id ? { ...a, active: !a.active } : a));
+            await JobAlertsService.toggleAlert(alert.id, !originalActive);
         } catch (err) {
             console.error('[JobAlertsPage] toggle error:', err);
+            setAlerts(prev => prev.map(a => a.id === alert.id ? { ...a, active: originalActive } : a));
+            setActionError('Failed to update alert status. Please try again.');
         }
     };
 
     const handleDelete = async (alertId: string) => {
+        const confirmed = window.confirm('Delete this alert?');
+        if (!confirmed) return;
+        setActionError(null);
         try {
             await JobAlertsService.deleteAlert(alertId);
             setAlerts(prev => prev.filter(a => a.id !== alertId));
         } catch (err) {
             console.error('[JobAlertsPage] delete error:', err);
+            setActionError('Failed to delete alert. Please try again.');
         }
     };
 
@@ -211,6 +213,11 @@ const JobAlertsPage: React.FC = () => {
                 )}
 
                 {/* Alerts list */}
+                {actionError && (
+                    <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                        {actionError}
+                    </div>
+                )}
                 {loading ? (
                     <div className="flex items-center justify-center py-20">
                         <Loader2 className="w-8 h-8 animate-spin text-sky-600" />

@@ -29,7 +29,7 @@ interface CandidateDetailModalProps {
 }
 
 export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ candidate, isOpen, onClose }) => {
-  const { user, userData } = useAuth()
+  const { user } = useAuth()
   const [saved, setSaved] = useState(false)
   const [savingLoading, setSavingLoading] = useState(false)
   const [checkingStatus, setCheckingStatus] = useState(true)
@@ -37,6 +37,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
   const [contactMessage, setContactMessage] = useState("")
   const [contactSending, setContactSending] = useState(false)
   const [contactSent, setContactSent] = useState(false)
+  const [contactError, setContactError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isOpen || !user || !candidate) {
@@ -56,6 +57,20 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
     }
     void check()
   }, [isOpen, user, candidate])
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowContact(false)
+      setContactMessage("")
+      setContactSent(false)
+      setContactError(null)
+      return
+    }
+    setShowContact(false)
+    setContactMessage("")
+    setContactSent(false)
+    setContactError(null)
+  }, [isOpen, candidate?.id])
 
   useEffect(() => {
     if (!isOpen) return
@@ -91,21 +106,12 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
   const handleContact = () => {
     if (!user || !candidate || !contactMessage.trim()) return
     setContactSending(true)
+    setContactError(null)
     try {
-      const senderName = userData?.displayName ?? "An employer"
-      // Cross-user notifications are server-only.
-      // TODO: invoke trusted backend endpoint to deliver this message.
-      console.warn(
-        `[CandidateDetailModal] Contact notification skipped (backend required): to=${candidate.id}, from=${senderName}`,
-      )
-      setContactSent(true)
-      setContactMessage("")
-      setTimeout(() => {
-        setContactSent(false)
-        setShowContact(false)
-      }, 2500)
+      throw new Error('Messaging delivery is not available yet. Please use email/LinkedIn links for now.')
     } catch (err) {
       console.error("[CandidateDetailModal] contact send failed:", err)
+      setContactError(err instanceof Error ? err.message : 'Failed to send message')
     } finally {
       setContactSending(false)
     }
@@ -287,6 +293,9 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
           {/* Contact message compose */}
           {showContact && (
             <div className='px-6 py-4 border-t border-slate-100 bg-slate-50'>
+              <div className='mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700'>
+                Contact delivery endpoint is pending. Message sending is temporarily disabled.
+              </div>
               {contactSent ? (
                 <div className='flex items-center gap-2 text-sm text-emerald-700 font-semibold py-2'>
                   <Check className='w-4 h-4' /> Message sent!
@@ -310,7 +319,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
                       onClick={() => {
                         handleContact()
                       }}
-                      disabled={contactSending || !contactMessage.trim()}
+                      disabled
                       className='flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-sky-700 hover:bg-sky-800 text-white rounded-xl transition-colors disabled:opacity-50'
                     >
                       {contactSending ? (
@@ -329,6 +338,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({ cand
                       Cancel
                     </button>
                   </div>
+                  {contactError && <p className='text-xs text-red-600'>{contactError}</p>}
                 </div>
               )}
             </div>

@@ -117,7 +117,7 @@ export const ShortlistFeed: React.FC<ShortlistFeedProps> = ({ userId }) => {
             {applyingJob && (
                 <ApplyModal
                     job={applyingJob}
-                    isOpen={true}
+                    isOpen={!!applyingJob}
                     onClose={() => { setApplyingJob(null); }}
                 />
             )}
@@ -233,9 +233,13 @@ const ShortlistCard: React.FC<ShortlistCardProps> = ({ job, onApply }) => {
                     >
                         <Send className="w-3 h-3" /> Apply
                     </button>
-                    <div className="flex items-center gap-1 text-xs font-semibold text-sky-700 group-hover:text-sky-800">
+                    <div
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500"
+                        role="img"
+                        aria-label="View details"
+                    >
                         View
-                        <ArrowUpRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        <ArrowUpRight className="w-3.5 h-3.5" />
                     </div>
                 </div>
             </div>

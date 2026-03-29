@@ -4,10 +4,14 @@ import { ThemeContext, type Theme } from './ThemeContext';
 const STORAGE_KEY = 'wm-theme';
 
 function getInitialTheme(): Theme {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'dark' || stored === 'light') return stored;
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-    return 'light';
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored === 'dark' || stored === 'light') return stored;
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+        return 'light';
+    } catch {
+        return 'light';
+    }
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

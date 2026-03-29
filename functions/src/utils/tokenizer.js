@@ -89,7 +89,8 @@ function generateJobTokens(job) {
     const typeToken = tokenizeJobType(job.type || '');
     if (typeToken) tokens.push(typeToken);
     
-    // Deduplicate and limit to 30 (Firestore array-contains-any limit)
+    // Deduplicate and cap at 30 so token queries stay compatible with
+    // Firestore array-contains-any disjunction limits.
     return [...new Set(tokens)].slice(0, 30);
 }
 

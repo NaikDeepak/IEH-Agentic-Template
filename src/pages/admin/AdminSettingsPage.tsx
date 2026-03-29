@@ -28,6 +28,17 @@ const DEFAULT_CONFIG: PlatformConfig = {
 
 const CONFIG_DOC = 'config/platform';
 
+function mergePlatformConfig(defaults: PlatformConfig, incoming?: Partial<PlatformConfig>): PlatformConfig {
+    return {
+        ...defaults,
+        ...incoming,
+        featureFlags: {
+            ...defaults.featureFlags,
+            ...(incoming?.featureFlags ?? {}),
+        },
+    };
+}
+
 const AdminSettingsPage: React.FC = () => {
     const [config, setConfig] = useState<PlatformConfig>(DEFAULT_CONFIG);
     const [loading, setLoading] = useState(true);
@@ -40,7 +51,8 @@ const AdminSettingsPage: React.FC = () => {
             try {
                 const snap = await getDoc(doc(db, CONFIG_DOC));
                 if (snap.exists()) {
-                    setConfig(snap.data() as PlatformConfig);
+                    const merged = mergePlatformConfig(DEFAULT_CONFIG, snap.data() as Partial<PlatformConfig>);
+                    setConfig(merged);
                 }
             } catch (err) {
                 console.error('[AdminSettingsPage] load error:', err);
@@ -131,7 +143,17 @@ const AdminSettingsPage: React.FC = () => {
                             max={100}
                             step={0.5}
                             value={config.platformFeePercent}
-                            onChange={(e) => { setConfig(prev => ({ ...prev, platformFeePercent: Number(e.target.value) })); }}
+                            onChange={(e) => {
+                                const raw = e.target.value;
+                                const parsed = Number.parseFloat(raw);
+                                if (!Number.isFinite(parsed)) {
+                                    setConfig((prev) => ({ ...prev, platformFeePercent: prev.platformFeePercent }));
+                                    return;
+                                }
+                                const clamped = Math.min(100, Math.max(0, parsed));
+                                const snapped = Math.round(clamped * 2) / 2;
+                                setConfig((prev) => ({ ...prev, platformFeePercent: snapped }));
+                            }}
                             className="w-32 px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
                         />
                         <span className="text-sm text-slate-500">% of transaction value</span>

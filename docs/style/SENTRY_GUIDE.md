@@ -5,10 +5,12 @@ This document provides standards for error tracking and performance monitoring u
 ## Initialization
 
 ### Vite + React Configuration
+
 Initialization happens in the app entry point. Do not repeat `Sentry.init` elsewhere.
 - **Entry point**: `src/main.tsx` (call `Sentry.init` before rendering)
 
 ### Baseline Setup
+
 ```javascript
 import * as Sentry from "@sentry/react";
 
@@ -24,9 +26,11 @@ Sentry.init({
 ## Instrumentation
 
 ### Exception Catching
+
 Use `Sentry.captureException(error)` in `try/catch` blocks.
 
 ### Performance Tracing
+
 Use `Sentry.startSpan` for meaningful actions (clicks, API calls).
 
 ```javascript
@@ -40,6 +44,7 @@ Sentry.startSpan({
 ```
 
 ## Structured Logging
+
 Reference the logger using `const { logger } = Sentry`. Use `logger.fmt` for variables.
 
 | Level | Usage Example |

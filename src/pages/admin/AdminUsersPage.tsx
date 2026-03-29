@@ -4,7 +4,7 @@ import {
     RefreshCw, ChevronDown,
 } from 'lucide-react';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, Timestamp, limit, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
 import type { UserData } from '../../context/AuthContext';
 
 type UserRow = UserData & { createdAt?: Timestamp };
@@ -26,22 +26,44 @@ const AdminUsersPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState<'all' | 'seeker' | 'employer' | 'admin'>('all');
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [lastVisibleDoc, setLastVisibleDoc] = useState<QueryDocumentSnapshot | null>(null);
+    const [isLastPage, setIsLastPage] = useState(false);
 
-    const load = async () => {
+    const PAGE_SIZE = 50;
+
+    const load = async (append = false) => {
         setLoading(true);
+        setLoadError(null);
         try {
-            const snap = await getDocs(
-                query(collection(db, 'users'), orderBy('createdAt', 'desc'))
+            let usersQuery = query(
+                collection(db, 'users'),
+                orderBy('createdAt', 'desc'),
+                limit(PAGE_SIZE),
             );
-            setUsers(snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserRow)));
+            if (append && lastVisibleDoc) {
+                usersQuery = query(
+                    collection(db, 'users'),
+                    orderBy('createdAt', 'desc'),
+                    startAfter(lastVisibleDoc),
+                    limit(PAGE_SIZE),
+                );
+            }
+
+            const snap = await getDocs(usersQuery);
+            const newRows = snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserRow));
+            setUsers(prev => append ? [...prev, ...newRows] : newRows);
+            setLastVisibleDoc(snap.docs[snap.docs.length - 1] ?? null);
+            setIsLastPage(snap.docs.length < PAGE_SIZE);
         } catch (err) {
             console.error('[AdminUsersPage] load error:', err);
+            setLoadError('Failed to load users. Please retry.');
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => { void load(); }, []);
+    useEffect(() => { void load(false); }, []);
 
     const filtered = users.filter(u => {
         const matchRole = roleFilter === 'all' || u.role === roleFilter;
@@ -61,7 +83,7 @@ const AdminUsersPage: React.FC = () => {
                     <p className="text-xs text-slate-400 mt-0.5">{users.length} total accounts</p>
                 </div>
                 <button
-                    onClick={() => { void load(); }}
+                    onClick={() => { void load(false); }}
                     className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
                 >
                     <RefreshCw className="w-3.5 h-3.5" /> Refresh
@@ -99,6 +121,10 @@ const AdminUsersPage: React.FC = () => {
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
                     <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
                     <p className="text-sm text-slate-400">Loading users...</p>
+                </div>
+            ) : loadError ? (
+                <div className="bg-white rounded-2xl border border-red-200 p-8 text-center">
+                    <p className="text-red-600 font-semibold">{loadError}</p>
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-16 text-center">
@@ -156,6 +182,16 @@ const AdminUsersPage: React.FC = () => {
                             ))}
                         </tbody>
                     </table>
+                    {!isLastPage && (
+                        <div className="p-4 border-t border-slate-100 text-center">
+                            <button
+                                onClick={() => { void load(true); }}
+                                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                            >
+                                Load More
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

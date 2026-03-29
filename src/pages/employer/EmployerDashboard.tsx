@@ -41,7 +41,7 @@ export const EmployerDashboard: React.FC = () => {
         })
         .slice(0, 5);
 
-    const companyName = userData?.displayName ?? 'your company';
+    const companyName = userData?.displayName;
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">

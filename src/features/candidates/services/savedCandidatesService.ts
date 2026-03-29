@@ -13,6 +13,10 @@ function docId(employerId: string, candidateId: string): string {
 
 export const SavedCandidatesService = {
     async save(employerId: string, candidate: CandidateSearchResult): Promise<void> {
+        if (!candidate.id) {
+            throw new Error('Candidate ID is required');
+        }
+
         const ref = doc(db, COLLECTION, docId(employerId, candidate.id));
         await setDoc(ref, {
             employerId,
@@ -36,6 +40,14 @@ export const SavedCandidatesService = {
     async getSavedByEmployer(employerId: string): Promise<CandidateSearchResult[]> {
         const q = query(collection(db, COLLECTION), where('employerId', '==', employerId));
         const snap = await getDocs(q);
-        return snap.docs.map(d => (d.data() as { snapshot: CandidateSearchResult }).snapshot);
+        return snap.docs
+            .map((d) => d.data())
+            .flatMap((data) => {
+                if (!('snapshot' in data) || typeof data.snapshot !== 'object' || data.snapshot === null) {
+                    console.warn('[SavedCandidatesService] Skipping malformed saved candidate document');
+                    return [];
+                }
+                return [data.snapshot as CandidateSearchResult];
+            });
     },
 };

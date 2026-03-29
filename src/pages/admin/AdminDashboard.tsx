@@ -16,12 +16,22 @@ interface RecentItem {
     id: string;
     text: string;
     sub: string;
-    ts: string;
+}
+
+interface HealthStatus {
+    label: string;
+    status: 'healthy' | 'unhealthy';
+    detail: string;
 }
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState<LiveStats | null>(null);
     const [recentActivity, setRecentActivity] = useState<RecentItem[]>([]);
+    const [healthStatuses, setHealthStatuses] = useState<HealthStatus[]>([
+        { label: 'Firebase Auth', status: 'unhealthy', detail: 'Status checks coming soon' },
+        { label: 'Firestore', status: 'unhealthy', detail: 'Status checks coming soon' },
+        { label: 'AI Proxy (Express)', status: 'unhealthy', detail: 'Status checks coming soon' },
+    ]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -50,9 +60,14 @@ const AdminDashboard = () => {
                     const ts = data.createdAt instanceof Timestamp
                         ? data.createdAt.toDate().toLocaleDateString()
                         : 'Recently';
-                    return { id: d.id, text: `New ${role} registered: ${name}`, sub: ts, ts };
+                    return { id: d.id, text: `New ${role} registered: ${name}`, sub: ts };
                 });
                 setRecentActivity(items);
+                setHealthStatuses([
+                    { label: 'Firebase Auth', status: 'unhealthy', detail: 'Status checks coming soon' },
+                    { label: 'Firestore', status: 'unhealthy', detail: 'Status checks coming soon' },
+                    { label: 'AI Proxy (Express)', status: 'unhealthy', detail: 'Status checks coming soon' },
+                ]);
             } catch (err) {
                 console.error('[AdminDashboard] stats load error:', err);
             } finally {
@@ -124,33 +139,17 @@ const AdminDashboard = () => {
                                 System Health
                             </h3>
                             <div className="space-y-5">
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-xs font-medium">
-                                        <span className="text-slate-600">Firebase Auth</span>
-                                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Operational</span>
+                                {healthStatuses.map((item) => (
+                                    <div key={item.label} className="space-y-2">
+                                        <div className="flex items-center justify-between text-xs font-medium">
+                                            <span className="text-slate-600">{item.label}</span>
+                                            <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-semibold">
+                                                Placeholder
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-slate-400">{item.detail}</p>
                                     </div>
-                                    <div className="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-emerald-500 rounded-full w-full"></div>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-xs font-medium">
-                                        <span className="text-slate-600">Firestore</span>
-                                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Operational</span>
-                                    </div>
-                                    <div className="w-full h-2 bg-emerald-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-emerald-500 rounded-full w-full"></div>
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-xs font-medium">
-                                        <span className="text-slate-600">AI Proxy (Express)</span>
-                                        <span className="bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-semibold">Active</span>
-                                    </div>
-                                    <div className="w-full h-2 bg-sky-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-sky-500 rounded-full w-[95%]"></div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>

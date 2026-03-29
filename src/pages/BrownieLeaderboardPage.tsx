@@ -69,7 +69,6 @@ const BrownieLeaderboardPage: React.FC = () => {
         void load();
     }, [user, userData]);
 
-    const myPointsVal = myPoints;
     const isInTopList = leaders.some(e => e.uid === user?.uid);
 
     return (
@@ -109,7 +108,7 @@ const BrownieLeaderboardPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="text-right shrink-0">
-                                    <p className="text-2xl font-bold text-amber-600 tabular-nums">{myPointsVal.toLocaleString()}</p>
+                                    <p className="text-2xl font-bold text-amber-600 tabular-nums">{myPoints.toLocaleString()}</p>
                                     <p className="text-xs text-slate-400">
                                         {myRank !== null ? `Rank #${myRank}` : '—'}
                                     </p>

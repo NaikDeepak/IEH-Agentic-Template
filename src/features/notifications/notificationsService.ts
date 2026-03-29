@@ -66,10 +66,14 @@ export const NotificationsService = {
     const q = query(collection(db, COL), where("userId", "==", userId), where("read", "==", false))
     const snap = await getDocs(q)
     if (snap.empty) return
-    const batch = writeBatch(db)
-    snap.docs.forEach((d) => {
-      batch.update(d.ref, { read: true })
-    })
-    await batch.commit()
+
+    const unreadDocs = snap.docs
+    for (let i = 0; i < unreadDocs.length; i += 500) {
+      const batch = writeBatch(db)
+      unreadDocs.slice(i, i + 500).forEach((d) => {
+        batch.update(d.ref, { read: true })
+      })
+      await batch.commit()
+    }
   },
 }

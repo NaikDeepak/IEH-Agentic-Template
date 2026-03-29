@@ -49,7 +49,8 @@ export const EmployerJobs: React.FC = () => {
         try {
             await JobService.setJobStatus(job.id, next);
             setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: next } : j));
-        } catch {
+        } catch (err) {
+            console.error('[EmployerJobs] status toggle error:', err);
             setError('Failed to update job status. Please try again.');
         } finally {
             setActionLoading(null);
@@ -62,7 +63,8 @@ export const EmployerJobs: React.FC = () => {
             await JobService.setJobStatus(jobId, 'closed');
             setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'closed' } : j));
             setDeleteConfirm(null);
-        } catch {
+        } catch (err) {
+            console.error('[EmployerJobs] close job error:', err);
             setError('Failed to close job posting. Please try again.');
         } finally {
             setActionLoading(null);
@@ -260,15 +262,16 @@ const JobRow: React.FC<JobRowProps> = ({
                 )}
 
                 {/* Close Job */}
-                <button
-                    onClick={onRequestDelete}
-                    title="Close posting"
-                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-transparent hover:border-red-100 transition-colors"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                {!isClosed && (
+                    <button
+                        onClick={onRequestDelete}
+                        title="Close posting"
+                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-transparent hover:border-red-100 transition-colors"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
+                )}
             </div>
         </div>
     );
 };
-

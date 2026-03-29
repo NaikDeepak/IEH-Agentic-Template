@@ -13,7 +13,7 @@ export const onUserUpdate = onDocumentWritten("users/{userId}", async (event) =>
 
     // User deleted — remove from leaderboard
     if (!event.data?.after?.exists) {
-        await leaderRef.delete().catch(() => {});
+        await leaderRef.delete();
         return;
     }
 

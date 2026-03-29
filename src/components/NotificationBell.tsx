@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Bell, BriefcaseBusiness, Sparkles, Eye, CheckCheck } from 'lucide-react';
+import { Bell, BriefcaseBusiness, Sparkles, Eye, CheckCheck, CircleAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../features/notifications/useNotifications';
 import type { AppNotification } from '../features/notifications/types';
@@ -11,7 +11,26 @@ const TYPE_ICON: Record<AppNotification['type'], React.ReactNode> = {
 };
 
 function timeAgo(ts: AppNotification['createdAt']): string {
-    const secs = Math.floor((Date.now() - ts.toDate().getTime()) / 1000);
+    const createdAtDate = (() => {
+        if (ts && typeof (ts as { toDate?: unknown }).toDate === 'function') {
+            const candidate = (ts as { toDate: () => Date }).toDate();
+            return candidate instanceof Date && !Number.isNaN(candidate.getTime()) ? candidate : null;
+        }
+
+        if (ts instanceof Date) {
+            return Number.isNaN(ts.getTime()) ? null : ts;
+        }
+
+        if (typeof ts === 'number') {
+            const candidate = new Date(ts);
+            return Number.isNaN(candidate.getTime()) ? null : candidate;
+        }
+
+        return null;
+    })();
+
+    if (!createdAtDate) return 'just now';
+    const secs = Math.floor((Date.now() - createdAtDate.getTime()) / 1000);
     if (secs < 60) return 'just now';
     if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
     if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
@@ -80,13 +99,17 @@ export const NotificationBell: React.FC = () => {
                             </div>
                         ) : (
                             notifications.map(n => (
+                                // Defensive fallback for unknown notification types.
+                                // Keeps list item icon slot meaningful even on malformed data.
+                                 
+                                ((icon) => (
                                 <button
                                     key={n.id}
                                     onClick={() => { void handleNotifClick(n); }}
                                     className={`w-full text-left flex items-start gap-3 px-4 py-3.5 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors ${!n.read ? 'bg-sky-50/50' : ''}`}
                                 >
                                     <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                                        {TYPE_ICON[n.type]}
+                                        {icon}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <p className={`text-sm leading-tight ${n.read ? 'text-slate-600' : 'font-semibold text-slate-900'}`}>
@@ -99,6 +122,7 @@ export const NotificationBell: React.FC = () => {
                                         <div className="w-2 h-2 bg-sky-500 rounded-full mt-1.5 shrink-0" />
                                     )}
                                 </button>
+                                ))(TYPE_ICON[n.type] ?? <CircleAlert className="w-4 h-4 text-slate-500" />)
                             ))
                         )}
                     </div>

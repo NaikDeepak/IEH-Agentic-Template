@@ -80,6 +80,7 @@ export const Header: React.FC = () => {
                     <button
                         onClick={toggleTheme}
                         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                        aria-pressed={theme === 'dark'}
                         className="p-2 text-slate-500 hover:text-sky-700 hover:bg-sky-50 rounded-lg transition-colors"
                     >
                         {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

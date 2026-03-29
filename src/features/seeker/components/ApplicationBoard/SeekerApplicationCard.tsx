@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Application } from '../../../applications/types';
@@ -31,6 +31,16 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
     const [notes, setNotes] = useState(application.notes ?? '');
     const [reminderDate, setReminderDate] = useState(application.reminder_date ?? '');
     const [saving, setSaving] = useState(false);
+    const [notesSaveError, setNotesSaveError] = useState<string | null>(null);
+    const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+    useEffect(() => {
+        setNotes(application.notes ?? '');
+        const incomingReminder = application.reminder_date ?? '';
+        setReminderDate(incomingReminder && incomingReminder < today ? today : incomingReminder);
+        setNotesSaveError(null);
+        setNotesOpen(false);
+    }, [application.id, application.notes, application.reminder_date, today]);
 
     const style = {
         transform: CSS.Translate.toString(transform),
@@ -54,10 +64,12 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
         e.stopPropagation();
         if (!application.id) return;
         setSaving(true);
+        setNotesSaveError(null);
         try {
             await ApplicationService.updateApplicationNotes(application.id, notes, reminderDate);
         } catch (err) {
             console.error('[SeekerApplicationCard] notes save error:', err);
+            setNotesSaveError('Failed to save notes. Please try again.');
         } finally {
             setSaving(false);
         }
@@ -155,7 +167,8 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
                         <input
                             type="date"
                             value={reminderDate}
-                            onChange={(e) => { setReminderDate(e.target.value); }}
+                            min={today}
+                            onChange={(e) => { setReminderDate(e.target.value < today ? today : e.target.value); }}
                             className="flex-1 text-xs px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sky-400 bg-white"
                             aria-label="Reminder date"
                         />
@@ -168,6 +181,11 @@ export const SeekerApplicationCard: React.FC<SeekerApplicationCardProps> = ({
                             Save
                         </button>
                     </div>
+                    {notesSaveError && (
+                        <p className="text-xs text-red-600" role="alert">
+                            {notesSaveError}
+                        </p>
+                    )}
                 </div>
             )}
         </div>

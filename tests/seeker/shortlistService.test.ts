@@ -50,6 +50,15 @@ vi.mock('firebase/firestore', () => {
             }
             toDate() { return new Date(this.seconds * 1000); }
         },
+        VectorValue: class {
+            private values: number[];
+            constructor(values: number[]) {
+                this.values = values;
+            }
+            toArray() {
+                return this.values;
+            }
+        },
         getFirestore: vi.fn(() => ({}))
     };
 });

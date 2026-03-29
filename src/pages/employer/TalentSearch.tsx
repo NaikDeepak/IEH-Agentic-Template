@@ -20,6 +20,7 @@ export const TalentSearch: React.FC = () => {
         setLoading(true);
         setError(null);
         setHasSearched(true);
+        setSelectedCandidate(null);
         setResults([]); // Clear previous results while loading
 
         try {

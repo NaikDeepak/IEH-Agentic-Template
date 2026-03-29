@@ -93,7 +93,12 @@ export const CompanyEditor: React.FC = () => {
     { key: 'location', label: 'Headquarters' },
     { key: 'video_url', label: 'Video' },
   ];
-  const filledCount = COMPLETENESS_FIELDS.filter(f => !!formData[f.key]).length;
+  const isFilled = (value: unknown) => {
+    if (value == null) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    return Boolean(value);
+  };
+  const filledCount = COMPLETENESS_FIELDS.filter(f => isFilled(formData[f.key])).length;
   const completenessPercent = Math.round((filledCount / COMPLETENESS_FIELDS.length) * 100);
 
   const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
@@ -149,8 +154,8 @@ export const CompanyEditor: React.FC = () => {
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
           {COMPLETENESS_FIELDS.map(f => (
-            <span key={f.key} className={`text-[11px] flex items-center gap-1 ${formData[f.key] ? 'text-emerald-600' : 'text-slate-400'}`}>
-              {formData[f.key] ? '✓' : '○'} {f.label}
+            <span key={f.key} className={`text-[11px] flex items-center gap-1 ${isFilled(formData[f.key]) ? 'text-emerald-600' : 'text-slate-400'}`}>
+              {isFilled(formData[f.key]) ? '✓' : '○'} {f.label}
             </span>
           ))}
         </div>

@@ -44,6 +44,10 @@ describe('tokenizer', () => {
         it('prefixes with loc: and normalizes spaces', () => {
             expect(tokenizeLocation('San Francisco')).toBe('loc:san-francisco');
         });
+
+        it('collapses consecutive spaces to a single dash', () => {
+            expect(tokenizeLocation('New   York')).toBe('loc:new-york');
+        });
         
         it('returns null for short locations', () => {
             expect(tokenizeLocation('A')).toBeNull();

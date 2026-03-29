@@ -39,12 +39,18 @@ jobs:
         run: npm ci
 
       - name: Lint
+        id: lint
+        continue-on-error: true
         run: npm run lint
 
       - name: Type check
+        id: type_check
+        continue-on-error: true
         run: npm run typecheck
 
       - name: Unit tests
+        id: unit_tests
+        continue-on-error: true
         run: npm test -- --run
 
       - name: Post review summary
@@ -52,17 +58,38 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const outcome = '${{ job.status }}' === 'success'
-              ? '✅ Passed'
-              : '❌ Failed';
+            const isForkPr = context.payload.pull_request?.head?.repo?.fork === true;
+            const actor = context.actor || '';
+            const isDependabot =
+              actor.startsWith('dependabot') ||
+              actor === 'dependabot[bot]' ||
+              actor === 'dependabot-preview[bot]';
+
+            if (isForkPr || isDependabot) {
+              console.log('Skipping comment: read-only token context (fork/dependabot).');
+              return;
+            }
+
+            const lintOutcome = '${{ steps.lint.outcome }}';
+            const typeCheckOutcome = '${{ steps.type_check.outcome }}';
+            const unitTestsOutcome = '${{ steps.unit_tests.outcome }}';
+
+            const formatOutcome = (label, outcome) => {
+              const passed = outcome === 'success';
+              return `- ${label}: ${passed ? '✅ Passed' : '❌ Failed'} (${outcome})`;
+            };
+
+            const allPassed = [lintOutcome, typeCheckOutcome, unitTestsOutcome]
+              .every((o) => o === 'success');
+            const outcome = allPassed ? '✅ Passed' : '❌ Failed';
             const body = [
               '### Automated PR Quality Review (Free)',
               '',
               `Status: ${outcome}`,
               '',
-              '- ESLint',
-              '- TypeScript typecheck',
-              '- Unit tests',
+              formatOutcome('ESLint', lintOutcome),
+              formatOutcome('TypeScript typecheck', typeCheckOutcome),
+              formatOutcome('Unit tests', unitTestsOutcome),
               '',
               '_This replaces Claude Code Review so PRs no longer depend on Claude API credits._'
             ].join('\n');

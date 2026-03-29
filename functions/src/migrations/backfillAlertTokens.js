@@ -11,7 +11,10 @@ import { generateAlertTokens } from '../utils/tokenizer.js';
 import * as readline from 'readline';
 
 // Determine target project
-const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID || 'india-emp-hub';
+const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID;
+if (!PROJECT_ID || !PROJECT_ID.trim()) {
+    throw new Error('VITE_FIREBASE_PROJECT_ID must be set before running backfillAlertTokens migration.');
+}
 const IS_PRODUCTION = PROJECT_ID === 'india-emp-hub';
 
 // Initialize Firebase Admin if not already done

@@ -25,6 +25,8 @@ dotenv.config();
 const MIN_QUERY_LENGTH = 2;
 const MAX_SUGGESTIONS = 5;
 const SUGGEST_SCAN_LIMIT = 150;
+const DEFAULT_VECTOR_LIMIT = 10;
+const MAX_VECTOR_LIMIT = 100;
 
 // Initialize Firebase Admin SDK
 initializeApp();
@@ -182,7 +184,7 @@ const handleError = (res, error, context) => {
 // Helper to generate embedding logic moved to src/lib/ai/generation.js
 
 // Helper to run vector search via Firebase Admin SDK
-const runVectorSearch = async (collectionName, queryVector, filters = [], limit = 10) => {
+const runVectorSearch = async (collectionName, queryVector, filters = [], limit = DEFAULT_VECTOR_LIMIT) => {
     if (!queryVector || !Array.isArray(queryVector)) {
         throw new Error("Invalid queryVector: must be an array");
     }
@@ -192,11 +194,16 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
     const collRef = db.collection(collectionName);
     const vectorValue = FieldValue.vector(queryVector);
 
+    const parsedLimit = Number(limit);
+    const sanitizedLimit = Number.isFinite(parsedLimit)
+        ? Math.max(1, Math.min(MAX_VECTOR_LIMIT, Math.floor(parsedLimit)))
+        : DEFAULT_VECTOR_LIMIT;
+
     // Fetch 5x to account for post-filtering
     const vectorQuery = collRef.findNearest({
         vectorField: 'embedding',
         queryVector: vectorValue,
-        limit: Number(limit) * 5,
+        limit: Math.min(MAX_VECTOR_LIMIT * 5, sanitizedLimit * 5),
         distanceMeasure: 'COSINE'
     });
 
@@ -240,7 +247,7 @@ const runVectorSearch = async (collectionName, queryVector, filters = [], limit 
         );
     }
     
-    return filteredResults.slice(0, Number(limit));
+    return filteredResults.slice(0, sanitizedLimit);
 };
 
 // Helper to construct equality filter
@@ -474,7 +481,7 @@ app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
-app.get("/api/jobs/suggest", requireAuth, suggestJobsHandler);
+app.get("/api/jobs/suggest", requireAuth, suggestLimiter, suggestJobsHandler);
 app.post("/api/jobs/search", requireAuth, searchLimiter, searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
@@ -643,4 +650,3 @@ export const reaper = onSchedule("every 24 hours", async (event) => {
 export * from "./src/triggers/onApplicationCreate.js";
 export * from "./src/triggers/onJobCreate.js";
 export * from "./src/triggers/onUserUpdate.js";
-

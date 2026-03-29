@@ -1,4 +1,4 @@
-import type { Timestamp, FieldValue } from "firebase/firestore";
+import type { Timestamp, FieldValue, VectorValue } from "firebase/firestore";
 
 export interface JobSearchFilters {
     workMode: string;
@@ -49,7 +49,7 @@ export interface JobPosting {
     expiresAt?: Timestamp | FieldValue;
     created_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
-    embedding?: number[] | FieldValue; // Vector embedding for search (FieldValue covers VectorValue writes)
+    embedding?: number[] | VectorValue | FieldValue;
 }
 
 export interface CreateJobInput {

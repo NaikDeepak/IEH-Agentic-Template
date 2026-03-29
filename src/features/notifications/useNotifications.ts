@@ -21,12 +21,25 @@ export function useNotifications() {
     const unreadCount = notifications.filter(n => !n.read).length;
 
     const markRead = async (id: string) => {
-        await NotificationsService.markRead(id);
+        try {
+            await NotificationsService.markRead(id);
+            return { success: true as const };
+        } catch (error) {
+            return { success: false as const, error: error as Error };
+        }
     };
 
     const markAllRead = async () => {
-        if (!user) return;
-        await NotificationsService.markAllRead(user.uid);
+        if (!user) {
+            return { success: false as const, error: new Error('User not authenticated') };
+        }
+
+        try {
+            await NotificationsService.markAllRead(user.uid);
+            return { success: true as const };
+        } catch (error) {
+            return { success: false as const, error: error as Error };
+        }
     };
 
     return { notifications, unreadCount, markRead, markAllRead };

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Dark mode: triggered by .dark class on <html> */
-@variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;

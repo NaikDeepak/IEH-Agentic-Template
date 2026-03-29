@@ -68,6 +68,7 @@ export const JobsPage: React.FC = () => {
     const [suggestions, setSuggestions] = useState<string[]>([]);
     const [applyingJob, setApplyingJob] = useState<JobPosting | null>(null);
     const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
+    const [saveInFlightIds, setSaveInFlightIds] = useState<Set<string>>(new Set());
 
     const userId = user?.uid ?? null;
 
@@ -173,16 +174,41 @@ export const JobsPage: React.FC = () => {
 
     const handleSaveJob = async (jobId: string) => {
         if (!userId) return;
-        const isSaved = savedJobIds.has(jobId);
-        if (isSaved) {
-            await SavedJobsService.unsave(userId, jobId);
+        if (saveInFlightIds.has(jobId)) return;
+
+        setSaveInFlightIds(prev => new Set([...prev, jobId]));
+        const wasSaved = savedJobIds.has(jobId);
+        if (wasSaved) {
             setSavedJobIds(prev => { const next = new Set(prev); next.delete(jobId); return next; });
         } else {
-            const posting = await JobService.getJobById(jobId);
-            if (posting) {
+            setSavedJobIds(prev => new Set([...prev, jobId]));
+        }
+
+        const isSaved = savedJobIds.has(jobId);
+        try {
+            if (isSaved) {
+                await SavedJobsService.unsave(userId, jobId);
+            } else {
+                const posting = await JobService.getJobById(jobId);
+                if (!posting) {
+                    throw new Error('Job not found while saving');
+                }
                 await SavedJobsService.save(userId, posting);
-                setSavedJobIds(prev => new Set([...prev, jobId]));
             }
+        } catch (err) {
+            console.error('[JobsPage] save toggle failed:', err);
+            setSavedJobIds(prev => {
+                const next = new Set(prev);
+                if (wasSaved) next.add(jobId);
+                else next.delete(jobId);
+                return next;
+            });
+        } finally {
+            setSaveInFlightIds(prev => {
+                const next = new Set(prev);
+                next.delete(jobId);
+                return next;
+            });
         }
     };
 
@@ -369,7 +395,7 @@ export const JobsPage: React.FC = () => {
             {applyingJob && (
                 <ApplyModal
                     job={applyingJob}
-                    isOpen={true}
+                    isOpen={!!applyingJob}
                     onClose={() => { setApplyingJob(null); }}
                 />
             )}
