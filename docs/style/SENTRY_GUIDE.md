@@ -4,15 +4,13 @@ This document provides standards for error tracking and performance monitoring u
 
 ## Initialization
 
-### Next.js Configuration
-Initialization happens in specific files. Do not repeat `Sentry.init` elsewhere.
-- **Client**: `instrumentation-client.(js|ts)`
-- **Server**: `sentry.server.config.ts`
-- **Edge**: `sentry.edge.config.ts`
+### Vite + React Configuration
+Initialization happens in the app entry point. Do not repeat `Sentry.init` elsewhere.
+- **Entry point**: `src/main.tsx` (call `Sentry.init` before rendering)
 
 ### Baseline Setup
 ```javascript
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from "@sentry/react";
 
 Sentry.init({
   dsn: "https://45f65fa704413041e1a11a99ce3c7b30@o4510482186960896.ingest.us.sentry.io/4510482187878401",

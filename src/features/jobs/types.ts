@@ -49,7 +49,7 @@ export interface JobPosting {
     expiresAt?: Timestamp | FieldValue;
     created_at: Timestamp | FieldValue;
     updated_at: Timestamp | FieldValue;
-    embedding?: number[]; // Vector embedding for search
+    embedding?: number[] | FieldValue; // Vector embedding for search (FieldValue covers VectorValue writes)
 }
 
 export interface CreateJobInput {

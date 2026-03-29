@@ -146,7 +146,7 @@ export const JobService = {
                 `.trim();
 
                 const embedding = await fetchEmbedding(semanticText);
-                updateData.embedding = vector(embedding) as unknown as number[];
+                updateData.embedding = vector(embedding);
 
                 if ('skills' in updates) {
                     updateData.skills = finalSkills.map(s => s.toLowerCase());

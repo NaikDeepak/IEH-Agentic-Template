@@ -446,7 +446,7 @@ export const searchCandidatesHandler = async (req, res) => {
 app.post("/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/embedding", requireAuth, embeddingHandler);
-app.get("/jobs/suggest", suggestJobsHandler);
+app.get("/jobs/suggest", requireAuth, suggestJobsHandler);
 app.post("/jobs/search", searchJobsHandler);
 app.post("/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 
@@ -455,7 +455,7 @@ app.post("/api/ai/generate-jd", requireAuth, generateJdHandler);
 app.post("/api/ai/generate-job-assist", requireAuth, generateJobAssistHandler);
 app.post("/api/ai/embedding", requireAuth, embeddingHandler);
 app.post("/api/embedding", requireAuth, embeddingHandler);
-app.get("/api/jobs/suggest", suggestJobsHandler);
+app.get("/api/jobs/suggest", requireAuth, suggestJobsHandler);
 app.post("/api/jobs/search", searchJobsHandler);
 app.post("/api/candidates/search", requireAuth, requireRole(['employer', 'admin']), searchCandidatesHandler);
 

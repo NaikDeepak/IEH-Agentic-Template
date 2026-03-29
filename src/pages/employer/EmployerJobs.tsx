@@ -6,7 +6,7 @@ import { Header } from '../../components/Header';
 import type { JobPosting, JobStatus } from '../../features/jobs/types';
 import {
     Loader2, Plus, Briefcase, Users, Pencil, Trash2,
-    PauseCircle, PlayCircle, ChevronDown,
+    PauseCircle, PlayCircle,
 } from 'lucide-react';
 
 const STATUS_BADGE: Record<JobStatus, string> = {
@@ -272,5 +272,3 @@ const JobRow: React.FC<JobRowProps> = ({
     );
 };
 
-// Suppress unused-import warning — ChevronDown kept for future filter dropdown
-void ChevronDown;

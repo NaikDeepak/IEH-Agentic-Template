@@ -97,12 +97,8 @@ service cloud.firestore {
                         && request.resource.data.browniePoints < resource.data.browniePoints
                       )
                     )
-                    // Embedding validation
-                    && ( !('embedding' in request.resource.data)
-                         || (request.resource.data.embedding is list
-                             && request.resource.data.embedding.size() == 768
-                             && request.resource.data.embedding[0] is number
-                             && request.resource.data.embedding[767] is number) )
+                    // Embedding: VectorValue type cannot be checked in rules; security is enforced by the
+                    // employer role check above. Allow any value (or absent).
                     // Validate expiresAt if present (max 4 days + 1 hour buffer)
                     && ( !('expiresAt' in request.resource.data)
                          || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
@@ -157,11 +153,8 @@ service cloud.firestore {
                       'company_id',
                       'company_bio'
                     ])
-                    && ( !('embedding' in request.resource.data)
-                         || (request.resource.data.embedding is list
-                             && request.resource.data.embedding.size() == 768
-                             && request.resource.data.embedding[0] is number
-                             && request.resource.data.embedding[767] is number) )
+                    // Embedding: VectorValue type cannot be checked in rules; security is enforced by the
+                    // employer role check above. Allow any value (or absent).
                     // validate status values on creation
                     && request.resource.data.status in ['active', 'passive', 'closed'];
 
@@ -197,15 +190,16 @@ service cloud.firestore {
                     // optional: validate status values if you use them
                     && ( !('status' in request.resource.data)
                          || request.resource.data.status in ['active', 'passive', 'closed'] )
-                    // validate embedding shape if present
-                    && ( !('embedding' in request.resource.data)
-                         || (request.resource.data.embedding is list
-                             && request.resource.data.embedding.size() == 768
-                             && request.resource.data.embedding[0] is number
-                             && request.resource.data.embedding[767] is number) )
+                    // Embedding: VectorValue type cannot be checked in rules; security is enforced by the
+                    // employer role check above. Allow any value (or absent).
                     // Validate expiresAt if present (max 4 days + 1 hour buffer)
                     && ( !('expiresAt' in request.resource.data)
                          || request.resource.data.expiresAt <= request.time + duration.value(4, 'd') + duration.value(1, 'h') );
+
+      // Only the job owner can delete their own job posting
+      allow delete: if request.auth != null
+                    && request.auth.token.role == 'employer'
+                    && resource.data.employer_id == request.auth.uid;
     }
 
     // Applications Collection
@@ -307,8 +301,11 @@ service cloud.firestore {
     match /notifications/{notifId} {
       // Only the recipient can read their notifications
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      // Authenticated users can create notifications (e.g. employer → seeker contact message)
+      // Client-side creates are restricted to self-notifications only.
+      // Cross-user notifications (e.g., employer → seeker) must go through
+      // Cloud Functions (Admin SDK bypasses rules).
       allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
                     && request.resource.data.keys().hasOnly([
                       'userId', 'type', 'title', 'message', 'read', 'link', 'createdAt'
                     ])

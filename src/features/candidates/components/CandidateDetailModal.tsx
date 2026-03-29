@@ -122,11 +122,8 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-                role="button"
-                tabIndex={-1}
-                aria-label="Close modal"
+                role="presentation"
                 onClick={onClose}
-                onKeyDown={(e) => { if (e.key === 'Escape') { onClose(); } }}
             />
 
             <FocusTrap>
@@ -270,7 +267,7 @@ export const CandidateDetailModal: React.FC<CandidateDetailModalProps> = ({
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    <p className="text-xs font-semibold text-slate-600">Message to {candidate.name}</p>
+                                    <p className="text-xs font-semibold text-slate-600">Message to {candidate.displayName ?? 'candidate'}</p>
                                     <textarea
                                         value={contactMessage}
                                         onChange={(e) => { setContactMessage(e.target.value); }}

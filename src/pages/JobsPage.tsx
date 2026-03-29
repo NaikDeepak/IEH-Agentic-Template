@@ -95,7 +95,7 @@ export const JobsPage: React.FC = () => {
 
     useEffect(() => {
         if (!userId || !isSeeker) return;
-        void SavedJobsService.getSavedJobIds(userId).then(ids => { setSavedJobIds(ids); });
+        void SavedJobsService.getSavedJobIds(userId).then(ids => { setSavedJobIds(ids); }).catch(() => { /* non-critical, saved state unavailable */ });
     }, [userId, isSeeker]);
 
     const handleSearch = async (term: string, filters: Partial<JobSearchFilters>) => {

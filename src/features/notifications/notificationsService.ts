@@ -18,7 +18,7 @@ export const NotificationsService = {
             limit(30)
         );
         return onSnapshot(q, snap => {
-            cb(snap.docs.map(d => ({ id: d.id, ...d.data() } as AppNotification)));
+            cb(snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) } as AppNotification)));
         });
     },
 
