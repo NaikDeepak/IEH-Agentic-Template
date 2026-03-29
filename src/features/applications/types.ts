@@ -16,6 +16,8 @@ export interface Application {
     updated_at: Timestamp | FieldValue;
     needsFollowUp?: boolean;
     nudgeReason?: string;
+    notes?: string;
+    reminder_date?: string;
 }
 
 export interface SubmitApplicationInput {

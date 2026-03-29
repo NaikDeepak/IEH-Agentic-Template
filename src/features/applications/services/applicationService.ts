@@ -50,6 +50,26 @@ export const ApplicationService = {
     }
   },
 
+  async updateApplicationNotes(appId: string, notes: string, reminderDate: string): Promise<void> {
+    try {
+      const docRef = doc(db, APPLICATIONS_COLLECTION, appId);
+      await updateDoc(docRef, {
+        notes,
+        reminder_date: reminderDate,
+        updated_at: serverTimestamp(),
+      });
+    } catch (error) {
+      const notesPreview = notes.length > 120 ? `${notes.slice(0, 120)}…` : notes;
+      console.error("[ApplicationService] Firestore notes update FAILED", {
+        appId,
+        notesPreview,
+        reminderDate,
+        error,
+      });
+      throw error;
+    }
+  },
+
   async submitApplication(data: SubmitApplicationInput): Promise<string> {
     const docRef = await addDoc(collection(db, APPLICATIONS_COLLECTION), {
       ...data,

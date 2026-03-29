@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CompanyService } from '../../features/companies/services/companyService';
 import { useAuth } from '../../hooks/useAuth';
-import { Loader2, ArrowLeft, Save, Globe, MapPin, Video, FileText } from 'lucide-react';
+import { Loader2, ArrowLeft, Save, Globe, MapPin, Video, FileText, CheckCircle2 } from 'lucide-react';
 import type { Company } from '../../features/companies/types';
 
 export const CompanyEditor: React.FC = () => {
@@ -85,6 +85,22 @@ export const CompanyEditor: React.FC = () => {
     }
   };
 
+  const COMPLETENESS_FIELDS: { key: keyof typeof formData; label: string }[] = [
+    { key: 'name', label: 'Company Name' },
+    { key: 'bio', label: 'Company Bio' },
+    { key: 'tagline', label: 'Tagline' },
+    { key: 'website', label: 'Website' },
+    { key: 'location', label: 'Headquarters' },
+    { key: 'video_url', label: 'Video' },
+  ];
+  const isFilled = (value: unknown) => {
+    if (value == null) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    return Boolean(value);
+  };
+  const filledCount = COMPLETENESS_FIELDS.filter(f => isFilled(formData[f.key])).length;
+  const completenessPercent = Math.round((filledCount / COMPLETENESS_FIELDS.length) * 100);
+
   const inputClasses = "w-full px-4 py-2.5 border border-slate-200 bg-white text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all placeholder:text-slate-400";
   const labelClasses = "text-xs font-medium text-slate-500 mb-1.5 flex items-center gap-1.5";
 
@@ -114,6 +130,35 @@ export const CompanyEditor: React.FC = () => {
         <p className="text-base text-slate-500 mt-2">
           Help candidates understand <span className="text-slate-700 font-medium">who you are</span> and <span className="text-slate-700 font-medium">why they should join</span>.
         </p>
+      </div>
+
+      {/* Profile completeness */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-soft p-5 mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            {completenessPercent === 100
+              ? <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              : <div className="w-4 h-4 rounded-full border-2 border-slate-300" />
+            }
+            <span className="text-sm font-semibold text-slate-700">Profile Completeness</span>
+          </div>
+          <span className={`text-sm font-bold ${completenessPercent === 100 ? 'text-emerald-600' : completenessPercent >= 50 ? 'text-sky-700' : 'text-amber-600'}`}>
+            {completenessPercent}%
+          </span>
+        </div>
+        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${completenessPercent === 100 ? 'bg-emerald-500' : completenessPercent >= 50 ? 'bg-sky-600' : 'bg-amber-500'}`}
+            style={{ width: `${completenessPercent}%` }}
+          />
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
+          {COMPLETENESS_FIELDS.map(f => (
+            <span key={f.key} className={`text-[11px] flex items-center gap-1 ${isFilled(formData[f.key]) ? 'text-emerald-600' : 'text-slate-400'}`}>
+              {isFilled(formData[f.key]) ? '✓' : '○'} {f.label}
+            </span>
+          ))}
+        </div>
       </div>
 
       {error && (
