@@ -12,7 +12,39 @@ export interface JobAlert {
     location: string;
     jobType: string;
     active: boolean;
+    searchTokens?: string[];
     createdAt: Timestamp;
+}
+
+/**
+ * Generate search tokens for a job alert (client-side tokenizer)
+ */
+function generateAlertTokens(keywords: string, location: string, jobType: string): string[] {
+    const tokens: string[] = [];
+    
+    // Tokenize keywords (comma or space separated)
+    const keywordTokens = keywords
+        .toLowerCase()
+        .trim()
+        .split(/[,\s]+/)
+        .filter(t => t.length >= 2)
+        .slice(0, 20);
+    tokens.push(...keywordTokens);
+    
+    // Add location token
+    const locNormalized = location.toLowerCase().trim().replace(/\s+/g, '-');
+    if (locNormalized.length >= 2) {
+        tokens.push(`loc:${locNormalized}`);
+    }
+    
+    // Add job type token
+    const typeNormalized = jobType.toLowerCase().trim();
+    if (typeNormalized) {
+        tokens.push(`type:${typeNormalized}`);
+    }
+    
+    // Deduplicate
+    return [...new Set(tokens)];
 }
 
 const COL = 'jobAlerts';
@@ -31,12 +63,14 @@ export const JobAlertsService = {
         location: string,
         jobType: string
     ): Promise<string> {
+        const searchTokens = generateAlertTokens(keywords, location, jobType);
         const ref = await addDoc(collection(db, COL), {
             seekerId,
             keywords: keywords.trim(),
             location: location.trim(),
             jobType,
             active: true,
+            searchTokens,
             createdAt: serverTimestamp(),
         });
         return ref.id;

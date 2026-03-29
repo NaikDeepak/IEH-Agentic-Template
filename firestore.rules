@@ -395,7 +395,7 @@ service cloud.firestore {
                     && request.auth.token.role == 'seeker'
                     && request.resource.data.seekerId == request.auth.uid
                     && request.resource.data.keys().hasOnly([
-                      'seekerId', 'keywords', 'location', 'jobType', 'active', 'createdAt'
+                      'seekerId', 'keywords', 'location', 'jobType', 'active', 'createdAt', 'searchTokens'
                     ]);
       // Only active toggle is allowed from client
       allow update: if request.auth != null
