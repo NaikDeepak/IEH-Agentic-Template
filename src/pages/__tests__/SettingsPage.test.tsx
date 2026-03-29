@@ -4,8 +4,12 @@ import { MemoryRouter } from 'react-router-dom';
 import { SettingsPage } from '../SettingsPage';
 import { useAuth } from '../../hooks/useAuth';
 
+const { mockRef } = vi.hoisted(() => ({
+    mockRef: { current: null as any }
+}));
+
 vi.mock('../../hooks/useAuth', () => ({
-    useAuth: vi.fn(),
+    useAuth: vi.fn(() => mockRef.current),
 }));
 
 const mockNavigate = vi.fn();
@@ -34,7 +38,7 @@ describe('SettingsPage', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        (useAuth as Mock).mockReturnValue(baseAuth);
+        mockRef.current = baseAuth;
     });
 
     const renderPage = () =>
@@ -50,7 +54,7 @@ describe('SettingsPage', () => {
     });
 
     it('shows employer role label for employer users', () => {
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, userData: { role: 'employer' } });
+        mockRef.current = { ...baseAuth, userData: { role: 'employer' } };
         renderPage();
         expect(screen.getByText('Employer')).toBeInTheDocument();
     });
@@ -88,7 +92,11 @@ describe('SettingsPage', () => {
     });
 
     it('shows error when updateDisplayName fails', async () => {
-        updateDisplayNameMock.mockRejectedValue(new Error('network error'));
+        const errorMsg = 'Failed to update name';
+        updateDisplayNameMock.mockImplementation(() => {
+            mockRef.current = { ...baseAuth, error: errorMsg };
+            return Promise.reject(new Error(errorMsg));
+        });
         renderPage();
 
         fireEvent.click(screen.getByRole('button', { name: /edit/i }));
@@ -97,7 +105,7 @@ describe('SettingsPage', () => {
         fireEvent.keyDown(input, { key: 'Enter' });
 
         await waitFor(() => {
-            expect(screen.getByText(/failed to update name/i)).toBeInTheDocument();
+            expect(screen.getByText(errorMsg)).toBeInTheDocument();
         });
     });
 
@@ -116,13 +124,17 @@ describe('SettingsPage', () => {
     });
 
     it('shows error when password reset fails', async () => {
-        resetPasswordMock.mockRejectedValue(new Error('send failed'));
+        const errorMsg = 'Failed to send reset email';
+        resetPasswordMock.mockImplementation(() => {
+            mockRef.current = { ...baseAuth, error: errorMsg };
+            return Promise.reject(new Error(errorMsg));
+        });
         renderPage();
 
         fireEvent.click(screen.getByRole('button', { name: /send password reset email/i }));
 
         await waitFor(() => {
-            expect(screen.getByText(/failed to send reset email/i)).toBeInTheDocument();
+            expect(screen.getByText(errorMsg)).toBeInTheDocument();
         });
     });
 
@@ -159,8 +171,16 @@ describe('SettingsPage', () => {
 
     it('shows friendly error when deleteAccount fails with requires-recent-login', async () => {
         const friendlyMessage = 'For security, please sign out and sign back in before deleting your account.';
-        deleteAccountMock.mockRejectedValue(new Error('auth/requires-recent-login'));
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, error: friendlyMessage, deleteAccount: deleteAccountMock });
+        
+        deleteAccountMock.mockImplementation(() => {
+            mockRef.current = { 
+                ...baseAuth, 
+                error: friendlyMessage, 
+                deleteAccount: deleteAccountMock 
+            };
+            return Promise.reject(new Error('auth/requires-recent-login'));
+        });
+
         renderPage();
 
         fireEvent.click(screen.getByRole('button', { name: /^delete$/i }));
@@ -211,7 +231,7 @@ describe('SettingsPage', () => {
     });
 
     it('shows admin role label for admin users', () => {
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, userData: { role: 'admin' } });
+        mockRef.current = { ...baseAuth, userData: { role: 'admin' } };
         renderPage();
         expect(screen.getByText('Admin')).toBeInTheDocument();
     });
@@ -220,7 +240,7 @@ describe('SettingsPage', () => {
 
     it('opens email edit mode when Change button is clicked', () => {
         const verifyEmailUpdateMock = vi.fn();
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        mockRef.current = { ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock };
         renderPage();
         fireEvent.click(screen.getByRole('button', { name: /change/i }));
         expect(screen.getByPlaceholderText(/new email address/i)).toBeInTheDocument();
@@ -228,7 +248,7 @@ describe('SettingsPage', () => {
 
     it('cancels email edit on Escape key', () => {
         const verifyEmailUpdateMock = vi.fn();
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        mockRef.current = { ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock };
         renderPage();
         fireEvent.click(screen.getByRole('button', { name: /change/i }));
         const input = screen.getByPlaceholderText(/new email address/i);
@@ -238,7 +258,7 @@ describe('SettingsPage', () => {
 
     it('submits email update and shows confirmation', async () => {
         const verifyEmailUpdateMock = vi.fn().mockResolvedValue(undefined);
-        (useAuth as Mock).mockReturnValue({ ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock });
+        mockRef.current = { ...baseAuth, verifyEmailUpdate: verifyEmailUpdateMock };
         renderPage();
         fireEvent.click(screen.getByRole('button', { name: /change/i }));
         const input = screen.getByPlaceholderText(/new email address/i);
